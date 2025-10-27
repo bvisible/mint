@@ -5,6 +5,7 @@ import datetime
 from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool import create_payment_entry_bts, create_journal_entry_bts
 from erpnext.accounts.party import get_party_account
 from erpnext import get_default_cost_center
+from mint.apis.vat_utils import calculate_journal_entry_with_vat
 
 @frappe.whitelist()
 def clear_clearing_date(voucher_type: str, voucher_name: str):
@@ -198,16 +199,30 @@ def create_bulk_bank_entry_and_reconcile(bank_transactions: list,
                                         voucher_type=("Credit Card Entry" if is_credit_card else "Bank Entry"))
 
 @frappe.whitelist(methods=['POST'])
-def create_bank_entry_and_reconcile(bank_transaction_name: str, 
+def create_bank_entry_and_reconcile(bank_transaction_name: str,
                                     cheque_date: str | datetime.date,
                                     posting_date: str | datetime.date,
                                     cheque_no: str,
                                     entries: list,
                                     user_remark: str = None,
                                     voucher_type: str = "Bank Entry",
-                                    dimensions: dict = None):
+                                    dimensions: dict = None,
+                                    is_vat_excluded: bool = False,
+                                    disable_vat_calculation: bool = False):
     """
         Create a bank entry and reconcile it with the bank transaction
+
+        Args:
+            bank_transaction_name: Name of the bank transaction
+            cheque_date: Reference date
+            posting_date: Posting date
+            cheque_no: Reference number
+            entries: List of entry dictionaries
+            user_remark: Remarks
+            voucher_type: Voucher type (Bank Entry or Credit Card Entry)
+            dimensions: Additional dimensions
+            is_vat_excluded: If True, amounts are HT. If False, amounts are TTC (default)
+            disable_vat_calculation: If True, disable automatic VAT calculation
     """
     # Create a new journal entry based on the bank transaction
     bank_transaction = frappe.db.get_values(
@@ -256,18 +271,27 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str,
     
     if not dimensions:
         dimensions = {}
-    
-    for entry in entries:
+
+    # Calculate entries with VAT if applicable
+    processed_entries = calculate_journal_entry_with_vat(
+        entries=entries,
+        is_withdrawal=is_withdrawal,
+        is_vat_excluded=is_vat_excluded,
+        disable_vat_calculation=disable_vat_calculation,
+        company=company
+    )
+
+    for entry in processed_entries:
         # Check if this account is a Income or Expense Account
         # If it is, and no cost center is added, select the company default cost center
-        cost_center = dimensions.get("cost_center")
+        cost_center = entry.get("cost_center") or dimensions.get("cost_center")
 
         if not cost_center:
             report_type = frappe.get_cached_value("Account", entry["account"], "report_type")
             if report_type == "Profit and Loss":
                 # Cost center is required
                 cost_center = default_cost_center
-        
+
         credit = entry["amount"] if not is_withdrawal else 0
         debit = entry["amount"] if is_withdrawal else 0
         bank_entry.append("accounts", {
@@ -297,6 +321,126 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str,
         "payment_name": bank_entry.name,
         "amount": paid_amount,
     }]), is_new_voucher=True)
+
+
+@frappe.whitelist(methods=['POST'])
+def preview_bank_entry_with_vat(bank_transaction_name: str,
+                                cheque_date: str | datetime.date,
+                                posting_date: str | datetime.date,
+                                cheque_no: str,
+                                entries: list,
+                                user_remark: str = None,
+                                voucher_type: str = "Bank Entry",
+                                dimensions: dict = None,
+                                is_vat_excluded: bool = False,
+                                disable_vat_calculation: bool = False):
+    """
+        Preview a bank entry with VAT calculations without saving
+
+        Returns:
+            Dictionary with journal entry structure including all lines (base + VAT)
+    """
+    # Get bank transaction details
+    bank_transaction = frappe.db.get_values(
+        "Bank Transaction",
+        bank_transaction_name,
+        fieldname=["name", "deposit", "withdrawal", "bank_account", "currency", "unallocated_amount"],
+        as_dict=True,
+    )[0]
+
+    bank_account = frappe.get_cached_value("Bank Account", bank_transaction.bank_account, "account")
+    company = frappe.get_cached_value("Account", bank_account, "company")
+
+    default_cost_center = get_default_cost_center(company)
+
+    is_withdrawal = bank_transaction.withdrawal > 0.0
+
+    if not dimensions:
+        dimensions = {}
+
+    # Calculate entries with VAT if applicable
+    processed_entries = calculate_journal_entry_with_vat(
+        entries=entries,
+        is_withdrawal=is_withdrawal,
+        is_vat_excluded=is_vat_excluded,
+        disable_vat_calculation=disable_vat_calculation,
+        company=company
+    )
+
+    # Build the journal entry structure
+    journal_entry_lines = []
+
+    # Add bank account line
+    if is_withdrawal:
+        journal_entry_lines.append({
+            "account": bank_account,
+            "bank_account": bank_transaction.bank_account,
+            "credit": bank_transaction.unallocated_amount,
+            "debit": 0,
+            "party_type": None,
+            "party": None,
+            "user_remark": None,
+            "cost_center": None,
+            "_is_bank_account": True
+        })
+    else:
+        journal_entry_lines.append({
+            "account": bank_account,
+            "bank_account": bank_transaction.bank_account,
+            "debit": bank_transaction.unallocated_amount,
+            "credit": 0,
+            "party_type": None,
+            "party": None,
+            "user_remark": None,
+            "cost_center": None,
+            "_is_bank_account": True
+        })
+
+    # Add processed entries (with VAT)
+    for entry in processed_entries:
+        cost_center = entry.get("cost_center") or dimensions.get("cost_center")
+
+        if not cost_center:
+            report_type = frappe.get_cached_value("Account", entry["account"], "report_type")
+            if report_type == "Profit and Loss":
+                cost_center = default_cost_center
+
+        credit = entry["amount"] if not is_withdrawal else 0
+        debit = entry["amount"] if is_withdrawal else 0
+
+        journal_entry_lines.append({
+            "account": entry["account"],
+            "debit": debit,
+            "credit": credit,
+            "cost_center": cost_center,
+            "party_type": entry.get("party_type"),
+            "party": entry.get("party"),
+            "user_remark": entry.get("user_remark"),
+            "_is_vat_line": entry.get("_is_vat_line", False),
+            "_is_base_for_vat": entry.get("_is_base_for_vat", False),
+            "_source_account": entry.get("_source_account")
+        })
+
+    # Calculate totals
+    total_debit = sum(line["debit"] for line in journal_entry_lines)
+    total_credit = sum(line["credit"] for line in journal_entry_lines)
+
+    return {
+        "voucher_type": voucher_type,
+        "company": company,
+        "posting_date": posting_date,
+        "cheque_date": cheque_date,
+        "cheque_no": cheque_no,
+        "user_remark": user_remark,
+        "accounts": journal_entry_lines,
+        "total_debit": total_debit,
+        "total_credit": total_credit,
+        "is_balanced": abs(total_debit - total_credit) < 0.01,
+        "currency": bank_transaction.currency,
+        "is_vat_excluded": is_vat_excluded,
+        "disable_vat_calculation": disable_vat_calculation
+    }
+
 
 @frappe.whitelist(methods=['POST'])
 def create_bulk_payment_entry_and_reconcile(bank_transaction_names: list, 
@@ -377,7 +521,15 @@ def get_account_defaults(account: str):
     """
         Get the default cost center and write off account for an account
     """
-    company, report_type = frappe.db.get_value("Account", account, ["company", "report_type"])
+    if not account:
+        return ""
+
+    result = frappe.db.get_value("Account", account, ["company", "report_type"], as_dict=False)
+
+    if not result:
+        return ""
+
+    company, report_type = result
 
     return get_default_cost_center(company) if report_type == "Profit and Loss" else  ""
 
