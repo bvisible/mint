@@ -188,12 +188,13 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
     const loading = previewLoading || submitLoading
     const error = previewError || submitError
 
-    const onPreview = (data: BankEntryFormData) => {
+    const onPreview = (data: BankEntryFormData, overrideVatDisabled?: boolean) => {
+        const vatDisabledValue = overrideVatDisabled !== undefined ? overrideVatDisabled : vatDisabled
         previewBankEntry({
             bank_transaction_name: selectedTransaction.name,
             ...data,
             is_vat_excluded: false,  // Always use TTC mode (amounts include VAT)
-            disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
+            disable_vat_calculation: vatDisabledValue  // Use state to disable VAT calculation
         }).then((result) => {
             console.log("Preview API Response:", result)
             // frappe-react-sdk wraps the response in a 'message' field
@@ -234,6 +235,12 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
         setPreviewData(null)
     }
 
+    const handleVatToggle = () => {
+        const newVatDisabled = !vatDisabled
+        setVatDisabled(newVatDisabled)
+        onPreview(form.getValues(), newVatDisabled)
+    }
+
     // If we have preview data, show the preview
     if (previewData) {
         return <JournalEntryPreview
@@ -242,12 +249,11 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             onConfirm={onConfirmSubmit}
             loading={loading}
             vatDisabled={vatDisabled}
-            setVatDisabled={setVatDisabled}
-            onRePreview={() => onPreview(form.getValues())}
+            onVatToggle={handleVatToggle}
         />
     }
     return <Form {...form}>
-        <form onSubmit={form.handleSubmit(onPreview)}>
+        <form onSubmit={form.handleSubmit((data) => onPreview(data))}>
             <div className='flex flex-col gap-4'>
                 {error && <ErrorBanner error={error} />}
                 <div className='grid grid-cols-2 gap-4'>
@@ -623,11 +629,10 @@ interface JournalEntryPreviewProps {
     onConfirm: () => void
     loading?: boolean
     vatDisabled: boolean
-    setVatDisabled: (value: boolean) => void
-    onRePreview: () => void
+    onVatToggle: () => void
 }
 
-const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled, setVatDisabled, onRePreview }: JournalEntryPreviewProps) => {
+const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled, onVatToggle }: JournalEntryPreviewProps) => {
     // Check if preview contains VAT lines
     const hasVatLines = preview?.accounts?.some(account => account._is_vat_line) ?? false
 
@@ -731,10 +736,7 @@ const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled,
                 <div className='flex justify-center'>
                     <Button
                         variant={vatDisabled ? "default" : "outline"}
-                        onClick={() => {
-                            setVatDisabled(!vatDisabled)
-                            onRePreview()
-                        }}
+                        onClick={onVatToggle}
                         disabled={loading}
                         type="button"
                     >
