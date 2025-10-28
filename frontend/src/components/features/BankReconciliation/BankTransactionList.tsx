@@ -7,7 +7,8 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { formatCurrency } from "@/lib/numbers"
 import { getCompanyCurrency } from "@/lib/company"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircle2, DollarSign, ExternalLink, Undo2, XCircle } from "lucide-react"
+import { CheckCircle2, ExternalLink, Undo2, XCircle } from "lucide-react"
+import { ChfIcon } from "@/components/ui/chf-icon"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Badge } from "@/components/ui/badge"
 import { useGetBankTransactions } from "./utils"
@@ -124,7 +125,7 @@ const BankTransactionListView = () => {
 
         {data && data.message.length === 0 &&
             <Alert variant='default'>
-                <DollarSign />
+                <ChfIcon />
                 <AlertTitle>{_("No transactions found")}</AlertTitle>
                 <AlertDescription>
                     {_("There are no transactions in the system for the selected bank account and dates.")}

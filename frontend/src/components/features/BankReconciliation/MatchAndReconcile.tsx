@@ -10,7 +10,8 @@ import Fuse from 'fuse.js'
 import { LinkedPayment, UnreconciledTransaction, useGetRuleForTransaction, useGetUnreconciledTransactions, useGetVouchersForTransaction, useIsTransactionWithdrawal, useReconcileTransaction } from "./utils"
 import { useDebounceValue } from 'usehooks-ts'
 import { Input } from "@/components/ui/input"
-import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, DollarSign, Landmark, Loader2, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
+import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, Landmark, Loader2, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
+import { ChfIcon } from "@/components/ui/chf-icon"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -191,13 +192,13 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="min-w-32 h-9 text-left">
-                            {typeFilter === 'All' ? <DollarSign className="w-4 h-4 text-muted-foreground" /> : typeFilter === 'Debits' ? <ArrowUpRight className="w-4 h-4 text-destructive" /> : <ArrowDownRight className="w-4 h-4 text-green-500" />}
+                            {typeFilter === 'All' ? <ChfIcon className="w-4 h-4 text-muted-foreground" /> : typeFilter === 'Debits' ? <ArrowUpRight className="w-4 h-4 text-destructive" /> : <ArrowDownRight className="w-4 h-4 text-green-500" />}
                             {_(typeFilter)}
                             <ChevronDown className="w-4 h-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => onTypeFilterChange('All')}><DollarSign /> {_("All")}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onTypeFilterChange('All')}><ChfIcon /> {_("All")}</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onTypeFilterChange('Debits')}><ArrowUpRight className="text-destructive" /> {_("Debits")}</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onTypeFilterChange('Credits')}><ArrowDownRight className="text-green-500" /> {_("Credits")}</DropdownMenuItem>
                     </DropdownMenuContent>
