@@ -3,7 +3,7 @@ import { bankRecRecordJournalEntryModalAtom, bankRecSelectedTransactionAtom, ban
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import _ from "@/lib/translate"
 import { UnreconciledTransaction, useGetRuleForTransaction, useRefreshUnreconciledTransactions } from "./utils"
-import { useFieldArray, useForm, useFormContext, useWatch, Controller } from "react-hook-form"
+import { useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form"
 import { JournalEntry } from "@/types/Accounts/JournalEntry"
 import { getCompanyCostCenter, getCompanyCurrency } from "@/lib/company"
 import { FrappeConfig, FrappeContext, useFrappePostCall } from "frappe-react-sdk"
@@ -16,7 +16,6 @@ import { Form } from "@/components/ui/form"
 import { useCallback, useContext, useMemo, useRef, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { Plus, Trash2 } from "lucide-react"
 import { formatCurrency } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
@@ -151,10 +150,12 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
     const setIsOpen = useSetAtom(bankRecRecordJournalEntryModalAtom)
 
     const [previewData, setPreviewData] = useState<any>(null)
+    const [vatDisabled, setVatDisabled] = useState(false)
 
     const onClose = () => {
         setIsOpen(false)
         setPreviewData(null)
+        setVatDisabled(false)
     }
 
     const isWithdrawal = (selectedTransaction.withdrawal && selectedTransaction.withdrawal > 0) ? true : false
@@ -166,8 +167,6 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             posting_date: selectedTransaction.date,
             cheque_no: (selectedTransaction.reference_number || selectedTransaction.description || '').slice(0, 140),
             user_remark: selectedTransaction.description,
-            is_vat_excluded: false, // Default to TTC (amounts include VAT)
-            disable_vat_calculation: false,
             entries: [
                 {
                     account: rule?.account ?? '',
@@ -192,7 +191,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
     const onPreview = (data: BankEntryFormData) => {
         previewBankEntry({
             bank_transaction_name: selectedTransaction.name,
-            ...data
+            ...data,
+            is_vat_excluded: false,  // Always use TTC mode (amounts include VAT)
+            disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
         }).then((result) => {
             console.log("Preview API Response:", result)
             // frappe-react-sdk wraps the response in a 'message' field
@@ -209,7 +210,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
 
         createBankEntry({
             bank_transaction_name: selectedTransaction.name,
-            ...data
+            ...data,
+            is_vat_excluded: false,  // Always use TTC mode (amounts include VAT)
+            disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
         }).then(() => {
             toast.success(_("Bank Entry Created"), {
                 duration: 4000,
@@ -238,6 +241,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             onEdit={onEditPreview}
             onConfirm={onConfirmSubmit}
             loading={loading}
+            vatDisabled={vatDisabled}
+            setVatDisabled={setVatDisabled}
+            onRePreview={() => onPreview(form.getValues())}
         />
     }
     return <Form {...form}>
@@ -281,24 +287,6 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                             name='user_remark'
                             label={"Remarks"}
                         />
-                        <div className='flex items-center gap-2'>
-                            <Controller
-                                name='is_vat_excluded'
-                                control={form.control}
-                                render={({ field }) => (
-                                    <div className='flex items-center gap-2'>
-                                        <Checkbox
-                                            id='is_vat_excluded'
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                        <Label htmlFor='is_vat_excluded' className='cursor-pointer'>
-                                            {_("Amount excluding VAT (HT)")}
-                                        </Label>
-                                    </div>
-                                )}
-                            />
-                        </div>
                     </div>
                 </div>
 
@@ -634,14 +622,20 @@ interface JournalEntryPreviewProps {
     onEdit: () => void
     onConfirm: () => void
     loading?: boolean
+    vatDisabled: boolean
+    setVatDisabled: (value: boolean) => void
+    onRePreview: () => void
 }
 
-const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading }: JournalEntryPreviewProps) => {
+const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled, setVatDisabled, onRePreview }: JournalEntryPreviewProps) => {
+    // Check if preview contains VAT lines
+    const hasVatLines = preview?.accounts?.some(account => account._is_vat_line) ?? false
+
     // Safety check
     if (!preview || !preview.accounts) {
         return (
             <div className='flex flex-col gap-4 p-4'>
-                <ErrorBanner error={new Error(_("Preview data is invalid. Please try again."))} />
+                <ErrorBanner error={{ message: _("Preview data is invalid. Please try again.") } as any} />
                 <DialogFooter>
                     <Button variant={'outline'} onClick={onEdit}>
                         {_("Back to Form")}
@@ -731,6 +725,23 @@ const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading }: JournalEnt
                     </div>
                 )}
             </div>
+
+            {/* Show Remove/Add VAT button only if VAT lines are present or were removed */}
+            {(hasVatLines || vatDisabled) && (
+                <div className='flex justify-center'>
+                    <Button
+                        variant={vatDisabled ? "default" : "outline"}
+                        onClick={() => {
+                            setVatDisabled(!vatDisabled)
+                            onRePreview()
+                        }}
+                        disabled={loading}
+                        type="button"
+                    >
+                        {vatDisabled ? _("With VAT") : _("Remove VAT")}
+                    </Button>
+                </div>
+            )}
 
             <DialogFooter>
                 <Button variant={'outline'} onClick={onEdit} disabled={loading}>
