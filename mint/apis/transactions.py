@@ -7,7 +7,12 @@ def get_bank_transactions(bank_account, from_date=None, to_date=None, all_transa
     filters.append(["bank_account", "=", bank_account])
     filters.append(["docstatus", "=", 1])
     if not all_transactions:
+        # Filter for unreconciled transactions using both unallocated_amount and status
+        # This ensures transactions are properly filtered even when accounting dimensions
+        # differ between journal entry lines (which can cause get_allocated_amount()
+        # to incorrectly calculate allocations in ERPNext's subtract_allocations function)
         filters.append(["unallocated_amount", ">", 0.0])
+        filters.append(["status", "=", "Unreconciled"])
     if to_date:
         filters.append(["date", "<=", to_date])
     if from_date:
