@@ -36,3 +36,6 @@ export const bankRecRecordJournalEntryModalAtom = atom(false)
 export const bankRecUnreconcileModalAtom = atom<string>('')
 
 export const bankRecMatchFilters = atomWithStorage<string[]>('mint-bank-rec-match-filters', ['payment_entry', 'journal_entry'])
+
+/** Include draft Journal Entries in matching - default true */
+export const bankRecIncludeDraftJE = atomWithStorage<boolean>('mint-bank-rec-include-draft-je', true)

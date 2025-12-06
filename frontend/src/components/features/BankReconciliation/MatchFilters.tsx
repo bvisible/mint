@@ -3,13 +3,17 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import _ from '@/lib/translate'
 import { Settings } from 'lucide-react'
-import { bankRecMatchFilters } from './bankRecAtoms'
-import { useAtom } from 'jotai'
+import { bankRecMatchFilters, bankRecIncludeDraftJE } from './bankRecAtoms'
+import { useAtom, useAtomValue } from 'jotai'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 
 const MatchFilters = () => {
+
+    const matchFilters = useAtomValue(bankRecMatchFilters)
+    const showDraftOption = matchFilters.includes('journal_entry')
+
     return (
         <Popover>
             <Tooltip>
@@ -30,6 +34,7 @@ const MatchFilters = () => {
                     <Separator />
                     <ToggleSwitch label={_("Payment Entry")} id="payment_entry" />
                     <ToggleSwitch label={_("Journal Entry")} id="journal_entry" />
+                    {showDraftOption && <IncludeDraftToggle />}
                     <ToggleSwitch label={_("Purchase Invoice")} id="purchase_invoice" />
                     <ToggleSwitch label={_("Sales Invoice")} id="sales_invoice" />
                     <ToggleSwitch label={_("Expense Claim")} id="expense_claim" />
@@ -53,6 +58,18 @@ const ToggleSwitch = ({ label, id }: { label: string, id: string }) => {
             }
         }} />
         <Label htmlFor={id}>{label}</Label>
+    </div>
+}
+
+const IncludeDraftToggle = () => {
+
+    const [includeDraft, setIncludeDraft] = useAtom(bankRecIncludeDraftJE)
+
+    return <div className="flex items-center space-x-2 pl-4">
+        <Switch id="include_draft_je" checked={includeDraft} onCheckedChange={setIncludeDraft} />
+        <Label htmlFor="include_draft_je" className="text-muted-foreground text-sm">
+            {_("Include Drafts")}
+        </Label>
     </div>
 }
 

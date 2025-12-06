@@ -10,7 +10,7 @@ import Fuse from 'fuse.js'
 import { LinkedPayment, UnreconciledTransaction, useGetRuleForTransaction, useGetUnreconciledTransactions, useGetVouchersForTransaction, useIsTransactionWithdrawal, useReconcileTransaction } from "./utils"
 import { useDebounceValue } from 'usehooks-ts'
 import { Input } from "@/components/ui/input"
-import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, Landmark, Loader2, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
+import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, FileEdit, Landmark, Loader2, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
 import { ChfIcon } from "@/components/ui/chf-icon"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -683,6 +683,12 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                         <Badge variant='secondary' className={cn("text-sm rounded-sm", isSuggested ? "bg-amber-100 text-amber-700" : "bg-secondary")}>{_(voucher.doctype)}</Badge>
+                        {voucher.is_draft === 1 && (
+                            <Badge variant='outline' className="text-sm rounded-sm border-orange-400 text-orange-600 bg-orange-50">
+                                <FileEdit className="w-3 h-3 mr-1" />
+                                {_("Draft")}
+                            </Badge>
+                        )}
                         <a target="_blank"
                             href={`/app/${slug(voucher.doctype)}/${voucher.name}`}
                             className="underline underline-offset-2 font-medium"

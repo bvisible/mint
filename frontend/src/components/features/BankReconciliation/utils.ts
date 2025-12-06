@@ -1,4 +1,4 @@
-import { bankRecDateAtom, bankRecMatchFilters, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from './bankRecAtoms'
+import { bankRecDateAtom, bankRecMatchFilters, bankRecIncludeDraftJE, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from './bankRecAtoms'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
 import { useFrappeGetCall, useFrappeGetDoc, useFrappePostCall, useSWRConfig } from 'frappe-react-sdk'
@@ -86,7 +86,8 @@ export interface LinkedPayment {
     posting_date: string,
     party_type?: string,
     party?: string,
-    currency: string
+    currency: string,
+    is_draft?: number  // 1 if draft Journal Entry, undefined otherwise
 }
 
 export const useGetBankTransactions = () => {
@@ -106,14 +107,16 @@ export const useGetVouchersForTransaction = (transaction: UnreconciledTransactio
     const dates = useAtomValue(bankRecDateAtom)
 
     const matchFilters = useAtomValue(bankRecMatchFilters)
+    const includeDraftJE = useAtomValue(bankRecIncludeDraftJE)
 
-    return useFrappeGetCall<{ message: LinkedPayment[] }>('erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool.get_linked_payments', {
+    return useFrappeGetCall<{ message: LinkedPayment[] }>('mint.apis.bank_reconciliation.get_linked_payments', {
         bank_transaction_name: transaction.name,
         document_types: matchFilters ?? ['payment_entry', 'journal_entry'],
         from_date: dates.fromDate,
         to_date: dates.toDate,
-        filter_by_reference_date: 0
-    }, `bank-reconciliation-vouchers-${transaction.name}-${dates.fromDate}-${dates.toDate}-${matchFilters.join(',')}`, {
+        filter_by_reference_date: 0,
+        include_draft_je: includeDraftJE ? 1 : 0
+    }, `bank-reconciliation-vouchers-${transaction.name}-${dates.fromDate}-${dates.toDate}-${matchFilters.join(',')}-draft-${includeDraftJE}`, {
         revalidateOnFocus: false
     })
 }

@@ -593,3 +593,171 @@ def search_for_transfer_transaction(transaction_id: str):
 
     return None
 
+
+@frappe.whitelist(methods=['GET'])
+def get_linked_payments(
+    bank_transaction_name: str,
+    document_types=None,
+    from_date: str = None,
+    to_date: str = None,
+    filter_by_reference_date: int = 0,
+    from_reference_date: str = None,
+    to_reference_date: str = None,
+    include_draft_je: int = 1,
+):
+    """
+    Get linked payments for a bank transaction, with optional support for draft Journal Entries.
+
+    This extends ERPNext's get_linked_payments to include draft Journal Entries,
+    allowing users to reconcile with JEs before submitting them.
+
+    Args:
+        bank_transaction_name: Name of the bank transaction
+        document_types: List of document types to search for
+        from_date: Start date for search
+        to_date: End date for search
+        filter_by_reference_date: Whether to filter by reference date
+        from_reference_date: Start reference date
+        to_reference_date: End reference date
+        include_draft_je: If True, include draft Journal Entries (default: True)
+    """
+    from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool import (
+        get_linked_payments as erpnext_get_linked_payments,
+    )
+
+    # Parse document_types if it's a string (from frontend)
+    if isinstance(document_types, str):
+        document_types = json.loads(document_types)
+
+    # Get submitted vouchers from ERPNext
+    submitted_vouchers = erpnext_get_linked_payments(
+        bank_transaction_name=bank_transaction_name,
+        document_types=document_types,
+        from_date=from_date,
+        to_date=to_date,
+        filter_by_reference_date=filter_by_reference_date,
+        from_reference_date=from_reference_date,
+        to_reference_date=to_reference_date,
+    )
+
+    # If include_draft_je is True and journal_entry is in document_types, get draft JEs
+    if int(include_draft_je) and document_types and 'journal_entry' in document_types:
+        draft_jes = get_draft_journal_entries(
+            bank_transaction_name=bank_transaction_name,
+            from_date=from_date,
+            to_date=to_date,
+            filter_by_reference_date=filter_by_reference_date,
+            from_reference_date=from_reference_date,
+            to_reference_date=to_reference_date,
+        )
+        # Combine and sort by rank
+        all_vouchers = submitted_vouchers + draft_jes
+        return sorted(all_vouchers, key=lambda x: x.get("rank", 0), reverse=True)
+
+    return submitted_vouchers
+
+
+def get_draft_journal_entries(
+    bank_transaction_name: str,
+    from_date: str = None,
+    to_date: str = None,
+    filter_by_reference_date: int = 0,
+    from_reference_date: str = None,
+    to_reference_date: str = None,
+):
+    """
+    Get draft Journal Entries that could match the bank transaction.
+
+    Returns a list of draft JEs with the same structure as get_linked_payments.
+    """
+    from frappe.query_builder.functions import Sum
+    from pypika.terms import ValueWrapper
+    from frappe.utils import cint
+
+    transaction = frappe.get_doc("Bank Transaction", bank_transaction_name)
+    bank_account_details = frappe.db.get_values(
+        "Bank Account", transaction.bank_account, ["account", "company"], as_dict=True
+    )[0]
+    gl_account = bank_account_details.account
+
+    # Determine credit or debit based on transaction type
+    cr_or_dr = "credit" if transaction.withdrawal > 0.0 else "debit"
+
+    je = frappe.qb.DocType("Journal Entry")
+    jea = frappe.qb.DocType("Journal Entry Account")
+
+    amount_field = f"{cr_or_dr}_in_account_currency"
+
+    # Build date filter
+    if cint(filter_by_reference_date):
+        filter_by_date = je.cheque_date.between(from_reference_date, to_reference_date)
+    else:
+        filter_by_date = je.posting_date.between(from_date, to_date)
+
+    # Query for draft Journal Entries (docstatus = 0)
+    subquery = (
+        frappe.qb.from_(jea)
+        .join(je)
+        .on(jea.parent == je.name)
+        .select(
+            Sum(getattr(jea, amount_field)).as_("paid_amount"),
+            ValueWrapper("Journal Entry").as_("doctype"),
+            je.name,
+            je.cheque_no.as_("reference_no"),
+            je.cheque_date.as_("reference_date"),
+            je.pay_to_recd_from.as_("party"),
+            jea.party_type,
+            je.posting_date,
+            jea.account_currency.as_("currency"),
+            ValueWrapper(1).as_("is_draft"),  # Flag to identify drafts
+        )
+        .where(je.docstatus == 0)  # Draft status
+        .where(je.voucher_type != "Opening Entry")
+        .where(jea.account == gl_account)
+        .where(filter_by_date)
+        .groupby(je.name)
+        .orderby(je.cheque_date if cint(filter_by_reference_date) else je.posting_date)
+    )
+
+    # Calculate ranking
+    ref_rank = frappe.qb.terms.Case().when(subquery.reference_no == transaction.reference_number, 1).else_(0)
+    amount_equality = subquery.paid_amount == transaction.unallocated_amount
+    amount_rank = frappe.qb.terms.Case().when(amount_equality, 1).else_(0)
+
+    query = (
+        frappe.qb.from_(subquery)
+        .select(
+            "*",
+            (ref_rank + amount_rank).as_("rank"),  # Slightly lower rank than submitted (no +1)
+        )
+        .where(subquery.paid_amount > 0.0)
+    )
+
+    draft_jes = query.run(as_dict=True)
+
+    # Subtract any existing allocations (same logic as ERPNext)
+    return subtract_allocations_for_drafts(gl_account, draft_jes)
+
+
+def subtract_allocations_for_drafts(gl_account, vouchers):
+    """
+    Subtract any existing Bank Transaction allocations from draft vouchers.
+    """
+    from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool import (
+        get_total_allocated_amount,
+        get_allocated_amount,
+    )
+
+    copied = []
+    voucher_docs = [(voucher.get("doctype"), voucher.get("name")) for voucher in vouchers]
+    voucher_allocated_amounts = get_total_allocated_amount(voucher_docs)
+
+    for voucher in vouchers:
+        if amount := get_allocated_amount(voucher_allocated_amounts, voucher, gl_account):
+            voucher["paid_amount"] -= amount
+
+        if voucher["paid_amount"] > 0:
+            copied.append(voucher)
+
+    return copied
+
