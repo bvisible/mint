@@ -87,7 +87,8 @@ export interface LinkedPayment {
     party_type?: string,
     party?: string,
     currency: string,
-    is_draft?: number  // 1 if draft Journal Entry, undefined otherwise
+    is_draft?: number,  // 1 if draft Journal Entry, undefined otherwise
+    user_remark?: string  // User remark for display (mainly for draft JEs)
 }
 
 export const useGetBankTransactions = () => {

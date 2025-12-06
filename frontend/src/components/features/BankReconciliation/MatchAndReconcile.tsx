@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { MissingFiltersBanner } from "./MissingFiltersBanner"
-import { bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
+import { bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
 import { useMemo, useState } from "react"
 import { getCompanyCurrency } from "@/lib/company"
@@ -10,7 +10,7 @@ import Fuse from 'fuse.js'
 import { LinkedPayment, UnreconciledTransaction, useGetRuleForTransaction, useGetUnreconciledTransactions, useGetVouchersForTransaction, useIsTransactionWithdrawal, useReconcileTransaction } from "./utils"
 import { useDebounceValue } from 'usehooks-ts'
 import { Input } from "@/components/ui/input"
-import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, FileEdit, Landmark, Loader2, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
+import { ArrowDownRight, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, FileEdit, Landmark, Loader2, MessageSquare, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
 import { ChfIcon } from "@/components/ui/chf-icon"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -28,6 +28,7 @@ import _ from "@/lib/translate"
 import TransferModal from "./TransferModal"
 import BankEntryModal from "./BankEntryModal"
 import RecordPaymentModal from "./RecordPaymentModal"
+import DraftJEModal from "./DraftJEModal"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
 import MatchFilters from "./MatchFilters"
@@ -54,6 +55,7 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
         <TransferModal />
         <BankEntryModal />
         <RecordPaymentModal />
+        <DraftJEModal />
     </>
 }
 
@@ -638,6 +640,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
     const selectedBank = useAtomValue(selectedBankAccountAtom)
     const selectedTransaction = useAtomValue(bankRecSelectedTransactionAtom(selectedBank?.name || ''))
+    const setDraftJEModal = useSetAtom(bankRecDraftJEModalAtom)
 
     const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested } = useMemo(() => {
 
@@ -667,6 +670,19 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
     const onClick = () => {
         if (!selectedTransaction) {
+            return
+        }
+        // If this is a draft Journal Entry, open the draft JE modal instead of reconciling directly
+        if (voucher.is_draft === 1 && voucher.doctype === 'Journal Entry') {
+            setDraftJEModal({
+                voucher: {
+                    name: voucher.name,
+                    posting_date: voucher.posting_date,
+                    reference_date: voucher.reference_date,
+                    user_remark: voucher.user_remark,
+                    paid_amount: voucher.paid_amount,
+                }
+            })
             return
         }
         reconcileTransaction(selectedTransaction[0], [voucher])
@@ -744,6 +760,20 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                                 </Tooltip>
                             </span>
                         </div>
+                        {/* Display user_remark if available (truncated) */}
+                        {voucher.user_remark && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 text-sm text-muted-foreground max-w-[300px] cursor-help">
+                                        <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
+                                        <span className="truncate">{voucher.user_remark}</span>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-sm">
+                                    <p className="whitespace-pre-wrap">{voucher.user_remark}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
                     </TooltipProvider>
                 </div>
                 <div>

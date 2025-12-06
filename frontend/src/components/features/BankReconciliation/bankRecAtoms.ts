@@ -39,3 +39,15 @@ export const bankRecMatchFilters = atomWithStorage<string[]>('mint-bank-rec-matc
 
 /** Include draft Journal Entries in matching - default true */
 export const bankRecIncludeDraftJE = atomWithStorage<boolean>('mint-bank-rec-include-draft-je', true)
+
+/** Draft JE modal state - stores the voucher to edit/submit, or null if closed */
+export interface DraftJEModalState {
+    voucher: {
+        name: string
+        posting_date: string
+        reference_date: string
+        user_remark?: string
+        paid_amount: number
+    } | null
+}
+export const bankRecDraftJEModalAtom = atom<DraftJEModalState>({ voucher: null })

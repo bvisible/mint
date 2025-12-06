@@ -709,6 +709,7 @@ def get_draft_journal_entries(
             jea.party_type,
             je.posting_date,
             jea.account_currency.as_("currency"),
+            je.user_remark,  # Include user_remark for display
             ValueWrapper(1).as_("is_draft"),  # Flag to identify drafts
         )
         .where(je.docstatus == 0)  # Draft status
@@ -760,4 +761,67 @@ def subtract_allocations_for_drafts(gl_account, vouchers):
             copied.append(voucher)
 
     return copied
+
+
+@frappe.whitelist(methods=['POST'])
+def submit_draft_je_and_reconcile(
+    bank_transaction_name: str,
+    journal_entry_name: str,
+    posting_date: str | datetime.date = None,
+    cheque_date: str | datetime.date = None,
+    user_remark: str = None,
+):
+    """
+    Submit a draft Journal Entry and reconcile it with the bank transaction.
+
+    This allows users to:
+    1. Update the posting_date and cheque_date to match the bank transaction date
+    2. Add/update the user_remark
+    3. Submit the Journal Entry
+    4. Reconcile with the bank transaction
+
+    Args:
+        bank_transaction_name: Name of the bank transaction
+        journal_entry_name: Name of the draft Journal Entry to submit
+        posting_date: New posting date (optional, uses existing if not provided)
+        cheque_date: New reference date (optional, uses existing if not provided)
+        user_remark: New user remark (optional, uses existing if not provided)
+    """
+    # Get the draft Journal Entry
+    je = frappe.get_doc("Journal Entry", journal_entry_name)
+
+    # Verify it's a draft
+    if je.docstatus != 0:
+        frappe.throw(_("Journal Entry {0} is not a draft").format(journal_entry_name))
+
+    # Update fields if provided
+    if posting_date:
+        je.posting_date = posting_date
+        # Also update posting_date in accounts for proper GL entries
+        for account in je.accounts:
+            account.posting_date = posting_date
+
+    if cheque_date:
+        je.cheque_date = cheque_date
+
+    if user_remark is not None:
+        je.user_remark = user_remark
+
+    # Save and submit the Journal Entry
+    je.save()
+    je.submit()
+
+    # Get the amount for reconciliation
+    bank_transaction = frappe.get_doc("Bank Transaction", bank_transaction_name)
+    if bank_transaction.deposit > 0.0:
+        paid_amount = bank_transaction.deposit
+    else:
+        paid_amount = bank_transaction.withdrawal
+
+    # Reconcile with the bank transaction
+    return reconcile_vouchers(bank_transaction_name, json.dumps([{
+        "payment_doctype": "Journal Entry",
+        "payment_name": je.name,
+        "amount": paid_amount,
+    }]), is_new_voucher=False)
 
