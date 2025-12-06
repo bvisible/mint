@@ -787,6 +787,9 @@ def submit_draft_je_and_reconcile(
         cheque_date: New reference date (optional, uses existing if not provided)
         user_remark: New user remark (optional, uses existing if not provided)
     """
+    # Get the bank transaction first (needed for reference_no fallback and reconciliation)
+    bank_transaction = frappe.get_doc("Bank Transaction", bank_transaction_name)
+
     # Get the draft Journal Entry
     je = frappe.get_doc("Journal Entry", journal_entry_name)
 
@@ -803,6 +806,9 @@ def submit_draft_je_and_reconcile(
 
     if cheque_date:
         je.cheque_date = cheque_date
+        # If cheque_date is set but cheque_no is empty, use bank transaction reference
+        if not je.cheque_no:
+            je.cheque_no = (bank_transaction.reference_number or bank_transaction.description or "")[:140]
 
     if user_remark is not None:
         je.user_remark = user_remark
@@ -812,7 +818,6 @@ def submit_draft_je_and_reconcile(
     je.submit()
 
     # Get the amount for reconciliation
-    bank_transaction = frappe.get_doc("Bank Transaction", bank_transaction_name)
     if bank_transaction.deposit > 0.0:
         paid_amount = bank_transaction.deposit
     else:
