@@ -73,6 +73,8 @@ class MintBankStatementImport(Document):
 				"type": transaction.get("type"),
 				"description": transaction.get("description")
 			})
+		# Save the document to persist extracted transactions
+		self.save()
 	
 	def before_submit(self):
 		# Validate all rows have an amount and a type

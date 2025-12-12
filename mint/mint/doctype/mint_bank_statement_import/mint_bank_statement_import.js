@@ -31,7 +31,7 @@ frappe.ui.form.on("Mint Bank Statement Import", {
                         });
                     }
                 });
-            }, __("Actions"));
+            }).addClass("btn-primary");
         }
     },
 });
