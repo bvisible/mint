@@ -57,11 +57,12 @@ class MintBankStatementImport(Document):
 	
 	def process_pdf(self):
 		"""
-		Process the PDF using Google Document AI and extract the transactions.
+		Process the PDF using Nora OCR and extract the transactions.
+		Replaces Google Document AI with self-hosted LLM-based OCR.
 		"""
-		from mint.apis.google_ai import run_bank_statement_processor
-		
-		transactions = run_bank_statement_processor(self.file)
+		from mint.apis.nora_ocr import extract_bank_transactions
+
+		transactions = extract_bank_transactions(self.file)
 		# Order the transactions by date
 		transactions.sort(key=lambda x: frappe.utils.getdate(x.get("date")))
 		self.transactions = []
