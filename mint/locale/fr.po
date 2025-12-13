@@ -1686,3 +1686,79 @@ msgstr "us"
 msgid "{0} {1} does not exist"
 msgstr "{0} {1} n'existe pas"
 
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Analyze and extract with Nora AI"
+msgstr "Analyser et extraire avec Nora AI"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Nora AI analysis in progress..."
+msgstr "Analyse Nora AI en cours..."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Continue in background"
+msgstr "Continuer en arrière-plan"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Retry with Nora AI"
+msgstr "Réessayer avec Nora AI"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "OCR processing in progress..."
+msgstr "Traitement OCR en cours..."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Starting OCR processing..."
+msgstr "Démarrage du traitement OCR..."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Failed to start OCR processing"
+msgstr "Échec du démarrage du traitement OCR"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Document Scan Already Exists"
+msgstr "Le Document Scan existe déjà"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "A Document Scan with the same name already exists:"
+msgstr "Un Document Scan avec le même nom existe déjà :"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "What would you like to do?"
+msgstr "Que souhaitez-vous faire ?"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Scan Anyway"
+msgstr "Scanner quand même"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "View Existing"
+msgstr "Voir l'existant"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Processing timeout - please check Document Scan"
+msgstr "Délai de traitement dépassé - veuillez vérifier le Document Scan"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "{0} transactions extracted!"
+msgstr "{0} transactions extraites !"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "OCR Failed"
+msgstr "Échec OCR"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Unknown error"
+msgstr "Erreur inconnue"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Processing continues in background. The page will reload when done."
+msgstr "Le traitement continue en arrière-plan. La page se rechargera une fois terminé."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "Save the document first to enable OCR processing"
+msgstr "Enregistrez d'abord le document pour activer le traitement OCR"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js
+msgid "View Document Scan"
+msgstr "Voir le Document Scan"
+
