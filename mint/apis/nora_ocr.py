@@ -319,7 +319,7 @@ def _normalize_type(type_str: str) -> str:
 
 
 @frappe.whitelist()
-def create_document_scan_for_bank_statement(file_url: str) -> dict:
+def create_document_scan_for_bank_statement(file_url: str, force_create: bool = False) -> dict:
     """
     Create a Document Scan for bank statement extraction.
     OCR runs in background via frappe.enqueue.
@@ -327,12 +327,15 @@ def create_document_scan_for_bank_statement(file_url: str) -> dict:
 
     Args:
         file_url: Frappe file URL to the bank statement PDF
+        force_create: If True, create with suffix if duplicate exists
 
     Returns:
         dict: {
             "success": bool,
             "document_scan_name": str,
-            "message": str
+            "message": str,
+            "duplicate": bool (if a duplicate exists),
+            "existing_name": str (name of existing document if duplicate)
         }
     """
     import json
@@ -347,10 +350,28 @@ def create_document_scan_for_bank_statement(file_url: str) -> dict:
     frappe.logger().info(f"[Mint Nora OCR] Creating Document Scan for bank statement: {file_url}")
 
     try:
-        # Generate a unique document name
+        # Generate base document name
         today = date.today().isoformat()
         file_name = file_url.split("/")[-1].replace(".pdf", "").replace(".PDF", "")
-        generated_name = f"{today}_BankStatement_{file_name}"
+        base_name = f"{today}_BankStatement_{file_name}"
+        generated_name = base_name
+
+        # Check if document with this name already exists
+        if frappe.db.exists("Document Scan", base_name):
+            if not force_create:
+                # Return duplicate info so frontend can ask user
+                return {
+                    "success": False,
+                    "duplicate": True,
+                    "existing_name": base_name,
+                    "message": _("A Document Scan with this name already exists")
+                }
+            else:
+                # Find next available suffix
+                suffix = 2
+                while frappe.db.exists("Document Scan", f"{base_name}-{suffix}"):
+                    suffix += 1
+                generated_name = f"{base_name}-{suffix}"
 
         # Create Document Scan with bank statement prompt via neoffice_theme API
         result = frappe.call(
@@ -483,6 +504,99 @@ def extract_transactions_from_document_scan(doc) -> list:
             normalized_transactions.append(normalized)
 
     return normalized_transactions
+
+
+@frappe.whitelist()
+def start_ocr_processing(docname: str, force_create: bool = False) -> dict:
+    """
+    Start async OCR processing via Document Scan for a Mint Bank Statement Import.
+    Returns immediately with status.
+
+    Args:
+        docname: Name of the Mint Bank Statement Import document
+        force_create: If True, create new scan even if duplicate exists (with suffix)
+
+    Returns:
+        dict with status, document_scan_name, and message
+        If duplicate exists and force_create=False, returns duplicate info
+    """
+    doc = frappe.get_doc("Mint Bank Statement Import", docname)
+
+    if not doc.file:
+        frappe.throw(_("Please upload a file"))
+
+    # Create Document Scan for bank statement (OCR runs in background)
+    result = create_document_scan_for_bank_statement(doc.file, force_create=force_create)
+
+    # Handle duplicate case
+    if result.get("duplicate"):
+        return {
+            "status": "Duplicate",
+            "existing_name": result.get("existing_name"),
+            "message": result.get("message")
+        }
+
+    if result.get("success"):
+        doc.document_scan_name = result.get("document_scan_name")
+        doc.ocr_status = "Processing"
+        doc.save()
+        return {
+            "status": "Processing",
+            "document_scan_name": result.get("document_scan_name"),
+            "message": _("OCR processing started")
+        }
+    else:
+        doc.ocr_status = "Failed"
+        doc.error = result.get("message")
+        doc.save()
+        frappe.throw(result.get("message"))
+
+
+@frappe.whitelist()
+def check_ocr_processing_status(docname: str) -> dict:
+    """
+    Check OCR processing status and populate transactions if completed.
+    Called by frontend polling.
+
+    Args:
+        docname: Name of the Mint Bank Statement Import document
+
+    Returns:
+        dict with status, count (if completed), or error (if failed)
+    """
+    doc = frappe.get_doc("Mint Bank Statement Import", docname)
+
+    if not doc.document_scan_name:
+        return {"status": "Not Started"}
+
+    result = check_document_scan_status(doc.document_scan_name)
+
+    if result.get("status") == "Completed":
+        # Populate transactions table
+        transactions = result.get("transactions", [])
+        doc._populate_transactions(transactions)
+        doc.ocr_status = "Completed"
+        doc.status = "Completed"
+        doc.save()
+        return {
+            "status": "Completed",
+            "count": len(transactions),
+            "message": _("{0} transactions extracted").format(len(transactions))
+        }
+
+    elif result.get("status") == "Failed":
+        doc.ocr_status = "Failed"
+        doc.error = result.get("error")
+        doc.status = "Error"
+        doc.save()
+        return {
+            "status": "Failed",
+            "error": result.get("error")
+        }
+
+    else:
+        # Still processing
+        return {"status": "Processing"}
 
 
 @frappe.whitelist()

@@ -45,90 +45,6 @@ class MintBankStatementImport(Document):
 		else:
 			return string_amount.lower().replace("dr", "").replace(" ", ""), "Withdrawal"
 
-	@frappe.whitelist()
-	def process_file(self):
-		"""
-		Start async OCR processing for the PDF.
-		Returns immediately - use check_processing_status() to poll for completion.
-		"""
-		if not self.file:
-			frappe.throw(_("Please upload a file"))
-
-		if self.file_type != "PDF":
-			frappe.throw(_("Invalid file type"))
-
-		# Start async processing
-		return self.start_ocr_processing()
-
-	@frappe.whitelist()
-	def start_ocr_processing(self):
-		"""
-		Start async OCR processing via Document Scan.
-		Returns immediately with status.
-		"""
-		from mint.apis.nora_ocr import create_document_scan_for_bank_statement
-
-		if not self.file:
-			frappe.throw(_("Please upload a file"))
-
-		# Create Document Scan for bank statement (OCR runs in background)
-		result = create_document_scan_for_bank_statement(self.file)
-
-		if result.get("success"):
-			self.document_scan_name = result.get("document_scan_name")
-			self.ocr_status = "Processing"
-			self.save()
-			return {
-				"status": "Processing",
-				"document_scan_name": result.get("document_scan_name"),
-				"message": _("OCR processing started")
-			}
-		else:
-			self.ocr_status = "Failed"
-			self.error = result.get("message")
-			self.save()
-			frappe.throw(result.get("message"))
-
-	@frappe.whitelist()
-	def check_processing_status(self):
-		"""
-		Check OCR processing status and populate transactions if completed.
-		Called by frontend polling.
-		"""
-		from mint.apis.nora_ocr import check_document_scan_status
-
-		if not self.document_scan_name:
-			return {"status": "Not Started"}
-
-		result = check_document_scan_status(self.document_scan_name)
-
-		if result.get("status") == "Completed":
-			# Populate transactions table
-			transactions = result.get("transactions", [])
-			self._populate_transactions(transactions)
-			self.ocr_status = "Completed"
-			self.status = "Completed"
-			self.save()
-			return {
-				"status": "Completed",
-				"count": len(transactions),
-				"message": _("{0} transactions extracted").format(len(transactions))
-			}
-
-		elif result.get("status") == "Failed":
-			self.ocr_status = "Failed"
-			self.error = result.get("error")
-			self.status = "Error"
-			self.save()
-			return {
-				"status": "Failed",
-				"error": result.get("error")
-			}
-
-		else:
-			# Still processing
-			return {"status": "Processing"}
-
 	def _populate_transactions(self, transactions: list):
 		"""
 		Populate the transactions child table from extracted data.
@@ -168,6 +84,3 @@ class MintBankStatementImport(Document):
 			bank_tx.insert()
 			bank_tx.submit()
 			transaction.imported = 1
-
-
-		
