@@ -10,6 +10,9 @@
   "status",
   "file",
   "file_type",
+  "column_break_ocr",
+  "ocr_status",
+  "document_scan_name",
   "transactions",
   "error",
   "amended_from"
@@ -49,6 +52,24 @@
    "fieldtype": "Select",
    "label": "File Type",
    "options": "PDF"
+  },
+  {
+   "fieldname": "column_break_ocr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ocr_status",
+   "fieldtype": "Select",
+   "label": "OCR Status",
+   "options": "\nPending\nProcessing\nCompleted\nFailed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "document_scan_name",
+   "fieldtype": "Link",
+   "label": "Document Scan",
+   "options": "Document Scan",
+   "read_only": 1
   },
   {
    "fieldname": "error",

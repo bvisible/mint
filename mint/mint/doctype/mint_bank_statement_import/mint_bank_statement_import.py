@@ -18,9 +18,11 @@ class MintBankStatementImport(Document):
 
 		amended_from: DF.Link | None
 		bank_account: DF.Link
+		document_scan_name: DF.Link | None
 		error: DF.Code | None
 		file: DF.Attach | None
 		file_type: DF.Literal["PDF"]
+		ocr_status: DF.Literal["", "Pending", "Processing", "Completed", "Failed"]
 		status: DF.Literal["Not Started", "Completed", "Error"]
 		transactions: DF.Table[MintBankStatementImportTransactions]
 	# end: auto-generated types
@@ -43,28 +45,96 @@ class MintBankStatementImport(Document):
 		else:
 			return string_amount.lower().replace("dr", "").replace(" ", ""), "Withdrawal"
 
-	
 	@frappe.whitelist()
 	def process_file(self):
+		"""
+		Start async OCR processing for the PDF.
+		Returns immediately - use check_processing_status() to poll for completion.
+		"""
+		if not self.file:
+			frappe.throw(_("Please upload a file"))
+
+		if self.file_type != "PDF":
+			frappe.throw(_("Invalid file type"))
+
+		# Start async processing
+		return self.start_ocr_processing()
+
+	@frappe.whitelist()
+	def start_ocr_processing(self):
+		"""
+		Start async OCR processing via Document Scan.
+		Returns immediately with status.
+		"""
+		from mint.apis.nora_ocr import create_document_scan_for_bank_statement
 
 		if not self.file:
 			frappe.throw(_("Please upload a file"))
 
-		if self.file_type == "PDF":
-			self.process_pdf()
-		else:
-			frappe.throw(_("Invalid file type"))
-	
-	def process_pdf(self):
-		"""
-		Process the PDF using Nora OCR and extract the transactions.
-		Replaces Google Document AI with self-hosted LLM-based OCR.
-		"""
-		from mint.apis.nora_ocr import extract_bank_transactions
+		# Create Document Scan for bank statement (OCR runs in background)
+		result = create_document_scan_for_bank_statement(self.file)
 
-		transactions = extract_bank_transactions(self.file)
+		if result.get("success"):
+			self.document_scan_name = result.get("document_scan_name")
+			self.ocr_status = "Processing"
+			self.save()
+			return {
+				"status": "Processing",
+				"document_scan_name": result.get("document_scan_name"),
+				"message": _("OCR processing started")
+			}
+		else:
+			self.ocr_status = "Failed"
+			self.error = result.get("message")
+			self.save()
+			frappe.throw(result.get("message"))
+
+	@frappe.whitelist()
+	def check_processing_status(self):
+		"""
+		Check OCR processing status and populate transactions if completed.
+		Called by frontend polling.
+		"""
+		from mint.apis.nora_ocr import check_document_scan_status
+
+		if not self.document_scan_name:
+			return {"status": "Not Started"}
+
+		result = check_document_scan_status(self.document_scan_name)
+
+		if result.get("status") == "Completed":
+			# Populate transactions table
+			transactions = result.get("transactions", [])
+			self._populate_transactions(transactions)
+			self.ocr_status = "Completed"
+			self.status = "Completed"
+			self.save()
+			return {
+				"status": "Completed",
+				"count": len(transactions),
+				"message": _("{0} transactions extracted").format(len(transactions))
+			}
+
+		elif result.get("status") == "Failed":
+			self.ocr_status = "Failed"
+			self.error = result.get("error")
+			self.status = "Error"
+			self.save()
+			return {
+				"status": "Failed",
+				"error": result.get("error")
+			}
+
+		else:
+			# Still processing
+			return {"status": "Processing"}
+
+	def _populate_transactions(self, transactions: list):
+		"""
+		Populate the transactions child table from extracted data.
+		"""
 		# Order the transactions by date
-		transactions.sort(key=lambda x: frappe.utils.getdate(x.get("date")))
+		transactions.sort(key=lambda x: frappe.utils.getdate(x.get("date")) if x.get("date") else frappe.utils.today())
 		self.transactions = []
 		for transaction in transactions:
 			self.append("transactions", {
@@ -73,8 +143,6 @@ class MintBankStatementImport(Document):
 				"type": transaction.get("type"),
 				"description": transaction.get("description")
 			})
-		# Save the document to persist extracted transactions
-		self.save()
 	
 	def before_submit(self):
 		# Validate all rows have an amount and a type

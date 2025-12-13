@@ -3,7 +3,10 @@ Nora OCR Integration for Mint
 Replaces Google Document AI for bank statement parsing
 
 This module provides a bridge between Mint's bank statement import
-functionality and Nora's generic OCR extraction API.
+functionality and Nora's unified OCR API (ocr_process).
+
+All bank statement extractions create Document Scan records for
+complete traceability.
 
 Usage:
     from mint.apis.nora_ocr import extract_bank_transactions
@@ -69,9 +72,11 @@ def extract_bank_transactions(file_url: str) -> list:
     """
     Extract bank transactions from a PDF statement using Nora OCR.
 
-    This function calls Nora's generic extract_data() API with a specialized
+    This function calls Nora's unified ocr_process() API with a specialized
     prompt for bank statement parsing. It replaces the Google Document AI
     integration for a free, self-hosted alternative.
+
+    All extractions create a Document Scan record for complete traceability.
 
     Args:
         file_url (str): Frappe file URL to the bank statement PDF
@@ -95,19 +100,24 @@ def extract_bank_transactions(file_url: str) -> list:
     frappe.logger().info(f"[Mint Nora OCR] Starting bank statement extraction: {file_url}")
 
     try:
-        # Call Nora's generic extraction API
+        # Call Nora's unified OCR API with Document Scan creation
         result = frappe.call(
-            "nora.api.ocr.extract_data",
+            "nora.api.ocr.ocr_process",
             file_url=file_url,
             prompt=BANK_STATEMENT_PROMPT,
             output_schema=BANK_STATEMENT_SCHEMA,
-            validate_schema=True,
-            max_retries=2
+            create_document_scan=True,  # Create Document Scan for traceability
+            add_to_rag=False,
+            validate_hallucination=False,  # Bank statements don't need hallucination check
+            max_retries=1
         )
 
         frappe.logger().info(f"[Mint Nora OCR] Extraction result: success={result.get('success')}, "
                             f"processing_time={result.get('processing_time')}s, "
-                            f"model={result.get('model_used')}")
+                            f"model={result.get('model_used')}, "
+                            f"retry_count={result.get('retry_count')}, "
+                            f"json_repair_applied={result.get('json_repair_applied')}, "
+                            f"document_scan={result.get('document_scan_name')}")
 
         if not result.get("success"):
             errors = result.get("validation_errors", [])
@@ -309,12 +319,180 @@ def _normalize_type(type_str: str) -> str:
 
 
 @frappe.whitelist()
+def create_document_scan_for_bank_statement(file_url: str) -> dict:
+    """
+    Create a Document Scan for bank statement extraction.
+    OCR runs in background via frappe.enqueue.
+    Returns immediately with document_scan_name.
+
+    Args:
+        file_url: Frappe file URL to the bank statement PDF
+
+    Returns:
+        dict: {
+            "success": bool,
+            "document_scan_name": str,
+            "message": str
+        }
+    """
+    import json
+    from datetime import date
+
+    if not file_url:
+        return {
+            "success": False,
+            "message": _("Please provide a file_url parameter")
+        }
+
+    frappe.logger().info(f"[Mint Nora OCR] Creating Document Scan for bank statement: {file_url}")
+
+    try:
+        # Generate a unique document name
+        today = date.today().isoformat()
+        file_name = file_url.split("/")[-1].replace(".pdf", "").replace(".PDF", "")
+        generated_name = f"{today}_BankStatement_{file_name}"
+
+        # Create Document Scan with bank statement prompt via neoffice_theme API
+        result = frappe.call(
+            "neoffice_theme.neoffice_theme.doctype.document_scan.document_scan.create_document_scan_from_json",
+            json_data=json.dumps({
+                "generated_document_name": generated_name,
+                "source_file": file_url,
+                "document_type": "Other",  # Bank Statement
+                "custom_prompt": BANK_STATEMENT_PROMPT,
+                "custom_schema": BANK_STATEMENT_SCHEMA
+            })
+        )
+
+        if result.get("success"):
+            frappe.logger().info(f"[Mint Nora OCR] Document Scan created: {result.get('name')}")
+            return {
+                "success": True,
+                "document_scan_name": result.get("name"),
+                "message": _("Bank statement processing started")
+            }
+        else:
+            return {
+                "success": False,
+                "message": result.get("message", _("Failed to create Document Scan"))
+            }
+
+    except Exception as e:
+        frappe.log_error("Bank Statement Document Scan Creation Failed", frappe.get_traceback())
+        return {
+            "success": False,
+            "message": str(e)
+        }
+
+
+@frappe.whitelist()
+def check_document_scan_status(document_scan_name: str) -> dict:
+    """
+    Check the OCR status of a Document Scan.
+
+    Args:
+        document_scan_name: Name of the Document Scan
+
+    Returns:
+        dict: {
+            "status": "Pending" | "Processing" | "Completed" | "Failed",
+            "ocr_status": str,
+            "transactions": list (if completed),
+            "error": str (if failed)
+        }
+    """
+    if not document_scan_name:
+        return {"status": "Error", "error": _("Missing document_scan_name")}
+
+    try:
+        doc = frappe.get_doc("Document Scan", document_scan_name)
+
+        if doc.ocr_status == "Completed":
+            # Extract transactions from ocr_results
+            transactions = extract_transactions_from_document_scan(doc)
+            return {
+                "status": "Completed",
+                "ocr_status": doc.ocr_status,
+                "transactions": transactions,
+                "count": len(transactions)
+            }
+
+        elif doc.ocr_status == "Failed":
+            return {
+                "status": "Failed",
+                "ocr_status": doc.ocr_status,
+                "error": doc.ocr_error or _("OCR processing failed")
+            }
+
+        else:
+            # Still processing
+            return {
+                "status": "Processing",
+                "ocr_status": doc.ocr_status
+            }
+
+    except frappe.DoesNotExistError:
+        return {"status": "Error", "error": _("Document Scan not found")}
+    except Exception as e:
+        return {"status": "Error", "error": str(e)}
+
+
+def extract_transactions_from_document_scan(doc) -> list:
+    """
+    Extract and normalize transactions from a completed Document Scan.
+
+    Args:
+        doc: Document Scan document with ocr_results
+
+    Returns:
+        list: Normalized transactions
+    """
+    import json
+
+    if not doc.ocr_results:
+        return []
+
+    try:
+        data = json.loads(doc.ocr_results)
+    except json.JSONDecodeError:
+        frappe.logger().warning(f"[Mint Nora OCR] Invalid JSON in ocr_results for {doc.name}")
+        return []
+
+    # Handle both array and dict formats
+    if isinstance(data, dict):
+        # If it's a dict, it might have a 'transactions' key or be an invoice format
+        data = data.get("transactions", [])
+
+    if not isinstance(data, list):
+        return []
+
+    # Normalize transactions
+    normalized_transactions = []
+    for tx in data:
+        if not isinstance(tx, dict):
+            continue
+
+        normalized = {
+            "date": _normalize_date(tx.get("date", "")),
+            "amount": _normalize_amount(tx.get("amount", "0")),
+            "type": _normalize_type(tx.get("type", "")),
+            "description": str(tx.get("description", "") or "").strip()
+        }
+
+        if normalized["amount"] and normalized["amount"] != "0":
+            normalized_transactions.append(normalized)
+
+    return normalized_transactions
+
+
+@frappe.whitelist()
 def test_bank_statement_extraction(file_url: str = None) -> dict:
     """
     Test function to extract bank transactions from a PDF.
 
     This is a whitelisted function for testing the OCR integration
-    from the browser console or via API.
+    from the browser console or via API. Returns detailed timing and
+    retry information for debugging.
 
     Args:
         file_url: Frappe file URL to test
@@ -324,25 +502,79 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             "success": bool,
             "transactions": list,
             "count": int,
+            "processing_time": float,
+            "retry_count": int,
+            "json_repair_applied": bool,
+            "document_scan_name": str,
             "error": str (if failed)
         }
     """
+    import time
+
     if not file_url:
         return {
             "success": False,
             "error": "Please provide a file_url parameter"
         }
 
+    start_time = time.time()
+
     try:
-        transactions = extract_bank_transactions(file_url)
+        # Call ocr_process directly to get full result with tracking
+        result = frappe.call(
+            "nora.api.ocr.ocr_process",
+            file_url=file_url,
+            prompt=BANK_STATEMENT_PROMPT,
+            output_schema=BANK_STATEMENT_SCHEMA,
+            create_document_scan=True,
+            add_to_rag=False,
+            validate_hallucination=False,
+            max_retries=2  # More retries for testing
+        )
+
+        total_time = time.time() - start_time
+
+        if not result.get("success"):
+            return {
+                "success": False,
+                "error": result.get("error", "Unknown error"),
+                "transactions": [],
+                "processing_time": round(total_time, 2),
+                "retry_count": result.get("retry_count", 0),
+                "json_repair_applied": result.get("json_repair_applied", False),
+                "document_scan_name": result.get("document_scan_name")
+            }
+
+        # Normalize transactions
+        data = result.get("data", [])
+        normalized_transactions = []
+        for tx in data:
+            if not isinstance(tx, dict):
+                continue
+            normalized = {
+                "date": _normalize_date(tx.get("date", "")),
+                "amount": _normalize_amount(tx.get("amount", "0")),
+                "type": _normalize_type(tx.get("type", "")),
+                "description": str(tx.get("description", "") or "").strip()
+            }
+            if normalized["amount"] and normalized["amount"] != "0":
+                normalized_transactions.append(normalized)
+
         return {
             "success": True,
-            "transactions": transactions,
-            "count": len(transactions)
+            "transactions": normalized_transactions,
+            "count": len(normalized_transactions),
+            "processing_time": round(total_time, 2),
+            "retry_count": result.get("retry_count", 0),
+            "json_repair_applied": result.get("json_repair_applied", False),
+            "document_scan_name": result.get("document_scan_name"),
+            "model_used": result.get("model_used")
         }
+
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
-            "transactions": []
+            "transactions": [],
+            "processing_time": round(time.time() - start_time, 2)
         }
