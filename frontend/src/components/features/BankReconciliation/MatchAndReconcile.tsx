@@ -642,7 +642,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
     const selectedTransaction = useAtomValue(bankRecSelectedTransactionAtom(selectedBank?.name || ''))
     const setDraftJEModal = useSetAtom(bankRecDraftJEModalAtom)
 
-    const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested } = useMemo(() => {
+    const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested, hasAnyMatch } = useMemo(() => {
 
         const transaction = selectedTransaction?.[0]
 
@@ -662,7 +662,10 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
         const isSuggested = amountMatches && (postingDateMatches || referenceDateMatches || referenceMatchesPartial) && index === 0
 
-        return { isSelected: false, amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested: isSuggested }
+        // Only show match info when there's at least one match
+        const hasAnyMatch = amountMatches || postingDateMatches || referenceDateMatches || referenceMatchesFull || referenceMatchesPartial
+
+        return { isSelected: false, amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested: isSuggested, hasAnyMatch }
 
     }, [voucher, selectedTransaction, index])
 
@@ -721,31 +724,31 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                     <TooltipProvider>
                         <div className="flex items-center gap-1">
                             <span>{_("Amount")}: <span className="font-bold font-mono">{formatCurrency(voucher.paid_amount, voucher.currency)}</span></span>
-                            {amountMatches ?
+                            {hasAnyMatch && (amountMatches ?
                                 <MatchBadge matchType="full" label={_("Amount matches the selected transaction")} />
                                 :
                                 <MatchBadge matchType="none" label={_("Amount does not match the selected transaction")} />
-                            }
+                            )}
                         </div>
                         <div className="flex gap-2 h-6">
 
                             <div className="flex items-center gap-1">
                                 <span>{_("Posted On")}: <span className="font-bold">{formatDate(voucher.posting_date)}</span></span>
-                                <MatchBadge
+                                {hasAnyMatch && <MatchBadge
                                     matchType={postingDateMatches ? "full" : "none"}
                                     label={postingDateMatches ? _("Posting Date matches the transaction date") : _("Posting Date does not match the transaction date")}
-                                />
+                                />}
                             </div>
                             {voucher.reference_date && <Separator orientation="vertical" className="h-4" />}
                             {voucher.reference_date && <div className="flex items-center gap-1">
                                 <span>{_("Reference Date")}: <span className="font-bold">{formatDate(voucher.reference_date)}</span></span>
-                                <MatchBadge
+                                {hasAnyMatch && <MatchBadge
                                     matchType={referenceDateMatches ? "full" : "none"}
                                     label={referenceDateMatches ? `${_("Reference Date matches the transaction date")}` : `${_("Reference Date does not match the transaction date")}`}
-                                />
+                                />}
                             </div>}
                         </div>
-                        <div className="flex items-start gap-1">
+                        {hasAnyMatch && <div className="flex items-start gap-1">
                             <span className="font-medium">
                                 {voucher.reference_no}
                                 &nbsp;&nbsp;
@@ -759,7 +762,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                                     </TooltipContent>
                                 </Tooltip>
                             </span>
-                        </div>
+                        </div>}
                         {/* Display user_remark if available (truncated) */}
                         {voucher.user_remark && (
                             <Tooltip>
