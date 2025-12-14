@@ -316,11 +316,17 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str,
     else:
         paid_amount = bank_transaction.withdrawal
 
-    return reconcile_vouchers(bank_transaction_name, json.dumps([{
+    reconcile_vouchers(bank_transaction_name, json.dumps([{
         "payment_doctype": "Journal Entry",
         "payment_name": bank_entry.name,
         "amount": paid_amount,
     }]), is_new_voucher=True)
+
+    # Return the journal entry name so clients can attach files
+    return {
+        "journal_entry": bank_entry.name,
+        "bank_transaction": bank_transaction_name
+    }
 
 
 @frappe.whitelist(methods=['POST'])

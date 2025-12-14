@@ -6,17 +6,19 @@ import { UnreconciledTransaction, useGetRuleForTransaction, useRefreshUnreconcil
 import { useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form"
 import { JournalEntry } from "@/types/Accounts/JournalEntry"
 import { getCompanyCostCenter, getCompanyCurrency } from "@/lib/company"
-import { FrappeConfig, FrappeContext, useFrappePostCall } from "frappe-react-sdk"
+import { FrappeConfig, FrappeContext, useFrappeFileUpload, useFrappePostCall } from "frappe-react-sdk"
 import { toast } from "sonner"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Button } from "@/components/ui/button"
 import SelectedTransactionDetails from "./SelectedTransactionDetails"
 import { AccountFormField, CurrencyFormField, DataField, DateField, LinkFormField, PartyTypeFormField, SmallTextField } from "@/components/ui/form-elements"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Form } from "@/components/ui/form"
 import { useCallback, useContext, useMemo, useRef, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Paperclip, X, FileIcon } from "lucide-react"
 import { formatCurrency } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -151,11 +153,16 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
 
     const [previewData, setPreviewData] = useState<any>(null)
     const [vatDisabled, setVatDisabled] = useState(false)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const { upload: uploadFile, loading: uploadLoading } = useFrappeFileUpload()
 
     const onClose = () => {
         setIsOpen(false)
         setPreviewData(null)
         setVatDisabled(false)
+        setSelectedFile(null)
     }
 
     const isWithdrawal = (selectedTransaction.withdrawal && selectedTransaction.withdrawal > 0) ? true : false
@@ -185,7 +192,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
 
     const setBankRecUnreconcileModalAtom = useSetAtom(bankRecUnreconcileModalAtom)
 
-    const loading = previewLoading || submitLoading
+    const loading = previewLoading || submitLoading || uploadLoading
     const error = previewError || submitError
 
     const onPreview = (data: BankEntryFormData, overrideVatDisabled?: boolean) => {
@@ -206,15 +213,37 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
         })
     }
 
-    const onConfirmSubmit = () => {
+    const onConfirmSubmit = async () => {
         const data = form.getValues()
 
-        createBankEntry({
-            bank_transaction_name: selectedTransaction.name,
-            ...data,
-            is_vat_excluded: false,  // Always use TTC mode (amounts include VAT)
-            disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
-        }).then(() => {
+        try {
+            const result = await createBankEntry({
+                bank_transaction_name: selectedTransaction.name,
+                ...data,
+                is_vat_excluded: false,  // Always use TTC mode (amounts include VAT)
+                disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
+            })
+
+            // Get journal entry name from response
+            const journalEntryName = result?.message?.journal_entry || result?.journal_entry
+
+            // If a file was selected, upload it and attach to the Journal Entry
+            if (selectedFile && journalEntryName) {
+                try {
+                    await uploadFile(selectedFile, {
+                        isPrivate: true,
+                        doctype: "Journal Entry",
+                        docname: journalEntryName,
+                    })
+                } catch (uploadError) {
+                    console.error("File upload error:", uploadError)
+                    // Still show success for JE creation even if file upload fails
+                    toast.warning(_("Bank Entry created but file upload failed"), {
+                        duration: 5000,
+                    })
+                }
+            }
+
             toast.success(_("Bank Entry Created"), {
                 duration: 4000,
                 closeButton: true,
@@ -228,7 +257,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             })
             onReconcile(selectedTransaction)
             onClose()
-        })
+        } catch (err) {
+            console.error("Error creating bank entry:", err)
+        }
     }
 
     const onEditPreview = () => {
@@ -250,6 +281,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             loading={loading}
             vatDisabled={vatDisabled}
             onVatToggle={handleVatToggle}
+            selectedFile={selectedFile}
         />
     }
     return <Form {...form}>
@@ -293,6 +325,46 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                             name='user_remark'
                             label={_("Remarks")}
                         />
+                        <div className='flex flex-col gap-2'>
+                            <Label>{_("Attachment")}</Label>
+                            <div className='flex items-center gap-2'>
+                                <Input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx"
+                                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                                    className='hidden'
+                                />
+                                <Button
+                                    type='button'
+                                    variant='outline'
+                                    size='sm'
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className='flex items-center gap-2'
+                                >
+                                    <Paperclip className='w-4 h-4' />
+                                    {_("Add Document")}
+                                </Button>
+                                {selectedFile && (
+                                    <div className='flex items-center gap-2 bg-muted px-2 py-1 rounded text-sm'>
+                                        <FileIcon className='w-4 h-4' />
+                                        <span className='max-w-32 truncate'>{selectedFile.name}</span>
+                                        <Button
+                                            type='button'
+                                            variant='ghost'
+                                            size='sm'
+                                            className='h-5 w-5 p-0'
+                                            onClick={() => {
+                                                setSelectedFile(null)
+                                                if (fileInputRef.current) fileInputRef.current.value = ''
+                                            }}
+                                        >
+                                            <X className='w-3 h-3' />
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -630,9 +702,10 @@ interface JournalEntryPreviewProps {
     loading?: boolean
     vatDisabled: boolean
     onVatToggle: () => void
+    selectedFile?: File | null
 }
 
-const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled, onVatToggle }: JournalEntryPreviewProps) => {
+const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled, onVatToggle, selectedFile }: JournalEntryPreviewProps) => {
     // Check if preview contains VAT lines
     const hasVatLines = preview?.accounts?.some(account => account._is_vat_line) ?? false
 
@@ -660,6 +733,15 @@ const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled,
                     <div><span className='font-medium'>{_("Posting Date")}:</span> {preview.posting_date}</div>
                     <div><span className='font-medium'>{_("Reference Date")}:</span> {preview.cheque_date}</div>
                     <div className='col-span-2'><span className='font-medium'>{_("Reference No")}:</span> {preview.cheque_no}</div>
+                    {selectedFile && (
+                        <div className='col-span-2 flex items-center gap-2 mt-2'>
+                            <span className='font-medium'>{_("Attachment")}:</span>
+                            <div className='flex items-center gap-1 bg-blue-50 dark:bg-blue-950/30 px-2 py-1 rounded text-blue-700 dark:text-blue-300'>
+                                <Paperclip className='w-3 h-3' />
+                                <span className='text-xs'>{selectedFile.name}</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
