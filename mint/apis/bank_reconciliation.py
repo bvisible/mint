@@ -656,9 +656,9 @@ def get_linked_payments(
             from_reference_date=from_reference_date,
             to_reference_date=to_reference_date,
         )
-        # Combine and sort by rank
+        # Combine and sort by posting_date, then by rank (for same-date entries)
         all_vouchers = submitted_vouchers + draft_jes
-        return sorted(all_vouchers, key=lambda x: x.get("rank", 0), reverse=True)
+        return sorted(all_vouchers, key=lambda x: (x.get("posting_date", ""), -x.get("rank", 0)))
 
     return submitted_vouchers
 
