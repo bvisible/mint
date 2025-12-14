@@ -19,6 +19,7 @@ class MintBankStatementImport(Document):
 		amended_from: DF.Link | None
 		bank_account: DF.Link
 		document_scan_name: DF.Link | None
+		document_status: DF.Literal["Draft", "Submitted", "Cancelled"]
 		error: DF.Code | None
 		file: DF.Attach | None
 		file_type: DF.Literal["PDF"]
@@ -27,7 +28,14 @@ class MintBankStatementImport(Document):
 		transactions: DF.Table[MintBankStatementImportTransactions]
 	# end: auto-generated types
 
+	def update_document_status(self):
+		"""Update document_status field based on docstatus."""
+		status_map = {0: "Draft", 1: "Submitted", 2: "Cancelled"}
+		self.document_status = status_map.get(self.docstatus, "Draft")
+
 	def before_validate(self):
+		# Update document_status based on docstatus
+		self.update_document_status()
 		# For all string amounts, compute the actual amount and type
 		for transaction in self.transactions:
 			if transaction.string_amount:
@@ -67,6 +75,9 @@ class MintBankStatementImport(Document):
 				frappe.throw(_("All rows must have an amount and a type. Missing in row {0}").format(transaction.get("idx")))
 		
 	def on_submit(self):
+		# Update document_status to Submitted
+		self.db_set("document_status", "Submitted")
+
 		if not self.transactions:
 			frappe.throw(_("No transactions found"))
 		

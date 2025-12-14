@@ -7,6 +7,7 @@
  "field_order": [
   "section_break_sttk",
   "bank_account",
+  "document_status",
   "status",
   "ocr_status",
   "column_break_ocr",
@@ -31,6 +32,14 @@
    "link_filters": "[[\"Bank Account\",\"is_company_account\",\"=\",1]]",
    "options": "Bank Account",
    "reqd": 1
+  },
+  {
+   "fieldname": "document_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Document Status",
+   "options": "Draft\nSubmitted\nCancelled",
+   "read_only": 1
   },
   {
    "default": "Not Started",
