@@ -141,6 +141,11 @@ def extract_bank_transactions(file_url: str) -> list:
 
         data = result.get("data", [])
 
+        # Handle both direct list and dict with transactions/items key
+        if isinstance(data, dict):
+            # Extract transactions from dict structure (from paged OCR merge)
+            data = data.get("transactions") or data.get("items") or []
+
         # Validate we got a list
         if not isinstance(data, list):
             frappe.log_error(
@@ -666,7 +671,11 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             }
 
         # Normalize transactions
+        # Handle both direct list and dict with transactions/items key
         data = result.get("data", [])
+        if isinstance(data, dict):
+            # Extract transactions from dict structure
+            data = data.get("transactions") or data.get("items") or []
         normalized_transactions = []
         for tx in data:
             if not isinstance(tx, dict):
