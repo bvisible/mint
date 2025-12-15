@@ -80,7 +80,7 @@ class MintBankStatementImport(Document):
 
 		if not self.transactions:
 			frappe.throw(_("No transactions found"))
-		
+
 		for transaction in self.transactions:
 			bank_tx = frappe.get_doc({
 				"doctype": "Bank Transaction",
@@ -95,3 +95,7 @@ class MintBankStatementImport(Document):
 			bank_tx.insert()
 			bank_tx.submit()
 			transaction.imported = 1
+
+		# Update linked Document Scan status to Processed
+		if self.document_scan_name:
+			frappe.db.set_value("Document Scan", self.document_scan_name, "status", "Processed")
