@@ -15,10 +15,10 @@ import { AccountFormField, CurrencyFormField, DataField, DateField, LinkFormFiel
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Form } from "@/components/ui/form"
-import { useCallback, useContext, useMemo, useRef, useState } from "react"
+import { useCallback, useContext, useMemo, useRef, useState, DragEvent } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus, Trash2, Paperclip, X, FileIcon } from "lucide-react"
+import { Plus, Trash2, Paperclip, X, FileIcon, Upload } from "lucide-react"
 import { formatCurrency } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -154,6 +154,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
     const [previewData, setPreviewData] = useState<any>(null)
     const [vatDisabled, setVatDisabled] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const { upload: uploadFile, loading: uploadLoading } = useFrappeFileUpload()
@@ -163,6 +164,53 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
         setPreviewData(null)
         setVatDisabled(false)
         setSelectedFile(null)
+        setIsDragging(false)
+    }
+
+    // Drag and drop handlers
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(true)
+    }
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(false)
+    }
+
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(false)
+
+        const files = e.dataTransfer.files
+        if (files && files.length > 0) {
+            const file = files[0]
+            // Validate file type
+            const validTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.doc', '.docx', '.xls', '.xlsx']
+            const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
+            if (validTypes.includes(fileExtension)) {
+                setSelectedFile(file)
+            } else {
+                toast.error(_("Invalid file type. Allowed: PDF, JPG, PNG, GIF, DOC, DOCX, XLS, XLSX"))
+            }
+        }
+    }
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setSelectedFile(file)
+        }
+    }
+
+    const removeFile = () => {
+        setSelectedFile(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
     }
 
     const isWithdrawal = (selectedTransaction.withdrawal && selectedTransaction.withdrawal > 0) ? true : false
@@ -327,43 +375,64 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                         />
                         <div className='flex flex-col gap-2'>
                             <Label>{_("Attachment")}</Label>
-                            <div className='flex items-center gap-2'>
-                                <Input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx"
-                                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                                    className='hidden'
-                                />
-                                <Button
-                                    type='button'
-                                    variant='outline'
-                                    size='sm'
+                            <Input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx"
+                                onChange={handleFileSelect}
+                                className='hidden'
+                            />
+                            {!selectedFile ? (
+                                <div
+                                    onDragOver={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
                                     onClick={() => fileInputRef.current?.click()}
-                                    className='flex items-center gap-2'
+                                    className={cn(
+                                        'border-2 border-dashed rounded-lg p-4 cursor-pointer transition-colors',
+                                        'flex flex-col items-center justify-center gap-2 min-h-[100px]',
+                                        isDragging
+                                            ? 'border-primary bg-primary/5'
+                                            : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50'
+                                    )}
                                 >
-                                    <Paperclip className='w-4 h-4' />
-                                    {_("Add Document")}
-                                </Button>
-                                {selectedFile && (
-                                    <div className='flex items-center gap-2 bg-muted px-2 py-1 rounded text-sm'>
-                                        <FileIcon className='w-4 h-4' />
-                                        <span className='max-w-32 truncate'>{selectedFile.name}</span>
+                                    <Upload className={cn(
+                                        'w-8 h-8',
+                                        isDragging ? 'text-primary' : 'text-muted-foreground'
+                                    )} />
+                                    <div className='text-center'>
+                                        <p className='text-sm text-muted-foreground'>
+                                            {isDragging
+                                                ? _("Drop file here")
+                                                : _("Drag and drop file here")}
+                                        </p>
+                                        <p className='text-xs text-muted-foreground/70 mt-1'>
+                                            {_("or click to browse")}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className='border rounded-lg p-3 bg-muted/30'>
+                                    <div className='flex items-center justify-between'>
+                                        <div className='flex items-center gap-2 min-w-0'>
+                                            <FileIcon className='w-5 h-5 text-primary flex-shrink-0' />
+                                            <span className='text-sm truncate'>{selectedFile.name}</span>
+                                        </div>
                                         <Button
                                             type='button'
                                             variant='ghost'
                                             size='sm'
-                                            className='h-5 w-5 p-0'
-                                            onClick={() => {
-                                                setSelectedFile(null)
-                                                if (fileInputRef.current) fileInputRef.current.value = ''
-                                            }}
+                                            className='h-6 w-6 p-0 flex-shrink-0 hover:bg-destructive/10 hover:text-destructive'
+                                            onClick={removeFile}
                                         >
-                                            <X className='w-3 h-3' />
+                                            <X className='w-4 h-4' />
                                         </Button>
                                     </div>
-                                )}
-                            </div>
+                                    <p className='text-xs text-muted-foreground mt-1'>
+                                        {(selectedFile.size / 1024).toFixed(1)} KB
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
