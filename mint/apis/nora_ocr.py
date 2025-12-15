@@ -101,6 +101,7 @@ def extract_bank_transactions(file_url: str) -> list:
 
     try:
         # Call Nora's unified OCR API with Document Scan creation
+        # Use page splitting for multi-page bank statements
         result = frappe.call(
             "nora.api.ocr.ocr_process",
             file_url=file_url,
@@ -109,7 +110,9 @@ def extract_bank_transactions(file_url: str) -> list:
             create_document_scan=True,  # Create Document Scan for traceability
             add_to_rag=False,
             validate_hallucination=False,  # Bank statements don't need hallucination check
-            max_retries=1
+            max_retries=1,
+            use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
+            pages_per_batch=2  # Process 2 pages at a time
         )
 
         frappe.logger().info(f"[Mint Nora OCR] Extraction result: success={result.get('success')}, "
@@ -635,6 +638,7 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
 
     try:
         # Call ocr_process directly to get full result with tracking
+        # Use page splitting for multi-page documents (15+ pages)
         result = frappe.call(
             "nora.api.ocr.ocr_process",
             file_url=file_url,
@@ -643,7 +647,9 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             create_document_scan=True,
             add_to_rag=False,
             validate_hallucination=False,
-            max_retries=2  # More retries for testing
+            max_retries=2,  # More retries for testing
+            use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
+            pages_per_batch=2  # Process 2 pages at a time
         )
 
         total_time = time.time() - start_time
