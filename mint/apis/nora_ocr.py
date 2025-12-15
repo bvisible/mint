@@ -112,7 +112,7 @@ def extract_bank_transactions(file_url: str) -> list:
             validate_hallucination=False,  # Bank statements don't need hallucination check
             max_retries=1,
             use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
-            pages_per_batch=2  # Process 2 pages at a time
+            pages_per_batch=4  # Process 4 pages at a time for speed
         )
 
         frappe.logger().info(f"[Mint Nora OCR] Extraction result: success={result.get('success')}, "
@@ -654,7 +654,7 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             validate_hallucination=False,
             max_retries=2,  # More retries for testing
             use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
-            pages_per_batch=2  # Process 2 pages at a time
+            pages_per_batch=4  # Process 4 pages at a time for speed
         )
 
         total_time = time.time() - start_time
