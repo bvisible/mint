@@ -112,8 +112,8 @@ def extract_bank_transactions(file_url: str) -> list:
             validate_hallucination=False,  # Bank statements don't need hallucination check
             max_retries=1,
             use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
-            pages_per_batch=1,  # Process 1 page at a time (fastest: ~19s/page)
-            use_context=False  # Disable context - each page is independent (faster!)
+            pages_per_batch=1,  # Process 1 page at a time (~25s/page with delay)
+            page_delay=2.0  # 2s delay between pages to avoid Cloudflare rate limiting
         )
 
         frappe.logger().info(f"[Mint Nora OCR] Extraction result: success={result.get('success')}, "
@@ -655,8 +655,8 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             validate_hallucination=False,
             max_retries=2,  # More retries for testing
             use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
-            pages_per_batch=1,  # Process 1 page at a time (fastest: ~19s/page)
-            use_context=False  # Disable context - each page is independent (faster!)
+            pages_per_batch=1,  # Process 1 page at a time (~25s/page with delay)
+            page_delay=2.0  # 2s delay between pages to avoid Cloudflare rate limiting
         )
 
         total_time = time.time() - start_time
