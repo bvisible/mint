@@ -6,6 +6,8 @@ tags
 node_modules
 __pycache__
 
-mint/public/mint
-mint/public/node_modules
-mint/www/mint.html
+# Ignore public folder EXCEPT mint (pre-built assets)
+mint/public/*
+!mint/public/mint/
+!mint/public/js/
+!mint/public/.gitkeep
