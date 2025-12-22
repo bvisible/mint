@@ -33,8 +33,15 @@ jobs:
       - name: Create Frappe config stub
         run: |
           # proxyOptions.ts needs ../../../sites/ from frontend/
+          # Debug: show current directory structure
+          echo "Current dir: $(pwd)"
+          echo "Creating stub at ../sites/"
           mkdir -p ../sites
           echo '{"default_site": "site1.local", "socketio_port": 9000, "webserver_port": 8000}' > ../sites/common_site_config.json
+          ls -la ../sites/
+          # Also check if this is the right path
+          echo "Testing path from frontend/proxyOptions.ts perspective:"
+          cd frontend && ls -la ../../../sites/ 2>/dev/null || echo "Path not found!"
 
       - name: Build assets
         working-directory: frontend
