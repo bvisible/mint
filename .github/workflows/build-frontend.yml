@@ -32,9 +32,9 @@ jobs:
 
       - name: Create Frappe config stub
         run: |
-          # proxyOptions.ts needs this file
-          mkdir -p sites
-          echo '{"default_site": "site1.local", "socketio_port": 9000, "webserver_port": 8000}' > sites/common_site_config.json
+          # proxyOptions.ts needs ../../../sites/ from frontend/
+          mkdir -p ../sites
+          echo '{"default_site": "site1.local", "socketio_port": 9000, "webserver_port": 8000}' > ../sites/common_site_config.json
 
       - name: Build assets
         working-directory: frontend
