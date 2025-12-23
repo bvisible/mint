@@ -301,11 +301,11 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str,
             "credit_in_account_currency": credit,
             "debit": debit,
             "credit": credit,
-            "cost_center": cost_center,
             "party_type": entry.get("party_type") if entry.get("party") else None,
             "party": entry.get("party"),
             "user_remark": entry.get("user_remark"),
-            **dimensions,
+            **entry,
+            "cost_center": cost_center
         })
 
     bank_entry.insert()
