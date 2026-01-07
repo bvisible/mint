@@ -17,6 +17,9 @@ def get_context(context):
     context.csrf_token = csrf_token
     context.build_version = frappe.utils.get_build_version()
 
+    # Get desk theme from user settings
+    context.desk_theme = frappe.db.get_value("User", frappe.session.user, "desk_theme") or "Light"
+
     return context
 
 @frappe.whitelist(methods=['POST'], allow_guest=True)

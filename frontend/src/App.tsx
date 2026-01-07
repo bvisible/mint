@@ -1,7 +1,7 @@
 import { FrappeProvider } from 'frappe-react-sdk'
 import BankReconciliation from './pages/BankReconciliation'
 import { Toaster } from './components/ui/sonner'
-import FrappeSidebar from './components/features/Sidebar/FrappeSidebar'
+import { FrappeSidebar } from '@neoffice/frappe-sidebar-react'
 
 function App() {
 

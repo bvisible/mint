@@ -34,7 +34,11 @@ const BankReconciliation = () => {
         <div className="p-4 flex flex-col gap-4">
             <div ref={ref} className="flex flex-col gap-4">
                 <div className="flex justify-between">
-                    <H1 className="text-base font-medium"><span className="text-4xl font-extrabold text-emerald-500">neopay</span>&nbsp; {_("Bank Reconciliation")}</H1>
+                    <H1 className="text-base font-medium flex items-center gap-2">
+                        <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-8" />
+                        <span className="text-gray-400">|</span>
+                        {_("Bank Reconciliation")}
+                    </H1>
                     <div className="flex items-center gap-2">
                         <RuleConfigureButton />
                         <Settings />
