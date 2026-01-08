@@ -35,7 +35,9 @@ const BankReconciliation = () => {
             <div ref={ref} className="flex flex-col gap-4">
                 <div className="flex justify-between">
                     <H1 className="text-base font-medium flex items-center gap-2">
-                        <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-8" />
+                        <a href="/app/home">
+                            <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-8" />
+                        </a>
                         <span className="text-gray-400">|</span>
                         {_("Bank Reconciliation")}
                     </H1>
