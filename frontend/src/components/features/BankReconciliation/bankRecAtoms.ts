@@ -51,3 +51,10 @@ export interface DraftJEModalState {
     } | null
 }
 export const bankRecDraftJEModalAtom = atom<DraftJEModalState>({ voucher: null })
+
+export const bankRecSearchText = atom<string>('')
+export const bankRecAmountFilter = atom<{ value: number, stringValue?: string | number }>({
+    value: 0,
+    stringValue: '0.00'
+})
+export const bankRecTransactionTypeFilter = atom<string>('All')
