@@ -101,7 +101,8 @@ def extract_bank_transactions(file_url: str) -> list:
 
     try:
         # Call Nora's unified OCR API with Document Scan creation
-        # Use page splitting for multi-page bank statements
+        # CRITICAL: Use document_type="bank_statement" to DISABLE two-pass mode
+        # Bank statements must process ALL pages - no page can be skipped!
         result = frappe.call(
             "nora.api.ocr.ocr_process",
             file_url=file_url,
@@ -111,6 +112,7 @@ def extract_bank_transactions(file_url: str) -> list:
             add_to_rag=False,
             validate_hallucination=False,  # Bank statements don't need hallucination check
             max_retries=1,
+            document_type="bank_statement",  # CRITICAL: Forces page-by-page, never skips pages
             use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
             pages_per_batch=1,  # Process 1 page at a time (~25s/page with delay)
             page_delay=2.0  # 2s delay between pages to avoid Cloudflare rate limiting
@@ -644,7 +646,8 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
 
     try:
         # Call ocr_process directly to get full result with tracking
-        # Use page splitting for multi-page documents (15+ pages)
+        # CRITICAL: Use document_type="bank_statement" to DISABLE two-pass mode
+        # Bank statements must process ALL pages - no page can be skipped!
         result = frappe.call(
             "nora.api.ocr.ocr_process",
             file_url=file_url,
@@ -654,6 +657,7 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             add_to_rag=False,
             validate_hallucination=False,
             max_retries=2,  # More retries for testing
+            document_type="bank_statement",  # CRITICAL: Forces page-by-page, never skips pages
             use_page_splitting=True,  # Enable page-by-page processing for multi-page PDFs
             pages_per_batch=1,  # Process 1 page at a time (~25s/page with delay)
             page_delay=2.0  # 2s delay between pages to avoid Cloudflare rate limiting
