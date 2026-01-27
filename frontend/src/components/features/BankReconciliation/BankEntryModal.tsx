@@ -24,6 +24,10 @@ import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
 import { JournalEntryAccount } from "@/types/Accounts/JournalEntryAccount"
+import { BankTransaction } from "@/types/Accounts/BankTransaction"
+import FileUploadBanner from "@/components/common/FileUploadBanner"
+import { Label } from "@/components/ui/label"
+import { FileDropzone } from "@/components/ui/file-dropzone"
 
 const BankEntryModal = () => {
 
@@ -216,6 +220,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
         const accounts: Partial<JournalEntryAccount>[] = [
             {
                 account: selectedBankAccount?.account ?? '',
+                bank_account: selectedTransaction.bank_account,
                 // Bank is debited if it's a deposit
                 debit: isWithdrawal ? 0 : selectedTransaction.unallocated_amount,
                 credit: isWithdrawal ? selectedTransaction.unallocated_amount : 0,
@@ -402,6 +407,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                     backgroundColor: "rgb(0, 138, 46)"
                 }
             })
+
             onReconcile(selectedTransaction)
             onClose()
         } catch (err) {
@@ -431,6 +437,11 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             selectedFile={selectedFile}
         />
     }
+
+    if (isUploading && isCompleted) {
+        return <FileUploadBanner uploadProgress={uploadProgress} />
+    }
+
     return <Form {...form}>
         <form onSubmit={form.handleSubmit((data) => onPreview(data))}>
             <div className='flex flex-col gap-4'>

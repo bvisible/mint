@@ -33,6 +33,7 @@ class MintBankTransactionRule(Document):
 		rule_name: DF.Data
 		transaction_type: DF.Literal["Any", "Withdrawal", "Deposit"]
 	# end: auto-generated types
+
 	
 	def before_insert(self):
 		"""Assign the next priority number for the new rule"""
@@ -41,7 +42,7 @@ class MintBankTransactionRule(Document):
 			highest_priority = frappe.db.get_value(
 				"Mint Bank Transaction Rule",
 				filters={"company": self.company},
-				fieldname="MAX(priority)",
+				fieldname="priority",
 				order_by="priority DESC"
 			)
 			
