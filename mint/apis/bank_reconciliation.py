@@ -421,8 +421,9 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
             if report_type == "Profit and Loss":
                 cost_center = default_cost_center
 
-        credit = entry["amount"] if not is_withdrawal else 0
-        debit = entry["amount"] if is_withdrawal else 0
+        amount = entry.get("amount", 0)
+        credit = amount if not is_withdrawal else 0
+        debit = amount if is_withdrawal else 0
 
         journal_entry_lines.append({
             "account": entry["account"],
