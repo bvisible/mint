@@ -72,9 +72,38 @@ export const BANK_LOGOS: { keywords: string[], logo: string }[] = [
         keywords: ['Truist'],
         logo: 'assets/bank-logos/Truist.svg'
     },
+    // Switzerland
     {
         keywords: ['UBS'],
         logo: 'assets/bank-logos/UBS.svg'
+    },
+    {
+        keywords: ['Credit Suisse', 'Crédit Suisse', 'CS'],
+        logo: 'assets/bank-logos/Credit_Suisse.svg'
+    },
+    {
+        keywords: ['PostFinance', 'Post Finance', 'Postfinance'],
+        logo: 'assets/bank-logos/PostFinance.svg'
+    },
+    {
+        keywords: ['Raiffeisen Schweiz', 'Raiffeisen Suisse', 'Raiffeisen CH', 'Banque Raiffeisen'],
+        logo: 'assets/bank-logos/Raiffeisen_Schweiz.svg'
+    },
+    {
+        keywords: ['Zürcher Kantonalbank', 'ZKB', 'Zurcher Kantonalbank', 'Zuercher Kantonalbank'],
+        logo: 'assets/bank-logos/Zuercher_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Banque Cantonale Vaudoise', 'BCV'],
+        logo: 'assets/bank-logos/BCV.svg'
+    },
+    {
+        keywords: ['Banque Cantonale du Valais', 'BCVs', 'BCVS'],
+        logo: 'assets/bank-logos/Banque_Cantonale_du_Valais.svg'
+    },
+    {
+        keywords: ['Cembra', 'Cembra Money Bank'],
+        logo: 'assets/bank-logos/Cembra.svg'
     },
     {
         keywords: ['US Bank', 'USBank', 'U.S. Bank', 'U.S. Bancorp'],
