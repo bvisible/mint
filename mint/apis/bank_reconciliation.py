@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils import flt
 import json
 import datetime
 from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool import create_payment_entry_bts, create_journal_entry_bts
@@ -382,28 +383,32 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
     journal_entry_lines = []
 
     # Separate bank account entry from other entries
-    bank_account_entries = []
+    # Only keep ONE bank account line (the first one with bank_account field)
+    bank_account_entry = None
     expense_entries = []
 
     for entry in entries:
         entry_account = entry.get("account", "")
-        # Check if this is the bank account line
-        if entry_account == bank_account or entry.get("bank_account"):
-            bank_account_entries.append(entry)
-        else:
+        has_bank_account_field = entry.get("bank_account")
+
+        # Check if this is the bank account line (has bank_account field set)
+        if has_bank_account_field and bank_account_entry is None:
+            bank_account_entry = entry
+        elif entry_account and entry_account != bank_account:
+            # Only add to expense entries if account is set and it's not the bank account
             expense_entries.append(entry)
 
-    # Add bank account line(s) first - keep as-is from frontend
-    for entry in bank_account_entries:
+    # Add the single bank account line first
+    if bank_account_entry:
         journal_entry_lines.append({
-            "account": entry.get("account", bank_account),
-            "bank_account": entry.get("bank_account", bank_transaction.bank_account),
-            "debit": entry.get("debit", 0),
-            "credit": entry.get("credit", 0),
-            "party_type": entry.get("party_type"),
-            "party": entry.get("party"),
-            "user_remark": entry.get("user_remark"),
-            "cost_center": entry.get("cost_center"),
+            "account": bank_account_entry.get("account", bank_account),
+            "bank_account": bank_account_entry.get("bank_account", bank_transaction.bank_account),
+            "debit": flt(bank_account_entry.get("debit", 0)),
+            "credit": flt(bank_account_entry.get("credit", 0)),
+            "party_type": bank_account_entry.get("party_type"),
+            "party": bank_account_entry.get("party"),
+            "user_remark": bank_account_entry.get("user_remark"),
+            "cost_center": bank_account_entry.get("cost_center"),
             "_is_bank_account": True
         })
 
@@ -412,8 +417,8 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
     for entry in expense_entries:
         entry_copy = dict(entry)
         # Use debit or credit as amount depending on which is non-zero
-        debit = entry.get("debit", 0) or 0
-        credit = entry.get("credit", 0) or 0
+        debit = flt(entry.get("debit", 0))
+        credit = flt(entry.get("credit", 0))
         entry_copy["amount"] = debit if debit > 0 else credit
         entries_with_amount.append(entry_copy)
 
@@ -428,22 +433,25 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
 
     # Add processed entries (with VAT)
     for entry in processed_entries:
+        account = entry.get("account")
+        # Skip entries without account
+        if not account:
+            continue
+
         cost_center = entry.get("cost_center") or dimensions.get("cost_center")
 
         if not cost_center:
-            account = entry.get("account")
-            if account:
-                report_type = frappe.get_cached_value("Account", account, "report_type")
-                if report_type == "Profit and Loss":
-                    cost_center = default_cost_center
+            report_type = frappe.get_cached_value("Account", account, "report_type")
+            if report_type == "Profit and Loss":
+                cost_center = default_cost_center
 
-        amount = entry.get("amount", 0)
+        amount = flt(entry.get("amount", 0))
         # For withdrawals: expense account is debited, for deposits: expense account is credited
         credit = amount if not is_withdrawal else 0
         debit = amount if is_withdrawal else 0
 
         journal_entry_lines.append({
-            "account": entry.get("account"),
+            "account": account,
             "debit": debit,
             "credit": credit,
             "cost_center": cost_center,
