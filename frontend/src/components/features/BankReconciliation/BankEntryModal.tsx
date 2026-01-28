@@ -25,9 +25,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
 import { JournalEntryAccount } from "@/types/Accounts/JournalEntryAccount"
 import { BankTransaction } from "@/types/Accounts/BankTransaction"
-import FileUploadBanner from "@/components/common/FileUploadBanner"
-import { Label } from "@/components/ui/label"
-import { FileDropzone } from "@/components/ui/file-dropzone"
 
 const BankEntryModal = () => {
 
@@ -436,10 +433,6 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
             onVatToggle={handleVatToggle}
             selectedFile={selectedFile}
         />
-    }
-
-    if (isUploading && isCompleted) {
-        return <FileUploadBanner uploadProgress={uploadProgress} />
     }
 
     return <Form {...form}>
