@@ -378,59 +378,72 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
     if not dimensions:
         dimensions = {}
 
+    # Build the journal entry structure
+    journal_entry_lines = []
+
+    # Separate bank account entry from other entries
+    bank_account_entries = []
+    expense_entries = []
+
+    for entry in entries:
+        entry_account = entry.get("account", "")
+        # Check if this is the bank account line
+        if entry_account == bank_account or entry.get("bank_account"):
+            bank_account_entries.append(entry)
+        else:
+            expense_entries.append(entry)
+
+    # Add bank account line(s) first - keep as-is from frontend
+    for entry in bank_account_entries:
+        journal_entry_lines.append({
+            "account": entry.get("account", bank_account),
+            "bank_account": entry.get("bank_account", bank_transaction.bank_account),
+            "debit": entry.get("debit", 0),
+            "credit": entry.get("credit", 0),
+            "party_type": entry.get("party_type"),
+            "party": entry.get("party"),
+            "user_remark": entry.get("user_remark"),
+            "cost_center": entry.get("cost_center"),
+            "_is_bank_account": True
+        })
+
+    # Convert debit/credit to amount for VAT calculation
+    entries_with_amount = []
+    for entry in expense_entries:
+        entry_copy = dict(entry)
+        # Use debit or credit as amount depending on which is non-zero
+        debit = entry.get("debit", 0) or 0
+        credit = entry.get("credit", 0) or 0
+        entry_copy["amount"] = debit if debit > 0 else credit
+        entries_with_amount.append(entry_copy)
+
     # Calculate entries with VAT if applicable
     processed_entries = calculate_journal_entry_with_vat(
-        entries=entries,
+        entries=entries_with_amount,
         is_withdrawal=is_withdrawal,
         is_vat_excluded=is_vat_excluded,
         disable_vat_calculation=disable_vat_calculation,
         company=company
     )
 
-    # Build the journal entry structure
-    journal_entry_lines = []
-
-    # Add bank account line
-    if is_withdrawal:
-        journal_entry_lines.append({
-            "account": bank_account,
-            "bank_account": bank_transaction.bank_account,
-            "credit": bank_transaction.unallocated_amount,
-            "debit": 0,
-            "party_type": None,
-            "party": None,
-            "user_remark": None,
-            "cost_center": None,
-            "_is_bank_account": True
-        })
-    else:
-        journal_entry_lines.append({
-            "account": bank_account,
-            "bank_account": bank_transaction.bank_account,
-            "debit": bank_transaction.unallocated_amount,
-            "credit": 0,
-            "party_type": None,
-            "party": None,
-            "user_remark": None,
-            "cost_center": None,
-            "_is_bank_account": True
-        })
-
     # Add processed entries (with VAT)
     for entry in processed_entries:
         cost_center = entry.get("cost_center") or dimensions.get("cost_center")
 
         if not cost_center:
-            report_type = frappe.get_cached_value("Account", entry["account"], "report_type")
-            if report_type == "Profit and Loss":
-                cost_center = default_cost_center
+            account = entry.get("account")
+            if account:
+                report_type = frappe.get_cached_value("Account", account, "report_type")
+                if report_type == "Profit and Loss":
+                    cost_center = default_cost_center
 
         amount = entry.get("amount", 0)
+        # For withdrawals: expense account is debited, for deposits: expense account is credited
         credit = amount if not is_withdrawal else 0
         debit = amount if is_withdrawal else 0
 
         journal_entry_lines.append({
-            "account": entry["account"],
+            "account": entry.get("account"),
             "debit": debit,
             "credit": credit,
             "cost_center": cost_center,
