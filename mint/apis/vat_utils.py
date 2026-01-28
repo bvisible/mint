@@ -1,6 +1,7 @@
 import frappe
 from typing import Optional, Dict, Any
 from decimal import Decimal, ROUND_HALF_UP
+from frappe.utils import flt
 
 def to_decimal(value: float, precision: int = 2) -> float:
     """
@@ -167,6 +168,10 @@ def calculate_journal_entry_with_vat(
         account = entry.get("account")
         amount = entry.get("amount", 0)
 
+        # If amount is not provided, derive it from debit or credit
+        if amount == 0:
+            amount = flt(entry.get("debit", 0)) or flt(entry.get("credit", 0))
+
         if not account or amount == 0:
             result_entries.append(entry)
             continue
@@ -194,16 +199,30 @@ def calculate_journal_entry_with_vat(
             base_amount = excluding_vat_price(amount, tax_info["tax_rate"])
             tax_amount = amount - base_amount
 
+        # Determine if original entry was a debit or credit
+        original_debit = flt(entry.get("debit", 0))
+        original_credit = flt(entry.get("credit", 0))
+        is_debit = original_debit > 0
+
         # Add the base entry (with HT amount)
         base_entry = entry.copy()
         base_entry["amount"] = base_amount
         base_entry["_is_base_for_vat"] = True
+        # Update debit or credit with the new base amount
+        if is_debit:
+            base_entry["debit"] = base_amount
+            base_entry["credit"] = 0
+        else:
+            base_entry["debit"] = 0
+            base_entry["credit"] = base_amount
         result_entries.append(base_entry)
 
         # Add the VAT entry
         vat_entry = {
             "account": tax_info["tax_account"],
             "amount": tax_amount,
+            "debit": tax_amount if is_debit else 0,
+            "credit": 0 if is_debit else tax_amount,
             "party_type": None,
             "party": None,
             "cost_center": entry.get("cost_center"),
