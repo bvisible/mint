@@ -275,6 +275,8 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str,
 
     default_cost_center = get_default_cost_center(company)
 
+    is_withdrawal = bank_transaction.withdrawal > 0.0
+
     bank_entry = frappe.get_doc({
         "doctype": "Journal Entry",
         "voucher_type": voucher_type,
@@ -379,59 +381,18 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
     if not dimensions:
         dimensions = {}
 
-    # Build the journal entry structure
-    journal_entry_lines = []
-
-    # Separate bank account entry from other entries
-    # Only keep ONE bank account line (the first one with bank_account field)
-    bank_account_entry = None
-    expense_entries = []
-
-    for entry in entries:
-        entry_account = entry.get("account", "")
-        has_bank_account_field = entry.get("bank_account")
-
-        # Check if this is the bank account line (has bank_account field set)
-        if has_bank_account_field and bank_account_entry is None:
-            bank_account_entry = entry
-        elif entry_account and entry_account != bank_account:
-            # Only add to expense entries if account is set and it's not the bank account
-            expense_entries.append(entry)
-
-    # Add the single bank account line first
-    if bank_account_entry:
-        journal_entry_lines.append({
-            "account": bank_account_entry.get("account", bank_account),
-            "bank_account": bank_account_entry.get("bank_account", bank_transaction.bank_account),
-            "debit": flt(bank_account_entry.get("debit", 0)),
-            "credit": flt(bank_account_entry.get("credit", 0)),
-            "party_type": bank_account_entry.get("party_type"),
-            "party": bank_account_entry.get("party"),
-            "user_remark": bank_account_entry.get("user_remark"),
-            "cost_center": bank_account_entry.get("cost_center"),
-            "_is_bank_account": True
-        })
-
-    # Convert debit/credit to amount for VAT calculation
-    entries_with_amount = []
-    for entry in expense_entries:
-        entry_copy = dict(entry)
-        # Use debit or credit as amount depending on which is non-zero
-        debit = flt(entry.get("debit", 0))
-        credit = flt(entry.get("credit", 0))
-        entry_copy["amount"] = debit if debit > 0 else credit
-        entries_with_amount.append(entry_copy)
-
-    # Calculate entries with VAT if applicable
+    # Calculate entries with VAT if applicable (same logic as create_bank_entry_and_reconcile)
     processed_entries = calculate_journal_entry_with_vat(
-        entries=entries_with_amount,
+        entries=entries,
         is_withdrawal=is_withdrawal,
         is_vat_excluded=is_vat_excluded,
         disable_vat_calculation=disable_vat_calculation,
         company=company
     )
 
-    # Add processed entries (with VAT)
+    # Build the journal entry structure (same logic as create_bank_entry_and_reconcile)
+    journal_entry_lines = []
+
     for entry in processed_entries:
         account = entry.get("account")
         # Skip entries without account
@@ -445,19 +406,19 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
             if report_type == "Profit and Loss":
                 cost_center = default_cost_center
 
-        amount = flt(entry.get("amount", 0))
-        # For withdrawals: expense account is debited, for deposits: expense account is credited
-        credit = amount if not is_withdrawal else 0
-        debit = amount if is_withdrawal else 0
+        # Check if this is the bank account line
+        is_bank_line = entry.get("bank_account") is not None
 
         journal_entry_lines.append({
             "account": account,
-            "debit": debit,
-            "credit": credit,
+            "bank_account": entry.get("bank_account"),
+            "debit": flt(entry.get("debit", 0)),
+            "credit": flt(entry.get("credit", 0)),
             "cost_center": cost_center,
-            "party_type": entry.get("party_type"),
+            "party_type": entry.get("party_type") if entry.get("party") else None,
             "party": entry.get("party"),
             "user_remark": entry.get("user_remark"),
+            "_is_bank_account": is_bank_line,
             "_is_vat_line": entry.get("_is_vat_line", False),
             "_is_base_for_vat": entry.get("_is_base_for_vat", False),
             "_source_account": entry.get("_source_account")
