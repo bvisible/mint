@@ -385,6 +385,8 @@ def create_document_scan_for_bank_statement(file_url: str, force_create: bool = 
                 generated_name = f"{base_name}-{suffix}"
 
         # Create Document Scan with bank statement prompt via neoffice_theme API
+        # CRITICAL: ocr_params forces page-by-page processing — bank statements
+        # must process ALL pages, never use two-pass/hybrid which skip pages
         result = frappe.call(
             "neoffice_theme.neoffice_theme.doctype.document_scan.document_scan.create_document_scan_from_json",
             json_data=json.dumps({
@@ -392,7 +394,13 @@ def create_document_scan_for_bank_statement(file_url: str, force_create: bool = 
                 "source_file": file_url,
                 "document_type": "Other",  # Bank Statement
                 "custom_prompt": BANK_STATEMENT_PROMPT,
-                "custom_schema": BANK_STATEMENT_SCHEMA
+                "custom_schema": BANK_STATEMENT_SCHEMA,
+                "ocr_params": {
+                    "document_type": "bank_statement",
+                    "use_page_splitting": True,
+                    "pages_per_batch": 1,
+                    "page_delay": 2.0,
+                }
             })
         )
 
