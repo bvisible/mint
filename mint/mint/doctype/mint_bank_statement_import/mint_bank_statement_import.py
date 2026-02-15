@@ -57,8 +57,10 @@ class MintBankStatementImport(Document):
 		"""
 		Populate the transactions child table from extracted data.
 		"""
+		# Filter out transactions without a valid date (mandatory field)
+		transactions = [tx for tx in transactions if tx.get("date")]
 		# Order the transactions by date
-		transactions.sort(key=lambda x: frappe.utils.getdate(x.get("date")) if x.get("date") else frappe.utils.today())
+		transactions.sort(key=lambda x: frappe.utils.getdate(x.get("date")))
 		self.transactions = []
 		for transaction in transactions:
 			self.append("transactions", {
