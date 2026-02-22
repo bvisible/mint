@@ -20,4 +20,12 @@ export interface PaymentEntryDeduction{
 	is_exchange_gain_loss?: 0 | 1
 	/**	Description : Small Text	*/
 	description?: string
+
+	// Marqueurs TVA (non persistés en DB - UI only)
+	/** Indicates this is an auto-generated VAT line */
+	_is_vat_line?: boolean
+	/** Indicates this deduction has VAT extracted */
+	_is_base_for_vat?: boolean
+	/** Source account that triggered VAT calculation */
+	_source_account?: string
 }

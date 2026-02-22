@@ -445,6 +445,102 @@ def preview_bank_entry_with_vat(bank_transaction_name: str,
     }
 
 
+@frappe.whitelist(methods=['POST'])
+def calculate_deductions_with_vat(
+    deductions: list,
+    company: str,
+    is_vat_excluded: bool = False,
+    disable_vat_calculation: bool = False
+) -> dict:
+    """
+    Calcule les déductions avec extraction TVA automatique.
+
+    Pour chaque déduction:
+    - Si compte a taxable_account: split en HT + ligne TVA
+    - Sinon: retourne tel quel
+
+    Réutilise: get_account_tax_info(), excluding_vat_price() de vat_utils.py
+
+    Args:
+        deductions: List of deduction dictionaries with 'account', 'amount', 'cost_center', 'description'
+        company: Company name
+        is_vat_excluded: If True, amounts are HT. If False, amounts are TTC (default)
+        disable_vat_calculation: If True, skip VAT calculation
+
+    Returns:
+        Dictionary with:
+        - deductions: Processed deductions list (including VAT lines)
+        - total_deductions: Total amount of all deductions
+        - has_vat: Boolean indicating if VAT lines were added
+    """
+    from mint.apis.vat_utils import (
+        get_company_vat_method,
+        get_account_tax_info,
+        excluding_vat_price,
+        calculate_vat_amount
+    )
+
+    # Vérifier si forfait (pas de TVA)
+    if company:
+        vat_method = get_company_vat_method(company)
+        if vat_method and "Flat" in vat_method:
+            disable_vat_calculation = True
+
+    result_deductions = []
+    has_vat = False
+
+    for deduction in deductions:
+        account = deduction.get("account")
+        amount = flt(deduction.get("amount", 0))
+
+        if not account or amount == 0 or disable_vat_calculation:
+            result_deductions.append(deduction)
+            continue
+
+        # Récupérer info TVA du compte
+        tax_info = get_account_tax_info(account)
+
+        if not tax_info:
+            result_deductions.append(deduction)
+            continue
+
+        has_vat = True
+
+        # Extraction TVA
+        if is_vat_excluded:
+            # Mode HT: montant = base, calculer TVA dessus
+            base_amount = amount
+            vat_amount = calculate_vat_amount(base_amount, tax_info["tax_rate"], True)
+        else:
+            # Mode TTC: montant inclut TVA, extraire base
+            base_amount = excluding_vat_price(amount, tax_info["tax_rate"])
+            vat_amount = amount - base_amount
+
+        # Ajouter déduction base (montant HT)
+        base_deduction = deduction.copy()
+        base_deduction["amount"] = base_amount
+        base_deduction["_is_base_for_vat"] = True
+        result_deductions.append(base_deduction)
+
+        # Ajouter ligne TVA
+        vat_deduction = {
+            "account": tax_info["tax_account"],
+            "amount": vat_amount,
+            "cost_center": deduction.get("cost_center"),
+            "description": f"TVA - {deduction.get('description', account)}",
+            "_is_vat_line": True,
+            "_source_account": account
+        }
+        result_deductions.append(vat_deduction)
+
+    total_deductions = sum(flt(d.get("amount", 0)) for d in result_deductions)
+
+    return {
+        "deductions": result_deductions,
+        "total_deductions": total_deductions,
+        "has_vat": has_vat
+    }
+
 
 @frappe.whitelist(methods=['POST'])
 def create_bulk_payment_entry_and_reconcile(bank_transaction_names: list, 

@@ -15,7 +15,7 @@ import { Form } from "@/components/ui/form"
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AlertCircleIcon, Plus, Trash2 } from "lucide-react"
+import { AlertCircleIcon, Plus, Trash2, X } from "lucide-react"
 import { flt, formatCurrency } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -35,6 +35,19 @@ import { Label } from "@/components/ui/label"
 import { FileDropzone } from "@/components/ui/file-dropzone"
 import { BankTransaction } from "@/types/Accounts/BankTransaction"
 import FileUploadBanner from "@/components/common/FileUploadBanner"
+
+// Hook pour calcul TVA sur les déductions
+const useDeductionsVatCalculation = () => {
+    const { call } = useFrappePostCall<{
+        message: {
+            deductions: PaymentEntryDeduction[]
+            total_deductions: number
+            has_vat: boolean
+        }
+    }>('mint.apis.bank_reconciliation.calculate_deductions_with_vat')
+
+    return { calculateVat: call }
+}
 
 const RecordPaymentModal = () => {
 
@@ -1079,15 +1092,18 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
 const OtherChargesSection = ({ currency }: { currency: string }) => {
 
     const { setTotalAllocatedAmount } = usePaymentEntryCalculations()
-    const { getValues, control } = useFormContext<PaymentEntry>()
+    const { getValues, control, setValue, watch } = useFormContext<PaymentEntry>()
+    const { calculateVat } = useDeductionsVatCalculation()
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, replace } = useFieldArray({
         control: control,
         name: 'deductions'
     })
 
-
     const [selectedRows, setSelectedRows] = useState<number[]>([])
+    const [isCalculating, setIsCalculating] = useState(false)
+
+    const company = watch('company')
 
     const onSelectRow = useCallback((index: number) => {
         setSelectedRows(prev => {
@@ -1108,34 +1124,116 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
     }, [fields])
 
     const onRemove = useCallback(() => {
-        remove(selectedRows)
+        // Filter out selected rows
+        const newDeductions = fields.filter((_, index) => !selectedRows.includes(index))
+        replace(newDeductions)
         setSelectedRows([])
         setTotalAllocatedAmount()
-    }, [remove, selectedRows, setTotalAllocatedAmount])
+    }, [fields, selectedRows, replace, setTotalAllocatedAmount])
+
+    const onRemoveVat = useCallback((index: number) => {
+        // Remove VAT line and update base amount
+        const deduction = fields[index]
+        if (!deduction._is_vat_line) return
+
+        // Find the base deduction (previous non-VAT line with same source)
+        const baseIndex = fields.findIndex((d, i) =>
+            i < index &&
+            d._is_base_for_vat &&
+            d.account === deduction._source_account
+        )
+
+        if (baseIndex >= 0) {
+            const baseDeduction = fields[baseIndex]
+            // Restore original amount (base + VAT)
+            const originalAmount = baseDeduction.amount + deduction.amount
+
+            // Update base deduction
+            setValue(`deductions.${baseIndex}.amount`, originalAmount)
+            setValue(`deductions.${baseIndex}._is_base_for_vat`, false)
+        }
+
+        // Remove VAT line
+        remove(index)
+        setTotalAllocatedAmount()
+    }, [fields, setValue, remove, setTotalAllocatedAmount])
 
     const onAdd = () => {
-
         append({
             account: '',
             cost_center: getCompanyCostCenter(getValues('company')),
             description: '',
             amount: 0
         } as PaymentEntryDeduction)
-
-
     }
+
+    // Trigger VAT calculation when account or amount changes
+    const handleVatCalculation = useCallback(async (index: number) => {
+        const currentDeductions = getValues('deductions') || []
+        const deduction = currentDeductions[index]
+
+        // Skip if no account or amount is zero or if already a VAT line
+        if (!deduction?.account || deduction.amount === 0 || deduction._is_vat_line) {
+            return
+        }
+
+        // Check if there's already a VAT line for this deduction (next line)
+        const nextIndex = index + 1
+        const hasExistingVatLine = nextIndex < currentDeductions.length &&
+            currentDeductions[nextIndex]._is_vat_line &&
+            currentDeductions[nextIndex]._source_account === deduction.account
+
+        // If already has VAT line and this is a base line, remove the old VAT line first
+        if (hasExistingVatLine) {
+            // Remove the existing VAT line
+            const deductionsWithoutOldVat = [
+                ...currentDeductions.slice(0, nextIndex),
+                ...currentDeductions.slice(nextIndex + 1)
+            ]
+            replace(deductionsWithoutOldVat)
+            // Wait a tick for the replace to complete
+            await new Promise(resolve => setTimeout(resolve, 0))
+        }
+
+        setIsCalculating(true)
+
+        try {
+            const result = await calculateVat({
+                deductions: [deduction],
+                company: company,
+                is_vat_excluded: false,
+                disable_vat_calculation: false
+            })
+
+            if (result?.message?.has_vat && result?.message?.deductions) {
+                // Replace the single deduction with base + VAT
+                const freshDeductions = getValues('deductions') || []
+                const newDeductions = [
+                    ...freshDeductions.slice(0, index),
+                    ...result.message.deductions,
+                    ...freshDeductions.slice(index + 1)
+                ]
+                replace(newDeductions)
+                setTotalAllocatedAmount()
+            }
+        } catch (error) {
+            console.error('VAT calculation error:', error)
+        } finally {
+            setIsCalculating(false)
+        }
+    }, [calculateVat, company, getValues, replace, setTotalAllocatedAmount])
 
     return <div className="flex flex-col gap-2">
         <div className="flex gap-2 items-center">
             <H4 className="text-base">Other Charges / Deductions</H4>
             <TotalDeductions currency={currency} />
+            {isCalculating && <span className="text-xs text-muted-foreground">{_("Calculating VAT...")}</span>}
         </div>
         <Table>
             <TableHeader>
                 <TableRow>
                     <TableHead><Checkbox
                         disabled={fields.length === 0}
-                        // Make this accessible to screen readers
                         aria-label={_("Select all")}
                         checked={selectedRows.length > 0 && selectedRows.length === fields.length}
                         onCheckedChange={onSelectAll} /></TableHead>
@@ -1143,79 +1241,138 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
                     <TableHead>{_("Cost Center")} <span className="text-destructive">*</span></TableHead>
                     <TableHead>{_("Description")}</TableHead>
                     <TableHead className="text-right">{_("Amount")} <span className="text-destructive">*</span></TableHead>
+                    <TableHead className="w-14"></TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {fields.map((field, index) => (
-                    <TableRow key={field.id}>
-                        <TableCell>
-                            <Checkbox
-                                checked={selectedRows.includes(index)}
-                                onCheckedChange={() => onSelectRow(index)}
-                                // Make this accessible to screen readers
-                                aria-label={_("Select row {0}", [String(index + 1)])}
-                            />
-                        </TableCell>
+                {fields.map((field, index) => {
+                    const isVatLine = field._is_vat_line
+                    const isBaseForVat = field._is_base_for_vat
 
-                        <TableCell className="align-top">
-                            <AccountFormField
-                                name={`deductions.${index}.account`}
-                                label={_("Account")}
-                                rules={{
-                                    required: _("Account is required"),
-                                }}
-                                buttonClassName="min-w-64"
-                                isRequired
-                                hideLabel
-                            />
-                        </TableCell>
-                        <TableCell className="align-top">
-                            <LinkFormField
-                                doctype="Cost Center"
-                                reference_doctype="Payment Entry Deduction"
-                                customQuery={{
-                                    query: "erpnext.controllers.queries.get_filtered_dimensions",
-                                    filters: {
-                                        "dimension": "cost_center",
-                                        "company": getValues('company'),
-                                    }
-                                }}
-                                rules={{
-                                    required: _("Cost Center is required"),
-                                }}
-                                name={`deductions.${index}.cost_center`}
-                                label={_("Cost Center")}
-                                buttonClassName="min-w-48"
-                                hideLabel
-                            />
-                        </TableCell>
-                        <TableCell className="align-top">
-                            <DataField
-                                name={`entries.${index}.user_remark`}
-                                label={_("Remarks")}
-                                inputProps={{
-                                    placeholder: _("e.g. Bank Charges"),
-                                    className: 'min-w-64'
-                                }}
-                                hideLabel
-                            />
-                        </TableCell>
-                        <TableCell className="text-right align-top">
-                            <CurrencyFormField
-                                name={`deductions.${index}.amount`}
-                                label={_("Amount")}
-                                isRequired
-                                hideLabel
-                                currency={currency}
-                                rules={{
-                                    onChange: () => {
-                                        setTotalAllocatedAmount()
-                                    }
-                                }}
-                            />
-                        </TableCell>
-                    </TableRow>
-                ))}
+                    return (
+                        <TableRow
+                            key={field.id}
+                            className={cn(
+                                isVatLine && 'bg-blue-50 dark:bg-blue-950/20'
+                            )}
+                        >
+                            <TableCell>
+                                {!isVatLine && <Checkbox
+                                    checked={selectedRows.includes(index)}
+                                    onCheckedChange={() => onSelectRow(index)}
+                                    aria-label={_("Select row {0}", [String(index + 1)])}
+                                />}
+                            </TableCell>
+
+                            <TableCell className="align-top">
+                                <div className="flex items-center gap-2">
+                                    {isVatLine ? (
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm">{field.account}</span>
+                                            <span className='text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded'>
+                                                {_("VAT")}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <AccountFormField
+                                            name={`deductions.${index}.account`}
+                                            label={_("Account")}
+                                            rules={{
+                                                required: _("Account is required"),
+                                                onChange: () => handleVatCalculation(index)
+                                            }}
+                                            buttonClassName="min-w-64"
+                                            isRequired
+                                            hideLabel
+                                        />
+                                    )}
+                                </div>
+                            </TableCell>
+                            <TableCell className="align-top">
+                                {isVatLine ? (
+                                    <span className="text-sm text-muted-foreground">{field.cost_center}</span>
+                                ) : (
+                                    <LinkFormField
+                                        doctype="Cost Center"
+                                        reference_doctype="Payment Entry Deduction"
+                                        customQuery={{
+                                            query: "erpnext.controllers.queries.get_filtered_dimensions",
+                                            filters: {
+                                                "dimension": "cost_center",
+                                                "company": getValues('company'),
+                                            }
+                                        }}
+                                        rules={{
+                                            required: _("Cost Center is required"),
+                                        }}
+                                        name={`deductions.${index}.cost_center`}
+                                        label={_("Cost Center")}
+                                        buttonClassName="min-w-48"
+                                        hideLabel
+                                    />
+                                )}
+                            </TableCell>
+                            <TableCell className="align-top">
+                                {isVatLine ? (
+                                    <span className="text-sm text-muted-foreground italic">{field.description}</span>
+                                ) : (
+                                    <DataField
+                                        name={`deductions.${index}.description`}
+                                        label={_("Remarks")}
+                                        inputProps={{
+                                            placeholder: _("e.g. Bank Charges"),
+                                            className: 'min-w-64'
+                                        }}
+                                        hideLabel
+                                    />
+                                )}
+                            </TableCell>
+                            <TableCell className="text-right align-top">
+                                {isVatLine ? (
+                                    <span className="font-mono text-sm text-blue-700 dark:text-blue-300">
+                                        {formatCurrency(field.amount, currency)}
+                                    </span>
+                                ) : (
+                                    <CurrencyFormField
+                                        name={`deductions.${index}.amount`}
+                                        label={_("Amount")}
+                                        isRequired
+                                        hideLabel
+                                        currency={currency}
+                                        rules={{
+                                            onChange: () => {
+                                                setTotalAllocatedAmount()
+                                            },
+                                            onBlur: () => {
+                                                handleVatCalculation(index)
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </TableCell>
+                            <TableCell>
+                                {isVatLine && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant='ghost'
+                                                size='icon'
+                                                type='button'
+                                                className="text-blue-600 hover:text-blue-800"
+                                                onClick={() => onRemoveVat(index)}
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {_("Remove VAT extraction")}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    )
+                })}
             </TableBody>
         </Table>
         <div className="flex justify-between gap-2">
