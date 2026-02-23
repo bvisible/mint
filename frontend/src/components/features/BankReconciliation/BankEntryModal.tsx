@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { bankRecRecordJournalEntryModalAtom, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import _ from "@/lib/translate"
-import { UnreconciledTransaction, useGetRuleForTransaction, useRefreshUnreconciledTransactions } from "./utils"
+import { UnreconciledTransaction, useGetRuleForTransaction, useRefreshUnreconciledTransactions, useUpdateActionLog } from "./utils"
 import { useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form"
 import { JournalEntry } from "@/types/Accounts/JournalEntry"
 import { getCompanyCostCenter, getCompanyCurrency } from "@/lib/company"
@@ -78,9 +78,10 @@ const BulkBankEntryForm = ({ selectedTransactions }: { selectedTransactions: Unr
         }
     })
 
-    const { call, loading, error } = useFrappePostCall('mint.apis.bank_reconciliation.create_bulk_bank_entry_and_reconcile')
+    const { call, loading, error } = useFrappePostCall<{ message: { transaction: BankTransaction, journal_entry: JournalEntry }[] }>('mint.apis.bank_reconciliation.create_bulk_bank_entry_and_reconcile')
 
     const onReconcile = useRefreshUnreconciledTransactions()
+    const addToActionLog = useUpdateActionLog()
 
     const setIsOpen = useSetAtom(bankRecRecordJournalEntryModalAtom)
 
@@ -89,7 +90,25 @@ const BulkBankEntryForm = ({ selectedTransactions }: { selectedTransactions: Unr
         call({
             bank_transactions: selectedTransactions.map(transaction => transaction.name),
             account: data.account
-        }).then(() => {
+        }).then(({ message }) => {
+
+            addToActionLog({
+                type: 'bank_entry',
+                timestamp: (new Date()).getTime(),
+                isBulk: true,
+                items: message.map((item) => ({
+                    bankTransaction: item.transaction,
+                    voucher: {
+                        reference_doctype: "Journal Entry",
+                        reference_name: item.journal_entry.name,
+                        doc: item.journal_entry,
+                        posting_date: item.journal_entry.posting_date,
+                    }
+                })),
+                bulkCommonData: {
+                    account: data.account,
+                }
+            })
 
             toast.success(_("Bank Entries Created"), {
                 duration: 4000,
@@ -340,6 +359,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
     const { call: createBankEntry, loading: submitLoading, error: submitError } = useFrappePostCall('mint.apis.bank_reconciliation.create_bank_entry_and_reconcile')
 
     const setBankRecUnreconcileModalAtom = useSetAtom(bankRecUnreconcileModalAtom)
+    const addToActionLog = useUpdateActionLog()
 
     const loading = previewLoading || submitLoading || uploadLoading
     const error = previewError || submitError
@@ -373,8 +393,30 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                 disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
             })
 
+            const message = result?.message || result
+
+            // Log the action for undo support
+            addToActionLog({
+                type: 'bank_entry',
+                isBulk: false,
+                timestamp: (new Date()).getTime(),
+                items: [
+                    {
+                        bankTransaction: message.transaction,
+                        voucher: {
+                            reference_doctype: "Journal Entry",
+                            reference_name: message.journal_entry?.name || message.journal_entry,
+                            reference_no: message.journal_entry?.cheque_no,
+                            reference_date: message.journal_entry?.cheque_date,
+                            posting_date: message.journal_entry?.posting_date,
+                            doc: message.journal_entry,
+                        }
+                    }
+                ]
+            })
+
             // Get journal entry name from response
-            const journalEntryName = result?.message?.journal_entry || result?.journal_entry
+            const journalEntryName = message.journal_entry?.name || message.journal_entry
 
             // If a file was selected, upload it and attach to the Journal Entry
             if (selectedFile && journalEntryName) {
@@ -460,9 +502,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                                 }}
                             />
                         </div>
-                        <DataField name='cheque_no' label={_("Reference No")} isRequired inputProps={{ autoFocus: false }}
+                        <DataField name='cheque_no' label={_("Reference")} isRequired inputProps={{ autoFocus: false }}
                             rules={{
-                                required: _("Reference No is required"),
+                                required: _("Reference is required"),
                             }} />
                     </div>
                 </div>
