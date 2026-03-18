@@ -202,7 +202,7 @@ msgstr "Rapprochement bancaire"
 
 #: mint/mint/page/bank_reconciliation/bank_reconciliation.js:7
 msgid "Bank Reconciliation - Mint"
-msgstr ""
+msgstr "Rapprochement bancaire - Mint"
 
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:97
 #: frontend/src/pages/BankReconciliation.tsx:51
@@ -842,7 +842,7 @@ msgstr "Aucun compte trouvé."
 
 #: frontend/src/components/features/BankReconciliation/CompanySelector.tsx:55
 msgid "No company found."
-msgstr ""
+msgstr "Aucune société trouvée."
 
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:149
 msgid "No entries found"
@@ -1334,7 +1334,7 @@ msgstr "Rechercher un compte..."
 
 #: frontend/src/components/features/BankReconciliation/CompanySelector.tsx:53
 msgid "Search company..."
-msgstr ""
+msgstr "Rechercher une société..."
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:151
 msgid "Search transactions"
@@ -1369,7 +1369,7 @@ msgstr "Tout sélectionner"
 
 #: frontend/src/components/ui/form-elements.tsx:157
 msgid "Select date"
-msgstr ""
+msgstr "Sélectionner une date"
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:376
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:612
@@ -1702,5 +1702,463 @@ msgstr "{0} {1} n'existe pas"
 #. Count format of shortcut in the Mint Workspace
 #: mint/mint/workspace/mint/mint.json
 msgid "{} Open"
-msgstr ""
+msgstr "{} Ouvert(s)"
 
+
+# ── Mint UI translations (added by audit) ──
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Closing Balance as per statement"
+msgstr "Solde de clôture selon le relevé"
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Click to set the closing balance as per statement"
+msgstr "Cliquer pour définir le solde de clôture selon le relevé"
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Closing balance set."
+msgstr "Solde de clôture défini."
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Closing balance is required."
+msgstr "Le solde de clôture est requis."
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Set closing balance as per bank statement"
+msgstr "Définir le solde de clôture selon le relevé bancaire"
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Deleting closing balance..."
+msgstr "Suppression du solde de clôture..."
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Closing balance deleted."
+msgstr "Solde de clôture supprimé."
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Failed to delete closing balance."
+msgstr "Échec de la suppression du solde de clôture."
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "As of {0}"
+msgstr "Au {0}"
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Balances as per bank statement before {0}"
+msgstr "Soldes selon le relevé bancaire avant le {0}"
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Closing balance on bank statement as of {0}"
+msgstr "Solde de clôture sur le relevé bancaire au {0}"
+
+#: frontend/src/components/features/BankBalance/BankBalance.tsx
+msgid "Enter the closing balance you see in your bank statement for {0} as of the {1}"
+msgstr "Saisissez le solde de clôture de votre relevé bancaire pour {0} au {1}"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Invalid file type. Allowed: PDF, JPG, PNG, GIF, DOC, DOCX, XLS, XLSX"
+msgstr "Type de fichier invalide. Autorisés : PDF, JPG, PNG, GIF, DOC, DOCX, XLS, XLSX"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Bank Entry created but file upload failed"
+msgstr "Écriture bancaire créée mais le téléchargement du fichier a échoué"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Reference is required"
+msgstr "La référence est requise"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Drop file here"
+msgstr "Déposer le fichier ici"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Drag and drop file here"
+msgstr "Glisser-déposer le fichier ici"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "or click to browse"
+msgstr "ou cliquer pour parcourir"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Preview"
+msgstr "Aperçu"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "This is the bank account entry. You cannot edit it."
+msgstr "Ceci est l'écriture du compte bancaire. Vous ne pouvez pas la modifier."
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Bank account debit for deposit"
+msgstr "Débit du compte bancaire pour le dépôt"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Bank account credit for withdrawal"
+msgstr "Crédit du compte bancaire pour le retrait"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Total Debit"
+msgstr "Total débit"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Total Credit"
+msgstr "Total crédit"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Add a row with the difference amount"
+msgstr "Ajouter une ligne avec le montant de la différence"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Preview data is invalid. Please try again."
+msgstr "Les données d'aperçu sont invalides. Veuillez réessayer."
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Back to Form"
+msgstr "Retour au formulaire"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Journal Entry Details"
+msgstr "Détails de l'écriture de journal"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Voucher Type"
+msgstr "Type de pièce"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Accounting Entries"
+msgstr "Écritures comptables"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "VAT"
+msgstr "TVA"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Bank"
+msgstr "Banque"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Total"
+msgstr "Total"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Warning: The journal entry is not balanced. Debit and credit totals must be equal."
+msgstr "Attention : l'écriture de journal n'est pas équilibrée. Les totaux débit et crédit doivent être égaux."
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Remove VAT"
+msgstr "Retirer la TVA"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "With VAT"
+msgstr "Avec TVA"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Edit"
+msgstr "Modifier"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Confirm and Submit"
+msgstr "Confirmer et soumettre"
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Submitting..."
+msgstr "Soumission en cours..."
+
+#: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
+msgid "Calculating VAT..."
+msgstr "Calcul de la TVA..."
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "Submit Draft Journal Entry"
+msgstr "Soumettre le brouillon d'écriture de journal"
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "Update dates and remarks before submitting and reconciling the Journal Entry."
+msgstr "Mettre à jour les dates et remarques avant de soumettre et rapprocher l'écriture de journal."
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "Journal Entry submitted and reconciled"
+msgstr "Écriture de journal soumise et rapprochée"
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "Bank Transaction Date"
+msgstr "Date de la transaction bancaire"
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "The dates will be updated to match the bank transaction."
+msgstr "Les dates seront mises à jour pour correspondre à la transaction bancaire."
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "Add a remark for this entry..."
+msgstr "Ajouter une remarque pour cette écriture..."
+
+#: frontend/src/components/features/DraftJEModal/DraftJEModal.tsx
+msgid "Submit & Reconcile"
+msgstr "Soumettre et rapprocher"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "No transactions found for the given filters."
+msgstr "Aucune transaction trouvée pour les filtres donnés."
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "No unreconciled transactions found"
+msgstr "Aucune transaction non rapprochée trouvée"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "Posting date matches the transaction date"
+msgstr "La date de comptabilisation correspond à la date de transaction"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "Posting date does not match the transaction date"
+msgstr "La date de comptabilisation ne correspond pas à la date de transaction"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "Reference date matches the transaction date"
+msgstr "La date de référence correspond à la date de transaction"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "Reference date does not match the transaction date"
+msgstr "La date de référence ne correspond pas à la date de transaction"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "There are {0} unreconciled transactions before {1}."
+msgstr "Il y a {0} transactions non rapprochées avant le {1}."
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "There is one unreconciled transaction before {0}."
+msgstr "Il y a une transaction non rapprochée avant le {0}."
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "The opening balance might not match your bank statement. Would you like to reconcile them?"
+msgstr "Le solde d'ouverture pourrait ne pas correspondre à votre relevé bancaire. Souhaitez-vous les rapprocher ?"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "View older transaction"
+msgstr "Voir la transaction plus ancienne"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx
+msgid "View older transactions"
+msgstr "Voir les transactions plus anciennes"
+
+#: frontend/src/components/features/BankClearanceSummary/BankClearanceSummary.tsx
+msgid "Force Clear"
+msgstr "Forcer la compensation"
+
+#: frontend/src/components/features/BankClearanceSummary/BankClearanceSummary.tsx
+msgid "Set the clearance date for this voucher without reconciling with a bank transaction."
+msgstr "Définir la date de compensation pour cette pièce sans la rapprocher d'une transaction bancaire."
+
+#: frontend/src/components/features/BankClearanceSummary/BankClearanceSummary.tsx
+msgid "Clearance date updated"
+msgstr "Date de compensation mise à jour"
+
+#: frontend/src/components/features/BankClearanceSummary/BankClearanceSummary.tsx
+msgid "Force Clear Voucher"
+msgstr "Forcer la compensation de la pièce"
+
+#: frontend/src/components/features/BankTransactionList/BankTransactionList.tsx
+msgid "There are no transactions in the system for the selected bank account and dates that match the filters."
+msgstr "Il n'y a aucune transaction dans le système pour le compte bancaire et les dates sélectionnés correspondant aux filtres."
+
+#: frontend/src/components/features/BankTransactionList/BankTransactionList.tsx
+msgid "Unreconciled"
+msgstr "Non rapproché"
+
+#: frontend/src/components/features/MatchFilters/MatchFilters.tsx
+msgid "Include Drafts"
+msgstr "Inclure les brouillons"
+
+#: frontend/src/components/features/TransferModal/TransferModal.tsx
+msgid "Attachments"
+msgstr "Pièces jointes"
+
+#: frontend/src/components/features/RecordPaymentModal/RecordPaymentModal.tsx
+msgid "Remove VAT extraction"
+msgstr "Supprimer l'extraction TVA"
+
+#: frontend/src/components/features/Rules/RuleConfigureButton.tsx
+msgid "Force evaluate all"
+msgstr "Forcer l'évaluation de toutes"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Single Account"
+msgstr "Compte unique"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Multiple Accounts (Journal Template)"
+msgstr "Comptes multiples (modèle de journal)"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Create Bank Entry against"
+msgstr "Créer une écriture bancaire contre"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Journal Template Accounts"
+msgstr "Comptes du modèle de journal"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Configure Accounts"
+msgstr "Configurer les comptes"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "No accounts configured"
+msgstr "Aucun compte configuré"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "This is auto computed to balance the journal entry."
+msgstr "Ceci est calculé automatiquement pour équilibrer l'écriture de journal."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Based on the above entries, the balance amount (debit or credit) will be set for the last row to balance the journal entry."
+msgstr "Sur la base des écritures ci-dessus, le montant restant (débit ou crédit) sera défini pour la dernière ligne afin d'équilibrer l'écriture de journal."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "This is a formula based value."
+msgstr "Ceci est une valeur basée sur une formule."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "This is not a valid formula. Check the variable used in the formula."
+msgstr "Ceci n'est pas une formule valide. Vérifiez la variable utilisée dans la formule."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Configure Accounts for Bank Entry"
+msgstr "Configurer les comptes pour l'écriture bancaire"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Add all accounts that you want to split the transaction into."
+msgstr "Ajoutez tous les comptes dans lesquels vous souhaitez répartir la transaction."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "This is the row for the bank account. It will be auto populated based on the bank transaction."
+msgstr "Ceci est la ligne du compte bancaire. Elle sera remplie automatiquement à partir de la transaction bancaire."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Will be auto-populated"
+msgstr "Sera rempli automatiquement"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "This is the last row. It will be auto populated based on the bank transaction."
+msgstr "Ceci est la dernière ligne. Elle sera remplie automatiquement à partir de la transaction bancaire."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Help"
+msgstr "Aide"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "You can set up the rule to split the transaction across multiple accounts."
+msgstr "Vous pouvez configurer la règle pour répartir la transaction sur plusieurs comptes."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "You can also add credit or debit values to pre-fill - these support both static values (like 200) or formulas (like transaction_amount * 0.25)."
+msgstr "Vous pouvez également ajouter des valeurs de crédit ou débit pré-remplies - celles-ci prennent en charge les valeurs statiques (comme 200) ou les formules (comme transaction_amount * 0.25)."
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "Example"
+msgstr "Exemple"
+
+#: frontend/src/components/features/Rules/RuleForm.tsx
+msgid "In this case, the amount will be calculated as 25% of the transaction amount. If the transaction amount is 200, then this will be calculated as 200 * 0.25 = 50."
+msgstr "Dans ce cas, le montant sera calculé à 25% du montant de la transaction. Si le montant de la transaction est 200, cela sera calculé comme 200 * 0.25 = 50."
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Reconciliation History"
+msgstr "Historique de rapprochement"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "View all reconciliation actions taken in this session."
+msgstr "Voir toutes les actions de rapprochement effectuées dans cette session."
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "No reconciliation actions found"
+msgstr "Aucune action de rapprochement trouvée"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "You have not performed any reconciliations in this session yet."
+msgstr "Vous n'avez pas encore effectué de rapprochement dans cette session."
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Matched"
+msgstr "Apparié"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Bulk Payment"
+msgstr "Paiement groupé"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Payment"
+msgstr "Paiement"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Bulk Transfer"
+msgstr "Virement groupé"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Bulk Bank Entry"
+msgstr "Écriture bancaire groupée"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Transaction Date"
+msgstr "Date de transaction"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Match"
+msgstr "Correspondance"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Unmatched"
+msgstr "Non apparié"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Unmatch Transaction?"
+msgstr "Annuler l'appariement de la transaction ?"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Are you sure you want to unmatch the voucher from this transaction?"
+msgstr "Êtes-vous sûr de vouloir annuler l'appariement de la pièce de cette transaction ?"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Voucher Name"
+msgstr "Nom de la pièce"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Transfer Account"
+msgstr "Compte de virement"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "Payment Details"
+msgstr "Détails du paiement"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "1 invoice"
+msgstr "1 facture"
+
+#: frontend/src/components/features/ActionLog/ActionLog.tsx
+msgid "No invoice linked"
+msgstr "Aucune facture liée"
+
+#: frontend/src/components/features/Settings/Settings.tsx
+msgid "Number of days to match transfers"
+msgstr "Nombre de jours pour faire correspondre les virements"
+
+#: frontend/src/components/ui/file-dropzone.tsx
+msgid "Drop some files here, or click to select files"
+msgstr "Déposez des fichiers ici, ou cliquez pour sélectionner"
+
+#: frontend/src/components/ui/FileUploadBanner.tsx
+msgid "The document has been created and reconciled. Uploading attachments..."
+msgstr "Le document a été créé et rapproché. Téléchargement des pièces jointes..."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js
+msgid "Draft - Error"
+msgstr "Brouillon - Erreur"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js
+msgid "Draft - Processing"
+msgstr "Brouillon - En cours"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js
+msgid "Draft - Ready"
+msgstr "Brouillon - Prêt"
