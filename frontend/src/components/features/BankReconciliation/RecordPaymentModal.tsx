@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import SelectedTransactionDetails from "./SelectedTransactionDetails"
 import { AccountFormField, CurrencyFormField, DataField, DateField, LinkFormField, PartyTypeFormField, SmallTextField } from "@/components/ui/form-elements"
 import { Form } from "@/components/ui/form"
-import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { ChangeEvent, useCallback, useContext, useEffect, useRef, useMemo, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AlertCircleIcon, Plus, Trash2, X } from "lucide-react"
@@ -328,6 +328,23 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
         }
 
     }, [rule, setUnpaidInvoiceOpen])
+
+    // Auto-focus on Party field when modal opens
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const dialog = document.querySelector('[role="dialog"]')
+            if (dialog) {
+                const comboboxButtons = dialog.querySelectorAll('button[role="combobox"]')
+                // The first combobox in the form is PartyType, the second is Party
+                const partyButton = comboboxButtons[1] as HTMLButtonElement
+                if (partyButton) {
+                    partyButton.focus()
+                    partyButton.click()
+                }
+            }
+        }, 300)
+        return () => clearTimeout(timer)
+    }, [])
 
     const { call: createPaymentEntry, loading, error, isCompleted } = useFrappePostCall<{ message: { transaction: BankTransaction, payment_entry: PaymentEntry } }>('mint.apis.bank_reconciliation.create_payment_entry_and_reconcile')
 
@@ -1212,6 +1229,20 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
             description: '',
             amount: 0
         } as PaymentEntryDeduction)
+
+        // Auto-focus on the Account field of the newly added row
+        setTimeout(() => {
+            const rows = document.querySelectorAll('[data-deduction-row]')
+            const lastRow = rows[rows.length - 1]
+            if (lastRow) {
+                const accountBtn = lastRow.querySelector('[data-fieldname="account"] button') as HTMLButtonElement
+                    ?? lastRow.querySelector('button[class*="min-w-64"]') as HTMLButtonElement
+                if (accountBtn) {
+                    accountBtn.focus()
+                    accountBtn.click()
+                }
+            }
+        }, 100)
     }
 
     // Trigger VAT calculation when account or amount changes
@@ -1299,6 +1330,7 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
                     return (
                         <TableRow
                             key={field.id}
+                            data-deduction-row={index}
                             className={cn(
                                 isVatLine && 'bg-blue-50 dark:bg-blue-950/20'
                             )}
