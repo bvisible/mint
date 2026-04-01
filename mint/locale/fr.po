@@ -2162,3 +2162,27 @@ msgstr "Brouillon - En cours"
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js
 msgid "Draft - Ready"
 msgstr "Brouillon - Prêt"
+
+#: frontend/src/components/common/PartyTypeDropdown.tsx
+msgid "Customer"
+msgstr "Client"
+
+#: frontend/src/components/common/PartyTypeDropdown.tsx
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#: frontend/src/components/common/PartyTypeDropdown.tsx
+msgid "Employee"
+msgstr "Employé"
+
+#: frontend/src/components/common/PartyTypeDropdown.tsx
+msgid "Shareholder"
+msgstr "Actionnaire"
+
+#: frontend/src/components/common/PartyTypeDropdown.tsx
+msgid "Student"
+msgstr "Étudiant"
+
+#: frontend/src/components/common/LinkFieldCombobox.tsx
+msgid "Select {0}"
+msgstr "Sélectionner {0}"
