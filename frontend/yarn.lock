@@ -524,6 +524,9 @@
     lucide-react "^0.400.0"
     tailwind-merge "^2.0.0"
 
+"@neoffice/nora-learn-react@file:../../nora-learn-react":
+  version "1.0.0"
+
 "@radix-ui/number@1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@radix-ui/number/-/number-1.1.1.tgz#7b2c9225fbf1b126539551f5985769d0048d9090"

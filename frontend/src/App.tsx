@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import { FrappeProvider } from 'frappe-react-sdk'
 import BankReconciliation from './pages/BankReconciliation'
 import { Toaster } from './components/ui/sonner'
+import { toast } from 'sonner'
 import { FrappeSidebar } from '@neoffice/frappe-sidebar-react'
+import { NoraLearnProvider } from '@neoffice/nora-learn-react'
+import '@neoffice/nora-learn-react/styles'
 
 function App() {
 	useEffect(() => {
@@ -28,12 +31,24 @@ function App() {
 			}}
 			socketPort={import.meta.env.VITE_SOCKET_PORT}
 			siteName={window.frappe?.boot?.sitename ?? import.meta.env.VITE_SITE_NAME}>
-			<div className="flex h-screen overflow-hidden">
-				<FrappeSidebar homeUrl="/app/home" />
-				<div className="flex-1 overflow-auto">
-					<BankReconciliation />
+			<NoraLearnProvider config={{
+				appName: 'mint',
+				navigate: (url) => { window.location.href = url },
+				getCurrentRoute: () => window.location.pathname,
+				showAlert: (msg, variant) => {
+					if (variant === 'success') toast.success(msg)
+					else if (variant === 'error') toast.error(msg)
+					else if (variant === 'warning') toast.warning(msg)
+					else toast.info(msg)
+				},
+			}}>
+				<div className="flex h-screen overflow-hidden">
+					<FrappeSidebar homeUrl="/app/home" />
+					<div className="flex-1 overflow-auto">
+						<BankReconciliation />
+					</div>
 				</div>
-			</div>
+			</NoraLearnProvider>
 			<Toaster richColors />
 		</FrappeProvider>
 	)
