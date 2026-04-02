@@ -17,7 +17,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.2.1",
     "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#bff94fcd173aafb51eed72127df617958d3e67be",
-    "@neoffice/nora-learn-react": "git+https://github.com/bvisible/nora-learn-react.git#f2fe64c0f29e82de0570165ed348e5d007a43f51",
+    "@neoffice/nora-learn-react": "git+https://github.com/bvisible/nora-learn-react.git#dd0e467",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-table": "^8.21.3",
     "chrono-node": "^2.8.3",
