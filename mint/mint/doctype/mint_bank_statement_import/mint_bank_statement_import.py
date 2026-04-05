@@ -174,6 +174,36 @@ class MintBankStatementImport(Document):
 				bank_tx.submit()
 				stats["created"] += 1
 
+				# First: check if a Payment Entry already exists for this reference
+				# (e.g. created by Payment Proposal before bank confirmation)
+				existing_pe = frappe.db.get_value("Payment Entry",
+					{"reference_no": reference, "docstatus": 1}, "name")
+				if not existing_pe and transaction.invoice_matches:
+					# Also check by invoice reference (PE may use invoice name as reference)
+					try:
+						import ast as _ast
+						_inv_list = _ast.literal_eval(transaction.invoice_matches) if isinstance(transaction.invoice_matches, str) else transaction.invoice_matches
+						if _inv_list and len(_inv_list) == 1:
+							existing_pe = frappe.db.get_value("Payment Entry",
+								{"reference_no": _inv_list[0], "docstatus": 1}, "name")
+					except:
+						pass
+
+				if existing_pe:
+					# PE already exists — just link it to the Bank Transaction
+					bank_tx.reload()
+					bank_tx.append("payment_entries", {
+						"payment_document": "Payment Entry",
+						"payment_entry": existing_pe,
+						"allocated_amount": amount,
+					})
+					bank_tx.status = "Reconciled"
+					bank_tx.save()
+					stats["auto_matched"] += 1
+					transaction.db_set("status", "Paid")
+					transaction.db_set("imported", 1)
+					continue
+
 				# Try to auto-create Payment Entry from invoice matches
 				invoice_matches = transaction.invoice_matches
 				party_match = transaction.party_match
@@ -187,10 +217,7 @@ class MintBankStatementImport(Document):
 							if not is_withdrawal:
 								# Customer payment (CRDT)
 								sinv = frappe.get_doc("Sales Invoice", invoice_name)
-								# Skip auto-PE if amount doesn't match exactly
-								if abs(amount - sinv.outstanding_amount) > 0.01:
-									continue  # Leave for Mint to handle
-								if not frappe.db.exists("Payment Entry", {"reference_no": reference, "docstatus": 1}):
+								if abs(amount - sinv.outstanding_amount) <= 0.01 and not frappe.db.exists("Payment Entry", {"reference_no": reference, "docstatus": 1}):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
 										"payment_type": "Receive",
@@ -222,7 +249,7 @@ class MintBankStatementImport(Document):
 									bank_tx.status = "Reconciled" if amount == sinv.outstanding_amount else "Unreconciled"
 									bank_tx.save()
 									stats["auto_matched"] += 1
-									transaction.db_set("status", "Imported")
+									transaction.db_set("status", "Paid")
 									transaction.db_set("imported", 1)
 									continue
 							else:
@@ -259,7 +286,7 @@ class MintBankStatementImport(Document):
 									bank_tx.status = "Reconciled" if amount == pinv.outstanding_amount else "Unreconciled"
 									bank_tx.save()
 									stats["auto_matched"] += 1
-									transaction.db_set("status", "Imported")
+									transaction.db_set("status", "Paid")
 									transaction.db_set("imported", 1)
 									continue
 					except Exception as e:
@@ -372,7 +399,7 @@ def parse_xml_content(docname):
 
 	# Clear existing transactions and populate with parsed data
 	doc.transactions = []
-	stats = {"total": 0, "new": 0, "duplicates": 0}
+	stats = {"total": 0, "to_process": 0, "duplicates": 0}
 
 	for txn in transactions:
 		is_debit = txn.get("credit_debit") == "DBIT"
@@ -382,7 +409,7 @@ def parse_xml_content(docname):
 
 		# Check for existing Bank Transaction (pre-dedup)
 		existing_bt = None
-		status = "New"
+		status = "To Process"
 		if reference and doc.bank_account:
 			existing_bt = _find_existing_bank_transaction(
 				doc.bank_account, txn.get("date"), reference, amount, is_debit
@@ -391,7 +418,7 @@ def parse_xml_content(docname):
 				status = "Existing"
 				stats["duplicates"] += 1
 			else:
-				stats["new"] += 1
+				stats["to_process"] += 1
 
 		# Invoice matching info from bank_wizard parser
 		invoice_matches = txn.get("invoice_matches")
@@ -420,7 +447,7 @@ def parse_xml_content(docname):
 	return {
 		"success": True,
 		"transaction_count": stats["total"],
-		"new_count": stats["new"],
+		"new_count": stats["to_process"],
 		"duplicate_count": stats["duplicates"],
 		"bank_account": doc.bank_account,
 		"currency": doc.currency,

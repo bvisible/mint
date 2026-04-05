@@ -106,7 +106,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nNew\nExisting\nImported\nError",
+   "options": "\nTo Process\nExisting\nPaid\nImported\nError",
    "read_only": 1
   },
   {
