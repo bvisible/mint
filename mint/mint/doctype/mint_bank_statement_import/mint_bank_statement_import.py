@@ -174,20 +174,11 @@ class MintBankStatementImport(Document):
 				bank_tx.submit()
 				stats["created"] += 1
 
-				# First: check if a Payment Entry already exists for this reference
+				# First: check if a Payment Entry already exists
 				# (e.g. created by Payment Proposal before bank confirmation)
-				existing_pe = frappe.db.get_value("Payment Entry",
-					{"reference_no": reference, "docstatus": 1}, "name")
-				if not existing_pe and transaction.invoice_matches:
-					# Also check by invoice reference (PE may use invoice name as reference)
-					try:
-						import ast as _ast
-						_inv_list = _ast.literal_eval(transaction.invoice_matches) if isinstance(transaction.invoice_matches, str) else transaction.invoice_matches
-						if _inv_list and len(_inv_list) == 1:
-							existing_pe = frappe.db.get_value("Payment Entry",
-								{"reference_no": _inv_list[0], "docstatus": 1}, "name")
-					except:
-						pass
+				existing_pe = _find_existing_payment_entry(
+					reference, transaction, amount, is_withdrawal, company
+				)
 
 				if existing_pe:
 					# PE already exists — just link it to the Bank Transaction
@@ -454,6 +445,73 @@ def parse_xml_content(docname):
 		"opening_balance": doc.opening_balance,
 		"closing_balance": doc.closing_balance,
 	}
+
+
+def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, company):
+	"""Find existing Payment Entry that matches this bank transaction.
+	Covers: Payment Proposal PEs, manually created PEs, etc."""
+	from datetime import timedelta
+
+	# 1. Match by exact reference_no
+	pe = frappe.db.get_value("Payment Entry",
+		{"reference_no": reference, "docstatus": 1, "company": company}, "name")
+	if pe:
+		return pe
+
+	# 2. Match by invoice name in reference_no
+	if transaction.invoice_matches:
+		try:
+			import ast as _ast
+			inv_list = _ast.literal_eval(transaction.invoice_matches) if isinstance(transaction.invoice_matches, str) else transaction.invoice_matches
+			if inv_list:
+				for inv_name in inv_list:
+					pe = frappe.db.get_value("Payment Entry",
+						{"reference_no": inv_name, "docstatus": 1, "company": company}, "name")
+					if pe:
+						return pe
+		except:
+			pass
+
+	# 3. Match by party + amount + date range (±5 days)
+	party_name = transaction.party_match or transaction.party_name
+	if party_name and amount > 0:
+		from frappe.utils import getdate, add_days
+		tx_date = getdate(transaction.date)
+		date_from = add_days(tx_date, -5)
+		date_to = add_days(tx_date, 5)
+
+		payment_type = "Pay" if is_withdrawal else "Receive"
+		party_type = "Supplier" if is_withdrawal else "Customer"
+
+		# Find party
+		party = None
+		if is_withdrawal:
+			party = frappe.db.get_value("Supplier", {"supplier_name": party_name}, "name")
+		else:
+			party = frappe.db.get_value("Customer", {"customer_name": party_name}, "name")
+
+		if party:
+			pes = frappe.get_all("Payment Entry",
+				filters={
+					"docstatus": 1,
+					"payment_type": payment_type,
+					"party_type": party_type,
+					"party": party,
+					"paid_amount": amount,
+					"posting_date": ["between", [str(date_from), str(date_to)]],
+					"company": company,
+				},
+				fields=["name"],
+			)
+			# Only auto-match if exactly one PE found
+			if len(pes) == 1:
+				# Check it's not already linked to another Bank Transaction
+				already_linked = frappe.db.exists("Bank Transaction Payments",
+					{"payment_entry": pes[0].name})
+				if not already_linked:
+					return pes[0].name
+
+	return None
 
 
 def _find_existing_bank_transaction(bank_account, date, reference_number, amount, is_withdrawal):
