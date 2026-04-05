@@ -761,9 +761,9 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
         const amountMatches = voucher.paid_amount === transaction?.unallocated_amount
         const postingDateMatches = voucher.posting_date === transaction?.date
         const referenceDateMatches = voucher.reference_date === transaction?.date
-        const referenceMatchesFull = voucher.reference_no === transaction?.reference_number || voucher.reference_no === transaction?.description
+        const referenceMatchesFull = voucher.reference_no && (voucher.reference_no === transaction?.reference_number || voucher.reference_no === transaction?.description)
 
-        const referenceMatchesPartial = transaction?.reference_number?.includes(voucher.reference_no) || transaction?.description?.includes(voucher.reference_no)
+        const referenceMatchesPartial = voucher.reference_no && (transaction?.reference_number?.includes(voucher.reference_no) || transaction?.description?.includes(voucher.reference_no))
 
 
         const isSuggested = amountMatches && (postingDateMatches || referenceDateMatches || referenceMatchesPartial) && index === 0
