@@ -22,60 +22,60 @@
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "date",
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date",
-   "reqd": 1,
-   "columns": 1
+   "reqd": 1
   },
   {
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount",
-   "columns": 1,
    "options": "currency"
   },
   {
+   "columns": 1,
    "fieldname": "type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "Withdrawal\nDeposit",
-   "columns": 1
+   "options": "Withdrawal\nDeposit"
   },
   {
    "fieldname": "column_break_kwiw",
    "fieldtype": "Column Break"
   },
   {
+   "columns": 3,
    "fieldname": "description",
    "fieldtype": "Small Text",
    "in_list_view": 1,
-   "label": "Description",
-   "columns": 3
+   "label": "Description"
   },
   {
+   "columns": 2,
    "fieldname": "reference",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Reference",
-   "columns": 2
+   "in_list_view": 0,
+   "label": "Reference"
   },
   {
    "default": "0",
    "fieldname": "imported",
    "fieldtype": "Check",
-   "label": "Imported",
-   "in_list_view": 0
+   "in_list_view": 0,
+   "label": "Imported"
   },
   {
    "description": "Can be \"1200 Dr\" and will be translated to 1200 in amount and \"Withdrawal\"",
    "fieldname": "string_amount",
    "fieldtype": "Data",
-   "label": "String Amount",
-   "in_list_view": 0
+   "in_list_view": 0,
+   "label": "String Amount"
   },
   {
    "fieldname": "unique_reference",
@@ -84,8 +84,10 @@
    "read_only": 1
   },
   {
+   "columns": 2,
    "fieldname": "party_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Party Name",
    "read_only": 1
   },
@@ -103,21 +105,22 @@
    "read_only": 1
   },
   {
+   "columns": 1,
    "default": "Pending",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "\nTo Process\nExisting\nPaid\nImported\nError",
-   "read_only": 1,
-   "in_list_view": 1
+   "read_only": 1
   },
   {
    "fieldname": "existing_bank_transaction",
    "fieldtype": "Link",
+   "hidden": 0,
    "label": "Existing Bank Transaction",
    "options": "Bank Transaction",
-   "read_only": 1,
-   "hidden": 0
+   "read_only": 1
   },
   {
    "fieldname": "invoice_matches",
