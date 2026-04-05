@@ -69,9 +69,7 @@ frappe.ui.form.on("Mint Bank Statement Import", {
             }
         }
 
-        if (frm.doc.docstatus === 0 && !frm.is_new()) {
-            frm.add_custom_button(__("Import a file"), () => show_import_wizard(frm));
-        }
+
 
 
     },

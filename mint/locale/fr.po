@@ -2356,3 +2356,24 @@ msgstr "Nouveau"
 
 msgid "Existing"
 msgstr "Existant"
+
+msgid "XML Import Complete"
+msgstr "Import XML terminé"
+
+msgid "{0} transactions processed"
+msgstr "{0} transactions traitées"
+
+msgid "{0} duplicates skipped"
+msgstr "{0} doublons ignorés"
+
+msgid "{0} auto-matched"
+msgstr "{0} rapprochées automatiquement"
+
+msgid "{0} to review in Mint"
+msgstr "{0} à traiter dans Mint"
+
+msgid "{0} errors"
+msgstr "{0} erreurs"
+
+msgid "{0} created"
+msgstr "{0} créées"
