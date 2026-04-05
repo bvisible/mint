@@ -2377,3 +2377,9 @@ msgstr "{0} erreurs"
 
 msgid "{0} created"
 msgstr "{0} créées"
+
+msgid "To Process"
+msgstr "À traiter"
+
+msgid "Paid"
+msgstr "Payé"
