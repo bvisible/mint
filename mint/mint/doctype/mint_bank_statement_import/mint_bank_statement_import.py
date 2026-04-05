@@ -118,16 +118,16 @@ class MintBankStatementImport(Document):
 			frappe.db.set_value("Document Scan", self.document_scan_name, "status", "Processed")
 
 	def _submit_xml_transactions(self):
-		"""XML import flow — creates Bank Transactions with dedup and auto-match."""
-		from erpnextswiss.erpnextswiss.doctype.ebics_statement.ebics_to_bank_transaction import (
-			bank_transaction_exists,
-			auto_match_payment_entries,
-			link_payment_entry_to_bank_transaction,
-			get_bank_account_from_account,
+		"""XML import flow — creates Bank Transactions and Payment Entries automatically."""
+		from erpnextswiss.erpnextswiss.page.bank_wizard.bank_wizard import (
+			create_payment_entry,
+			get_default_customer,
+			get_default_supplier,
 		)
 
-		# Get company from bank account
+		# Get company and account from bank account
 		company = frappe.get_cached_value("Bank Account", self.bank_account, "company")
+		account = frappe.get_cached_value("Bank Account", self.bank_account, "account")
 
 		stats = {
 			"total": 0,
@@ -165,42 +165,117 @@ class MintBankStatementImport(Document):
 					"date": transaction.date,
 					"status": "Unreconciled",
 					"bank_account": self.bank_account,
-					"company": company,
 					"withdrawal": amount if is_withdrawal else 0,
 					"deposit": amount if not is_withdrawal else 0,
-					"description": transaction.description or "",
+					"description": transaction.description,
 					"reference_number": reference,
 				})
 				bank_tx.insert()
 				bank_tx.submit()
-
-				transaction.db_set("imported", 1)
-				transaction.db_set("status", "Imported")
 				stats["created"] += 1
 
-				# Try auto-match with existing Payment Entries
-				match_result = auto_match_payment_entries(
-					bank_transaction=bank_tx,
-					transaction_amount=amount,
-					transaction_date=str(transaction.date),
-				)
+				# Try to auto-create Payment Entry from invoice matches
+				invoice_matches = transaction.invoice_matches
+				party_match = transaction.party_match
+				if invoice_matches and party_match:
+					try:
+						import ast
+						matches = ast.literal_eval(invoice_matches) if isinstance(invoice_matches, str) else invoice_matches
+						if matches and len(matches) == 1:
+							# Single invoice match — auto-create PE only if exact amount
+							invoice_name = matches[0]
+							if not is_withdrawal:
+								# Customer payment (CRDT)
+								sinv = frappe.get_doc("Sales Invoice", invoice_name)
+								# Skip auto-PE if amount doesn't match exactly
+								if abs(amount - sinv.outstanding_amount) > 0.01:
+									continue  # Leave for Mint to handle
+								if not frappe.db.exists("Payment Entry", {"reference_no": reference, "docstatus": 1}):
+									pe = frappe.get_doc({
+										"doctype": "Payment Entry",
+										"payment_type": "Receive",
+										"party_type": "Customer",
+										"party": sinv.customer,
+										"posting_date": transaction.date,
+										"paid_to": account,
+										"paid_amount": amount,
+										"received_amount": amount,
+										"reference_no": reference,
+										"reference_date": transaction.date,
+										"remarks": _("{0} - Payment for {1}").format(transaction.party_name or party_match, invoice_name),
+										"references": [{
+											"reference_doctype": "Sales Invoice",
+											"reference_name": invoice_name,
+											"allocated_amount": min(amount, sinv.outstanding_amount),
+										}],
+									})
+									pe.insert()
+									pe.submit()
 
-				if match_result.get("success"):
-					stats["auto_matched"] += 1
-				else:
-					stats["unreconciled"] += 1
+									# Link PE to Bank Transaction
+									bank_tx.reload()
+									bank_tx.append("payment_entries", {
+										"payment_document": "Payment Entry",
+										"payment_entry": pe.name,
+										"allocated_amount": amount,
+									})
+									bank_tx.status = "Reconciled" if amount == sinv.outstanding_amount else "Unreconciled"
+									bank_tx.save()
+									stats["auto_matched"] += 1
+									transaction.db_set("status", "Imported")
+									transaction.db_set("imported", 1)
+									continue
+							else:
+								# Supplier payment (DBIT) — always create PE, partial or full
+								pinv = frappe.get_doc("Purchase Invoice", invoice_name)
+								if not frappe.db.exists("Payment Entry", {"reference_no": reference, "docstatus": 1}):
+									pe = frappe.get_doc({
+										"doctype": "Payment Entry",
+										"payment_type": "Pay",
+										"party_type": "Supplier",
+										"party": pinv.supplier,
+										"posting_date": transaction.date,
+										"paid_from": account,
+										"paid_amount": amount,
+										"received_amount": amount,
+										"reference_no": reference,
+										"reference_date": transaction.date,
+										"remarks": _("{0} - Payment for {1}").format(transaction.party_name or party_match, invoice_name),
+										"references": [{
+											"reference_doctype": "Purchase Invoice",
+											"reference_name": invoice_name,
+											"allocated_amount": min(amount, pinv.outstanding_amount),
+										}],
+									})
+									pe.insert()
+									pe.submit()
+
+									bank_tx.reload()
+									bank_tx.append("payment_entries", {
+										"payment_document": "Payment Entry",
+										"payment_entry": pe.name,
+										"allocated_amount": amount,
+									})
+									bank_tx.status = "Reconciled" if amount == pinv.outstanding_amount else "Unreconciled"
+									bank_tx.save()
+									stats["auto_matched"] += 1
+									transaction.db_set("status", "Imported")
+									transaction.db_set("imported", 1)
+									continue
+					except Exception as e:
+						frappe.log_error("Auto Payment Entry creation failed", str(e))
+
+				# No auto-match — mark as unreconciled for Mint
+				transaction.db_set("status", "Imported")
+				transaction.db_set("imported", 1)
+				stats["unreconciled"] += 1
 
 			except Exception as e:
+				transaction.db_set("status", "Error")
+				frappe.log_error("Bank Transaction import error", str(e))
 				stats["errors"] += 1
-				transaction.db_set("status", "Pending")
-				frappe.log_error(
-					_("Error importing transaction {0}: {1}").format(reference, str(e)),
-					_("Mint XML Import Error"),
-				)
 
-		frappe.db.commit()
-
-		# Build and save import summary
+		# Build summary
 		summary_parts = [
 			_("{0} transactions processed").format(stats["total"]),
 			_("{0} created").format(stats["created"]),
@@ -318,6 +393,11 @@ def parse_xml_content(docname):
 			else:
 				stats["new"] += 1
 
+		# Invoice matching info from bank_wizard parser
+		invoice_matches = txn.get("invoice_matches")
+		party_match = txn.get("party_match", "")
+		matched_amount = float(txn.get("matched_amount", 0))
+
 		doc.append("transactions", {
 			"date": txn.get("date"),
 			"amount": amount,
@@ -330,6 +410,9 @@ def parse_xml_content(docname):
 			"credit_debit": txn.get("credit_debit", ""),
 			"status": status,
 			"existing_bank_transaction": existing_bt or "",
+			"invoice_matches": str(invoice_matches) if invoice_matches else "",
+			"party_match": party_match or "",
+			"matched_amount": matched_amount,
 		})
 
 	doc.save()

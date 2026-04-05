@@ -116,6 +116,24 @@
    "options": "Bank Transaction",
    "read_only": 1,
    "hidden": 0
+  },
+  {
+   "fieldname": "invoice_matches",
+   "fieldtype": "Small Text",
+   "label": "Invoice Matches",
+   "read_only": 1
+  },
+  {
+   "fieldname": "party_match",
+   "fieldtype": "Data",
+   "label": "Party Match",
+   "read_only": 1
+  },
+  {
+   "fieldname": "matched_amount",
+   "fieldtype": "Currency",
+   "label": "Matched Amount",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
