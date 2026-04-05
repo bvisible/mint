@@ -1,6 +1,7 @@
 # Copyright (c) 2025, The Commit Company (Algocode Technologies Pvt. Ltd.) and contributors
 # For license information, please see license.txt
 
+import hashlib
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -18,12 +19,18 @@ class MintBankStatementImport(Document):
 
 		amended_from: DF.Link | None
 		bank_account: DF.Link
+		bank_statement_id: DF.Data | None
+		closing_balance: DF.Currency | None
+		content_hash: DF.Data | None
+		currency: DF.Link | None
 		document_scan_name: DF.Link | None
 		document_status: DF.Literal["Draft", "Submitted", "Cancelled"]
 		error: DF.Code | None
 		file: DF.Attach | None
-		file_type: DF.Literal["PDF"]
+		file_type: DF.Literal["PDF", "XML"]
+		import_summary: DF.SmallText | None
 		ocr_status: DF.Literal["", "Pending", "Processing", "Completed", "Failed"]
+		opening_balance: DF.Currency | None
 		status: DF.Literal["Not Started", "Completed", "Error"]
 		transactions: DF.Table[MintBankStatementImportTransactions]
 	# end: auto-generated types
@@ -36,12 +43,13 @@ class MintBankStatementImport(Document):
 	def before_validate(self):
 		# Update document_status based on docstatus
 		self.update_document_status()
-		# For all string amounts, compute the actual amount and type
-		for transaction in self.transactions:
-			if transaction.string_amount:
-				amount, tx_type = self.parse_string_amount(transaction.string_amount)
-				transaction.amount = amount
-				transaction.type = tx_type
+		# For PDF: compute actual amount and type from string amounts
+		if self.file_type == "PDF":
+			for transaction in self.transactions:
+				if transaction.string_amount:
+					amount, tx_type = self.parse_string_amount(transaction.string_amount)
+					transaction.amount = amount
+					transaction.type = tx_type
 
 	def parse_string_amount(self, string_amount: str):
 		"""
@@ -69,13 +77,13 @@ class MintBankStatementImport(Document):
 				"type": transaction.get("type"),
 				"description": transaction.get("description")
 			})
-	
+
 	def before_submit(self):
 		# Validate all rows have an amount and a type
 		for transaction in self.transactions:
 			if not transaction.get("amount") or not transaction.get("type"):
 				frappe.throw(_("All rows must have an amount and a type. Missing in row {0}").format(transaction.get("idx")))
-		
+
 	def on_submit(self):
 		# Update document_status to Submitted
 		self.db_set("document_status", "Submitted")
@@ -83,6 +91,13 @@ class MintBankStatementImport(Document):
 		if not self.transactions:
 			frappe.throw(_("No transactions found"))
 
+		if self.file_type == "XML":
+			self._submit_xml_transactions()
+		else:
+			self._submit_pdf_transactions()
+
+	def _submit_pdf_transactions(self):
+		"""Original PDF import flow — creates Bank Transactions directly."""
 		for transaction in self.transactions:
 			bank_tx = frappe.get_doc({
 				"doctype": "Bank Transaction",
@@ -101,3 +116,302 @@ class MintBankStatementImport(Document):
 		# Update linked Document Scan status to Processed
 		if self.document_scan_name:
 			frappe.db.set_value("Document Scan", self.document_scan_name, "status", "Processed")
+
+	def _submit_xml_transactions(self):
+		"""XML import flow — creates Bank Transactions with dedup and auto-match."""
+		from erpnextswiss.erpnextswiss.doctype.ebics_statement.ebics_to_bank_transaction import (
+			bank_transaction_exists,
+			auto_match_payment_entries,
+			link_payment_entry_to_bank_transaction,
+			get_bank_account_from_account,
+		)
+
+		# Get company from bank account
+		company = frappe.get_cached_value("Bank Account", self.bank_account, "company")
+
+		stats = {
+			"total": 0,
+			"created": 0,
+			"duplicates": 0,
+			"auto_matched": 0,
+			"unreconciled": 0,
+			"errors": 0,
+		}
+
+		for transaction in self.transactions:
+			stats["total"] += 1
+			is_withdrawal = transaction.credit_debit == "DBIT"
+			amount = float(transaction.amount or 0)
+			reference = transaction.unique_reference or transaction.reference or ""
+
+			try:
+				# Check for duplicates
+				existing_bt = _find_existing_bank_transaction(
+					self.bank_account,
+					transaction.date,
+					reference,
+					amount,
+					is_withdrawal,
+				)
+				if existing_bt:
+					transaction.db_set("status", "Existing")
+					transaction.db_set("existing_bank_transaction", existing_bt)
+					stats["duplicates"] += 1
+					continue
+
+				# Create Bank Transaction
+				bank_tx = frappe.get_doc({
+					"doctype": "Bank Transaction",
+					"date": transaction.date,
+					"status": "Unreconciled",
+					"bank_account": self.bank_account,
+					"company": company,
+					"withdrawal": amount if is_withdrawal else 0,
+					"deposit": amount if not is_withdrawal else 0,
+					"description": transaction.description or "",
+					"reference_number": reference,
+				})
+				bank_tx.insert()
+				bank_tx.submit()
+
+				transaction.db_set("imported", 1)
+				transaction.db_set("status", "Imported")
+				stats["created"] += 1
+
+				# Try auto-match with existing Payment Entries
+				match_result = auto_match_payment_entries(
+					bank_transaction=bank_tx,
+					transaction_amount=amount,
+					transaction_date=str(transaction.date),
+				)
+
+				if match_result.get("success"):
+					stats["auto_matched"] += 1
+				else:
+					stats["unreconciled"] += 1
+
+			except Exception as e:
+				stats["errors"] += 1
+				transaction.db_set("status", "Pending")
+				frappe.log_error(
+					_("Error importing transaction {0}: {1}").format(reference, str(e)),
+					_("Mint XML Import Error"),
+				)
+
+		frappe.db.commit()
+
+		# Build and save import summary
+		summary_parts = [
+			_("{0} transactions processed").format(stats["total"]),
+			_("{0} created").format(stats["created"]),
+		]
+		if stats["duplicates"]:
+			summary_parts.append(_("{0} duplicates skipped").format(stats["duplicates"]))
+		if stats["auto_matched"]:
+			summary_parts.append(_("{0} auto-matched").format(stats["auto_matched"]))
+		if stats["unreconciled"]:
+			summary_parts.append(_("{0} to review in Mint").format(stats["unreconciled"]))
+		if stats["errors"]:
+			summary_parts.append(_("{0} errors").format(stats["errors"]))
+
+		summary = " | ".join(summary_parts)
+		self.db_set("import_summary", summary)
+		self.db_set("status", "Completed")
+
+		frappe.msgprint(
+			summary,
+			title=_("XML Import Complete"),
+			indicator="green" if stats["errors"] == 0 else "orange",
+		)
+
+
+@frappe.whitelist()
+def parse_xml_content(docname):
+	"""Parse CAMT XML file and populate transactions child table."""
+	from erpnextswiss.erpnextswiss.page.bank_wizard.bank_wizard import (
+		read_camt053_meta,
+		read_camt053,
+	)
+
+	doc = frappe.get_doc("Mint Bank Statement Import", docname)
+
+	if doc.docstatus != 0:
+		frappe.throw(_("Cannot parse a submitted or cancelled document"))
+
+	if not doc.file:
+		frappe.throw(_("Please attach an XML file first"))
+
+	if doc.file_type != "XML":
+		frappe.throw(_("File type must be XML"))
+
+	# Read file content
+	file_content = _read_file_content(doc.file)
+
+	if not file_content:
+		frappe.throw(_("Could not read file content"))
+
+	# Calculate content hash for file-level dedup
+	if isinstance(file_content, bytes):
+		content_hash = hashlib.md5(file_content).hexdigest()
+		xml_string = file_content.decode("utf-8", errors="replace")
+	else:
+		content_hash = hashlib.md5(file_content.encode("utf-8")).hexdigest()
+		xml_string = file_content
+
+	# Parse meta information
+	meta = read_camt053_meta(xml_string)
+
+	# Auto-detect bank account from IBAN
+	iban = meta.get("iban", "")
+	detected_bank_account = None
+	if iban and iban != "n/a":
+		detected_bank_account = _find_bank_account_by_iban(iban)
+
+	# If bank_account is set, validate IBAN match
+	if doc.bank_account and detected_bank_account and doc.bank_account != detected_bank_account:
+		frappe.msgprint(
+			_("IBAN in XML ({0}) points to {1}, but {2} is selected. Using selected account.").format(
+				iban, detected_bank_account, doc.bank_account
+			),
+			indicator="orange",
+		)
+	elif not doc.bank_account and detected_bank_account:
+		doc.bank_account = detected_bank_account
+
+	if not doc.bank_account:
+		frappe.throw(_("Could not detect Bank Account from IBAN ({0}). Please select one manually.").format(iban))
+
+	# Get the linked Account for read_camt053
+	account = frappe.get_cached_value("Bank Account", doc.bank_account, "account")
+
+	# Parse transactions
+	result = read_camt053(xml_string, account)
+	transactions = result.get("transactions", [])
+
+	# Update document fields
+	doc.content_hash = content_hash
+	doc.bank_statement_id = meta.get("msgid", "")
+	doc.currency = meta.get("currency", "")
+	doc.opening_balance = meta.get("opening_balance", 0)
+	doc.closing_balance = meta.get("closing_balance", 0)
+
+	# Clear existing transactions and populate with parsed data
+	doc.transactions = []
+	stats = {"total": 0, "new": 0, "duplicates": 0}
+
+	for txn in transactions:
+		is_debit = txn.get("credit_debit") == "DBIT"
+		amount = float(txn.get("amount", 0))
+		reference = txn.get("unique_reference", "")
+		stats["total"] += 1
+
+		# Check for existing Bank Transaction (pre-dedup)
+		existing_bt = None
+		status = "New"
+		if reference and doc.bank_account:
+			existing_bt = _find_existing_bank_transaction(
+				doc.bank_account, txn.get("date"), reference, amount, is_debit
+			)
+			if existing_bt:
+				status = "Existing"
+				stats["duplicates"] += 1
+			else:
+				stats["new"] += 1
+
+		doc.append("transactions", {
+			"date": txn.get("date"),
+			"amount": amount,
+			"type": "Withdrawal" if is_debit else "Deposit",
+			"description": _build_description(txn),
+			"reference": reference,
+			"unique_reference": reference,
+			"party_name": txn.get("party_name", ""),
+			"party_iban": txn.get("party_iban", ""),
+			"credit_debit": txn.get("credit_debit", ""),
+			"status": status,
+			"existing_bank_transaction": existing_bt or "",
+		})
+
+	doc.save()
+
+	return {
+		"success": True,
+		"transaction_count": stats["total"],
+		"new_count": stats["new"],
+		"duplicate_count": stats["duplicates"],
+		"bank_account": doc.bank_account,
+		"currency": doc.currency,
+		"opening_balance": doc.opening_balance,
+		"closing_balance": doc.closing_balance,
+	}
+
+
+def _find_existing_bank_transaction(bank_account, date, reference_number, amount, is_withdrawal):
+	"""Find the existing Bank Transaction name if it exists (for dedup tracking)."""
+	if not reference_number:
+		return None
+
+	filters = {
+		"bank_account": bank_account,
+		"date": date,
+		"reference_number": reference_number,
+		"docstatus": ["<", 2],
+	}
+
+	if is_withdrawal:
+		filters["withdrawal"] = amount
+	else:
+		filters["deposit"] = amount
+
+	return frappe.db.get_value("Bank Transaction", filters, "name")
+
+
+def _read_file_content(file_url):
+	"""Read content from an attached file."""
+	if not file_url:
+		return None
+
+	# Try by exact file_url first
+	file_name = frappe.db.get_value("File", {"file_url": file_url}, "name")
+	if not file_name:
+		# Fallback: read directly from filesystem
+		import os
+		site_path = frappe.get_site_path()
+		file_path = os.path.join(site_path, file_url.lstrip("/"))
+		if os.path.exists(file_path):
+			with open(file_path, "rb") as f:
+				return f.read()
+		return None
+
+	file_doc = frappe.get_doc("File", file_name)
+	return file_doc.get_content()
+
+
+def _find_bank_account_by_iban(iban):
+	"""Find a Bank Account by IBAN."""
+	clean_iban = iban.replace(" ", "")
+	# Search in Account (IBAN is on Account, not Bank Account)
+	accounts = frappe.db.sql("""
+		SELECT ba.name
+		FROM `tabBank Account` ba
+		INNER JOIN `tabAccount` acc ON ba.account = acc.name
+		WHERE REPLACE(acc.iban, ' ', '') = %s
+		AND ba.is_company_account = 1
+		LIMIT 1
+	""", clean_iban, as_dict=True)
+
+	if accounts:
+		return accounts[0].name
+	return None
+
+
+def _build_description(txn):
+	"""Build a human-readable description from transaction data."""
+	parts = []
+	if txn.get("remarks"):
+		parts.append(txn["remarks"])
+	if txn.get("transaction_reference"):
+		parts.append(txn["transaction_reference"])
+	if not parts and txn.get("unique_reference"):
+		parts.append(txn["unique_reference"])
+	return " | ".join(parts) if parts else ""

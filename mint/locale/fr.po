@@ -1780,8 +1780,7 @@ msgid "Drag and drop file here"
 msgstr "Glisser-déposer le fichier ici"
 
 #: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
-msgid "or click to browse"
-msgstr "ou cliquer pour parcourir"
+
 
 #: frontend/src/components/features/BankEntryModal/BankEntryModal.tsx
 msgid "Preview"
@@ -2186,3 +2185,174 @@ msgstr "Étudiant"
 #: frontend/src/components/common/LinkFieldCombobox.tsx
 msgid "Select {0}"
 msgstr "Sélectionner {0}"
+
+msgid "Reprocess File"
+msgstr "Retraiter le fichier"
+
+msgid "Analyze with Nora AI"
+msgstr "Analyser avec Nora AI"
+
+msgid "Retry Analysis"
+msgstr "Relancer l'analyse"
+
+msgid "Save the document to start processing"
+msgstr "Enregistrez le document pour lancer le traitement"
+
+msgid "Starting analysis..."
+msgstr "Démarrage de l'analyse..."
+
+msgid "Analysis in progress..."
+msgstr "Analyse en cours..."
+
+msgid "Failed to start analysis"
+msgstr "Échec du démarrage de l'analyse"
+
+msgid "{0} transactions found"
+msgstr "{0} transactions trouvées"
+
+msgid "Analysis Failed"
+msgstr "Échec de l'analyse"
+
+msgid "Timeout — check Document Scan"
+msgstr "Délai dépassé — vérifiez le Document Scan"
+
+msgid "Nora AI analysis in progress..."
+msgstr "Analyse Nora AI en cours..."
+
+msgid "Continue in background"
+msgstr "Continuer en arrière-plan"
+
+msgid "Processing continues in background. Page will reload when done."
+msgstr "Le traitement continue en arrière-plan. La page se rechargera à la fin."
+
+msgid "Processing file..."
+msgstr "Traitement du fichier..."
+
+msgid "Processing bank file..."
+msgstr "Traitement du fichier bancaire..."
+
+msgid "Failed to process file"
+msgstr "Échec du traitement du fichier"
+
+msgid "A Document Scan with the same file already exists: {0}. Process anyway?"
+msgstr "Un Document Scan avec le même fichier existe déjà : {0}. Traiter quand même ?"
+
+msgid "View Document Scan"
+msgstr "Voir le Document Scan"
+
+msgid "Bank Statement Import"
+msgstr "Import de relevé bancaire"
+
+msgid "Bank Account"
+msgstr "Compte bancaire"
+
+msgid "Statement ID"
+msgstr "ID du relevé"
+
+msgid "Opening Balance"
+msgstr "Solde d'ouverture"
+
+msgid "Closing Balance"
+msgstr "Solde de clôture"
+
+msgid "File Type"
+msgstr "Type de fichier"
+
+msgid "Import Summary"
+msgstr "Résumé de l'import"
+
+msgid "Not Imported"
+msgstr "Non importées"
+
+msgid "Already imported in"
+msgstr "Déjà importée dans"
+
+msgid "Reason"
+msgstr "Raison"
+
+msgid "Unique Reference"
+msgstr "Référence unique"
+
+msgid "Party Name"
+msgstr "Nom du tiers"
+
+msgid "Party IBAN"
+msgstr "IBAN du tiers"
+
+msgid "Existing Bank Transaction"
+msgstr "Transaction bancaire existante"
+
+msgid "XML Details"
+msgstr "Détails XML"
+
+msgid "Bank Statement ID"
+msgstr "ID du relevé bancaire"
+
+msgid "Content Hash"
+msgstr "Empreinte du contenu"
+
+msgid "Drag and drop your bank file here"
+msgstr "Glissez-déposez votre fichier bancaire ici"
+
+msgid "PDF bank statement or XML file (CAMT 053/054) from your bank"
+msgstr "Relevé bancaire PDF ou fichier XML (CAMT 053/054) de votre banque"
+
+msgid "or click to browse"
+msgstr "ou cliquez pour parcourir"
+
+msgid "Import Bank Statement"
+msgstr "Importer un relevé bancaire"
+
+msgid "XML file"
+msgstr "Fichier XML"
+
+msgid "PDF bank statement"
+msgstr "Relevé bancaire PDF"
+
+msgid "CAMT 053/054 file downloaded from your bank portal. Transactions are extracted automatically with bank references, amounts and party details."
+msgstr "Fichier CAMT 053/054 téléchargé depuis le portail de votre banque. Les transactions sont extraites automatiquement avec les références bancaires, montants et coordonnées des tiers."
+
+msgid "Scanned or downloaded bank statement. Nora AI analyzes the document and extracts transactions using artificial intelligence (OCR)."
+msgstr "Relevé bancaire scanné ou téléchargé. Nora AI analyse le document et extrait les transactions grâce à l'intelligence artificielle (OCR)."
+
+msgid "XML file — automatic processing"
+msgstr "Fichier XML — traitement automatique"
+
+msgid "PDF — analyzed by Nora AI"
+msgstr "PDF — analysé par Nora AI"
+
+msgid "Click here to import a bank file"
+msgstr "Cliquez ici pour importer un fichier bancaire"
+
+msgid "Import a file"
+msgstr "Importer un fichier"
+
+msgid "Process"
+msgstr "Traiter"
+
+msgid "Please select a bank account"
+msgstr "Veuillez sélectionner un compte bancaire"
+
+msgid "Please attach a file"
+msgstr "Veuillez joindre un fichier"
+
+msgid "Select a bank account"
+msgstr "Sélectionnez un compte bancaire"
+
+msgid "{0} new, {1} already imported"
+msgstr "{0} nouvelles, {1} déjà importées"
+
+msgid "Duplicate"
+msgstr "Doublon"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Skipped"
+msgstr "Ignorée"
+
+msgid "New"
+msgstr "Nouveau"
+
+msgid "Existing"
+msgstr "Existant"
