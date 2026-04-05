@@ -797,7 +797,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                         onAccountChange(event.target.value, index)
                                     }
                                 }}
-                                buttonClassName="min-w-64"
+                                buttonClassName="min-w-44"
                                 readOnly={index === 0}
                                 isRequired
                                 hideLabel
@@ -809,7 +809,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 name={`entries.${index}.cost_center`}
                                 label={_("Cost Center")}
                                 filters={[["company", "=", company], ["is_group", "=", 0], ["disabled", "=", 0]]}
-                                buttonClassName="min-w-48"
+                                buttonClassName="min-w-36"
                                 readOnly={index === 0}
                                 hideLabel
                             />
@@ -821,13 +821,13 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 readOnly={index === 0}
                                 inputProps={{
                                     placeholder: _("e.g. Bank Charges"),
-                                    className: 'min-w-64',
+                                    className: 'min-w-40',
                                     readOnly: index === 0
                                 }}
                                 hideLabel
                             />
                         </TableCell>
-                        <TableCell className={cn("text-right align-top min-w-36")}>
+                        <TableCell className={cn("text-right align-top w-28")}>
                             <CurrencyFormField
                                 name={`entries.${index}.debit`}
                                 label={_("Debit")}
@@ -844,7 +844,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 </Tooltip> : undefined}
                             />
                         </TableCell>
-                        <TableCell className={cn("text-right align-top min-w-36")}>
+                        <TableCell className={cn("text-right align-top w-28")}>
                             <CurrencyFormField
                                 name={`entries.${index}.credit`}
                                 style={index === 0 && isWithdrawal ? {
