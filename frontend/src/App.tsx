@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { FrappeProvider } from 'frappe-react-sdk'
 import BankReconciliation from './pages/BankReconciliation'
+import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
 import { toast } from 'sonner'
 import { FrappeSidebar } from '@neoffice/frappe-sidebar-react'
@@ -45,7 +47,13 @@ function App() {
 				<div className="flex h-screen overflow-hidden">
 					<FrappeSidebar homeUrl="/app/home" />
 					<div className="flex-1 overflow-auto">
-						<BankReconciliation />
+						<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
+							<Routes>
+								<Route index element={<BankReconciliation />} />
+								<Route path="/statement-importer" element={<BankStatementImporter />} />
+								<Route path="*" element={<Navigate to="/" />} />
+							</Routes>
+						</BrowserRouter>
 					</div>
 				</div>
 			</NoraLearnProvider>

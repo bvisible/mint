@@ -34,7 +34,8 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount",
-   "columns": 1
+   "columns": 1,
+   "options": "currency"
   },
   {
    "fieldname": "type",

@@ -1,16 +1,14 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { MissingFiltersBanner } from "./MissingFiltersBanner"
-import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
+import { bankRecAmountFilter, bankRecDateAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import { getCompanyCurrency } from "@/lib/company"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Separator } from "@/components/ui/separator"
 import Fuse from 'fuse.js'
 import { getSearchResults, LinkedPayment, UnreconciledTransaction, useGetRuleForTransaction, useGetUnreconciledTransactions, useGetVouchersForTransaction, useIsTransactionWithdrawal, useReconcileTransaction, useTransactionSearch } from "./utils"
 import { Input } from "@/components/ui/input"
-import { AlertCircle, ArrowDownRight, ArrowRightIcon, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, DollarSign, FileEdit, Landmark, Loader2, MessageSquare, Receipt, Search, User, XCircle, ZapIcon } from "lucide-react"
-import { ChfIcon } from "@/components/ui/chf-icon"
+import { AlertCircle, ArrowDownRight, ArrowRightIcon, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, DollarSign, Landmark, LandmarkIcon, ListIcon, Loader2, Receipt, ReceiptIcon, Search, User, XCircle, ZapIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -27,7 +25,6 @@ import _ from "@/lib/translate"
 import TransferModal from "./TransferModal"
 import BankEntryModal from "./BankEntryModal"
 import RecordPaymentModal from "./RecordPaymentModal"
-import DraftJEModal from "./DraftJEModal"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
 import MatchFilters from "./MatchFilters"
@@ -35,12 +32,21 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { KeyboardMetaKeyIcon } from "@/components/ui/keyboard-keys"
 import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { useFrappeGetCall } from "frappe-react-sdk"
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { Link } from "react-router"
 
 const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
     const selectedBank = useAtomValue(selectedBankAccountAtom)
 
     if (!selectedBank) {
-        return <MissingFiltersBanner text={_("Select a bank account to reconcile")} />
+        return <Empty className="bg-muted/30 h-64">
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <LandmarkIcon />
+                </EmptyMedia>
+                <EmptyTitle>{_("Select a bank account to reconcile")}</EmptyTitle>
+            </EmptyHeader>
+        </Empty>
     }
 
     return <>
@@ -58,7 +64,6 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
         <TransferModal />
         <BankEntryModal />
         <RecordPaymentModal />
-        <DraftJEModal />
     </>
 }
 
@@ -71,6 +76,8 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
     const formatInfo = getCurrencyFormatInfo(currency)
     const groupSeparator = formatInfo.group_sep || ","
     const decimalSeparator = formatInfo.decimal_str || "."
+
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const { data: unreconciledTransactions, isLoading, error } = useGetUnreconciledTransactions()
 
@@ -114,10 +121,20 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         onFilterChange()
     }
 
+    const onClearFilters = () => {
+        setSearch('')
+        if (inputRef.current) {
+            inputRef.current.value = ''
+        }
+        setTypeFilter('All')
+        setAmountFilter({ value: 0, stringValue: '' })
+        onFilterChange()
+    }
+
     const hasFilters = search !== '' || typeFilter !== 'All' || amountFilter.value !== 0
 
     if (isLoading) {
-        return <div className="text-sm text-center p-4 text-muted-foreground">{_("Loading")}...</div>
+        return <UnreconciledTransactionsLoadingState />
     }
 
     return <div className="space-y-1">
@@ -128,7 +145,12 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                 "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
             )}>
                 <Search className="w-5 h-5 text-muted-foreground" />
-                <Input placeholder={_("Search")} type='search' onChange={onSearchChange} defaultValue={search}
+                <Input
+                    placeholder={_("Search")}
+                    type='search'
+                    onChange={onSearchChange}
+                    defaultValue={search}
+                    ref={inputRef}
                     className="border-none px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
                 <div>
                     <span className="text-sm text-muted-foreground text-nowrap whitespace-nowrap">{results?.length} {_(results?.length === 1 ? "result" : "results")}</span>
@@ -141,7 +163,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                     decimalSeparator={decimalSeparator}
                     placeholder={`${currencySymbol}0${decimalSeparator}00`}
                     decimalsLimit={2}
-                    // value={amountFilter.stringValue}
+                    value={amountFilter.stringValue}
                     maxLength={12}
                     decimalScale={2}
                     prefix={currencySymbol}
@@ -165,13 +187,13 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="min-w-32 h-9 text-left">
-                            {typeFilter === 'All' ? <ChfIcon className="w-4 h-4 text-muted-foreground" /> : typeFilter === 'Debits' ? <ArrowUpRight className="w-4 h-4 text-destructive" /> : <ArrowDownRight className="w-4 h-4 text-green-500" />}
+                            {typeFilter === 'All' ? <DollarSign className="w-4 h-4 text-muted-foreground" /> : typeFilter === 'Debits' ? <ArrowUpRight className="w-4 h-4 text-destructive" /> : <ArrowDownRight className="w-4 h-4 text-green-600" />}
                             {_(typeFilter)}
                             <ChevronDown className="w-4 h-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => onTypeFilterChange('All')}><ChfIcon /> {_("All")}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onTypeFilterChange('All')}><DollarSign /> {_("All")}</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onTypeFilterChange('Debits')}><ArrowUpRight className="text-destructive" /> {_("Debits")}</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onTypeFilterChange('Credits')}><ArrowDownRight className="text-green-600" /> {_("Credits")}</DropdownMenuItem>
                     </DropdownMenuContent>
@@ -183,7 +205,10 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
 
         <OlderUnreconciledTransactionsBanner />
 
-        {results.length === 0 && <MissingFiltersBanner text={hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")} />}
+        {results.length === 0 && <NoTransactionsFoundBanner
+            onClearFilters={hasFilters ? onClearFilters : undefined}
+            text={hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")}
+            description={hasFilters ? _("Try adjusting your search or filter criteria.") : _("Import your bank statement to get started.")} />}
 
         <Virtuoso
             data={results}
@@ -194,6 +219,41 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
             totalCount={results?.length}
         />
 
+    </div>
+}
+
+const NoTransactionsFoundBanner = ({ text, description, onClearFilters }: { text: string, description?: string, onClearFilters?: () => void }) => {
+
+    return <Empty className="h-64">
+        <EmptyHeader>
+            <EmptyMedia variant="icon">
+                <ListIcon />
+            </EmptyMedia>
+            <EmptyTitle>{text}</EmptyTitle>
+            {description && <EmptyDescription>{description}</EmptyDescription>}
+        </EmptyHeader>
+        <EmptyContent>
+            {onClearFilters ? <Button type='button' size='sm' variant='outline' onClick={onClearFilters}>Clear Filters</Button> :
+                <Button type='button' asChild size='sm' variant='outline'>
+                    <Link to="/statement-importer">
+                        {_("Import Bank Statement")}
+                    </Link>
+                </Button>}
+        </EmptyContent>
+    </Empty>
+}
+
+const UnreconciledTransactionsLoadingState = () => {
+
+    return <div className="flex flex-col gap-2 py-2">
+        <div className="flex items-center gap-2 pb-2">
+            <Skeleton className="h-9.5 w-full" />
+            <Skeleton className="h-9.5 min-w-36" />
+            <Skeleton className="h-9.5 min-w-32" />
+        </div>
+        {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="h-16 w-full" />
+        ))}
     </div>
 }
 
@@ -263,7 +323,14 @@ const VouchersSection = ({ contentHeight }: { contentHeight: number }) => {
 
 
     if (selectedTransactions.length === 0) {
-        return <MissingFiltersBanner text={_("Select a transaction to match and reconcile with vouchers")} />
+        return <Empty className="h-64 my-4">
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <ReceiptIcon />
+                </EmptyMedia>
+                <EmptyTitle>{_("Select a transaction to match and reconcile with vouchers")}</EmptyTitle>
+            </EmptyHeader>
+        </Empty>
     }
 
     if (selectedTransactions.length > 1) {
@@ -657,7 +724,14 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
             <span>or</span>
             <Separator className="flex-1" />
         </div>
-        {vouchers?.message.length === 0 && <MissingFiltersBanner text={_("No vouchers found for this transaction")} className="min-h-[10vh]" />}
+        {vouchers?.message.length === 0 && <Empty className="h-64 my-4">
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <ReceiptIcon />
+                </EmptyMedia>
+                <EmptyTitle>{_("No vouchers found for this transaction")}</EmptyTitle>
+            </EmptyHeader>
+        </Empty>}
         <Virtuoso
             data={vouchers?.message}
             itemContent={(index, voucher) => (
@@ -673,9 +747,8 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
     const selectedBank = useAtomValue(selectedBankAccountAtom)
     const selectedTransaction = useAtomValue(bankRecSelectedTransactionAtom(selectedBank?.name || ''))
-    const setDraftJEModal = useSetAtom(bankRecDraftJEModalAtom)
 
-    const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested, hasAnyMatch } = useMemo(() => {
+    const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested } = useMemo(() => {
 
         const transaction = selectedTransaction?.[0]
 
@@ -688,18 +761,14 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
         const amountMatches = voucher.paid_amount === transaction?.unallocated_amount
         const postingDateMatches = voucher.posting_date === transaction?.date
         const referenceDateMatches = voucher.reference_date === transaction?.date
-        // Only consider reference match if voucher.reference_no is truthy (not null/undefined/empty)
-        const referenceMatchesFull = voucher.reference_no && (voucher.reference_no === transaction?.reference_number || voucher.reference_no === transaction?.description)
+        const referenceMatchesFull = voucher.reference_no === transaction?.reference_number || voucher.reference_no === transaction?.description
 
-        const referenceMatchesPartial = voucher.reference_no && (transaction?.reference_number?.includes(voucher.reference_no) || transaction?.description?.includes(voucher.reference_no))
+        const referenceMatchesPartial = transaction?.reference_number?.includes(voucher.reference_no) || transaction?.description?.includes(voucher.reference_no)
 
 
         const isSuggested = amountMatches && (postingDateMatches || referenceDateMatches || referenceMatchesPartial) && index === 0
 
-        // Only show match info when there's at least one match
-        const hasAnyMatch = amountMatches || postingDateMatches || referenceDateMatches || referenceMatchesFull || referenceMatchesPartial
-
-        return { isSelected: false, amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested: isSuggested, hasAnyMatch }
+        return { isSelected: false, amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested: isSuggested }
 
     }, [voucher, selectedTransaction, index])
 
@@ -707,19 +776,6 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
     const onClick = () => {
         if (!selectedTransaction) {
-            return
-        }
-        // If this is a draft Journal Entry, open the draft JE modal instead of reconciling directly
-        if (voucher.is_draft === 1 && voucher.doctype === 'Journal Entry') {
-            setDraftJEModal({
-                voucher: {
-                    name: voucher.name,
-                    posting_date: voucher.posting_date,
-                    reference_date: voucher.reference_date,
-                    user_remark: voucher.user_remark,
-                    paid_amount: voucher.paid_amount,
-                }
-            })
             return
         }
         reconcileTransaction(selectedTransaction[0], voucher)
@@ -736,12 +792,6 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                         <Badge variant='secondary' className={cn("text-sm rounded-sm", isSuggested ? "bg-amber-100 text-amber-700" : "bg-secondary")}>{_(voucher.doctype)}</Badge>
-                        {voucher.is_draft === 1 && (
-                            <Badge variant='outline' className="text-sm rounded-sm border-orange-400 text-orange-600 bg-orange-50">
-                                <FileEdit className="w-3 h-3 mr-1" />
-                                {_("Draft")}
-                            </Badge>
-                        )}
                         <a target="_blank"
                             href={`/app/${slug(voucher.doctype)}/${voucher.name}`}
                             className="underline underline-offset-2 font-medium"
@@ -782,7 +832,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                                 />
                             </div>}
                         </div>
-                        {voucher.reference_no && <div className="flex items-start gap-1">
+                        <div className="flex items-start gap-1">
                             <span className="font-medium">
                                 {voucher.reference_no}
                                 &nbsp;&nbsp;
@@ -796,21 +846,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                                     </TooltipContent>
                                 </Tooltip>
                             </span>
-                        </div>}
-                        {/* Display user_remark if available (truncated) */}
-                        {voucher.user_remark && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1 text-sm text-muted-foreground max-w-[300px] cursor-help">
-                                        <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
-                                        <span className="truncate">{voucher.user_remark}</span>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-sm">
-                                    <p className="whitespace-pre-wrap">{voucher.user_remark}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
+                        </div>
                     </TooltipProvider>
                 </div>
                 <div>
@@ -864,7 +900,7 @@ const OlderUnreconciledTransactionsBanner = () => {
     if (data && data.message.count > 0) {
 
         return <div className="flex flex-col gap-2">
-            <div className="border border-amber-500 rounded-md p-4">
+            <div className="border border-amber-500 rounded-md p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="min-w-8">
                         <AlertCircle className="w-6 h-6 text-amber-600" />
@@ -877,17 +913,18 @@ const OlderUnreconciledTransactionsBanner = () => {
                         )}
                         <span className="text-sm text-amber-600">{_("The opening balance might not match your bank statement. Would you like to reconcile them?")}</span>
                     </div>
-                    <div className="flex items-center gap-2 w-fit pl-4">
-                        <Button
-                            size='sm'
-                            type='button'
-                            className="shadow-none"
-                            onClick={() => setDates({ fromDate: data.message.oldest_date, toDate: dates.toDate })}
-                            variant='outline'>
-                            <span>{data.message.count > 1 ? _("View older transactions") : _("View older transaction")}</span>
-                            <ArrowRightIcon className="w-4 h-4" />
-                        </Button>
-                    </div>
+
+                </div>
+                <div className="flex items-center gap-2 w-fit pl-4">
+                    <Button
+                        size='sm'
+                        type='button'
+                        className="shadow-none"
+                        onClick={() => setDates({ fromDate: data.message.oldest_date, toDate: dates.toDate })}
+                        variant='outline'>
+                        <span>{data.message.count > 1 ? _("View older transactions") : _("View older transaction")}</span>
+                        <ArrowRightIcon className="w-4 h-4" />
+                    </Button>
                 </div>
             </div>
         </div>

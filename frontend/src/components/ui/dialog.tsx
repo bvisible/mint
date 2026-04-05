@@ -51,6 +51,31 @@ function DialogContent({
   children,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  // Protect Nora Learn popup from being blocked by Radix hideOthers()
+  // Radix sets aria-hidden + pointer-events:none on all elements outside the portal
+  // We counter this by continuously stripping those attributes from Learn elements
+  const noraGuardRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
+  React.useEffect(() => {
+    noraGuardRef.current = setInterval(() => {
+      document.querySelectorAll('.nora-lp, #nora-step-popover').forEach(el => {
+        if (el.getAttribute('aria-hidden') === 'true') {
+          el.removeAttribute('aria-hidden')
+        }
+        if ((el as HTMLElement).hasAttribute('inert')) {
+          (el as HTMLElement).removeAttribute('inert')
+        }
+        ;(el as HTMLElement).style.setProperty('pointer-events', 'auto', 'important')
+        ;(el as HTMLElement).style.setProperty('z-index', '2147483647', 'important')
+        el.querySelectorAll('*').forEach(child => {
+          ;(child as HTMLElement).style.setProperty('pointer-events', 'auto', 'important')
+        })
+      })
+    }, 50)
+    return () => {
+      if (noraGuardRef.current) clearInterval(noraGuardRef.current)
+    }
+  }, [])
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
