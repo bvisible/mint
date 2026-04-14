@@ -218,7 +218,7 @@ class MintBankStatementImport(Document):
 							if not is_withdrawal:
 								# Customer payment (CRDT)
 								sinv = frappe.get_doc("Sales Invoice", invoice_name)
-								if abs(amount - sinv.outstanding_amount) <= 0.01 and not frappe.db.exists("Payment Entry", {"reference_no": reference, "docstatus": 1}):
+								if abs(amount - sinv.outstanding_amount) <= 0.01 and not frappe.db.exists("Payment Entry", {"reference_no": reference, "paid_amount": amount, "docstatus": 1}):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
 										"payment_type": "Receive",
@@ -256,7 +256,7 @@ class MintBankStatementImport(Document):
 							else:
 								# Supplier payment (DBIT) — always create PE, partial or full
 								pinv = frappe.get_doc("Purchase Invoice", invoice_name)
-								if not frappe.db.exists("Payment Entry", {"reference_no": reference, "docstatus": 1}):
+								if not frappe.db.exists("Payment Entry", {"reference_no": reference, "paid_amount": amount, "docstatus": 1}):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
 										"payment_type": "Pay",
