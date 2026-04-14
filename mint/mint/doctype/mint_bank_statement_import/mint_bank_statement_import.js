@@ -357,7 +357,7 @@ function render_file_info(frm) {
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 24px;">${icon}</span>
                     <div>
-                        <div style="font-weight: 600; font-size: 13px;">${fname}</div>
+                        <div style="font-weight: 600; font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${fname}">${fname}</div>
                         <div style="font-size: 11px; color: var(--text-muted);">${typeLabel}</div>
                     </div>
                 </div>
