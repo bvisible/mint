@@ -462,11 +462,15 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 	Covers: Payment Proposal PEs, manually created PEs, etc."""
 	from datetime import timedelta
 
-	# 1. Match by exact reference_no
+	# 1. Match by exact reference_no + amount
 	pe = frappe.db.get_value("Payment Entry",
-		{"reference_no": reference, "docstatus": 1, "company": company}, "name")
+		{"reference_no": reference, "paid_amount": amount, "docstatus": 1, "company": company}, "name")
 	if pe:
-		return pe
+		# Verify not already linked to another Bank Transaction
+		already_linked = frappe.db.exists("Bank Transaction Payments",
+			{"payment_entry": pe})
+		if not already_linked:
+			return pe
 
 	# 2. Match by invoice name in reference_no
 	if transaction.invoice_matches:
