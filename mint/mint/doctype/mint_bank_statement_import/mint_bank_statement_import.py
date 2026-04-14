@@ -145,7 +145,7 @@ class MintBankStatementImport(Document):
 			reference = transaction.unique_reference or transaction.reference or ""
 
 			try:
-				# Check for duplicates
+				# Check for duplicates by reference
 				existing_bt = _find_existing_bank_transaction(
 					self.bank_account,
 					transaction.date,
@@ -153,6 +153,16 @@ class MintBankStatementImport(Document):
 					amount,
 					is_withdrawal,
 				)
+				# Fallback: check for duplicates by description + date + amount
+				# (catches repeated payment batches with different batch references)
+				if not existing_bt and transaction.description:
+					existing_bt = _find_existing_bank_transaction_by_description(
+						self.bank_account,
+						transaction.date,
+						transaction.description,
+						amount,
+						is_withdrawal,
+					)
 				if existing_bt:
 					transaction.db_set("status", "Existing")
 					transaction.db_set("existing_bank_transaction", existing_bt)
@@ -512,6 +522,26 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 					return pes[0].name
 
 	return None
+
+
+def _find_existing_bank_transaction_by_description(bank_account, date, description, amount, is_withdrawal):
+	"""Find existing Bank Transaction by description + date + amount (fallback dedup)."""
+	if not description:
+		return None
+
+	filters = {
+		"bank_account": bank_account,
+		"date": date,
+		"description": description,
+		"docstatus": ["<", 2],
+	}
+
+	if is_withdrawal:
+		filters["withdrawal"] = amount
+	else:
+		filters["deposit"] = amount
+
+	return frappe.db.get_value("Bank Transaction", filters, "name")
 
 
 def _find_existing_bank_transaction(bank_account, date, reference_number, amount, is_withdrawal):
