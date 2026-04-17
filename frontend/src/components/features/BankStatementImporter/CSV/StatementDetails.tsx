@@ -28,10 +28,28 @@ const AMOUNT_FORMAT_LABEL_MAP = {
 }
 
 const parseDateFormat = (dateFormat: string) => {
-    return {
-        label: dateFormat,
-        dayjsFormat: dateFormat,
+
+    const charMap = {
+        "%d": "DD",
+        "%m": "MM",
+        "%Y": "YYYY",
+        "%y": "YY",
+        "%b": "MMM",
+        "%B": "MMMM",
     }
+
+    let label = dateFormat
+
+    Object.keys(charMap).forEach((char) => {
+        label = label.replace(char, charMap[char as keyof typeof charMap])
+    })
+
+    return {
+        label,
+        dayjsFormat: label,
+    }
+
+
 }
 
 type Props = {
