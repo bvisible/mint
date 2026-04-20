@@ -43,6 +43,11 @@ class MintBankStatementImport(Document):
 	def before_validate(self):
 		# Update document_status based on docstatus
 		self.update_document_status()
+		# Set currency from bank account (upstream fix)
+		if self.bank_account and not self.currency:
+			account = frappe.get_cached_value("Bank Account", self.bank_account, "account")
+			if account:
+				self.currency = frappe.get_cached_value("Account", account, "account_currency")
 		# For PDF: compute actual amount and type from string amounts
 		if self.file_type == "PDF":
 			for transaction in self.transactions:
@@ -104,6 +109,7 @@ class MintBankStatementImport(Document):
 				"date": transaction.get("date"),
 				"status": "Unreconciled",
 				"bank_account": self.bank_account,
+				"currency": self.currency,
 				"withdrawal": transaction.get("amount") if transaction.get("type") == "Withdrawal" else 0,
 				"deposit": transaction.get("amount") if transaction.get("type") == "Deposit" else 0,
 				"description": transaction.get("description"),
@@ -119,12 +125,6 @@ class MintBankStatementImport(Document):
 
 	def _submit_xml_transactions(self):
 		"""XML import flow — creates Bank Transactions and Payment Entries automatically."""
-		from erpnextswiss.erpnextswiss.page.bank_wizard.bank_wizard import (
-			create_payment_entry,
-			get_default_customer,
-			get_default_supplier,
-		)
-
 		# Get company and account from bank account
 		company = frappe.get_cached_value("Bank Account", self.bank_account, "company")
 		account = frappe.get_cached_value("Bank Account", self.bank_account, "account")
@@ -165,6 +165,7 @@ class MintBankStatementImport(Document):
 					"date": transaction.date,
 					"status": "Unreconciled",
 					"bank_account": self.bank_account,
+					"currency": self.currency,
 					"withdrawal": amount if is_withdrawal else 0,
 					"deposit": amount if not is_withdrawal else 0,
 					"description": transaction.description,
@@ -432,6 +433,11 @@ def parse_xml_content(docname):
 			"party_match": party_match or "",
 			"matched_amount": matched_amount,
 		})
+
+	# Mark as Completed when parsing is done and there are no new transactions to process
+	if stats["to_process"] == 0:
+		doc.status = "Completed"
+		doc.import_summary = _("No new transactions to import")
 
 	doc.save()
 
