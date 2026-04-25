@@ -94,7 +94,10 @@ class MintBankStatementImport(Document):
 		self.db_set("document_status", "Submitted")
 
 		if not self.transactions:
-			frappe.throw(_("No transactions found"))
+			# No transactions at all — mark as completed
+			self.db_set("status", "Completed")
+			self.db_set("import_summary", _("No transactions to import"))
+			return
 
 		if self.file_type == "XML":
 			self._submit_xml_transactions()
@@ -434,12 +437,14 @@ def parse_xml_content(docname):
 			"matched_amount": matched_amount,
 		})
 
-	# Mark as Completed when parsing is done and there are no new transactions to process
+	# Auto-submit when there are no new transactions to process
 	if stats["to_process"] == 0:
 		doc.status = "Completed"
 		doc.import_summary = _("No new transactions to import")
-
-	doc.save()
+		doc.save()
+		doc.submit()
+	else:
+		doc.save()
 
 	return {
 		"success": True,
