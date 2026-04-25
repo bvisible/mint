@@ -1428,7 +1428,7 @@ msgstr "Montant en chaîne"
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:232
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:404
 msgid "Submit"
-msgstr "Soumettre"
+msgstr "Valider"
 
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:254
 msgid "Suggest creating a"
@@ -2383,3 +2383,30 @@ msgstr "À traiter"
 
 msgid "Paid"
 msgstr "Payé"
+
+msgid "No new transactions to import"
+msgstr "Aucune nouvelle transaction à importer"
+
+msgid "No transactions to import"
+msgstr "Aucune transaction à importer"
+
+msgid "{0} - Payment for {1}"
+msgstr "{0} - Paiement pour {1}"
+
+msgid "Cannot parse a submitted or cancelled document"
+msgstr "Impossible de traiter un document validé ou annulé"
+
+msgid "Could not detect Bank Account from IBAN ({0}). Please select one manually."
+msgstr "Impossible de détecter le compte bancaire à partir de l'IBAN ({0}). Veuillez le sélectionner manuellement."
+
+msgid "Could not read file content"
+msgstr "Impossible de lire le contenu du fichier"
+
+msgid "File type must be XML"
+msgstr "Le type de fichier doit être XML"
+
+msgid "IBAN in XML ({0}) points to {1}, but {2} is selected. Using selected account."
+msgstr "L'IBAN dans le XML ({0}) correspond à {1}, mais {2} est sélectionné. Le compte sélectionné sera utilisé."
+
+msgid "Please attach an XML file first"
+msgstr "Veuillez d'abord joindre un fichier XML"
