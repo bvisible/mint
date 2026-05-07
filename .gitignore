@@ -6,7 +6,11 @@ tags
 node_modules
 __pycache__
 
-mint/public/mint
+# 2026-05-07 (NORA #28) — frontend build outputs are committed on this branch.
+# See docs/COMMIT-BUILD-PATTERN.md in neoffice-devops.
+# (Mint writes vite output to public/mint/ instead of public/frontend/, see
+# vite.config.ts --base=/assets/mint/mint/.)
+# mint/public/mint
 mint/public/node_modules
-mint/www/mint.html
+# mint/www/mint.html
 CLAUDE.md
