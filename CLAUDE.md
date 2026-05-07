@@ -167,3 +167,37 @@ Rules suggest actions (create Bank Entry, Payment Entry, or Transfer) when match
 - Cross-currency payment creation is not supported in the Mint UI (must be done in ERPNext)
 - PDF parsing via Google Cloud Document AI is experimental and not recommended for production use
 - The app uses AGPLv3 license
+
+## Build pipeline (commit-the-build)
+
+⚠️ **Ne jamais lancer `yarn build` ou `bench build --app mint` localement sur un serveur Neoffice** (4 GB RAM → OOM-kill garanti). Le build se fait UNIQUEMENT sur GitHub Actions (ubuntu-latest, 16 GB RAM).
+
+### Comment ça marche
+
+1. Modif d'un fichier source (`frontend/...`) en local → `git commit` → `git push origin version-15`. **Ne pas builder localement.**
+2. Le workflow `.github/workflows/build-frontend.yml` détecte le push, lance `yarn build` sur ubuntu-latest (~1-2 min) et commit les artefacts back avec un commit `[skip-build] frontend artifacts for <SHA>` (par `github-actions[bot]`).
+3. Sur les instances clients, le pipeline d'update fait `git pull` (ramène ton commit + le commit du bot). Quand `bench build --app mint` tourne, il appelle `yarn build` à la racine — **le `package.json` voit les artefacts déjà présents et skip vite** (gate). Plus d'OOM-kill.
+
+### Paths spécifiques
+
+- **Source frontend** : `frontend/`
+- **Artefacts vite (commités)** : `mint/public/mint/`
+- **SPA HTML(s) (commités)** : `mint/www/mint.html`
+- **Build script root** : `yarn (`cd frontend && yarn build`, `--base=/assets/mint/mint/`)`
+
+### Forcer un rebuild local (si vraiment nécessaire)
+
+```bash
+FORCE_REBUILD=1 yarn build
+```
+
+### Documentation complète
+
+- Doc canonique : `bvisible/neoffice-devops:main` → `docs/COMMIT-BUILD-PATTERN.md`
+- Doc batch migration (12 apps) : même fichier, sections "Apps that have adopted the pattern" + "Edge cases discovered"
+- Vault Obsidian : `[[NORA/04-savoir-faire/drive-frontend-build-pattern]]`
+
+### Edge cases spécifiques à mint
+
+- ⚠️ Path atypique : artefacts dans `mint/public/mint/` (pas `public/frontend/`).
+- **proxyOptions.ts**: `require('../../../sites/common_site_config.json')` enveloppé dans try/catch avec fallback `webserver_port=8000` (dev-only, commit `c0dec9c`).
