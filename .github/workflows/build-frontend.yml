@@ -32,6 +32,14 @@ jobs:
           cache: yarn
           cache-dependency-path: frontend/yarn.lock
 
+      # Mint frontend/proxyOptions.ts statically imports
+      # ../../../sites/common_site_config.json (3 levels, not 4 like socket.js).
+      # Stub it at the right path.
+      - name: Create common_site_config stub
+        run: |
+          mkdir -p ../sites
+          echo '{"socketio_port": 9000}' > ../sites/common_site_config.json
+
       - name: Install
         run: cd frontend && yarn install --frozen-lockfile
 
