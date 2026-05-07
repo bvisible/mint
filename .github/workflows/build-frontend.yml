@@ -32,13 +32,18 @@ jobs:
           cache: yarn
           cache-dependency-path: frontend/yarn.lock
 
-      # Mint frontend/proxyOptions.ts statically imports
-      # ../../../sites/common_site_config.json (3 levels, not 4 like socket.js).
-      # Stub it at the right path.
+      # Mint frontend/proxyOptions.ts has:
+      #   const common_site_config = require('../../../sites/common_site_config.json');
+      # That path resolves to <repo-parent>/sites/. Stub it at multiple
+      # candidate locations to be safe (esbuild path resolution differs
+      # subtly from cjs require).
       - name: Create common_site_config stub
         run: |
-          mkdir -p ../sites
-          echo '{"socketio_port": 9000}' > ../sites/common_site_config.json
+          for d in ../sites ./sites; do
+            mkdir -p "$d"
+            echo '{"socketio_port": 9000, "webserver_port": 8000, "default_site": "prod.local"}' > "$d/common_site_config.json"
+          done
+          echo "stubs:" && ls -la ../sites ./sites 2>/dev/null
 
       - name: Install
         run: cd frontend && yarn install --frozen-lockfile
