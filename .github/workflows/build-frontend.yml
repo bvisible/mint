@@ -1,0 +1,52 @@
+name: build-frontend
+
+on:
+  push:
+    branches: [version-15]
+    paths:
+      - 'frontend/**'
+      - '!**/node_modules/**'
+      - '!mint/public/mint/**'
+      - '!mint/www/mint.html'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install
+        run: cd frontend && yarn install --frozen-lockfile
+
+      - name: Build
+        run: cd frontend && yarn build
+
+      # Mint writes vite output to public/mint/, not public/frontend/.
+      - name: Commit artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mint/public/mint mint/www/mint.html
+          if git diff --cached --quiet; then
+            echo "No artifact changes to commit"
+            exit 0
+          fi
+          git commit --no-verify -m "[skip-build] frontend artifacts for ${GITHUB_SHA::8}"
+          git push
