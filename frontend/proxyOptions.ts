@@ -1,5 +1,14 @@
-const common_site_config = require('../../../sites/common_site_config.json');
-const { webserver_port } = common_site_config;
+// Dev-only: read webserver_port from the bench's common_site_config.json
+// when running in a frappe-bench checkout. In production builds (CI) the
+// file is absent, so fall back to the default webserver port.
+let webserver_port = 8000;
+try {
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const cfg = require('../../../sites/common_site_config.json');
+	webserver_port = cfg.webserver_port || webserver_port;
+} catch {
+	// fall back to default 8000
+}
 
 export default {
 	'^/(app|api|assets|files|private)': {
