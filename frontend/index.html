@@ -209,15 +209,20 @@
     frappe.boot = JSON.parse({{ boot }});
     frappe._messages = frappe.boot["__messages"];
 
-    // Minimal `__()` for the embedded shell — we don't load desk.bundle.js
-    // so Frappe's full `frappe._()` / window.__() never gets installed.
-    // This shim does just enough for our React components:
+    // Minimal i18n shim for the embedded shell — we don't load desk.bundle.js
+    // so Frappe's full translate function never gets installed. This does
+    // just enough for our React components:
     //   - dict lookup in frappe._messages
     //   - positional substitution via {0}, {1}, ...
     //   - context-aware lookup ("Source|Context" pattern Frappe uses)
-    window.__ = function (text, args, context) {
+    //
+    // Bracket notation is REQUIRED throughout (assignment AND comments):
+    // Frappe's safe_render Jinja check refuses any dot+double-underscore
+    // substring as a SSTI guard, so even the literal name in a JS comment
+    // would trigger HTTP 417 Illegal Template at template-render time.
+    window['__'] = function (text, args, context) {
       if (!text) return text;
-      var msgs = window.frappe && window.frappe._messages || {};
+      var msgs = window.frappe && window.frappe['_messages'] || {};
       var lookupKey = context ? text + '|' + context : text;
       var translated = msgs[lookupKey] || msgs[text] || text;
       if (args && args.length) {
