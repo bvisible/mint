@@ -342,12 +342,18 @@ export const FrappeSidebar: FC = () => {
 							{visibleWorkspaces.map((ws) => {
 								const slug = slugify(ws.name)
 								const isActive = activeWorkspace === ws.name
+								// Workspace.title is stored in English in the DocType
+								// (e.g. "Selling", "Stock", "Buying"); Frappe Desk runs
+								// it through __() at render time. Mirror that so the
+								// label, the <a title> tooltip and the item-title attr
+								// are all localized like /app/home.
+								const wsLabel = t(ws.title || ws.label || ws.name)
 								return (
 									<div
 										key={ws.name}
 										className={`sidebar-item-container ${isActive ? 'active-sidebar' : ''}`}
 										item-name={ws.name}
-										item-title={ws.title}
+										item-title={wsLabel}
 										item-public={ws.public ? '1' : '0'}
 										item-is-hidden={ws.is_hidden ? '1' : '0'}
 									>
@@ -355,7 +361,7 @@ export const FrappeSidebar: FC = () => {
 											<a
 												href={`/app/${slug}`}
 												className="item-anchor"
-												title={ws.title}
+												title={wsLabel}
 											>
 												<span
 													className="sidebar-item-icon"
@@ -363,7 +369,7 @@ export const FrappeSidebar: FC = () => {
 												>
 													{renderWorkspaceIcon(ws)}
 												</span>
-												<span className="sidebar-item-label">{ws.title || ws.label || ws.name}</span>
+												<span className="sidebar-item-label">{wsLabel}</span>
 											</a>
 											<div className="sidebar-item-control" />
 										</div>
