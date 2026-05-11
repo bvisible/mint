@@ -50,6 +50,10 @@ NAVBAR_BOOT_KEYS = (
     "module_app",
     # NoraLearn integration relies on these keys when the popup is mounted.
     "neoffice_settings",
+    # `docs` carries the metadocs (DocType/Role/User/etc.) preloaded by Frappe.
+    # main.tsx calls `frappe.model.sync(frappe.boot.docs)` so this MUST be set
+    # — otherwise React never mounts (Object.sync throws on undefined.docs).
+    "docs",
 )
 
 
