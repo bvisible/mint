@@ -19,6 +19,7 @@
  */
 import { useState, useEffect, useRef } from 'react'
 import type { FC } from 'react'
+import { t } from './i18n'
 
 interface NavbarBoot {
 	user?: { name?: string; email?: string; user_image?: string; full_name?: string }
@@ -113,7 +114,7 @@ export const FrappeNavbar: FC = () => {
 				<div className="container">
 					<button
 						className="btn-reset navbar-toggle-sidebar d-sm-none"
-						aria-label="Toggle Sidebar"
+						aria-label={t('Toggle Sidebar')}
 					>
 						<svg className="es-icon icon-md">
 							<use href="#es-line-align-justify" />
@@ -121,7 +122,7 @@ export const FrappeNavbar: FC = () => {
 					</button>
 
 					<a className="navbar-brand navbar-home" href="/app/home">
-						<img className="app-logo" src={logoUrl} alt="App Logo" />
+						<img className="app-logo" src={logoUrl} alt={t('App Logo')} />
 					</a>
 
 					<ul className="nav navbar-nav d-none d-sm-flex" id="navbar-breadcrumbs"></ul>
@@ -137,7 +138,7 @@ export const FrappeNavbar: FC = () => {
 									id="navbar-search"
 									type="text"
 									className="form-control"
-									placeholder={`Search or type a command (${isMac ? '⌘ + G' : 'Ctrl + G'})`}
+									placeholder={t('Search or type a command ({0})', [isMac ? '⌘ + G' : 'Ctrl + G'])}
 									aria-haspopup="true"
 								/>
 								<span className="search-icon">
@@ -152,7 +153,7 @@ export const FrappeNavbar: FC = () => {
 							{/* NORA quick chat (only if NORA assets exist) */}
 							<li
 								className="nav-item nora-quick-chat-btn"
-								title="Ask NORA"
+								title={t('Ask NORA')}
 								style={{ cursor: 'pointer', margin: '0 8px' }}
 								onClick={goNora}
 							>
@@ -184,7 +185,7 @@ export const FrappeNavbar: FC = () => {
 								viewBox="0 0 512 512"
 								onClick={goCalendar}
 							>
-								<title>See the calendar</title>
+								<title>{t('See the calendar')}</title>
 								<style type="text/css">{`
 									.st0{fill:transparent;stroke:#667777;stroke-width:4;stroke-miterlimit:10;}
 									.st1{fill:var(--primary);}
@@ -253,7 +254,7 @@ export const FrappeNavbar: FC = () => {
 											<div className="header-actions"></div>
 										</div>
 										<div className="notification-list-body">
-											<div className="panel-notifications">No notifications</div>
+											<div className="panel-notifications">{t('No notifications')}</div>
 										</div>
 									</div>
 								)}
@@ -268,10 +269,10 @@ export const FrappeNavbar: FC = () => {
 									className="btn-reset nav-link"
 									onClick={() => setHelpOpen((o) => !o)}
 									aria-controls="toolbar-help"
-									aria-label="Help Dropdown"
+									aria-label={t('Help Dropdown')}
 								>
 									<span>
-										Help
+										{t('Help')}
 										<svg className="es-icon icon-xs">
 											<use href="#es-line-down" />
 										</svg>
@@ -294,7 +295,7 @@ export const FrappeNavbar: FC = () => {
 								<button
 									className="btn-reset nav-link"
 									onClick={() => setUserMenuOpen((o) => !o)}
-									aria-label="User Menu"
+									aria-label={t('User Menu')}
 								>
 									{userImage ? (
 										<img
@@ -329,14 +330,14 @@ export const FrappeNavbar: FC = () => {
 										role="menu"
 									>
 										<a className="dropdown-item" href="/app/user-profile">
-											My Settings
+											{t('My Settings')}
 										</a>
 										<a className="dropdown-item" href="/app/user-permission">
-											Permissions
+											{t('Permissions')}
 										</a>
 										<div className="dropdown-divider"></div>
 										<a className="dropdown-item" href="/api/method/logout">
-											Logout
+											{t('Logout')}
 										</a>
 									</div>
 								)}

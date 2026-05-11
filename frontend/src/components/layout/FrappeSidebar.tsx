@@ -22,6 +22,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FC } from 'react'
+import { t } from './i18n'
 
 interface SidebarPage {
 	name: string
@@ -245,13 +246,13 @@ export const FrappeSidebar: FC = () => {
 							</div>
 							<div className="sidebar-item-label app-title" style={{ marginLeft: 10 }}>
 								<div className="app-title-name">{currentApp.app_title}</div>
-								<div className="app-title-subtitle">Active Module</div>
+								<div className="app-title-subtitle">{t('Active Module')}</div>
 							</div>
 						</div>
 						<div className="sidebar-item-control">
 							<button
 								className="btn-reset drop-icon show-in-edit-mode"
-								aria-label="Open app switcher"
+								aria-label={t('Open app switcher')}
 							>
 								<svg
 									className="es-icon es-line icon-sm"
@@ -298,7 +299,7 @@ export const FrappeSidebar: FC = () => {
 					<div className="sidebar-items">
 						{/* Section 1 — Navigation (workspaces of current app) */}
 						<div className="standard-sidebar-section nested-container" data-title="All">
-							<div className="standard-sidebar-label">Navigation</div>
+							<div className="standard-sidebar-label">{t('Navigation')}</div>
 							{visibleWorkspaces.map((ws) => {
 								const slug = slugify(ws.name)
 								const isActive = activeWorkspace === ws.name
@@ -335,7 +336,7 @@ export const FrappeSidebar: FC = () => {
 
 						{/* Section 2 — All Modules (mirror of app switcher, with active highlight) */}
 						<div className="standard-sidebar-section modules-section" data-title="Modules">
-							<div className="standard-sidebar-label">All Modules</div>
+							<div className="standard-sidebar-label">{t('All Modules')}</div>
 							{sortedApps.map((app) => {
 								const isActiveApp = currentApp.app_name === app.app_name
 								return (
@@ -384,7 +385,7 @@ export const FrappeSidebar: FC = () => {
 							/>
 						</svg>
 						<span className="collapse-sidebar-label">
-							{expanded ? ' Collapse' : ' Expand'}
+							{' '}{expanded ? t('Collapse') : t('Expand')}
 						</span>
 					</a>
 				</div>

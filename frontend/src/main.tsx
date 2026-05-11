@@ -9,10 +9,11 @@ import './lib/namespace'
 // session has loaded meta). React still needs to mount in that case.
 function safeSyncDocs() {
   try {
-    // @ts-expect-error - frappe globals provided by index.html
-    if (window.frappe?.model?.sync && window.frappe?.boot?.docs) {
-      // @ts-expect-error - frappe globals provided by index.html
-      window.frappe.model.sync(window.frappe.boot.docs)
+    const w = window as unknown as {
+      frappe?: { model?: { sync?: (docs: unknown) => void }; boot?: { docs?: unknown } }
+    }
+    if (w.frappe?.model?.sync && w.frappe?.boot?.docs) {
+      w.frappe.model.sync(w.frappe.boot.docs)
     }
   } catch (e) {
     console.warn('[mint] frappe.model.sync failed, continuing without docs:', e)

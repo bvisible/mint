@@ -57,11 +57,32 @@ NAVBAR_BOOT_KEYS = (
 )
 
 
+def _load_ui_translations() -> dict:
+    """Load translations for the apps whose strings the embedded Frappe shell
+    uses (sidebar + navbar labels). Without `desk.bundle.js`, Frappe never
+    pushes these strings into `frappe._messages` — we have to bake them in
+    the mini-boot ourselves, otherwise `__("Help")` etc. always return EN.
+    """
+    from frappe.translate import get_all_translations
+
+    try:
+        # `get_all_translations(lang)` returns the merged dict for ALL apps
+        # in the user's language. It's cached internally by Frappe, so the
+        # cost is paid once per worker.
+        return get_all_translations(frappe.local.lang) or {}
+    except Exception:
+        return {}
+
+
 def get_navbar_boot() -> dict:
     """Return the curated bootinfo subset used by FrappeNavbar/FrappeSidebar.
 
     Always sets `is_fc_site` and `developer_mode` (even if missing upstream)
     so that downstream JS bundles never see `undefined` on a defensive read.
+
+    Bakes the UI translations directly into `__messages` so the embedded
+    shell's `__()` calls resolve in the user's language without needing
+    desk.bundle.js.
     """
     from frappe.boot import get_bootinfo
 
@@ -69,9 +90,12 @@ def get_navbar_boot() -> dict:
     boot = {k: full.get(k) for k in NAVBAR_BOOT_KEYS}
     boot.setdefault("is_fc_site", False)
     boot.setdefault("developer_mode", bool(frappe.conf.get("developer_mode")))
-    # Preserve `__messages` so frappe._messages remains populated for `__()`.
-    if "__messages" in full:
-        boot["__messages"] = full["__messages"]
+    # Merge boot's stock `__messages` (country names, etc.) with the full
+    # translation dict of every installed app so the embedded shell can
+    # translate any UI string it ships.
+    messages = dict(full.get("__messages") or {})
+    messages.update(_load_ui_translations())
+    boot["__messages"] = messages
     return boot
 
 

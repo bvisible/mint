@@ -209,6 +209,26 @@
     frappe.boot = JSON.parse({{ boot }});
     frappe._messages = frappe.boot["__messages"];
 
+    // Minimal `__()` for the embedded shell — we don't load desk.bundle.js
+    // so Frappe's full `frappe._()` / window.__() never gets installed.
+    // This shim does just enough for our React components:
+    //   - dict lookup in frappe._messages
+    //   - positional substitution via {0}, {1}, ...
+    //   - context-aware lookup ("Source|Context" pattern Frappe uses)
+    window.__ = function (text, args, context) {
+      if (!text) return text;
+      var msgs = window.frappe && window.frappe._messages || {};
+      var lookupKey = context ? text + '|' + context : text;
+      var translated = msgs[lookupKey] || msgs[text] || text;
+      if (args && args.length) {
+        translated = translated.replace(/\{(\d+)\}/g, function (_, i) {
+          var v = args[+i];
+          return v === undefined || v === null ? '' : v;
+        });
+      }
+      return translated;
+    };
+
     // Integration flag — MUST be set BEFORE the bundle loads because App tsx
     // evaluates the layout swap at module load time. Bracket notation (not
     // dot) is required: Frappe's safe_render Jinja check refuses any
