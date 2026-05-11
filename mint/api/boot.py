@@ -74,6 +74,40 @@ def _load_ui_translations() -> dict:
         return {}
 
 
+def _apply_neoffice_theme_filters(bootinfo) -> None:
+    """Apply neoffice_theme's `extend_bootinfo` filters explicitly.
+
+    extend_bootinfo hooks normally run inside `frappe.boot.get_bootinfo()`,
+    but in the website-page context the bootinfo we get back here is missing
+    the filters that Desk would normally have applied. Calling them by hand
+    ensures `/mint` shows the SAME app_data + workspaces + form_width as
+    `/app/home` (no Mode simplifié, no Fiduciary, etc.).
+
+    Fail open: if neoffice_theme is missing or any filter throws, return the
+    bootinfo unmodified rather than break the SPA boot.
+    """
+    try:
+        from neoffice_theme.boot_override import (
+            filter_apps_by_interface_mode,
+            filter_apps_by_user_visibility,
+            filter_workspaces_by_interface_mode,
+            inject_user_form_width,
+        )
+    except Exception:
+        return
+
+    for fn in (
+        filter_apps_by_interface_mode,
+        filter_apps_by_user_visibility,
+        filter_workspaces_by_interface_mode,
+        inject_user_form_width,
+    ):
+        try:
+            fn(bootinfo)
+        except Exception:
+            continue
+
+
 def get_navbar_boot() -> dict:
     """Return the curated bootinfo subset used by FrappeNavbar/FrappeSidebar.
 
@@ -83,10 +117,19 @@ def get_navbar_boot() -> dict:
     Bakes the UI translations directly into `__messages` so the embedded
     shell's `__()` calls resolve in the user's language without needing
     desk.bundle.js.
+
+    Re-applies neoffice_theme's `extend_bootinfo` filters explicitly so
+    `app_data`, `workspaces` and form-width preferences match /app/home.
     """
     from frappe.boot import get_bootinfo
 
     full = get_bootinfo()
+
+    # Apply neoffice_theme's app/workspace filters explicitly so /mint
+    # matches /app/home (extend_bootinfo runs in get_bootinfo() but does not
+    # always reach the website-page payload — see boot_override.py).
+    _apply_neoffice_theme_filters(full)
+
     boot = {k: full.get(k) for k in NAVBAR_BOOT_KEYS}
     boot.setdefault("is_fc_site", False)
     boot.setdefault("developer_mode", bool(frappe.conf.get("developer_mode")))

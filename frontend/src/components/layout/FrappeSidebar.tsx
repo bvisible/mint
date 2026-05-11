@@ -18,7 +18,7 @@
  * that bundle either, the equivalent CSS rules are added inline in the
  * frontend/index.html template inside a <style> tag.
  *
- * Source: bvisible/Construction/frontend/src/app/layout/FrappeSidebar.tsx
+ * Source pattern: bvisible/mint/frontend/src/components/layout/FrappeSidebar.tsx
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FC } from 'react'
@@ -136,6 +136,29 @@ export const FrappeSidebar: FC = () => {
 				return (a.app_title || a.app_name).localeCompare(b.app_title || b.app_name)
 			}),
 		[apps],
+	)
+
+	// Mirror the Frappe Desk dropdown layout: the apps with sort_order < 70
+	// are "primary" (Commercial, Opérations, Finance, RH...). sort_order 70
+	// is conventionally "Site web" and 90+ is "Paramètres" — both rendered
+	// as standalone links separated by dividers + the controls block.
+	const primaryApps = useMemo(
+		() => sortedApps.filter((a) => (a.sort_order ?? 999) < 70),
+		[sortedApps],
+	)
+	const websiteApp = useMemo(
+		() =>
+			sortedApps.find((a) =>
+				a.app_name === 'Website' || a.app_name?.toLowerCase() === 'website' || (a.sort_order ?? 0) === 70,
+			),
+		[sortedApps],
+	)
+	const settingsApp = useMemo(
+		() =>
+			sortedApps.find((a) =>
+				a.app_name === 'Paramètres' || a.app_name?.toLowerCase() === 'settings' || (a.sort_order ?? 0) >= 90,
+			),
+		[sortedApps],
 	)
 
 	// Pick the "current" app:
@@ -266,32 +289,48 @@ export const FrappeSidebar: FC = () => {
 					</div>
 				</a>
 
-				{/* App switcher menu */}
+				{/* App switcher menu — mirrors the structure Frappe Desk renders
+				    in /app/home (apps_switcher.html + neoffice_theme controls):
+				    primary apps → Site web link → Mobile apps link → controls
+				    block (interface mode + theme + fullscreen + calculator +
+				    form width) → Paramètres link. */}
 				<div className={`app-switcher-menu ${switcherOpen ? 'show' : 'hidden'}`} role="menu">
-					{sortedApps.map((app) => (
-						<div
+					{primaryApps.map((app) => (
+						<AppMenuItem
 							key={app.app_name}
-							className={`app-item ${currentApp.app_name === app.app_name ? 'active' : ''}`}
-							data-app-name={app.app_name}
-							data-app-route={app.app_route}
-						>
-							<a
-								href={app.app_route || '/app'}
-								onClick={(e) => navigateApp(e, app)}
-								style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px' }}
-							>
-								<div className="sidebar-item-icon">
-									<img
-										className="app-logo"
-										src={app.app_logo_url || FALLBACK_LOGO}
-										alt={app.app_title}
-										style={{ width: 20, height: 20, objectFit: 'contain' }}
-									/>
-								</div>
-								<span className="app-item-title">{app.app_title}</span>
-							</a>
-						</div>
+							app={app}
+							active={currentApp.app_name === app.app_name}
+							onNavigate={navigateApp}
+						/>
 					))}
+
+					{websiteApp && (
+						<>
+							<div className="divider" />
+							<AppMenuItem
+								app={websiteApp}
+								active={currentApp.app_name === websiteApp.app_name}
+								onNavigate={navigateApp}
+							/>
+						</>
+					)}
+
+					<div className="divider" />
+					<MobileAppsMenuItem />
+
+					<div className="divider" />
+					<AppSwitcherControls />
+
+					{settingsApp && (
+						<>
+							<div className="divider" />
+							<AppMenuItem
+								app={settingsApp}
+								active={currentApp.app_name === settingsApp.app_name}
+								onNavigate={navigateApp}
+							/>
+						</>
+					)}
 				</div>
 
 				{/* Top scroll area : "Navigation" + "All Modules" sections */}
@@ -393,6 +432,276 @@ export const FrappeSidebar: FC = () => {
 
 			{/* Mobile overlay (kept for parity, MVP focuses on desktop) */}
 			<div className="overlay" style={{ zIndex: 1021 }} />
+		</div>
+	)
+}
+
+/* -------------------------------------------------------------------------- */
+/*  App switcher dropdown sub-components                                      */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Standard app entry inside the app-switcher dropdown menu — matches
+ * frappe/public/js/frappe/ui/apps_switcher.html. The class names align with
+ * desk.bundle.css and neoffice-theme.css so we don't need inline styles.
+ */
+const AppMenuItem: FC<{
+	app: AppEntry
+	active: boolean
+	onNavigate: (e: React.MouseEvent, app: AppEntry) => void
+}> = ({ app, active, onNavigate }) => (
+	<div
+		className={`app-item ${active ? 'active' : ''}`}
+		data-app-name={app.app_name}
+		data-app-route={app.app_route}
+	>
+		<a
+			href={app.app_route || '/app'}
+			onClick={(e) => onNavigate(e, app)}
+		>
+			<div className="sidebar-item-icon">
+				<img
+					className="app-logo"
+					src={app.app_logo_url || FALLBACK_LOGO}
+					alt={app.app_title}
+				/>
+			</div>
+			<span className="app-item-title">{app.app_title}</span>
+		</a>
+	</div>
+)
+
+/**
+ * Synthetic "Applications Mobiles" link (Frappe Desk hardcodes it in the
+ * neoffice-theme app-switcher). Routes to the Mobile App settings page.
+ */
+const MobileAppsMenuItem: FC = () => (
+	<div className="app-item">
+		<a href="/app/mobile-app">
+			<div className="sidebar-item-icon">
+				<img
+					className="app-logo"
+					src="/assets/frappe/images/mobile-app.svg"
+					alt={t('Mobile Apps')}
+				/>
+			</div>
+			<span className="app-item-title">{t('Mobile Apps')}</span>
+		</a>
+	</div>
+)
+
+/**
+ * App-switcher controls block (interface mode + theme + fullscreen +
+ * calculator + form width). Mirrors the markup neoffice-theme.js injects in
+ * /app/home so desk.bundle.css + neoffice-theme.css style it identically.
+ *
+ * Persistence is local-only (localStorage). The "Calculatrice" button is a
+ * placeholder — the real Frappe calculator widget lives in desk.bundle.js
+ * which we don't load in the embedded shell.
+ */
+const AppSwitcherControls: FC = () => {
+	type Mode = 'Simple' | 'Advanced'
+	type Width = 'S' | 'M' | 'L'
+
+	const [mode, setMode] = useState<Mode>(() => {
+		if (typeof window === 'undefined') return 'Advanced'
+		return (window.localStorage.getItem('interface_mode') as Mode) || 'Advanced'
+	})
+	const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+		if (typeof window === 'undefined') return 'light'
+		return document.body.classList.contains('dark') ? 'dark' : 'light'
+	})
+	const [width, setWidth] = useState<Width>(() => {
+		if (typeof window === 'undefined') return 'L'
+		return (window.localStorage.getItem('form_width_preference') as Width) || 'L'
+	})
+
+	const updateMode = (next: Mode) => {
+		setMode(next)
+		window.localStorage.setItem('interface_mode', next)
+	}
+	const toggleTheme = () => {
+		const next = theme === 'dark' ? 'light' : 'dark'
+		setTheme(next)
+		document.body.classList.remove('light', 'dark')
+		document.body.classList.add(next)
+		window.localStorage.setItem('desk_theme', next)
+	}
+	const toggleFullscreen = () => {
+		if (document.fullscreenElement) {
+			document.exitFullscreen?.()
+		} else {
+			document.documentElement.requestFullscreen?.()
+		}
+	}
+	const updateWidth = (next: Width) => {
+		setWidth(next)
+		window.localStorage.setItem('form_width_preference', next)
+	}
+	const openCalculator = () => {
+		// Real calculator lives in desk.bundle.js; route to a fallback page so
+		// the click is not a no-op for the user.
+		window.location.href = '/app/calculator'
+	}
+
+	return (
+		<div className="app-switcher-controls" onClick={(e) => e.stopPropagation()}>
+			{/* Interface mode toggle */}
+			<div className="interface-mode-switch app-switcher-interface-toggle">
+				<div className="interface-switch-label">{t("Interface Mode")}</div>
+				<div className="switches-container-apps">
+					<input
+						type="radio"
+						id="appsSwitchSimple"
+						name="apps-interface-switch"
+						value="Simple"
+						checked={mode === 'Simple'}
+						onChange={() => updateMode('Simple')}
+					/>
+					<input
+						type="radio"
+						id="appsSwitchAdvanced"
+						name="apps-interface-switch"
+						value="Advanced"
+						checked={mode === 'Advanced'}
+						onChange={() => updateMode('Advanced')}
+					/>
+					<label htmlFor="appsSwitchSimple">{t('Simple')}</label>
+					<label htmlFor="appsSwitchAdvanced">{t('Advanced')}</label>
+					<div className="switch-wrapper">
+						<div className="neoswitch-apps">
+							<div>{t('Simple')}</div>
+							<div>{t('Advanced')}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Quick actions row 1: theme toggle + fullscreen */}
+			<div className="app-switcher-quick-actions">
+				<button
+					className="quick-action-btn"
+					id="appsSwitcherThemeToggle"
+					title={theme === 'dark' ? t('Switch to Light Mode') : t('Switch to Dark Mode')}
+					onClick={toggleTheme}
+				>
+					<span className="quick-action-icon">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							{theme === 'dark' ? (
+								<>
+									<circle cx="12" cy="12" r="5" />
+									<line x1="12" y1="1" x2="12" y2="3" />
+									<line x1="12" y1="21" x2="12" y2="23" />
+									<line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+									<line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+									<line x1="1" y1="12" x2="3" y2="12" />
+									<line x1="21" y1="12" x2="23" y2="12" />
+									<line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+									<line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+								</>
+							) : (
+								<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+							)}
+						</svg>
+					</span>
+					<span className="quick-action-label">
+						{theme === 'dark' ? t('Light') : t('Dark')}
+					</span>
+				</button>
+				<button
+					className="quick-action-btn quick-action-icon-only"
+					id="appsSwitcherFullscreen"
+					title={t('Toggle Fullscreen')}
+					onClick={toggleFullscreen}
+				>
+					<span className="quick-action-icon">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							<polyline points="15 3 21 3 21 9" />
+							<polyline points="9 21 3 21 3 15" />
+							<line x1="21" y1="3" x2="14" y2="10" />
+							<line x1="3" y1="21" x2="10" y2="14" />
+						</svg>
+					</span>
+				</button>
+			</div>
+
+			{/* Quick actions row 2: calculator */}
+			<div className="app-switcher-quick-actions app-switcher-tools-row">
+				<button
+					className="quick-action-btn"
+					id="appsSwitcherCalculator"
+					title={t('Calculator')}
+					onClick={openCalculator}
+				>
+					<span className="quick-action-icon">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							<rect x="4" y="2" width="16" height="20" rx="2" />
+							<line x1="8" y1="6" x2="16" y2="6" />
+							<line x1="8" y1="10" x2="10" y2="10" />
+							<line x1="12" y1="10" x2="14" y2="10" />
+							<line x1="16" y1="10" x2="16" y2="10" />
+							<line x1="8" y1="14" x2="10" y2="14" />
+							<line x1="12" y1="14" x2="14" y2="14" />
+							<line x1="16" y1="14" x2="16" y2="14" />
+							<line x1="8" y1="18" x2="10" y2="18" />
+							<line x1="12" y1="18" x2="14" y2="18" />
+							<line x1="16" y1="18" x2="16" y2="18" />
+						</svg>
+					</span>
+					<span className="quick-action-label">{t('Calculator')}</span>
+				</button>
+			</div>
+
+			{/* Form width segments S/M/L */}
+			<div className="form-width-switch app-switcher-interface-toggle">
+				<div className="interface-switch-label">{t('Form Width')}</div>
+				<div
+					className="form-width-segments"
+					role="radiogroup"
+					aria-label={t('Form Width')}
+				>
+					{(['S', 'M', 'L'] as Width[]).map((w) => (
+						<button
+							key={w}
+							type="button"
+							className={`form-width-segment ${width === w ? 'active' : ''}`}
+							onClick={() => updateWidth(w)}
+						>
+							{w}
+						</button>
+					))}
+				</div>
+			</div>
 		</div>
 	)
 }
