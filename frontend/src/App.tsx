@@ -5,9 +5,19 @@ import BankReconciliation from './pages/BankReconciliation'
 import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
 import { toast } from 'sonner'
-import { FrappeSidebar } from '@neoffice/frappe-sidebar-react'
+import { FrappeSidebar as PackageFrappeSidebar } from '@neoffice/frappe-sidebar-react'
+import { FrappeLayout } from './components/layout'
 import { NoraLearnProvider } from '@neoffice/nora-learn-react'
 import '@neoffice/nora-learn-react/styles'
+
+// Frappe integration flag — set by mint/www/mint.html before the bundle loads.
+// When true, we wrap routes in the FrappeLayout (native sidebar + navbar)
+// reimplemented locally, sourced from the curated mini-boot. When false (vite
+// standalone dev), we fall back to the simpler @neoffice/frappe-sidebar-react
+// package which only needs basic boot data.
+const FRAPPE_INTEGRATION =
+	typeof window !== 'undefined' &&
+	(window as unknown as { __FRAPPE_INTEGRATION__?: boolean }).__FRAPPE_INTEGRATION__ === true
 
 function App() {
 	useEffect(() => {
@@ -20,11 +30,29 @@ function App() {
 			if (import.meta.env.DEV) {
 				return
 			}
-			// Redirect to Frappe login page
 			window.location.href = '/login?redirect-to=/mint'
 			return
 		}
 	}, [])
+
+	const Routing = (
+		<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
+			<Routes>
+				<Route index element={<BankReconciliation />} />
+				<Route path="/statement-importer" element={<BankStatementImporter />} />
+				<Route path="*" element={<Navigate to="/" />} />
+			</Routes>
+		</BrowserRouter>
+	)
+
+	const Shell = FRAPPE_INTEGRATION ? (
+		<FrappeLayout>{Routing}</FrappeLayout>
+	) : (
+		<div className="flex h-screen overflow-hidden">
+			<PackageFrappeSidebar homeUrl="/app/home" />
+			<div className="flex-1 overflow-auto">{Routing}</div>
+		</div>
+	)
 
 	return (
 		<FrappeProvider
@@ -44,18 +72,7 @@ function App() {
 					else toast.info(msg)
 				},
 			}}>
-				<div className="flex h-screen overflow-hidden">
-					<FrappeSidebar homeUrl="/app/home" />
-					<div className="flex-1 overflow-auto">
-						<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
-							<Routes>
-								<Route index element={<BankReconciliation />} />
-								<Route path="/statement-importer" element={<BankStatementImporter />} />
-								<Route path="*" element={<Navigate to="/" />} />
-							</Routes>
-						</BrowserRouter>
-					</div>
-				</div>
+				{Shell}
 			</NoraLearnProvider>
 			<Toaster richColors />
 		</FrappeProvider>

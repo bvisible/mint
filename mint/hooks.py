@@ -8,7 +8,12 @@ app_license = "agpl-3.0"
 # Apps
 # ------------------
 
-# required_apps = []
+# Hard dependency on neoffice_theme: provides the Lucide icon sprite at
+# /assets/neoffice_theme/icons/lucide/sprite.svg + the desk shell CSS bundle
+# consumed by the embedded FrappeSidebar/FrappeNavbar React components.
+# Without it, the sidebar renders without icons and the navbar loses its
+# theme. Same dependency as bvisible/neoconstruction.
+required_apps = ["neoffice_theme"]
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [

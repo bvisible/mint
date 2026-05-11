@@ -14,16 +14,229 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Inter:wght@100..900&display=swap"
     rel="stylesheet">
-  <title>mint</title>
+  <!-- Frappe Desk CSS only, no JS bundle — enough to style FrappeNavbar/Sidebar -->
+  {% if desk_css_url %}<link rel="stylesheet" href="{{ desk_css_url }}" />{% endif %}
+  <link rel="stylesheet" href="{{ neoffice_theme_css_url }}" />
+  <title>Mint</title>
+  <style>
+    /* Override Tailwind .collapse utility that conflicts with Bootstrap navbar
+       + inline the sidebar hover-expand rules normally injected at runtime by
+       neoffice-theme.js. Since we don't load that bundle in the website page
+       we have to ship the CSS ourselves. */
+    header.navbar .navbar-collapse,
+    header.navbar .navbar-collapse * {
+      visibility: visible !important;
+    }
+    header.navbar .navbar-collapse {
+      display: flex;
+    }
+
+    /* Tailwind ships a `.collapse { visibility: collapse }` utility that
+       hides every element whose class name *contains* the substring
+       `collapse` — including Frappe's `.collapse-sidebar-link` and any other
+       sidebar element built on the same class convention. Re-affirm
+       visibility on the whole sidebar subtree to neutralise that side-effect.
+       The `:not(.app-switcher-menu)` keeps the dropdown's hidden/show toggle
+       working. */
+    .body-sidebar .collapse-sidebar-link,
+    .body-sidebar [class*="collapse"],
+    .body-sidebar-container [class*="collapse"]:not(.app-switcher-menu) {
+      visibility: visible !important;
+    }
+
+    /* ---- FrappeSidebar hover-expand (mirrors neoffice-theme.js) ---- */
+    .body-sidebar-container:not(.expanded) .body-sidebar {
+      position: absolute;
+      z-index: 1031;
+    }
+    .body-sidebar-container:not(.expanded) .body-sidebar-placeholder {
+      display: flex;
+      width: 50px;
+    }
+    .body-sidebar-container:not(.expanded) .body-sidebar {
+      transition: width 0.18s ease-out, box-shadow 0.18s ease-out;
+    }
+    .body-sidebar-container:not(.expanded) .body-sidebar .sidebar-item-label {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+    }
+
+    /* Hover-expanded state */
+    .body-sidebar-container.hover-expanded .body-sidebar {
+      width: var(--left-sidebar-width, 220px);
+      box-shadow: var(--shadow-lg);
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-label {
+      display: flex;
+      align-items: center;
+      opacity: 1;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .standard-sidebar-label {
+      display: block;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .modules-section {
+      display: flex;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .body-sidebar-top {
+      width: 100%;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-container {
+      width: 100%;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-control {
+      display: block;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-items {
+      padding: 0px;
+      width: 100%;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .collapse-sidebar-link {
+      visibility: visible;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .body-sidebar-bottom {
+      width: 100%;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .app-switcher-dropdown {
+      width: 100%;
+      left: 0px;
+      padding: 3px;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .app-title {
+      display: block !important;
+    }
+
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-label,
+    .body-sidebar-container.hover-expanded .body-sidebar .standard-sidebar-label,
+    .body-sidebar-container.hover-expanded .body-sidebar .modules-section,
+    .body-sidebar-container.hover-expanded .body-sidebar .app-title-subtitle {
+      animation: sidebar-content-appear 260ms ease-out 80ms both;
+    }
+    @keyframes sidebar-content-appear {
+      from { opacity: 0; transform: translateX(-4px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* App switcher dropdown — show/hide via React state class */
+    .app-switcher-menu.hidden { display: none; }
+    .app-switcher-menu.show {
+      display: block;
+      position: absolute;
+      background: var(--fg-color, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 6px;
+      box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 10%));
+      z-index: 1040;
+      min-width: 200px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 4px;
+      left: 8px;
+      top: 56px;
+    }
+
+    /* ---- Frappe-pattern layout : sidebar and main as flex siblings ---- */
+    .main-section {
+      background: var(--fg-color, white);
+    }
+    .main-section > .navbar-wrapper,
+    header.navbar {
+      position: relative;
+      background: var(--navbar-bg, var(--fg-color, white));
+    }
+
+    /* Concave corner pseudo-element — bottom-left of navbar visually rounds
+       into the top-right of the sidebar. */
+    header.navbar::before {
+      content: "";
+      position: absolute;
+      bottom: -16px;
+      left: 0;
+      width: 16px;
+      height: 16px;
+      background: radial-gradient(
+        circle at bottom right,
+        transparent 16px,
+        var(--navbar-bg, var(--fg-color, white)) 16px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .body-sidebar {
+      background: var(--fg-color, white);
+    }
+
+    /* === Match Frappe Desk page styling === */
+    body {
+      background: var(--bg-color, oklch(0.965 0.005 80)) !important;
+    }
+    main.main-section {
+      background: transparent !important;
+    }
+    .page-content {
+      padding: 24px 36px !important;
+    }
+    .frappe-desk-root {
+      background: var(--bg-color, oklch(0.965 0.005 80));
+    }
+
+    /* Body is set to display:flex by Frappe CSS — force #root to take full
+       width so the SPA wrapper doesn't shrink when content is small. */
+    body {
+      display: block !important;
+    }
+    #root {
+      width: 100%;
+      min-height: 100vh;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Container for inlined Frappe icon sprites (timeless + espresso + lucide)
+       so that <use href="#es-line-..."> and <use href="#icon-..."> resolve to
+       actual <symbol> defs. -->
+  <div id="all-symbols" style="display: none; position: absolute; width: 0; height: 0;"></div>
   <div id="root"></div>
-  <script>window.csrf_token = '{{ frappe.session.csrf_token }}';
+  <script>
+    window.csrf_token = '{{ frappe.session.csrf_token }}';
     if (!window.frappe) window.frappe = {};
-
     frappe.boot = JSON.parse({{ boot }});
     frappe._messages = frappe.boot["__messages"];
+
+    // Integration flag — MUST be set BEFORE the bundle loads because App tsx
+    // evaluates the layout swap at module load time. Bracket notation (not
+    // dot) is required: Frappe's safe_render Jinja check refuses any
+    // dot+double-underscore substring as a SSTI guard.
+    window['__FRAPPE_INTEGRATION__'] = true;
+    window['__FRAPPE_BASENAME__'] = '/mint';
+
+    // Fetch Frappe icon sprites and inline them into #all-symbols so that
+    // FrappeNavbar/FrappeSidebar React components can reference them via
+    // <use href="#...">. Best-effort: missing sprites are silently skipped.
+    (function loadIcons() {
+      var sprites = [
+        '/assets/frappe/icons/timeless/icons.svg',
+        '/assets/frappe/icons/espresso/icons.svg',
+        '/assets/neoffice_theme/icons/lucide/sprite.svg',
+      ];
+      sprites.forEach(function (url) {
+        fetch(url)
+          .then(function (r) { return r.text(); })
+          .then(function (svgText) {
+            var div = document.createElement('div');
+            div.innerHTML = svgText;
+            var container = document.getElementById('all-symbols');
+            if (container) container.appendChild(div);
+          })
+          .catch(function () {});
+      });
+    })();
   </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
