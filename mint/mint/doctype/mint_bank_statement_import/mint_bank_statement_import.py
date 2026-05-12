@@ -609,12 +609,27 @@ def _find_bank_account_by_iban(iban):
 
 
 def _build_description(txn):
-	"""Build a human-readable description from transaction data."""
-	parts = []
-	if txn.get("remarks"):
-		parts.append(txn["remarks"])
-	if txn.get("transaction_reference"):
-		parts.append(txn["transaction_reference"])
-	if not parts and txn.get("unique_reference"):
-		parts.append(txn["unique_reference"])
-	return " | ".join(parts) if parts else ""
+	"""Build a human-readable description from CAMT transaction data.
+
+	Priority order (joined with newlines, deduplicated):
+	  1. <AddtlNtryInf> — the bank's own multi-line summary of the entry
+	     (e.g. "Paiement Revolut Bank UAB\nKonstitucijos ave. 21B, ...\nDaniel Moret, CH")
+	  2. <RmtInf><Ustrd> / ESR ref / end-to-end ID (via transaction_reference)
+	  3. <AcctSvcrRef> as last-resort unique_reference fallback
+	"""
+	addtl = (txn.get("entry_addtl_info") or "").strip()
+	tx_ref = (txn.get("transaction_reference") or "").strip()
+	remarks = (txn.get("remarks") or "").strip()
+	unique_ref = (txn.get("unique_reference") or "").strip()
+
+	lines = []
+	if addtl:
+		lines.append(addtl)
+	if remarks and remarks not in addtl:
+		lines.append(remarks)
+	if tx_ref and tx_ref not in addtl and tx_ref != remarks:
+		lines.append(tx_ref)
+	if not lines and unique_ref:
+		lines.append(unique_ref)
+
+	return "\n".join(lines)
