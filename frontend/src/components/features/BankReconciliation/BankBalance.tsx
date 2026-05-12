@@ -34,8 +34,8 @@ const BankBalance = () => {
         return null
     }
     return (
-        <div className="flex justify-between">
-            <div className="w-[80%] flex justify-between gap-2 pr-8 border-r-border border-r">
+        <div className="flex flex-wrap justify-between gap-y-4 gap-x-4">
+            <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-6 gap-y-2 pr-4 lg:pr-8 lg:border-r-border lg:border-r">
                 <OpeningBalance />
                 <ClosingBalance />
                 <ClosingBalanceAsPerStatement />
@@ -51,9 +51,9 @@ const OpeningBalance = () => {
     const bankAccount = useAtomValue(selectedBankAccountAtom)
     const { data, isLoading } = useGetAccountOpeningBalance()
 
-    return <StatContainer className="min-w-48">
+    return <StatContainer className="min-w-32">
         <StatLabel>{_("Opening Balance")}</StatLabel>
-        {isLoading ? <Skeleton className="w-[150px] h-9" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
     </StatContainer>
 }
 
@@ -62,7 +62,7 @@ const ClosingBalance = () => {
     const { data, isLoading } = useGetAccountClosingBalance()
 
     return (
-        <StatContainer className="min-w-48">
+        <StatContainer className="min-w-36">
             <div className="flex items-start gap-1">
                 <StatLabel>
                     {_("Closing Balance as per system")}
@@ -80,13 +80,13 @@ const ClosingBalance = () => {
                             <br />
                             {_("If your bank statement shows a different closing balance, it is because all transactions have not reconciled yet.")}
                             <br /><br />
-                            For more information, click on the <strong>Bank Reconciliation Statement</strong> tab below.
+                            {_("For more information, click on the {0} tab below.", [_("Bank Reconciliation Statement")])}
                         </Paragraph>
                     </HoverCardContent>
                 </HoverCard>
 
             </div>
-            {isLoading ? <Skeleton className="w-[150px] h-9" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+            {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
         </StatContainer>
     )
 }
@@ -102,9 +102,9 @@ const Difference = () => {
 
     const isError = difference !== 0
 
-    return <StatContainer className="w-fit text-right sm:min-w-56">
+    return <StatContainer className="w-fit text-right sm:min-w-32">
         <StatLabel className="text-right">{_("Difference")}</StatLabel>
-        {isLoading ? <Skeleton className="w-[150px] h-9" /> : <StatValue className={isError ? 'text-destructive font-mono' : 'font-mono'}>
+        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className={isError ? 'text-destructive font-mono' : 'font-mono'}>
             {formatCurrency(difference,
                 bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))
             }</StatValue>}
@@ -132,9 +132,9 @@ const ReconcileProgress = () => {
 
     const progress = (totalCount ? reconciledCount / totalCount : 0) * 100
 
-    return <div className="w-[18%] flex flex-col gap-1 items-end">
+    return <div className="flex flex-col gap-1 items-end min-w-[180px] w-full lg:w-auto lg:min-w-[200px] lg:max-w-[260px]">
         <div>
-            <span className="text-right font-medium text-sm">{_("Your Progress")}: {reconciledCount} / {totalCount} {_("reconciled")}</span>
+            <span className="text-right font-medium text-sm whitespace-nowrap">{_("Your Progress")}: {reconciledCount} / {totalCount} {_("reconciled")}</span>
         </div>
         <div className="w-full">
             <Progress value={progress} max={100} />
@@ -164,15 +164,15 @@ const ClosingBalanceAsPerStatement = () => {
     const [isOpen, setIsOpen] = useState(false)
 
 
-    return <StatContainer className="min-w-48">
+    return <StatContainer className="min-w-36">
         <StatLabel>{_("Closing Balance as per statement")}</StatLabel>
         <div className="flex flex-col gap-2 items-start">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div className="flex items-center gap-4 underline cursor-pointer underline-offset-6">
-                                {isLoading ? <Skeleton className="w-[150px] h-9" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+                            <div className="flex items-center gap-3 underline cursor-pointer underline-offset-6">
+                                {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
                                 <Edit className="w-4 h-4" />
                             </div>
                         </TooltipTrigger>

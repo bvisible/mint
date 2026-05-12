@@ -68,7 +68,7 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
 
     return <div
         role="button"
-        title={`Select ${bank.account_name}`}
+        title={_("Select {0}", [bank.account_name ?? ''])}
         onClick={onSelect}
         className={cn('rounded-md border-2 border-gray-200 min-w-80 relative p-2 bg-card overflow-hidden cursor-pointer',
             isSelected ? 'border-primary bg-primary-foreground' : 'hover:bg-gray-50',

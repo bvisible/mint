@@ -235,7 +235,7 @@ const NoTransactionsFoundBanner = ({ text, description, onClearFilters }: { text
             {description && <EmptyDescription>{description}</EmptyDescription>}
         </EmptyHeader>
         <EmptyContent>
-            {onClearFilters ? <Button type='button' size='sm' variant='outline' onClick={onClearFilters}>Clear Filters</Button> :
+            {onClearFilters ? <Button type='button' size='sm' variant='outline' onClick={onClearFilters}>{_("Clear Filters")}</Button> :
                 <Button type='button' asChild size='sm' variant='outline'>
                     <Link to="/statement-importer">
                         {_("Import Bank Statement")}
@@ -708,7 +708,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
         return <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Separator className="flex-1" />
-                <span>or</span>
+                <span>{_("or")}</span>
                 <Separator className="flex-1" />
             </div>
             <Skeleton className="h-16 w-full" />

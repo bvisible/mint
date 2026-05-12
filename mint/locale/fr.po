@@ -2410,3 +2410,189 @@ msgstr "L'IBAN dans le XML ({0}) correspond à {1}, mais {2} est sélectionné. 
 
 msgid "Please attach an XML file first"
 msgstr "Veuillez d'abord joindre un fichier XML"
+
+msgid "0.00"
+msgstr "0.00"
+
+msgid "Amount column has positive/negative values"
+msgstr "La colonne montant contient des valeurs positives/négatives"
+
+msgid "Back"
+msgstr "Retour"
+
+msgid "Balance"
+msgstr "Solde"
+
+msgid "Bank Statement"
+msgstr "Relevé bancaire"
+
+msgid "Bank statement imported."
+msgstr "Relevé bancaire importé."
+
+msgid "Cancelled"
+msgstr "Annulé"
+
+msgid "Clear Filters"
+msgstr "Effacer les filtres"
+
+msgid "Column Name"
+msgstr "Nom de la colonne"
+
+msgid "Conflicting Transactions"
+msgstr "Transactions en conflit"
+
+msgid "Detected Amount Format"
+msgstr "Format de montant détecté"
+
+msgid "Detected Date Format"
+msgstr "Format de date détecté"
+
+msgid "Draft"
+msgstr "Brouillon"
+
+msgid "Drop a file here, or click to select a file"
+msgstr "Déposez un fichier ici, ou cliquez pour en sélectionner un"
+
+msgid "Existing transactions in the system belonging to the same bank account and date range"
+msgstr "Transactions existantes appartenant au même compte bancaire et à la même plage de dates"
+
+msgid "For more information, click on the {0} tab below."
+msgstr "Pour plus d'informations, cliquez sur l'onglet {0} ci-dessous."
+
+msgid "Get Unpaid Invoices"
+msgstr "Récupérer les factures impayées"
+
+msgid "Import your bank statement to get started."
+msgstr "Importez votre relevé bancaire pour commencer."
+
+msgid "Imported On"
+msgstr "Importé le"
+
+msgid "Importing..."
+msgstr "Importation..."
+
+msgid "Maps To"
+msgstr "Correspond à"
+
+msgid "No bank statements imported yet"
+msgstr "Aucun relevé bancaire importé pour le moment"
+
+msgid "No transaction selected"
+msgstr "Aucune transaction sélectionnée"
+
+msgid "Number of Transactions"
+msgstr "Nombre de transactions"
+
+msgid "Paid to (Party Type)"
+msgstr "Payé à (Type de tiers)"
+
+msgid "Please review the details below and click the 'Import' button to proceed."
+msgstr "Veuillez vérifier les détails ci-dessous et cliquer sur le bouton 'Importer' pour continuer."
+
+msgid "Preview Transactions"
+msgstr "Aperçu des transactions"
+
+msgid "Previous Imports"
+msgstr "Imports précédents"
+
+msgid "Received from (Party Type)"
+msgstr "Reçu de (Type de tiers)"
+
+msgid "Ref."
+msgstr "Réf."
+
+msgid "Select"
+msgstr "Sélectionner"
+
+msgid "Select Invoices"
+msgstr "Sélectionner les factures"
+
+msgid "Separate columns for withdrawal and deposit"
+msgstr "Colonnes séparées pour retrait et dépôt"
+
+msgid "Statement Details"
+msgstr "Détails du relevé"
+
+msgid "Statement File"
+msgstr "Fichier de relevé"
+
+msgid "Statement Import Instructions"
+msgstr "Instructions d'import du relevé"
+
+msgid "The amount format detected in the statement file. This is used to parse the deposit and withdrawal values from each row."
+msgstr "Le format de montant détecté dans le fichier de relevé. Utilisé pour analyser les valeurs de dépôt et retrait de chaque ligne."
+
+msgid "The date format detected in the statement file. This is used to parse the date values."
+msgstr "Le format de date détecté dans le fichier de relevé. Utilisé pour analyser les valeurs de date."
+
+msgid "The date of the transaction"
+msgstr "La date de la transaction"
+
+msgid "The description of the transaction"
+msgstr "La description de la transaction"
+
+msgid "The file should contain the following columns with a distinct header row. You can upload most bank statements as is without changing the columns."
+msgstr "Le fichier doit contenir les colonnes suivantes avec une ligne d'en-tête distincte. Vous pouvez importer la plupart des relevés bancaires tels quels sans modifier les colonnes."
+
+msgid "The following documents will be {0}:"
+msgstr "Les documents suivants seront {0} :"
+
+msgid "The reference number of the transaction"
+msgstr "Le numéro de référence de la transaction"
+
+msgid "The withdrawal or deposit amounts - only required if there's no amount column."
+msgstr "Les montants de retrait ou dépôt — uniquement requis s'il n'y a pas de colonne de montant."
+
+msgid "There was an error while importing the bank statement."
+msgstr "Une erreur s'est produite lors de l'importation du relevé bancaire."
+
+msgid "Transaction Dates"
+msgstr "Dates de transaction"
+
+msgid "Transactions to be imported into the system"
+msgstr "Transactions à importer dans le système"
+
+msgid "Try adjusting your search or filter criteria."
+msgstr "Essayez d'ajuster vos critères de recherche ou de filtre."
+
+msgid "Unpaid invoices from {0} for {1}."
+msgstr "Factures impayées de {0} pour {1}."
+
+msgid "Upload"
+msgstr "Importer"
+
+msgid "Upload your bank statement file to start the import process. We support CSV, and XLSX files."
+msgstr "Importez votre fichier de relevé bancaire pour commencer le processus d'import. Formats pris en charge : CSV et XLSX."
+
+msgid "Uploading..."
+msgstr "Importation en cours..."
+
+msgid "View Instructions"
+msgstr "Voir les instructions"
+
+msgid "We support uploading CSV, XLSX and XLS files. Please make sure the file contains the correct columns."
+msgstr "Formats pris en charge : CSV, XLSX et XLS. Assurez-vous que le fichier contient les bonnes colonnes."
+
+msgid "We've auto-detected the details of the statement file."
+msgstr "Nous avons détecté automatiquement les détails du fichier de relevé."
+
+msgid "We've found 1 existing transaction in the system that conflicts with the transactions in the statement file. Are you sure you want to proceed with the import?"
+msgstr "Nous avons trouvé 1 transaction existante dans le système qui entre en conflit avec les transactions du fichier de relevé. Êtes-vous sûr de vouloir continuer l'import ?"
+
+msgid "We've found 1 transaction in the statement file that will be imported into the system. Please review the details below and click the 'Import' button to proceed."
+msgstr "Nous avons trouvé 1 transaction dans le fichier de relevé qui sera importée dans le système. Veuillez vérifier les détails ci-dessous et cliquer sur le bouton 'Importer' pour continuer."
+
+msgid "cancelled"
+msgstr "annulé"
+
+msgid "e.g. Last 3 weeks"
+msgstr "ex. 3 dernières semaines"
+
+msgid "or"
+msgstr "ou"
+
+msgid "Header Row"
+msgstr "Ligne d'en-tête"
+
+msgid "Other Charges / Deductions"
+msgstr "Autres frais / Déductions"

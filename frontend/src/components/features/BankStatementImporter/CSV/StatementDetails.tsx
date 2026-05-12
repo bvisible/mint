@@ -122,7 +122,7 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                                         <H4 className="text-base mb-0">{bank?.bank}</H4>
                                     </div>}
                                     <span className="tracking-tight text-sm font-medium">{bank?.account_name}</span>
-                                    <span title="GL Account" className="text-sm">{bank?.account}</span>
+                                    <span title={_("GL Account")} className="text-sm">{bank?.account}</span>
                                 </div>
                             </TableCell>
                         </TableRow>

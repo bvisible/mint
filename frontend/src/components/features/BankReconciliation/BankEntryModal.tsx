@@ -32,7 +32,7 @@ const BankEntryModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='!max-w-[min(95vw,1400px)] w-[min(95vw,1400px)] sm:!max-w-[min(95vw,1400px)]'>
+            <DialogContent className='!max-w-[min(92vw,1300px)] w-[min(92vw,1300px)] sm:!max-w-[min(92vw,1300px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Bank Entry")}</DialogTitle>
                     <DialogDescription>
@@ -53,7 +53,7 @@ const RecordBankEntryModalContent = () => {
 
     if (!selectedTransaction || !selectedBankAccount) {
         return <div className='p-4'>
-            <span className='text-center'>No transaction selected</span>
+            <span className='text-center'>{_("No transaction selected")}</span>
         </div>
     }
 

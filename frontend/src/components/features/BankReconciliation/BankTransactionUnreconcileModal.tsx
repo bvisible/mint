@@ -105,7 +105,7 @@ const BankTransactionUnreconcileModalContent = () => {
                 </TableBody>
             </Table>
             <div className="py-4">
-                {vouchersWhichWillBeCancelled && vouchersWhichWillBeCancelled?.length > 0 && <span>The following documents will be <strong>cancelled</strong>:</span>}
+                {vouchersWhichWillBeCancelled && vouchersWhichWillBeCancelled?.length > 0 && <span dangerouslySetInnerHTML={{ __html: _("The following documents will be {0}:", [`<strong>${_("cancelled")}</strong>`]) }} />}
                 {vouchersWhichWillBeCancelled && vouchersWhichWillBeCancelled?.length > 0 && <ol className="ml-6 list-disc [&>li]:mt-2">
                     {vouchersWhichWillBeCancelled?.map((voucher) => {
                         return <li key={voucher.name}>{_(voucher.payment_document)}: {voucher.payment_entry}</li>

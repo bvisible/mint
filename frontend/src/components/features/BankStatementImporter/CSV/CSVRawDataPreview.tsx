@@ -23,7 +23,7 @@ const CSVRawDataPreview = ({ data }: { data: GetStatementDetailsResponse }) => {
                     const isTransactionRow = index >= data.transaction_starting_index && index <= data.transaction_ending_index;
 
                     return <TableRow key={index}
-                        title={isHeaderRow ? "Header Row" : ""}
+                        title={isHeaderRow ? _("Header Row") : ""}
                         className={cn({
                             // "bg-yellow-100": isHeaderRow,
                             // "hover:bg-yellow-100": isHeaderRow,

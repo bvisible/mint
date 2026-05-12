@@ -32,7 +32,7 @@ const TransferModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='!max-w-[min(95vw,1280px)] w-[min(95vw,1280px)] sm:!max-w-[min(95vw,1280px)]'>
+            <DialogContent className='!max-w-[min(92vw,1200px)] w-[min(92vw,1200px)] sm:!max-w-[min(92vw,1200px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Transfer")}</DialogTitle>
                     <DialogDescription>
@@ -53,7 +53,7 @@ const TransferModalContent = () => {
 
     if (!selectedTransaction || !selectedBankAccount) {
         return <div className='p-4'>
-            <span className='text-center'>No transaction selected</span>
+            <span className='text-center'>{_("No transaction selected")}</span>
         </div>
     }
 

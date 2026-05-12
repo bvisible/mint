@@ -55,7 +55,7 @@ const RecordPaymentModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='!max-w-[min(95vw,1400px)] w-[min(95vw,1400px)] sm:!max-w-[min(95vw,1400px)]'>
+            <DialogContent className='!max-w-[min(92vw,1300px)] w-[min(92vw,1300px)] sm:!max-w-[min(92vw,1300px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Record Payment")}</DialogTitle>
                     <DialogDescription>
@@ -77,7 +77,7 @@ const RecordPaymentModalContent = () => {
 
     if (!selectedTransaction || !selectedBankAccount) {
         return <div className='p-4'>
-            <span className='text-center'>No transaction selected</span>
+            <span className='text-center'>{_("No transaction selected")}</span>
         </div>
     }
 
@@ -922,12 +922,12 @@ const GetUnpaidInvoicesButton = () => {
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             {partyType && party && <DialogTrigger asChild>
-                <Button variant='outline' size='sm' type='button'>Get Unpaid Invoices</Button>
+                <Button variant='outline' size='sm' type='button'>{_("Get Unpaid Invoices")}</Button>
             </DialogTrigger>}
-            <DialogContent className='!max-w-[min(75vw,1100px)] w-[min(75vw,1100px)] sm:!max-w-[min(75vw,1100px)]'>
+            <DialogContent className='!max-w-[min(72vw,1000px)] w-[min(72vw,1000px)] sm:!max-w-[min(72vw,1000px)]'>
                 <DialogHeader>
-                    <DialogTitle>Select Invoices</DialogTitle>
-                    <DialogDescription>Unpaid invoices from {partyName} for {formatCurrency(amount)}.</DialogDescription>
+                    <DialogTitle>{_("Select Invoices")}</DialogTitle>
+                    <DialogDescription>{_("Unpaid invoices from {0} for {1}.", [partyName ?? '', formatCurrency(amount)])}</DialogDescription>
                 </DialogHeader>
                 <FetchInvoicesModal onClose={() => setIsOpen(false)} />
             </DialogContent>
@@ -1118,14 +1118,14 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
         </Table> : null}
         <div className="flex justify-between items-center">
             <div className="flex gap-2">
-                <span className="text-muted-foreground">Invoices: <span className="text-foreground font-mono font-medium">{selectedInvoices.length}</span></span> /
-                <span className="text-muted-foreground">Total: <span className="text-foreground font-mono font-medium">{formatCurrency(selectedInvoices.reduce((acc, invoice) => acc + invoice.outstanding_amount, 0))}</span></span>
+                <span className="text-muted-foreground">{_("Invoices")}: <span className="text-foreground font-mono font-medium">{selectedInvoices.length}</span></span> /
+                <span className="text-muted-foreground">{_("Total")}: <span className="text-foreground font-mono font-medium">{formatCurrency(selectedInvoices.reduce((acc, invoice) => acc + invoice.outstanding_amount, 0))}</span></span>
             </div>
             <DialogFooter className="pt-2">
                 <DialogClose asChild>
-                    <Button variant='ghost' disabled={allocateAmountToReferencesLoading}>Cancel</Button>
+                    <Button variant='ghost' disabled={allocateAmountToReferencesLoading}>{_("Cancel")}</Button>
                 </DialogClose>
-                <Button onClick={onSelect} disabled={allocateAmountToReferencesLoading}>Select</Button>
+                <Button onClick={onSelect} disabled={allocateAmountToReferencesLoading}>{_("Select")}</Button>
             </DialogFooter>
         </div>
 
@@ -1284,7 +1284,7 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
 
     return <div className="flex flex-col gap-2">
         <div className="flex gap-2 items-center">
-            <H4 className="text-base">Other Charges / Deductions</H4>
+            <H4 className="text-base">{_("Other Charges / Deductions")}</H4>
             <TotalDeductions currency={currency} />
             {isCalculating && <span className="text-xs text-muted-foreground">{_("Calculating VAT...")}</span>}
         </div>
