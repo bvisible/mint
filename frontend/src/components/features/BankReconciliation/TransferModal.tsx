@@ -32,7 +32,7 @@ const TransferModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='min-w-7xl'>
+            <DialogContent className='!max-w-[min(95vw,1280px)] w-[min(95vw,1280px)] sm:!max-w-[min(95vw,1280px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Transfer")}</DialogTitle>
                     <DialogDescription>
@@ -394,7 +394,8 @@ const BankOrCashPicker = ({ bankAccount, onAccountChange, selectedAccount, compa
                     <img
                         src={`/assets/mint/mint/${bank.logo}`}
                         alt={bank.bank || ''}
-                        className='w-12 h-12 object-contain'
+                        className='object-contain'
+                        style={{ maxWidth: '64px', maxHeight: '32px', width: 'auto', height: 'auto' }}
                     /> : <div className='flex items-center justify-center h-10 w-10'>
                         <Landmark size='24px' />
                     </div>
@@ -518,7 +519,8 @@ const RecommendedTransferAccount = ({ transaction, onAccountChange }: { transact
                             <img
                                 src={`/assets/mint/mint/${bank.logo}`}
                                 alt={bank.bank}
-                                className="h-8 max-w-24 object-contain"
+                                className="object-contain"
+                                style={{ maxWidth: '80px', maxHeight: '28px', width: 'auto', height: 'auto' }}
                             />
                         ) : (
                             <Landmark className={cn("w-8 h-8", isSuggested ? "text-green-600" : "text-purple-600")} />

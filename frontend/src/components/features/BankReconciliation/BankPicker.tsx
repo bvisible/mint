@@ -80,9 +80,12 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
         {bank.logo ? <img
             src={`/assets/mint/mint/${bank.logo}`}
             alt={bank.bank || bank.name || ''}
-            className={cn("max-w-24 object-left h-10 object-contain mb-1", {
-                'h-6 max-w-18 mb-2': size === 'sm',
+            className={cn("object-left object-contain mb-1", {
+                'mb-2': size === 'sm',
             })}
+            style={size === 'sm'
+                ? { maxWidth: '64px', maxHeight: '20px', width: 'auto', height: 'auto' }
+                : { maxWidth: '112px', maxHeight: '32px', width: 'auto', height: 'auto' }}
         /> : <div className={cn("rounded-md flex items-center h-10 gap-2", {
             "h-6 mb-2": size === 'sm',
         })}>

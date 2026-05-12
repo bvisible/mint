@@ -225,12 +225,12 @@ const LinkFieldCombobox = ({
                         disabled={disabled || readOnly}
                         aria-expanded={open}
                         aria-readonly={readOnly}
-                        className={cn("w-full justify-between font-normal group",
+                        className={cn("w-full justify-between font-normal group min-w-0",
                             readOnly ? "bg-muted" : ""
                             , buttonClassName)}>
-                        {linkTitle || placeholder}
+                        <span className="truncate text-left">{linkTitle || placeholder}</span>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 shrink-0">
                             {value && <a href={`/app/${slug(doctype)}/${value}`} target="_blank" className="group-hover:block hidden">
                                 <ExternalLink className="h-4 w-4 shrink-0 opacity-50" />
                             </a>}
@@ -244,10 +244,10 @@ const LinkFieldCombobox = ({
                         ref={buttonRef}
                         disabled={disabled}
                         aria-expanded={open}
-                        className={cn("w-full justify-between font-normal",
+                        className={cn("w-full justify-between font-normal min-w-0",
                             readOnly ? "bg-muted" : ""
                             , buttonClassName)}>
-                        {value || placeholder}
+                        <span className="truncate text-left">{value || placeholder}</span>
 
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>}

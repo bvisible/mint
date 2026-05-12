@@ -12,7 +12,7 @@
  *
  * Source: bvisible/Construction/frontend/src/app/layout/FrappeLayout.tsx
  */
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { FrappeSidebar } from './FrappeSidebar'
 import { FrappeNavbar } from './FrappeNavbar'
 
@@ -21,6 +21,18 @@ interface FrappeLayoutProps {
 }
 
 export function FrappeLayout({ children }: FrappeLayoutProps) {
+	// Expose the sidebar placeholder width as a CSS var so Radix overlays
+	// (Dialog, AlertDialog) mounted via Portal to document.body can offset
+	// their centering and width to avoid passing under the absolute-positioned
+	// sidebar (z-index 1031). Without this, viewport-centered modals overlap
+	// the sidebar on the left and overflow main on the right.
+	useEffect(() => {
+		const root = document.documentElement
+		root.style.setProperty('--mint-sidebar-offset', '50px')
+		return () => {
+			root.style.removeProperty('--mint-sidebar-offset')
+		}
+	}, [])
 	return (
 		<div
 			className="frappe-desk-root"

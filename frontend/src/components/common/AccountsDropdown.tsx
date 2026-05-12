@@ -123,10 +123,10 @@ const AccountsDropdown = ({ root_type, report_type, account_type, value, onChang
                         disabled={disabled || readOnly}
                         aria-readonly={readOnly}
                         aria-expanded={open}
-                        className={cn("w-full justify-between font-normal",
+                        className={cn("w-full justify-between font-normal min-w-0",
                             readOnly ? "bg-muted pointer-events-none" : ""
                             , buttonClassName)}>
-                        {value || _('Select Account')}
+                        <span className="truncate text-left">{value || _('Select Account')}</span>
 
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -137,10 +137,10 @@ const AccountsDropdown = ({ root_type, report_type, account_type, value, onChang
                         ref={buttonRef}
                         disabled={disabled}
                         aria-expanded={open}
-                        className={cn("w-full justify-between font-normal",
+                        className={cn("w-full justify-between font-normal min-w-0",
                             readOnly ? "bg-muted" : ""
                         )}>
-                        {value || _('Select Account')}
+                        <span className="truncate text-left">{value || _('Select Account')}</span>
 
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>}

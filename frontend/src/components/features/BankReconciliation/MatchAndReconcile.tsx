@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { bankRecAmountFilter, bankRecDateAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
+import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
 import { useMemo, useRef } from "react"
 import { getCompanyCurrency } from "@/lib/company"
@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import Fuse from 'fuse.js'
 import { getSearchResults, LinkedPayment, UnreconciledTransaction, useGetRuleForTransaction, useGetUnreconciledTransactions, useGetVouchersForTransaction, useIsTransactionWithdrawal, useReconcileTransaction, useTransactionSearch } from "./utils"
 import { Input } from "@/components/ui/input"
-import { AlertCircle, ArrowDownRight, ArrowRightIcon, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, DollarSign, Landmark, LandmarkIcon, ListIcon, Loader2, Receipt, ReceiptIcon, Search, User, XCircle, ZapIcon } from "lucide-react"
+import { AlertCircle, ArrowDownRight, ArrowRightIcon, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, DollarSign, FileEdit, Landmark, LandmarkIcon, ListIcon, Loader2, Receipt, ReceiptIcon, Search, User, XCircle, ZapIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,7 @@ import _ from "@/lib/translate"
 import TransferModal from "./TransferModal"
 import BankEntryModal from "./BankEntryModal"
 import RecordPaymentModal from "./RecordPaymentModal"
+import DraftJEModal from "./DraftJEModal"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
 import MatchFilters from "./MatchFilters"
@@ -64,6 +65,7 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
         <TransferModal />
         <BankEntryModal />
         <RecordPaymentModal />
+        <DraftJEModal />
     </>
 }
 
@@ -747,6 +749,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
     const selectedBank = useAtomValue(selectedBankAccountAtom)
     const selectedTransaction = useAtomValue(bankRecSelectedTransactionAtom(selectedBank?.name || ''))
+    const setDraftJEModal = useSetAtom(bankRecDraftJEModalAtom)
 
     const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested } = useMemo(() => {
 
@@ -778,6 +781,19 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
         if (!selectedTransaction) {
             return
         }
+        // If this is a draft Journal Entry, open the draft JE modal instead of reconciling directly
+        if (voucher.is_draft === 1 && voucher.doctype === 'Journal Entry') {
+            setDraftJEModal({
+                voucher: {
+                    name: voucher.name,
+                    posting_date: voucher.posting_date,
+                    reference_date: voucher.reference_date,
+                    user_remark: voucher.user_remark,
+                    paid_amount: voucher.paid_amount,
+                }
+            })
+            return
+        }
         reconcileTransaction(selectedTransaction[0], voucher)
     }
 
@@ -792,6 +808,12 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                         <Badge variant='secondary' className={cn("text-sm rounded-sm", isSuggested ? "bg-amber-100 text-amber-700" : "bg-secondary")}>{_(voucher.doctype)}</Badge>
+                        {voucher.is_draft === 1 && (
+                            <Badge variant='outline' className="text-sm rounded-sm border-orange-400 text-orange-600 bg-orange-50">
+                                <FileEdit className="w-3 h-3 mr-1" />
+                                {_("Draft")}
+                            </Badge>
+                        )}
                         <a target="_blank"
                             href={`/app/${slug(voucher.doctype)}/${voucher.name}`}
                             className="underline underline-offset-2 font-medium"

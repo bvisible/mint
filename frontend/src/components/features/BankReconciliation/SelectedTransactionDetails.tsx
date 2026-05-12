@@ -40,7 +40,8 @@ const SelectedTransactionDetails = ({ transaction, showAccount = false, account 
                             <div className='flex flex-col'> {bank?.logo ? <img
                                 src={`/assets/mint/mint/${bank.logo}`}
                                 alt={bank.bank}
-                                className="max-w-20 object-left h-10 object-contain"
+                                className="object-left object-contain"
+                                style={{ maxWidth: '96px', maxHeight: '28px', width: 'auto', height: 'auto' }}
                             /> :
                                 <Landmark size={'30px'} />
                             }

@@ -55,7 +55,7 @@ const RecordPaymentModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='min-w-[95vw]'>
+            <DialogContent className='!max-w-[min(95vw,1400px)] w-[min(95vw,1400px)] sm:!max-w-[min(95vw,1400px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Record Payment")}</DialogTitle>
                     <DialogDescription>
@@ -441,44 +441,44 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
             <div className='flex flex-col gap-4'>
                 {error && <ErrorBanner error={error} />}
                 <div className='grid grid-cols-2 gap-4 items-start'>
-                    <SelectedTransactionDetails transaction={selectedTransaction} />
-                    <div className='flex flex-col gap-2'>
-                        <H4 className="text-base">{isWithdrawal ? _("Paid to") : _("Received from")}</H4>
-                        <div className='grid grid-cols-4 gap-4'>
-                            <div className="col-span-1">
-                                <PartyTypeFormField
-                                    name='party_type'
-                                    label={_("Party Type")}
-                                    isRequired
-                                    inputProps={{
-                                        triggerProps: {
-                                            className: 'w-full'
-                                        },
-                                        type: isWithdrawal ? 'Payable' : 'Receivable'
-                                    }}
-                                    rules={{
-                                        required: "Party Type is required"
-                                    }}
-                                />
-                            </div>
-                            <div className="col-span-3">
-                                <PartyField />
-                            </div>
-
-                            <div className="col-span-2">
-                                <AccountDropdown isWithdrawal={isWithdrawal} />
-                            </div>
-
-                            <div className="col-span-2">
-                                <LinkFormField
-                                    name='mode_of_payment'
-                                    label={_("Mode of Payment")}
-                                    doctype="Mode of Payment"
-                                />
-                            </div>
-
-                        </div>
-
+                    <div className='flex flex-col gap-3'>
+                        <SelectedTransactionDetails transaction={selectedTransaction} />
+                        <DataField name='reference_no' label={_("Reference")} isRequired inputProps={{ autoFocus: false }} />
+                    </div>
+                    <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
+                        <DateField
+                            name='posting_date'
+                            label={_("Posting Date")}
+                            isRequired
+                            inputProps={{ autoFocus: false }}
+                        />
+                        <DateField
+                            name='reference_date'
+                            label={_("Reference Date")}
+                            isRequired
+                            inputProps={{ autoFocus: false }}
+                        />
+                        <PartyTypeFormField
+                            name='party_type'
+                            label={isWithdrawal ? _("Paid to (Party Type)") : _("Received from (Party Type)")}
+                            isRequired
+                            inputProps={{
+                                triggerProps: {
+                                    className: 'w-full'
+                                },
+                                type: isWithdrawal ? 'Payable' : 'Receivable'
+                            }}
+                            rules={{
+                                required: "Party Type is required"
+                            }}
+                        />
+                        <PartyField />
+                        <AccountDropdown isWithdrawal={isWithdrawal} />
+                        <LinkFormField
+                            name='mode_of_payment'
+                            label={_("Mode of Payment")}
+                            doctype="Mode of Payment"
+                        />
                     </div>
                 </div>
 
@@ -493,37 +493,18 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
                 <Separator />
 
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-4">
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <DateField
-                                name='posting_date'
-                                label={_("Posting Date")}
-                                isRequired
-                                inputProps={{ autoFocus: false }}
-                            />
-                            <DateField
-                                name='reference_date'
-                                label={_("Reference Date")}
-                                isRequired
-                                inputProps={{ autoFocus: false }}
-                            />
-                        </div>
-                        <DataField name='reference_no' label={_("Reference")} isRequired inputProps={{ autoFocus: false }} />
-                        <div
-                            data-slot="form-item"
-                            className="flex flex-col gap-2"
-                        >
-                            <Label>{_("Attachments")}</Label>
-                            <FileDropzone files={files} setFiles={setFiles} />
-                        </div>
-                    </div>
                     <SmallTextField
                         name='remarks'
                         label={_("Custom Remarks")}
-                        formDescription={"This will be auto-populated if not set."}
+                        formDescription={_("This will be auto-populated if not set.")}
                     />
-
+                    <div
+                        data-slot="form-item"
+                        className="flex flex-col gap-2"
+                    >
+                        <Label>{_("Attachments")}</Label>
+                        <FileDropzone files={files} setFiles={setFiles} />
+                    </div>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
@@ -943,7 +924,7 @@ const GetUnpaidInvoicesButton = () => {
             {partyType && party && <DialogTrigger asChild>
                 <Button variant='outline' size='sm' type='button'>Get Unpaid Invoices</Button>
             </DialogTrigger>}
-            <DialogContent className="min-w-[75vw]">
+            <DialogContent className='!max-w-[min(75vw,1100px)] w-[min(75vw,1100px)] sm:!max-w-[min(75vw,1100px)]'>
                 <DialogHeader>
                     <DialogTitle>Select Invoices</DialogTitle>
                     <DialogDescription>Unpaid invoices from {partyName} for {formatCurrency(amount)}.</DialogDescription>

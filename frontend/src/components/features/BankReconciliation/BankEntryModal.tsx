@@ -32,7 +32,7 @@ const BankEntryModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='min-w-[95vw]'>
+            <DialogContent className='!max-w-[min(95vw,1400px)] w-[min(95vw,1400px)] sm:!max-w-[min(95vw,1400px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Bank Entry")}</DialogTitle>
                     <DialogDescription>
@@ -737,21 +737,21 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
 
 
     return <div className="flex flex-col gap-2">
-        <Table>
+        <Table className="table-fixed min-w-[900px]">
             <TableHeader>
                 <TableRow>
-                    <TableHead><Checkbox
+                    <TableHead className="w-8"><Checkbox
                         disabled={fields.length === 0}
                         // Make this accessible to screen readers
                         aria-label={_("Select all")}
                         checked={selectedRows.length > 0 && selectedRows.length === fields.length}
                         onCheckedChange={onSelectAll} /></TableHead>
-                    <TableHead>{_("Party")}</TableHead>
-                    <TableHead>{_("Account")}</TableHead>
-                    <TableHead>{_("Cost Center")}</TableHead>
-                    <TableHead>{_("Remarks")}</TableHead>
-                    <TableHead className="text-right">{_("Debit")}</TableHead>
-                    <TableHead className="text-right">{_("Credit")}</TableHead>
+                    <TableHead className="w-[18%]">{_("Party")}</TableHead>
+                    <TableHead className="w-[22%]">{_("Account")}</TableHead>
+                    <TableHead className="w-[14%]">{_("Cost Center")}</TableHead>
+                    <TableHead className="w-[14%]">{_("Remarks")}</TableHead>
+                    <TableHead className="w-[14%] text-right">{_("Debit")}</TableHead>
+                    <TableHead className="w-[14%] text-right">{_("Credit")}</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -797,7 +797,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                         onAccountChange(event.target.value, index)
                                     }
                                 }}
-                                buttonClassName="min-w-44"
+                                buttonClassName="w-full"
                                 readOnly={index === 0}
                                 isRequired
                                 hideLabel
@@ -809,7 +809,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 name={`entries.${index}.cost_center`}
                                 label={_("Cost Center")}
                                 filters={[["company", "=", company], ["is_group", "=", 0], ["disabled", "=", 0]]}
-                                buttonClassName="min-w-36"
+                                buttonClassName="w-full"
                                 readOnly={index === 0}
                                 hideLabel
                             />
@@ -821,13 +821,13 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 readOnly={index === 0}
                                 inputProps={{
                                     placeholder: _("e.g. Bank Charges"),
-                                    className: 'min-w-40',
+                                    className: 'w-full',
                                     readOnly: index === 0
                                 }}
                                 hideLabel
                             />
                         </TableCell>
-                        <TableCell className={cn("text-right align-top w-28")}>
+                        <TableCell className={cn("text-right align-top")}>
                             <CurrencyFormField
                                 name={`entries.${index}.debit`}
                                 label={_("Debit")}
@@ -844,7 +844,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 </Tooltip> : undefined}
                             />
                         </TableCell>
-                        <TableCell className={cn("text-right align-top w-28")}>
+                        <TableCell className={cn("text-right align-top")}>
                             <CurrencyFormField
                                 name={`entries.${index}.credit`}
                                 style={index === 0 && isWithdrawal ? {
@@ -896,7 +896,7 @@ const PartyField = ({ index, onChange, readOnly }: { index: number, onChange: (v
             isRequired
             inputProps={{
                 disabled: true,
-                className: 'rounded-l-none border-l-0 min-w-64'
+                className: 'rounded-l-none border-l-0 w-full'
             }}
             hideLabel
         />
@@ -912,7 +912,7 @@ const PartyField = ({ index, onChange, readOnly }: { index: number, onChange: (v
         }}
         hideLabel
         readOnly={readOnly}
-        buttonClassName="rounded-l-none border-l-0 min-w-64"
+        buttonClassName="rounded-l-none border-l-0 w-full"
         doctype={party_type}
 
     />
