@@ -192,15 +192,9 @@ class MintBankStatementImport(Document):
 				)
 
 				if existing_pe:
-					# PE already exists — just link it to the Bank Transaction
+					# PE already exists — link it (with clearance_date posting)
 					bank_tx.reload()
-					bank_tx.append("payment_entries", {
-						"payment_document": "Payment Entry",
-						"payment_entry": existing_pe,
-						"allocated_amount": amount,
-					})
-					bank_tx.status = "Reconciled"
-					bank_tx.save()
+					_link_payment_entry_to_bt(bank_tx, existing_pe, reconciliation_type="Matched")
 					stats["auto_matched"] += 1
 					transaction.db_set("status", "Paid")
 					transaction.db_set("imported", 1)
@@ -241,15 +235,9 @@ class MintBankStatementImport(Document):
 									pe.insert()
 									pe.submit()
 
-									# Link PE to Bank Transaction
+									# Link PE to Bank Transaction (with clearance_date posting)
 									bank_tx.reload()
-									bank_tx.append("payment_entries", {
-										"payment_document": "Payment Entry",
-										"payment_entry": pe.name,
-										"allocated_amount": amount,
-									})
-									bank_tx.status = "Reconciled" if amount == sinv.outstanding_amount else "Unreconciled"
-									bank_tx.save()
+									_link_payment_entry_to_bt(bank_tx, pe.name, reconciliation_type="Voucher Created")
 									stats["auto_matched"] += 1
 									transaction.db_set("status", "Paid")
 									transaction.db_set("imported", 1)
@@ -280,13 +268,7 @@ class MintBankStatementImport(Document):
 									pe.submit()
 
 									bank_tx.reload()
-									bank_tx.append("payment_entries", {
-										"payment_document": "Payment Entry",
-										"payment_entry": pe.name,
-										"allocated_amount": amount,
-									})
-									bank_tx.status = "Reconciled" if amount == pinv.outstanding_amount else "Unreconciled"
-									bank_tx.save()
+									_link_payment_entry_to_bt(bank_tx, pe.name, reconciliation_type="Voucher Created")
 									stats["auto_matched"] += 1
 									transaction.db_set("status", "Paid")
 									transaction.db_set("imported", 1)
@@ -334,6 +316,31 @@ class MintBankStatementImport(Document):
 		# with is_rule_evaluated=0 until the hourly scheduler picks them up.
 		from mint.apis.rules import run_rule_evaluation
 		run_rule_evaluation()
+
+
+def _link_payment_entry_to_bt(bank_tx, payment_entry_name: str, reconciliation_type: str = "Matched"):
+	"""Link a Payment Entry to a (submitted) Bank Transaction with full ERPNext machinery.
+
+	Mirrors the manual reconcile_vouchers flow: appends with allocated_amount=0
+	so ERPNext's allocate_payment_entries() handles the proper allocation AND
+	calls clear_linked_payment_entry() which posts the clearance_date on the PE.
+
+	If we append with allocated_amount=amount directly, ERPNext's
+	allocate_payment_entries() skips the row (its loop ignores rows where
+	allocated_amount != 0) → clearance_date is never posted → the PE stays
+	"Non compensé" in the Bank Clearance Summary.
+	"""
+	bank_tx.append("payment_entries", {
+		"payment_document": "Payment Entry",
+		"payment_entry": payment_entry_name,
+		"allocated_amount": 0.0,
+		"reconciliation_type": reconciliation_type,
+	})
+	bank_tx.validate_duplicate_references()
+	bank_tx.allocate_payment_entries()
+	bank_tx.update_allocated_amount()
+	bank_tx.set_status()
+	bank_tx.save()
 
 
 def _fail_with_context(doc, title: str, message: str):
