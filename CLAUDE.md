@@ -201,3 +201,36 @@ FORCE_REBUILD=1 yarn build
 
 - ⚠️ Path atypique : artefacts dans `mint/public/mint/` (pas `public/frontend/`).
 - **proxyOptions.ts**: `require('../../../sites/common_site_config.json')` enveloppé dans try/catch avec fallback `webserver_port=8000` (dev-only, commit `c0dec9c`).
+
+## Discipline fork-upstream (OBLIGATOIRE en début de session)
+
+Mint est un **fork** de `The-Commit-Company/mint`. On a beaucoup customisé (frontend layout Frappe natif, EBICS XML, PDF, VAT/Swiss). Pour ne pas refaire le travail déjà fait — comme cherry-picker 9 commits dont 8 étaient déjà intégrés manuellement (session du 2026-05-14) — exécuter ce diagnostic AVANT toute action liée à l'upstream :
+
+```bash
+git fetch upstream
+
+# 1. Liste BRUTE des commits upstream pas encore mergés
+git log $(git merge-base HEAD upstream/develop)..upstream/develop --oneline --no-merges
+
+# 2. Filtrage REAL vs no-op (NE PAS faire confiance à `git cherry`, faux négatifs
+#    quand l'intégration a été faite manuellement avec whitespace différent) :
+for sha in <liste-des-sha>; do
+  git cherry-pick --no-commit $sha 2>/dev/null
+  if git diff --cached --quiet; then
+    echo "$sha = NO-OP (déjà intégré)"
+  else
+    echo "$sha = REAL (vraie apport)"
+  fi
+  git reset --hard HEAD --quiet
+done
+
+# 3. État du build CI
+gh run list --workflow build-frontend.yml --limit 3 --json status,conclusion,headSha
+
+# 4. HEAD de chaque instance déployée
+for s in osiris dmis; do
+  ssh $s 'cd /home/neoffice/frappe-bench/apps/mint && git log -1 --oneline'
+done
+```
+
+Ne JAMAIS cherry-picker une liste de commits upstream sans avoir d'abord établi ce qui est REAL vs no-op. La règle vaut pour tout fork (TransHub, NORA, etc.). Référence vault : `[[wiki/concepts/Fork Upstream Sync Discipline]]`.
