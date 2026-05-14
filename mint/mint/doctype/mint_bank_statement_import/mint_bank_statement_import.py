@@ -126,6 +126,13 @@ class MintBankStatementImport(Document):
 		if self.document_scan_name:
 			frappe.db.set_value("Document Scan", self.document_scan_name, "status", "Processed")
 
+		# Trigger the Mint rule engine so freshly imported transactions are
+		# evaluated immediately (mirrors the CSV/XLSX flow in
+		# mint.apis.statement_import.import_statement). Without this, they sit
+		# with is_rule_evaluated=0 until the hourly scheduler picks them up.
+		from mint.apis.rules import run_rule_evaluation
+		run_rule_evaluation()
+
 	def _submit_xml_transactions(self):
 		"""XML import flow — creates Bank Transactions and Payment Entries automatically."""
 		# Get company and account from bank account
@@ -321,6 +328,33 @@ class MintBankStatementImport(Document):
 			indicator="green" if stats["errors"] == 0 else "orange",
 		)
 
+		# Trigger the Mint rule engine so freshly imported transactions are
+		# evaluated immediately (mirrors the CSV/XLSX flow in
+		# mint.apis.statement_import.import_statement). Without this, they sit
+		# with is_rule_evaluated=0 until the hourly scheduler picks them up.
+		from mint.apis.rules import run_rule_evaluation
+		run_rule_evaluation()
+
+
+def _fail_with_context(doc, title: str, message: str):
+	"""Persist a user-visible error on the MBSI doc, add a timeline comment,
+	then throw with the same message.
+
+	Surfaces the failure reason directly on the document (error field, status,
+	and Activity timeline) so users don't have to dig through the global Error
+	Log to understand why an import failed.
+	"""
+	if doc and doc.name and doc.docstatus == 0:
+		doc.db_set("error", message)
+		doc.db_set("status", "Error")
+		doc.add_comment(
+			"Comment",
+			f"<strong>{frappe.utils.escape_html(title)}</strong><br>"
+			f"{frappe.utils.escape_html(message).replace(chr(10), '<br>')}"
+		)
+		frappe.db.commit()
+	frappe.throw(message, title=title)
+
 
 @frappe.whitelist()
 def parse_xml_content(docname):
@@ -333,19 +367,19 @@ def parse_xml_content(docname):
 	doc = frappe.get_doc("Mint Bank Statement Import", docname)
 
 	if doc.docstatus != 0:
-		frappe.throw(_("Cannot parse a submitted or cancelled document"))
+		_fail_with_context(doc, _("Document cannot be parsed"), _("Cannot parse a submitted or cancelled document"))
 
 	if not doc.file:
-		frappe.throw(_("Please attach an XML file first"))
+		_fail_with_context(doc, _("Missing file"), _("Please attach an XML file first"))
 
 	if doc.file_type != "XML":
-		frappe.throw(_("File type must be XML"))
+		_fail_with_context(doc, _("Wrong file type"), _("File type must be XML"))
 
 	# Read file content
 	file_content = _read_file_content(doc.file)
 
 	if not file_content:
-		frappe.throw(_("Could not read file content"))
+		_fail_with_context(doc, _("Cannot read file"), _("Could not read file content"))
 
 	# Calculate content hash for file-level dedup
 	if isinstance(file_content, bytes):
@@ -376,7 +410,7 @@ def parse_xml_content(docname):
 		doc.bank_account = detected_bank_account
 
 	if not doc.bank_account:
-		frappe.throw(_("Could not detect Bank Account from IBAN ({0}). Please select one manually.").format(iban))
+		_fail_with_context(doc, _("Missing IBAN"), _("Please check your IBAN. It is missing: {0}").format(iban))
 
 	# Get the linked Account for read_camt053
 	account = frappe.get_cached_value("Bank Account", doc.bank_account, "account")
