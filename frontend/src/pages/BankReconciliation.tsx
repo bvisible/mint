@@ -33,8 +33,8 @@ const BankReconciliation = () => {
     const remainingHeightAfterTabs = window.innerHeight - headerHeight - 324
 
     return (
-        <div className="p-4 flex flex-col gap-4 h-full overflow-hidden">
-            <div ref={ref} className="flex flex-col gap-4 shrink-0">
+        <div className="p-4 flex flex-col gap-4">
+            <div ref={ref} className="flex flex-col gap-4">
                 <div className="flex justify-between">
                     <H1 className="text-sm font-medium flex items-center gap-2 whitespace-nowrap shrink-0">
                         <a href="/app/home">
@@ -56,27 +56,27 @@ const BankReconciliation = () => {
                 <BankPicker />
                 <BankBalance />
             </div>
-            <Tabs defaultValue="Match and Reconcile" className="flex-1 min-h-0 flex flex-col">
-                <TabsList className="w-full shrink-0">
+            <Tabs defaultValue="Match and Reconcile">
+                <TabsList className="w-full">
                     <TabsTrigger value="Match and Reconcile">{_("Match and Reconcile")}</TabsTrigger>
                     <TabsTrigger value="Bank Reconciliation Statement">{_("Bank Reconciliation Statement")}</TabsTrigger>
                     <TabsTrigger value="Bank Transactions">{_("Bank Transactions")}</TabsTrigger>
                     <TabsTrigger value="Bank Clearance Summary">{_("Bank Clearance Summary")}</TabsTrigger>
                     <TabsTrigger value="Incorrectly Cleared Entries">{_("Incorrectly Cleared Entries")}</TabsTrigger>
                 </TabsList>
-                <TabsContent value="Match and Reconcile" className="flex-1 min-h-0">
+                <TabsContent value="Match and Reconcile">
                     <MatchAndReconcile contentHeight={remainingHeightAfterTabs} />
                 </TabsContent>
-                <TabsContent value="Bank Reconciliation Statement" className="flex-1 min-h-0 overflow-y-auto">
+                <TabsContent value="Bank Reconciliation Statement">
                     <BankReconciliationStatement />
                 </TabsContent>
-                <TabsContent value="Bank Transactions" className="flex-1 min-h-0 overflow-y-auto">
+                <TabsContent value="Bank Transactions">
                     <BankTransactions />
                 </TabsContent>
-                <TabsContent value="Bank Clearance Summary" className="flex-1 min-h-0 overflow-y-auto">
+                <TabsContent value="Bank Clearance Summary">
                     <BankClearanceSummary />
                 </TabsContent>
-                <TabsContent value="Incorrectly Cleared Entries" className="flex-1 min-h-0 overflow-y-auto">
+                <TabsContent value="Incorrectly Cleared Entries">
                     <IncorrectlyClearedEntries />
                 </TabsContent>
             </Tabs>

@@ -38,24 +38,13 @@ export function FrappeLayout({ children }: FrappeLayoutProps) {
 				style={{
 					flex: 1,
 					height: '100vh',
-					overflow: 'hidden',
+					overflowY: 'auto',
 					position: 'relative',
 					minWidth: 0,
-					display: 'flex',
-					flexDirection: 'column',
 				}}
 			>
 				<FrappeNavbar />
-				<div
-					className="page-content"
-					style={{
-						flex: 1,
-						minHeight: 0,
-						overflowY: 'auto',
-					}}
-				>
-					{children}
-				</div>
+				<div className="page-content">{children}</div>
 			</main>
 		</div>
 	)
