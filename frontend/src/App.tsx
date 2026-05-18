@@ -35,6 +35,50 @@ function App() {
 		}
 	}, [])
 
+	// //// NEOFFICE PATCH — Bridge Frappe theme onto html[data-theme]
+	// WHY: Mint is always embedded inside the Frappe shell on Neoffice
+	//      deployments. Frappe writes the active theme to localStorage
+	//      (`theme_active` already resolved + `appearance` raw) but the
+	//      Mint route is rendered by its own www/mint.html template and
+	//      Frappe never sets `<html data-theme="dark">` on it. The
+	//      injected Neoffice menu stylesheet keys all its dark rules on
+	//      that attribute, so the navbar/sidebar around Mint stayed in
+	//      light mode no matter what the user picked in Frappe.
+	//      Mirror the value here + live-sync via storage/poll.
+	// REVIEW: drop when the Neoffice shell-bridge package exposes a
+	//         single helper we can import everywhere.
+	useEffect(() => {
+		const readFrappeTheme = (): 'light' | 'dark' | null => {
+			try {
+				const ta = window.localStorage.getItem('theme_active')
+				if (ta === 'dark' || ta === 'light') return ta
+				const ap = (window.localStorage.getItem('appearance') || '').replace(/^"|"$/g, '')
+				if (ap === 'dark' || ap === 'light') return ap
+				if (ap === 'automatic') {
+					return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+				}
+			} catch { /* sandboxed contexts can throw */ }
+			return null
+		}
+		const apply = (mode: 'light' | 'dark') => {
+			document.documentElement.setAttribute('data-theme', mode)
+		}
+		let last = readFrappeTheme()
+		if (last) apply(last)
+		const sync = () => {
+			const fresh = readFrappeTheme()
+			if (!fresh || fresh === last) return
+			last = fresh
+			apply(fresh)
+		}
+		window.addEventListener('storage', sync)
+		const id = window.setInterval(sync, 1000)
+		return () => {
+			window.removeEventListener('storage', sync)
+			window.clearInterval(id)
+		}
+	}, [])
+
 	const Routing = (
 		<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
 			<Routes>
