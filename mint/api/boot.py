@@ -92,20 +92,63 @@ def _apply_neoffice_theme_filters(bootinfo) -> None:
             filter_apps_by_user_visibility,
             filter_workspaces_by_interface_mode,
             inject_user_form_width,
+            apply_workspace_custom_titles,
+            fix_module_wise_workspaces,
         )
     except Exception:
         return
 
+    # Order matches neoffice_theme/hooks.py::extend_bootinfo so the SPA
+    # payload is byte-identical to /app/home. Filters first, then the
+    # title remap (else we'd rename entries about to be filtered out),
+    # then the breadcrumb cross-reference fix last.
     for fn in (
         filter_apps_by_interface_mode,
         filter_apps_by_user_visibility,
         filter_workspaces_by_interface_mode,
         inject_user_form_width,
+        apply_workspace_custom_titles,
+        fix_module_wise_workspaces,
     ):
         try:
             fn(bootinfo)
         except Exception:
             continue
+
+    _translate_sidebar_labels(bootinfo)
+
+
+def _translate_sidebar_labels(bootinfo) -> None:
+    """Translate sidebar_pages/app_data titles server-side via frappe._().
+
+    Defensive layer: even though Mint ships a full __messages dict and the
+    React shell calls __() on render, applying server-side translation here
+    keeps the data shape identical to /app/home and protects against any
+    React render path that forgets to wrap a label in __(). Uses the
+    existing FR/DE/IT .po entries — zero new strings.
+    """
+    from frappe import _
+
+    def _xlate(s):
+        return _(s) if isinstance(s, str) and s else s
+
+    sp = getattr(bootinfo, "sidebar_pages", None)
+    if isinstance(sp, dict):
+        pages = sp.get("pages") or []
+    elif isinstance(sp, list):
+        pages = sp
+    else:
+        pages = []
+    for p in pages:
+        if isinstance(p, dict) and p.get("title"):
+            p["title"] = _xlate(p["title"])
+
+    for app in getattr(bootinfo, "app_data", None) or []:
+        if isinstance(app, dict):
+            if app.get("app_title"):
+                app["app_title"] = _xlate(app["app_title"])
+            if app.get("title"):
+                app["title"] = _xlate(app["title"])
 
 
 def get_navbar_boot() -> dict:
