@@ -16,15 +16,10 @@ import frappe
 from frappe import _
 
 
-# Bank statement extraction prompt optimized for structured output
+# Bank statement extraction prompt optimized for structured output.
+# Returns an ARRAY (one object per transaction) — required for the paged merge.
 BANK_STATEMENT_PROMPT = """
-Extract the account metadata AND all transactions from this bank statement.
-
-Account metadata (usually printed in the statement header, page 1):
-- bank_name: the bank / financial institution name (e.g. "Revolut", "PostFinance", "UBS", "Raiffeisen")
-- account_iban: the IBAN of the account THIS statement belongs to (the account holder's own IBAN, NOT a counterparty IBAN)
-- period_start: the statement period start date in YYYY-MM-DD format
-- period_end: the statement period end date in YYYY-MM-DD format
+Extract ALL transactions from this bank statement.
 
 For EACH transaction visible in the document, extract:
 - date: Transaction date in YYYY-MM-DD format (convert from any format)
@@ -41,59 +36,63 @@ RULES:
 - Type is "Withdrawal" for money going OUT (debits, withdrawals, payments, charges)
 - Description should capture the transaction text/narration/reference
 - If a field is unclear or missing, use empty string ""
-- account_iban is the statement owner's IBAN; if several IBANs appear, pick the one in the account header
 
-Return a JSON object: {"bank_name": "...", "account_iban": "...", "period_start": "...", "period_end": "...", "transactions": [ ... ]}
+Return a JSON array of transaction objects.
 """
 
-# JSON schema for bank statement: account metadata + transactions
+# JSON schema for bank statement transactions.
+# IMPORTANT: this MUST stay an ARRAY at the root. NORA's paged OCR merge
+# (use_page_splitting=True, pages_per_batch=1) concatenates array results
+# across pages; an object root is NOT merged (only one page survives → most
+# transactions lost). Account metadata (bank, IBAN, period) is read with a
+# separate single-page pass — see _ocr_statement_header.
 BANK_STATEMENT_SCHEMA = {
-    "type": "object",
-    "required": ["transactions"],
-    "properties": {
-        "bank_name": {
-            "type": "string",
-            "description": "Bank / financial institution name"
-        },
-        "account_iban": {
-            "type": "string",
-            "description": "IBAN of the statement's own account"
-        },
-        "period_start": {
-            "type": "string",
-            "description": "Statement period start date (YYYY-MM-DD)"
-        },
-        "period_end": {
-            "type": "string",
-            "description": "Statement period end date (YYYY-MM-DD)"
-        },
-        "transactions": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": ["date", "amount", "type", "description"],
-                "properties": {
-                    "date": {
-                        "type": "string",
-                        "description": "Transaction date in YYYY-MM-DD format"
-                    },
-                    "amount": {
-                        "type": "string",
-                        "description": "Positive amount as string without currency symbol"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": ["Deposit", "Withdrawal"],
-                        "description": "Transaction type"
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Transaction description/narration"
-                    }
-                }
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": ["date", "amount", "type", "description"],
+        "properties": {
+            "date": {
+                "type": "string",
+                "description": "Transaction date in YYYY-MM-DD format"
+            },
+            "amount": {
+                "type": "string",
+                "description": "Positive amount as string without currency symbol"
+            },
+            "type": {
+                "type": "string",
+                "enum": ["Deposit", "Withdrawal"],
+                "description": "Transaction type"
+            },
+            "description": {
+                "type": "string",
+                "description": "Transaction description/narration"
             }
         }
     }
+}
+
+# Lightweight schema for the separate single-page header pass (account metadata).
+STATEMENT_HEADER_PROMPT = """
+This is the first page of a bank statement. Extract ONLY the account header
+metadata (do NOT list the transactions):
+- bank_name: the bank / financial institution name (e.g. "Revolut", "PostFinance", "UBS")
+- account_iban: the IBAN of the account this statement belongs to (the owner's IBAN)
+- period_start: statement period start date in YYYY-MM-DD format
+- period_end: statement period end date in YYYY-MM-DD format
+If a field is missing, use an empty string "".
+Return a JSON object with exactly these four keys.
+"""
+
+STATEMENT_HEADER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "bank_name": {"type": "string"},
+        "account_iban": {"type": "string"},
+        "period_start": {"type": "string"},
+        "period_end": {"type": "string"},
+    },
 }
 
 
@@ -554,26 +553,77 @@ def extract_transactions_from_document_scan(doc) -> list:
     return normalized_transactions
 
 
-def extract_statement_meta_from_document_scan(doc) -> dict:
-    """Read account metadata (bank_name, account_iban, period) from a completed
-    Document Scan's ocr_results. Returns {} when absent (old array-only format
-    or a model that didn't fill the header fields)."""
-    import json
+def _ocr_statement_header(file_url: str) -> dict:
+    """Read the account header (bank_name, account_iban, period) with a SEPARATE
+    single-page OCR pass.
 
-    if not doc.ocr_results:
+    The transaction pass must return an ARRAY (required for NORA's paged merge),
+    so it cannot also carry object-level header fields. We therefore OCR page 1
+    only — where the account header lives — with page-splitting disabled (one
+    response, no merge). Best-effort: returns {} on any failure.
+    """
+    import os
+
+    if not file_url or not file_url.lower().endswith(".pdf"):
         return {}
+
+    if file_url.startswith("/private/files/"):
+        path = frappe.get_site_path("private", "files", file_url.replace("/private/files/", ""))
+    elif file_url.startswith("/files/"):
+        path = frappe.get_site_path("public", "files", file_url.replace("/files/", ""))
+    else:
+        path = frappe.get_site_path(file_url.lstrip("/"))
+    if not os.path.exists(path):
+        return {}
+
+    tmp_file = None
     try:
-        data = json.loads(doc.ocr_results)
-    except json.JSONDecodeError:
+        import fitz
+
+        # Extract page 1 into a temporary single-page PDF.
+        src = fitz.open(path)
+        first = fitz.open()
+        first.insert_pdf(src, from_page=0, to_page=0)
+        pdf_bytes = first.tobytes()
+        src.close()
+        first.close()
+
+        tmp_file = frappe.get_doc({
+            "doctype": "File",
+            "file_name": f"stmt_header_{frappe.generate_hash(length=8)}.pdf",
+            "content": pdf_bytes,
+            "is_private": 1,
+        }).insert(ignore_permissions=True)
+
+        result = frappe.call(
+            "nora.api.ocr.ocr_process",
+            file_url=tmp_file.file_url,
+            prompt=STATEMENT_HEADER_PROMPT,
+            output_schema=STATEMENT_HEADER_SCHEMA,
+            create_document_scan=False,
+            add_to_rag=False,
+            validate_hallucination=False,
+            use_page_splitting=False,
+            max_retries=1,
+        )
+        data = result.get("data") if isinstance(result, dict) else None
+        if not isinstance(data, dict):
+            return {}
+        return {
+            "bank_name": (data.get("bank_name") or "").strip(),
+            "account_iban": (data.get("account_iban") or "").strip().replace(" ", ""),
+            "period_start": (data.get("period_start") or "").strip(),
+            "period_end": (data.get("period_end") or "").strip(),
+        }
+    except Exception as e:
+        frappe.logger().warning(f"[Mint] statement header OCR failed: {e}")
         return {}
-    if not isinstance(data, dict):
-        return {}
-    return {
-        "bank_name": (data.get("bank_name") or "").strip(),
-        "account_iban": (data.get("account_iban") or "").strip().replace(" ", ""),
-        "period_start": (data.get("period_start") or "").strip(),
-        "period_end": (data.get("period_end") or "").strip(),
-    }
+    finally:
+        if tmp_file:
+            try:
+                frappe.delete_doc("File", tmp_file.name, ignore_permissions=True, force=True)
+            except Exception:
+                pass
 
 
 def _apply_statement_metadata(mbsi, scan_name: str, meta: dict) -> None:
@@ -697,8 +747,8 @@ def check_ocr_processing_status(docname: str) -> dict:
         # and rename the scan to "Relevé <bank> <period>". Best-effort.
         try:
             scan_doc = frappe.get_doc("Document Scan", doc.document_scan_name)
-            meta = extract_statement_meta_from_document_scan(scan_doc)
-            if meta:
+            meta = _ocr_statement_header(scan_doc.source_file)
+            if meta and any(meta.values()):
                 _apply_statement_metadata(doc, doc.document_scan_name, meta)
         except Exception as e:
             frappe.logger().warning(f"[Mint] statement metadata apply failed: {e}")
