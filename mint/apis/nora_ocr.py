@@ -640,6 +640,10 @@ def _apply_statement_metadata(mbsi, scan_name: str, meta: dict) -> None:
 
     # 1. Auto-match the company bank account from the IBAN (only if unset).
     if account_iban and not mbsi.bank_account:
+        from mint.mint.doctype.mint_bank_statement_import.mint_bank_statement_import import (
+            _find_bank_account_by_iban,
+        )
+
         matched = _find_bank_account_by_iban(account_iban)
         if matched:
             mbsi.bank_account = matched
