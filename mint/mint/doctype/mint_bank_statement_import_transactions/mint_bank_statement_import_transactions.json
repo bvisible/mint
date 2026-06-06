@@ -106,7 +106,7 @@
   },
   {
    "columns": 1,
-   "default": "Pending",
+   "default": "To Process",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
