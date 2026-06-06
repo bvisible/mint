@@ -18,7 +18,13 @@ from frappe import _
 
 # Bank statement extraction prompt optimized for structured output
 BANK_STATEMENT_PROMPT = """
-Extract ALL transactions from this bank statement.
+Extract the account metadata AND all transactions from this bank statement.
+
+Account metadata (usually printed in the statement header, page 1):
+- bank_name: the bank / financial institution name (e.g. "Revolut", "PostFinance", "UBS", "Raiffeisen")
+- account_iban: the IBAN of the account THIS statement belongs to (the account holder's own IBAN, NOT a counterparty IBAN)
+- period_start: the statement period start date in YYYY-MM-DD format
+- period_end: the statement period end date in YYYY-MM-DD format
 
 For EACH transaction visible in the document, extract:
 - date: Transaction date in YYYY-MM-DD format (convert from any format)
@@ -35,33 +41,56 @@ RULES:
 - Type is "Withdrawal" for money going OUT (debits, withdrawals, payments, charges)
 - Description should capture the transaction text/narration/reference
 - If a field is unclear or missing, use empty string ""
+- account_iban is the statement owner's IBAN; if several IBANs appear, pick the one in the account header
 
-Return a JSON array of transaction objects.
+Return a JSON object: {"bank_name": "...", "account_iban": "...", "period_start": "...", "period_end": "...", "transactions": [ ... ]}
 """
 
-# JSON schema for bank statement transactions
+# JSON schema for bank statement: account metadata + transactions
 BANK_STATEMENT_SCHEMA = {
-    "type": "array",
-    "items": {
-        "type": "object",
-        "required": ["date", "amount", "type", "description"],
-        "properties": {
-            "date": {
-                "type": "string",
-                "description": "Transaction date in YYYY-MM-DD format"
-            },
-            "amount": {
-                "type": "string",
-                "description": "Positive amount as string without currency symbol"
-            },
-            "type": {
-                "type": "string",
-                "enum": ["Deposit", "Withdrawal"],
-                "description": "Transaction type"
-            },
-            "description": {
-                "type": "string",
-                "description": "Transaction description/narration"
+    "type": "object",
+    "required": ["transactions"],
+    "properties": {
+        "bank_name": {
+            "type": "string",
+            "description": "Bank / financial institution name"
+        },
+        "account_iban": {
+            "type": "string",
+            "description": "IBAN of the statement's own account"
+        },
+        "period_start": {
+            "type": "string",
+            "description": "Statement period start date (YYYY-MM-DD)"
+        },
+        "period_end": {
+            "type": "string",
+            "description": "Statement period end date (YYYY-MM-DD)"
+        },
+        "transactions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["date", "amount", "type", "description"],
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "description": "Transaction date in YYYY-MM-DD format"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Positive amount as string without currency symbol"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["Deposit", "Withdrawal"],
+                        "description": "Transaction type"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Transaction description/narration"
+                    }
+                }
             }
         }
     }
@@ -525,6 +554,74 @@ def extract_transactions_from_document_scan(doc) -> list:
     return normalized_transactions
 
 
+def extract_statement_meta_from_document_scan(doc) -> dict:
+    """Read account metadata (bank_name, account_iban, period) from a completed
+    Document Scan's ocr_results. Returns {} when absent (old array-only format
+    or a model that didn't fill the header fields)."""
+    import json
+
+    if not doc.ocr_results:
+        return {}
+    try:
+        data = json.loads(doc.ocr_results)
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    return {
+        "bank_name": (data.get("bank_name") or "").strip(),
+        "account_iban": (data.get("account_iban") or "").strip().replace(" ", ""),
+        "period_start": (data.get("period_start") or "").strip(),
+        "period_end": (data.get("period_end") or "").strip(),
+    }
+
+
+def _apply_statement_metadata(mbsi, scan_name: str, meta: dict) -> None:
+    """Apply OCR-extracted statement metadata to the import and its scan:
+    - auto-fill the import's bank_account by matching the account IBAN
+    - store the IBAN on the Document Scan (bank reference)
+    - rename the Document Scan to a readable "Relevé <bank> <period>"
+    Best-effort: any missing field is skipped; the caller saves the MBSI.
+    """
+    bank_name = meta.get("bank_name") or ""
+    account_iban = meta.get("account_iban") or ""
+    period_start = meta.get("period_start") or ""
+    period_end = meta.get("period_end") or ""
+
+    # 1. Auto-match the company bank account from the IBAN (only if unset).
+    if account_iban and not mbsi.bank_account:
+        matched = _find_bank_account_by_iban(account_iban)
+        if matched:
+            mbsi.bank_account = matched
+
+    if not scan_name:
+        return
+
+    # 2. Store the IBAN on the Document Scan as the bank reference.
+    if account_iban:
+        try:
+            frappe.db.set_value("Document Scan", scan_name, "iban", account_iban)
+        except Exception:
+            pass
+
+    # 3. Rename the Document Scan to "Relevé <bank> <period>" for readability.
+    if bank_name:
+        if period_start and period_end:
+            period = f"{period_start} - {period_end}"
+        else:
+            period = period_end or period_start
+        new_name = " ".join(p for p in ["Relevé", bank_name, period] if p)
+        new_name = new_name.replace("/", "-").strip()[:140]
+        if new_name and new_name != scan_name and not frappe.db.exists("Document Scan", new_name):
+            try:
+                frappe.rename_doc(
+                    "Document Scan", scan_name, new_name, force=True, show_alert=False
+                )
+                mbsi.document_scan_name = new_name
+            except Exception as e:
+                frappe.logger().warning(f"[Mint] Could not rename Document Scan: {e}")
+
+
 @frappe.whitelist()
 def start_ocr_processing(docname: str, force_create: bool = False) -> dict:
     """
@@ -594,6 +691,18 @@ def check_ocr_processing_status(docname: str) -> dict:
         # Populate transactions table
         transactions = result.get("transactions", [])
         doc._populate_transactions(transactions)
+
+        # Apply statement metadata (bank, IBAN, period): match the company
+        # bank account from the IBAN, store the IBAN reference on the scan,
+        # and rename the scan to "Relevé <bank> <period>". Best-effort.
+        try:
+            scan_doc = frappe.get_doc("Document Scan", doc.document_scan_name)
+            meta = extract_statement_meta_from_document_scan(scan_doc)
+            if meta:
+                _apply_statement_metadata(doc, doc.document_scan_name, meta)
+        except Exception as e:
+            frappe.logger().warning(f"[Mint] statement metadata apply failed: {e}")
+
         doc.ocr_status = "Completed"
         doc.status = "Completed"
         doc.save()
