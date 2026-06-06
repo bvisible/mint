@@ -2596,3 +2596,16 @@ msgstr "Ligne d'en-tête"
 
 msgid "Other Charges / Deductions"
 msgstr "Autres frais / Déductions"
+
+#. Bank statement import created from a Neoffice Document Scan
+msgid "This Document Scan has no source file to import."
+msgstr "Ce document scanné n'a aucun fichier source à importer."
+
+msgid "An import already exists for this scan"
+msgstr "Un import existe déjà pour ce relevé"
+
+msgid "Bank statement analysis started"
+msgstr "Analyse du relevé bancaire démarrée"
+
+msgid "Bank statement import created"
+msgstr "Import du relevé bancaire créé"

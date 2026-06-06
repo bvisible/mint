@@ -721,3 +721,121 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
             "transactions": [],
             "processing_time": round(time.time() - start_time, 2)
         }
+
+
+@frappe.whitelist()
+def create_import_from_document_scan(document_scan_name: str, bank_account: str = None) -> dict:
+    """Create a Mint Bank Statement Import from an EXISTING Document Scan.
+
+    Entry point for the Neoffice "Document Scan" flow: when a user scans or
+    imports a document and marks it as a bank statement, the Document Scan
+    routes it here. Unlike start_ocr_processing (which creates a brand new
+    Document Scan via create_document_scan_for_bank_statement), this REUSES the
+    existing scan so we never end up with two Document Scans for one file.
+
+    For PDF scans, OCR is (re)started in bank-statement mode on the existing
+    Document Scan and the import is returned with ocr_status="Processing" — the
+    Mint form's onload_post_render then resumes polling automatically. For XML
+    files, no OCR is needed (the Mint form offers XML parsing on open).
+
+    Args:
+        document_scan_name: name of the source Document Scan
+        bank_account: company Bank Account to import into (optional here; the
+            Mint form still requires it before the transactions are submitted)
+
+    Returns:
+        dict: {"success", "name" (MBSI), "file_type", "message"}
+    """
+    import json
+
+    scan = frappe.get_doc("Document Scan", document_scan_name)
+    if not scan.source_file:
+        frappe.throw(_("This Document Scan has no source file to import."))
+
+    # Detect file type from the source file extension.
+    lower = scan.source_file.lower()
+    is_xml = (
+        lower.endswith(".xml")
+        or lower.endswith(".camt")
+        or lower.endswith(".camt053")
+    )
+    file_type = "XML" if is_xml else "PDF"
+
+    # Reuse an existing draft import for this scan instead of creating duplicates.
+    existing = frappe.db.get_value(
+        "Mint Bank Statement Import",
+        {"document_scan_name": scan.name, "docstatus": 0},
+        ["name", "file_type"],
+        as_dict=True,
+    )
+    if existing:
+        return {
+            "success": True,
+            "name": existing.name,
+            "file_type": existing.file_type or file_type,
+            "message": _("An import already exists for this scan"),
+        }
+
+    # Create the Mint Bank Statement Import linked back to this scan.
+    mbsi = frappe.get_doc({
+        "doctype": "Mint Bank Statement Import",
+        "bank_account": bank_account or None,
+        "file": scan.source_file,
+        "file_type": file_type,
+        "document_scan_name": scan.name,
+    })
+    # bank_account is enforced by the form before submit, not at creation.
+    mbsi.flags.ignore_mandatory = True
+    mbsi.insert(ignore_permissions=True)
+
+    if file_type == "PDF":
+        # Reconfigure the existing scan for bank-statement OCR and restart it,
+        # mirroring neoffice_theme document_scan.retry_ocr but with the
+        # bank-statement prompt/schema/params instead of the invoice ones.
+        scan.document_type = "Bank Statement"
+        scan.custom_prompt = BANK_STATEMENT_PROMPT
+        scan.custom_schema = json.dumps(BANK_STATEMENT_SCHEMA)
+        scan.ocr_params = json.dumps({
+            "document_type": "bank_statement",
+            "use_page_splitting": True,
+            "pages_per_batch": 1,
+            "page_delay": 2.0,
+        })
+        scan.ocr_status = "Pending"
+        scan.status = "Processing"
+        if hasattr(scan, "ocr_error"):
+            scan.ocr_error = None
+        if hasattr(scan, "ocr_processing_time"):
+            scan.ocr_processing_time = 0.0
+        scan.save(ignore_permissions=True)
+
+        mbsi.ocr_status = "Processing"
+        mbsi.save(ignore_permissions=True)
+        frappe.db.commit()
+
+        # Run OCR in the background (same enqueue path as document_scan).
+        frappe.enqueue(
+            "neoffice_theme.neoffice_theme.doctype.document_scan.document_scan.process_ocr",
+            doc_name=scan.name,
+            queue="short",
+            timeout=600,
+        )
+
+        return {
+            "success": True,
+            "name": mbsi.name,
+            "file_type": file_type,
+            "message": _("Bank statement analysis started"),
+        }
+
+    # XML: mark the scan as a bank statement; the Mint form handles parsing.
+    scan.document_type = "Bank Statement"
+    scan.save(ignore_permissions=True)
+    frappe.db.commit()
+
+    return {
+        "success": True,
+        "name": mbsi.name,
+        "file_type": file_type,
+        "message": _("Bank statement import created"),
+    }
