@@ -5,7 +5,7 @@ import BankReconciliation from './pages/BankReconciliation'
 import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
 import { toast } from 'sonner'
-import { FrappeSidebar as PackageFrappeSidebar } from '@neoffice/frappe-sidebar-react'
+import { NeoCockpit } from '@neoffice/frappe-sidebar-react'
 import { FrappeLayout } from './components/layout'
 import { NoraLearnProvider } from '@neoffice/nora-learn-react'
 import '@neoffice/nora-learn-react/styles'
@@ -92,10 +92,8 @@ function App() {
 	const Shell = FRAPPE_INTEGRATION ? (
 		<FrappeLayout>{Routing}</FrappeLayout>
 	) : (
-		<div className="flex h-screen overflow-hidden">
-			<PackageFrappeSidebar homeUrl="/app/home" />
-			<div className="flex-1 overflow-auto">{Routing}</div>
-		</div>
+		// standalone vite dev — same NeoCockpit shell, just without the mini-boot
+		<NeoCockpit env="spa">{Routing}</NeoCockpit>
 	)
 
 	return (
