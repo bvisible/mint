@@ -16,7 +16,8 @@ interface FrappeLayoutProps {
 
 export function FrappeLayout({ children }: FrappeLayoutProps) {
 	return (
-		<NeoCockpit env="spa">
+		// Mint is the finance surface: pin the Finance module in the menu
+		<NeoCockpit env="spa" defaultApp="Finance">
 			<div className="page-content">{children}</div>
 		</NeoCockpit>
 	)
