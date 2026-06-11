@@ -31,6 +31,7 @@ NAVBAR_BOOT_KEYS = (
     "app_data",
     "apps_data",
     "surface_apps",
+    "neoffice_wiki_url",
     "allowed_workspaces",
     "home_page",
     "notification_settings",
@@ -95,6 +96,7 @@ def _apply_neoffice_theme_filters(bootinfo) -> None:
             inject_user_form_width,
             apply_workspace_custom_titles,
             fix_module_wise_workspaces,
+            inject_instance_config,
         )
     except Exception:
         return
@@ -110,6 +112,7 @@ def _apply_neoffice_theme_filters(bootinfo) -> None:
         inject_user_form_width,
         apply_workspace_custom_titles,
         fix_module_wise_workspaces,
+        inject_instance_config,
     ):
         try:
             fn(bootinfo)
