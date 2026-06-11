@@ -30,6 +30,7 @@ NAVBAR_BOOT_KEYS = (
     "letter_heads",
     "app_data",
     "apps_data",
+    "surface_apps",
     "allowed_workspaces",
     "home_page",
     "notification_settings",
