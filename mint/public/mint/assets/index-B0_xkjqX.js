@@ -2146,12 +2146,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   padding: 8px 10px;
 }
 .nc-menu .nc-app-tiles .tile {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border: 1px solid var(--nc-line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--nc-surface);
   cursor: pointer;
 }
@@ -2160,8 +2160,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   background: var(--nc-accent-tint);
 }
 .nc-menu .nc-app-tiles .tile img {
-  width: 20px;
-  height: 20px;
+  width: 33px;
+  height: 33px;
   object-fit: contain;
 }
 [data-theme=dark] .neocockpit img[src*="/icons/apps/"] {
