@@ -19,7 +19,7 @@ const FavoriteStar = () => {
 
     const toggle = async () => {
         if (loading) return
-        await call({ route: FAV_ROUTE, label: FAV_LABEL, fav_type: "Page", icon: "landmark" })
+        await call({ route: FAV_ROUTE, label: _(FAV_LABEL), fav_type: "Page", icon: "landmark" })
         mutate()
         // Ask the NeoCockpit sidebar to refresh its "Favoris" section.
         window.dispatchEvent(new CustomEvent("nf-favorites-changed"))
