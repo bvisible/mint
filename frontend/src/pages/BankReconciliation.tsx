@@ -11,6 +11,7 @@ import MatchAndReconcile from "@/components/features/BankReconciliation/MatchAnd
 import RuleConfigureButton from "@/components/features/BankReconciliation/Rules/RuleConfigureButton"
 import Settings from "@/components/features/Settings/Settings"
 import ActionLog from "@/components/features/ActionLog/ActionLog"
+import FavoriteStar from "@/components/features/BankReconciliation/FavoriteStar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { H1 } from "@/components/ui/typography"
@@ -42,6 +43,7 @@ const BankReconciliation = () => {
                         </a>
                         <span className="text-gray-400">|</span>
                         {_("Bank Reconciliation")}
+                        <FavoriteStar />
                     </H1>
                     <div className="flex items-center gap-2">
                         <TooltipProvider>

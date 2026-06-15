@@ -140,3 +140,20 @@
 .bank-picker-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(156 163 175);
 }
+
+/* NeoCockpit tab-bar fix -----------------------------------------------
+   Inside the NeoCockpit frame an ancestor redefines --background/--radius, so
+   shadcn's bg-background / rounded-md collapse to transparent / 0 on the active
+   tab (segmented control looked flat-grey, active tab indistinct). Force the
+   active pill with fixed values so it stands out again. */
+[data-slot="tabs-list"] { border-radius: 0.625rem; }
+[data-slot="tabs-trigger"] { border-radius: 0.5rem; }
+[data-slot="tabs-trigger"][data-state="active"] {
+  background-color: #ffffff;
+  color: #18181b;
+  box-shadow: 0 1px 2px -1px rgb(0 0 0 / 0.10), 0 1px 3px 0 rgb(0 0 0 / 0.10);
+}
+.dark [data-slot="tabs-trigger"][data-state="active"] {
+  background-color: #3f3f46;
+  color: #fafafa;
+}
