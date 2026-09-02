@@ -13,7 +13,13 @@ app_license = "agpl-3.0"
 # consumed by the embedded FrappeSidebar/FrappeNavbar React components.
 # Without it, the sidebar renders without icons and the navbar loses its
 # theme. Same dependency as bvisible/neoconstruction.
-required_apps = ["neoffice_theme"]
+#//// Neoffice — org/repo form on purpose (upstream has no such dependency).
+#//// frappe/installer.py runs parse_app_name() on every required_apps entry
+#//// BEFORE the "already installed" check; a bare name is looked up under the
+#//// frappe/ and erpnext/ GitHub orgs -> 404 for a private app ->
+#//// InvalidRemoteException aborts every install-app. "org/repo" is split
+#//// locally into the package name, no network involved.
+required_apps = ["bvisible/neoffice_theme"]
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
