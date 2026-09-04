@@ -1,3 +1,7 @@
+////// Neoffice — added, and it sits above upstream's copyright header on purpose (5bb4045).
+////// Frappe collapses a section it believes is empty; our XML transactions section is filled
+////// by script after render, so the desk hid it and the imported lines were invisible. The
+////// rule is injected once, from here, because a doctype has no place to ship its own CSS.
 // Inject CSS to prevent Frappe from hiding transactions section
 (function() {
     if (!document.getElementById('mint-bsi-style')) {
@@ -11,10 +15,16 @@
 // Copyright (c) 2025, The Commit Company (Algocode Technologies Pvt. Ltd.) and contributors
 // For license information, please see license.txt
 
+////// Neoffice — added (5bb4045). Module-level guards for the import wizard below: Frappe
+////// fires onload_post_render more than once on a new document, so without them the dialog
+////// opened twice. Upstream has no wizard at all.
 let bsi_wizard_showing = false;
 let bsi_wizard_bypass = false;
 
 frappe.ui.form.on("Mint Bank Statement Import", {
+    ////// Neoffice — added handler (b714fd5, 5bb4045). Upstream's form has only refresh(). This
+    ////// opens the import wizard on a brand-new document and resumes the OCR poll when the page
+    ////// is reloaded while an analysis is still running.
     onload_post_render(frm) {
         if (frm.doc.__islocal && !bsi_wizard_showing && !bsi_wizard_bypass) {
             show_import_wizard(frm);
@@ -25,6 +35,10 @@ frappe.ui.form.on("Mint Bank Statement Import", {
     },
 
     refresh(frm) {
+        ////// Neoffice — refresh() rewritten (b714fd5, 841e983, 5bb4045). Upstream's whole body is the
+        ////// "Process via Google AI" button removed just below. Ours branches on file_type: XML gets
+        ////// Reprocess, PDF gets Analyze with Nora AI / Retry / View Document Scan, and the poll
+        ////// interval is cleared on every refresh so a stale timer cannot survive a route change.
         if (frm._poll_interval) { clearInterval(frm._poll_interval); frm._poll_interval = null; }
         if (typeof neoffice !== 'undefined' && neoffice.processing_overlay) { neoffice.processing_overlay.hide(); }
 
@@ -68,8 +82,14 @@ frappe.ui.form.on("Mint Bank Statement Import", {
                 }
             }
         }
+        ////// Neoffice — upstream's only refresh() body was removed here (d4f7f73): a
+        ////// "Process via Google AI" button calling frm.call("process_file"). Google Document AI is
+        ////// gone (client statements leaving Switzerland, plus a synchronous call that timed out) and
+        ////// process_file no longer exists on the controller. Replaced by the buttons above.
 
 
+    ////// Neoffice — added handlers (b714fd5, 5bb4045). file() re-detects PDF vs CAMT XML from the
+    ////// attachment and repaints the file card; upstream reacts to no field at all.
 
 
     },
@@ -77,12 +97,19 @@ frappe.ui.form.on("Mint Bank Statement Import", {
     file(frm) {
         if (frm.doc.file) { detect_file_type(frm); render_file_info(frm); }
     },
+    ////// Neoffice — added handlers (5bb4045). file_type() shows only the fields of the chosen
+    ////// format; before_unload() kills the OCR poll, which otherwise kept firing after the user
+    ////// left the form and eventually flooded the site with requests.
     file_type(frm) { toggle_file_type_fields(frm); },
     before_unload(frm) {
         if (frm._poll_interval) { clearInterval(frm._poll_interval); frm._poll_interval = null; }
         if (typeof neoffice !== 'undefined' && neoffice.processing_overlay) { neoffice.processing_overlay.hide(); }
     }
 });
+////// Neoffice — added: everything from here to the end of the file is ours (b714fd5, 841e983,
+////// 6b745f6, 5bb4045). The import wizard (bank account + file in one dialog), the CAMT XML
+////// parse trigger, the OCR start/poll pair against Document Scan, the file card and the
+////// field toggles. Upstream's file stops at the closing of frappe.ui.form.on above.
 
 // =============================================
 // IMPORT WIZARD
