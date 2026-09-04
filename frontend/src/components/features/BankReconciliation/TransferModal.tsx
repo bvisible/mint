@@ -32,6 +32,10 @@ const TransferModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {/*//// Neoffice — width rewritten (e582a55). Upstream's min-w-7xl overflowed the viewport once */}
+            {/*//// the modal renders inside the desk chrome instead of full screen; the clamp keeps it */}
+            {/*//// inside the frame and matches the other modals. The sm: override is needed because */}
+            {/*//// shadcn's DialogContent sets its own max-width at that breakpoint. */}
             <DialogContent className='!max-w-[min(92vw,1200px)] w-[min(92vw,1200px)] sm:!max-w-[min(92vw,1200px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Transfer")}</DialogTitle>
@@ -53,6 +57,7 @@ const TransferModalContent = () => {
 
     if (!selectedTransaction || !selectedBankAccount) {
         return <div className='p-4'>
+            {/*//// Neoffice — wrapped in _() (1f2847e); upstream ships the bare English string. */}
             <span className='text-center'>{_("No transaction selected")}</span>
         </div>
     }
@@ -394,6 +399,9 @@ const BankOrCashPicker = ({ bankAccount, onAccountChange, selectedAccount, compa
                     <img
                         src={`/assets/mint/mint/${bank.logo}`}
                         alt={bank.bank || ''}
+                        ////// Neoffice — bank logo constrained (1f2847e). Upstream forces a 12x12 square, which
+                        ////// squashes the wide Swiss logos we added (PostFinance, Raiffeisen); this bounds the box
+                        ////// and lets the aspect ratio decide.
                         className='object-contain'
                         style={{ maxWidth: '64px', maxHeight: '32px', width: 'auto', height: 'auto' }}
                     /> : <div className='flex items-center justify-center h-10 w-10'>
@@ -519,6 +527,7 @@ const RecommendedTransferAccount = ({ transaction, onAccountChange }: { transact
                             <img
                                 src={`/assets/mint/mint/${bank.logo}`}
                                 alt={bank.bank}
+                                ////// Neoffice — same logo box fix (1f2847e), recommended-account card.
                                 className="object-contain"
                                 style={{ maxWidth: '80px', maxHeight: '28px', width: 'auto', height: 'auto' }}
                             />

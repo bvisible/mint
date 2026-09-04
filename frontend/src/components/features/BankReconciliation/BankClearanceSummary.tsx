@@ -7,6 +7,8 @@ import { useMemo, useState } from "react"
 import { useFrappeGetCall, useFrappePostCall, useSWRConfig } from "frappe-react-sdk"
 import { QueryReportReturnType } from "@/types/custom/Reports"
 import { formatDate } from "@/lib/date"
+////// Neoffice — NOT ours: TableCaption dropped when upstream v1.5.0 switched this table to
+////// react-virtuoso, hand-carried (89e7929). Take upstream's import at the merge.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatCurrency } from "@/lib/numbers"
 import { getCompanyCurrency } from "@/lib/company"
@@ -24,6 +26,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Form } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import { DateField } from "@/components/ui/form-elements"
+////// Neoffice — NOT ours: upstream v1.5.0 virtualised table, hand-carried (89e7929).
 import { TableVirtuoso } from "react-virtuoso"
 
 const BankClearanceSummary = () => {
@@ -95,6 +98,9 @@ const BankClearanceSummaryView = () => {
 
         {error && <ErrorBanner error={error} />}
 
+        {/*//// Neoffice — NOT ours: the whole plain-Table to TableVirtuoso rewrite below is upstream */}
+        {/*//// v1.5.0, hand-carried (89e7929). Apart from the two _() wraps further down, this file is */}
+        {/*//// identical to upstream/develop: take upstream's at the merge. */}
         <TableVirtuoso
             data={data?.message.result}
             style={{ minHeight: 'calc(100vh - 200px)' }}
@@ -151,8 +157,12 @@ const BankClearanceSummaryView = () => {
         {data && data.message.result.length === 0 &&
             <Alert variant='default'>
                 <AlertCircle />
+                {/*//// Neoffice — wrapped in _() (1f2847e): upstream ships the bare English sentence, which the */}
+                {/*//// extractor never sees, so it stayed English in a French desk. One of the only two lines */}
+                {/*//// of this file that are ours. */}
                 <AlertTitle>{_("No entries found")}</AlertTitle>
                 <AlertDescription>
+                    {/*//// Neoffice — same _() wrap (1f2847e), the other of the two lines that are ours. */}
                     {_("There are no accounting entries in the system for the selected account and dates.")}
                 </AlertDescription>
             </Alert>
