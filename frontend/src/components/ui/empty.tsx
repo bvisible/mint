@@ -1,6 +1,6 @@
-////// Neoffice — NOT ours: upstream v1.5.0 component, hand-carried (89e7929) because we had
-////// not merged upstream's branch. Byte-identical to upstream/develop today; take upstream's
-////// file at the merge and drop this marker.
+//// Neoffice — NOT ours: upstream v1.5.0 component, hand-carried (89e7929) because we had
+//// not merged upstream's branch. Byte-identical to upstream/develop today; take upstream's
+//// file at the merge and drop this marker.
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"

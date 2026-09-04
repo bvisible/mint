@@ -3,17 +3,17 @@ import { MissingFiltersBanner } from "./MissingFiltersBanner"
 import { bankRecDateAtom, bankRecUnreconcileModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { Paragraph } from "@/components/ui/typography"
 import { formatDate } from "@/lib/date"
-////// Neoffice — NOTHING in this file is our intent. It is upstream v1.5.0 plus upstream's own
-////// later fix 05f708b (backported here as 4969a76), hand-carried because we had not merged
-////// their branch. Byte-identical to upstream/develop today: at the merge take upstream's
-////// BankTransactionList.tsx and drop every marker in it.
-////// Note: 89e7929 also reverted OUR CHF icon (58eeb8c) here, which is why
-////// components/ui/chf-icon.tsx is now dead code.
+//// Neoffice — NOTHING in this file is our intent. It is upstream v1.5.0 plus upstream's own
+//// later fix 05f708b (backported here as 4969a76), hand-carried because we had not merged
+//// their branch. Byte-identical to upstream/develop today: at the merge take upstream's
+//// BankTransactionList.tsx and drop every marker in it.
+//// Note: 89e7929 also reverted OUR CHF icon (58eeb8c) here, which is why
+//// components/ui/chf-icon.tsx is now dead code.
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { formatCurrency, getCurrencyFormatInfo } from "@/lib/numbers"
 import { getCompanyCurrency } from "@/lib/company"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-////// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's.
+//// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's.
 import { ArrowDownRight, ArrowUpRight, CheckCircle2, ChevronDown, DollarSign, ExternalLink, ImportIcon, ListIcon, Search, Undo2, XCircle } from "lucide-react"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Badge } from "@/components/ui/badge"
@@ -28,7 +28,7 @@ import { getCurrencySymbol } from "@/lib/currency"
 import { cn } from "@/lib/utils"
 import { useDebounceValue } from "usehooks-ts"
 import { useMemo, useState } from "react"
-////// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's.
+//// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's.
 import { Link } from "react-router"
 import { TableVirtuoso } from "react-virtuoso"
 
@@ -93,7 +93,7 @@ const BankTransactionListView = () => {
                 if (status === 'Reconciled' && transaction.status !== 'Reconciled') {
                     return false
                 }
-                ////// Neoffice — NOT ours: backport of upstream 05f708b (as 4969a76), drop at the merge.
+                //// Neoffice — NOT ours: backport of upstream 05f708b (as 4969a76), drop at the merge.
                 if (status === 'Unreconciled') {
                     if (transaction.status === 'Reconciled') {
                         return false
@@ -103,7 +103,7 @@ const BankTransactionListView = () => {
                         return false
                     }
                 }
-                ////// Neoffice — NOT ours: backport of upstream 05f708b (as 4969a76), drop at the merge.
+                //// Neoffice — NOT ours: backport of upstream 05f708b (as 4969a76), drop at the merge.
                 if (status === 'Partially Reconciled') {
 
                     if (transaction.status === 'Reconciled') {
@@ -128,14 +128,14 @@ const BankTransactionListView = () => {
 
     return <div className="space-y-4 py-2">
 
-        {/*//// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's. */}
+        {/* //// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's. */}
         <div className="flex gap-2 justify-between items-center">
             <Paragraph className="text-sm">
                 <span dangerouslySetInnerHTML={{
                     __html: _("Below is a list of all bank transactions imported in the system for the bank account {0} between {1} and {2}.", [`<strong>${bankAccount?.account_name}</strong>`, `<strong>${formattedFromDate}</strong>`, `<strong>${formattedToDate}</strong>`])
                 }} />
             </Paragraph>
-{/*//// Neoffice — NOT ours: upstream v1.5.0 link to its statement importer (89e7929). */}
+{/* //// Neoffice — NOT ours: upstream v1.5.0 link to its statement importer (89e7929). */}
 
             <Button size='sm' variant='outline' asChild>
                 <Link to="/statement-importer">
@@ -159,7 +159,7 @@ const BankTransactionListView = () => {
             setStatus={setStatus}
         />}
 
-        {/*//// Neoffice — NOT ours: upstream v1.5.0 virtualised the list (89e7929). Take upstream's. */}
+        {/* //// Neoffice — NOT ours: upstream v1.5.0 virtualised the list (89e7929). Take upstream's. */}
         <TableVirtuoso
             data={filteredResults}
             components={{

@@ -40,9 +40,9 @@ export const bankRecUnreconcileModalAtom = atom<string>('')
 
 export const bankRecMatchFilters = atomWithStorage<string[]>('mint-bank-rec-match-filters', ['payment_entry', 'journal_entry'])
 
-////// Neoffice — added (88a7d8b, 9bfe719). Upstream matches against submitted vouchers only;
-////// these atoms carry the draft Journal Entry feature: the include-drafts toggle (persisted
-////// per user) and the state of the draft JE edit modal. No upstream equivalent.
+//// Neoffice — added (88a7d8b, 9bfe719). Upstream matches against submitted vouchers only;
+//// these atoms carry the draft Journal Entry feature: the include-drafts toggle (persisted
+//// per user) and the state of the draft JE edit modal. No upstream equivalent.
 /** Include draft Journal Entries in matching - default true */
 export const bankRecIncludeDraftJE = atomWithStorage<boolean>('mint-bank-rec-include-draft-je', true)
 
@@ -94,5 +94,5 @@ const actionLogStorage = createJSONStorage<ActionLog[]>(() => sessionStorage)
 
 export const bankRecActionLog = atomWithStorage<ActionLog[]>('mint-bank-rec-action-log', [], actionLogStorage, {
     getOnInit: true,
-////// Neoffice — same line as upstream; only the missing newline at end of file was added.
+//// Neoffice — same line as upstream; only the missing newline at end of file was added.
 })

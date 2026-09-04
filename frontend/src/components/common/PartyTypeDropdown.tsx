@@ -72,9 +72,9 @@ const PartyTypeDropdown = ({ value, onChange, readOnly, disabled, type, hideOpti
             }
             <SelectContent>
                 {filteredData.map((option) => (
-                    ////// Neoffice — wrapped in _() (f17f89f). Upstream prints the raw doctype name, so the party
-                    ////// type stayed "Customer"/"Supplier" in a French desk. The names come from the server, so
-                    ////// the strings live in the PO catalogue rather than in the source.
+                    //// Neoffice — wrapped in _() (f17f89f). Upstream prints the raw doctype name, so the party
+                    //// type stayed "Customer"/"Supplier" in a French desk. The names come from the server, so
+                    //// the strings live in the PO catalogue rather than in the source.
                     <SelectItem key={option.name} value={option.name}>{_(option.name)}</SelectItem>
                 ))}
             </SelectContent>

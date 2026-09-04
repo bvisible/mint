@@ -1,8 +1,8 @@
-////// Neoffice — added file (no upstream equivalent): edit and submit a DRAFT Journal Entry
-////// straight from the reconciliation screen (9bfe719, a401621, e582a55). ERPNext only offers
-////// submitted vouchers for matching, so an accountant had to leave Mint, submit the JE and
-////// come back. Pairs with get_linked_payments / submit_draft_je_and_reconcile in
-////// mint/apis/bank_reconciliation.py.
+//// Neoffice — added file (no upstream equivalent): edit and submit a DRAFT Journal Entry
+//// straight from the reconciliation screen (9bfe719, a401621, e582a55). ERPNext only offers
+//// submitted vouchers for matching, so an accountant had to leave Mint, submit the JE and
+//// come back. Pairs with get_linked_payments / submit_draft_je_and_reconcile in
+//// mint/apis/bank_reconciliation.py.
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { bankRecDraftJEModalAtom, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogClose } from "@/components/ui/dialog"

@@ -68,8 +68,8 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        ////// Neoffice — NOT ours: tabular-nums comes from upstream v1.5.0, hand-carried (89e7929).
-        ////// This file is byte-identical to upstream/develop today; take upstream's at the merge.
+        //// Neoffice — NOT ours: tabular-nums comes from upstream v1.5.0, hand-carried (89e7929).
+        //// This file is byte-identical to upstream/develop today; take upstream's at the merge.
         "text-foreground h-10 px-2 text-left align-middle tabular-nums font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
@@ -83,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        ////// Neoffice — NOT ours: same upstream v1.5.0 change, hand-carried (89e7929).
+        //// Neoffice — NOT ours: same upstream v1.5.0 change, hand-carried (89e7929).
         "p-2 align-middle whitespace-nowrap tabular-nums [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}

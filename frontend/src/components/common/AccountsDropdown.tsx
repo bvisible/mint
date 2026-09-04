@@ -123,13 +123,13 @@ const AccountsDropdown = ({ root_type, report_type, account_type, value, onChang
                         disabled={disabled || readOnly}
                         aria-readonly={readOnly}
                         aria-expanded={open}
-                        ////// Neoffice — min-w-0 added (e582a55). A flex child will not shrink below its content, so a
-                        ////// long Swiss account label ("1020 - Banque Raiffeisen compte courant CHF") pushed the
-                        ////// button past the edge of the modal. Pairs with the truncate span below.
+                        //// Neoffice — min-w-0 added (e582a55). A flex child will not shrink below its content, so a
+                        //// long Swiss account label ("1020 - Banque Raiffeisen compte courant CHF") pushed the
+                        //// button past the edge of the modal. Pairs with the truncate span below.
                         className={cn("w-full justify-between font-normal min-w-0",
                             readOnly ? "bg-muted pointer-events-none" : ""
                             , buttonClassName)}>
-                        {/*//// Neoffice — wrapped in a truncating span (e582a55); upstream renders the bare value. */}
+                        {/* //// Neoffice — wrapped in a truncating span (e582a55); upstream renders the bare value. */}
                         <span className="truncate text-left">{value || _('Select Account')}</span>
 
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -141,11 +141,11 @@ const AccountsDropdown = ({ root_type, report_type, account_type, value, onChang
                         ref={buttonRef}
                         disabled={disabled}
                         aria-expanded={open}
-                        ////// Neoffice — same min-w-0 (e582a55), read-only variant of the same button.
+                        //// Neoffice — same min-w-0 (e582a55), read-only variant of the same button.
                         className={cn("w-full justify-between font-normal min-w-0",
                             readOnly ? "bg-muted" : ""
                         )}>
-                        {/*//// Neoffice — same truncating span (e582a55). */}
+                        {/* //// Neoffice — same truncating span (e582a55). */}
                         <span className="truncate text-left">{value || _('Select Account')}</span>
 
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />

@@ -35,8 +35,8 @@ if (import.meta.env.DEV) {
       if (!window.frappe) window.frappe = {}
       // @ts-expect-error - frappe will be available
       frappe.boot = v
-      ////// Neoffice — same change as the marker above (16eec35): bracket notation on the message
-      ////// catalogue and the guarded sync, in the dev-server branch too.
+      //// Neoffice — same change as the marker above (16eec35): bracket notation on the message
+      //// catalogue and the guarded sync, in the dev-server branch too.
       // @ts-expect-error - frappe will be available
       frappe._messages = frappe.boot['__messages']
       safeSyncDocs()

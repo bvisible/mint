@@ -1,7 +1,7 @@
-////// Neoffice — added file (no upstream equivalent): list view settings for Mint Bank
-////// Statement Import (6d264d7). Upstream ships no list JS — the list showed only the
-////// processing status, so a cancelled import and a submitted one looked the same. This
-////// renders the docstatus as its own badge and colours the OCR states. Wired in hooks.py.
+//// Neoffice — added file (no upstream equivalent): list view settings for Mint Bank
+//// Statement Import (6d264d7). Upstream ships no list JS — the list showed only the
+//// processing status, so a cancelled import and a submitted one looked the same. This
+//// renders the docstatus as its own badge and colours the OCR states. Wired in hooks.py.
 // Copyright (c) 2025, The Commit Company (Algocode Technologies Pvt. Ltd.) and contributors
 // For license information, please see license.txt
 

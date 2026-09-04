@@ -147,9 +147,14 @@ VMs cannot run the build (see `.gitignore`, where upstream's two ignore lines ar
 out, and `CLAUDE.md`). `mint/www/mint.html` is then copied from `mint/public/mint/index.html`
 by `yarn copy-html-entry`.
 
-The two HTML entry points carry a *"GENERATED FILE, do not edit"* marker so the marker check
-stays green, but **the real source to mark is `frontend/index.html`**: the next build overwrites
-them. Never mark a file under `mint/public/mint/assets/`.
+**Never write a marker into any of them** — proven on 2026-09-04: a *"GENERATED FILE, do not
+edit"* comment added to the two HTML entry points was wiped by the very next
+`build-frontend` run. What keeps them marked is the markers in **`frontend/index.html`**,
+which vite carries through into the build output (five marker lines survive in
+`mint/www/mint.html` and `mint/public/mint/index.html`). The same holds for
+`mint/public/mint/assets/bank-logos/*.svg`: they are copies of
+`frontend/public/assets/bank-logos/*.svg`, and their markers come from the source files.
+**Mark the source, never the artifact.**
 
 ---
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--//// Neoffice — added file (no upstream equivalent): the Neoffice wordmark shown in the header -->
-<!--//// of the reconciliation page (031d31d), where upstream shows its own Mint mark. Copied into -->
-<!--//// the built SPA under mint/public/mint/assets/ by the vite build. -->
+<!-- //// Neoffice — added file (no upstream equivalent): the Neoffice wordmark shown in the header -->
+<!-- //// of the reconciliation page (031d31d), where upstream shows its own Mint mark. Copied into -->
+<!-- //// the built SPA under mint/public/mint/assets/ by the vite build. -->
 <!-- Generator: Adobe Illustrator 28.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 331.2 78.2" style="enable-background:new 0 0 331.2 78.2;" xml:space="preserve">

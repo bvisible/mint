@@ -1,5 +1,5 @@
-////// Neoffice — bankRecIncludeDraftJE added to the import (88a7d8b), for the draft Journal
-////// Entry support below.
+//// Neoffice — bankRecIncludeDraftJE added to the import (88a7d8b), for the draft Journal
+//// Entry support below.
 import { ActionLog, bankRecActionLog, bankRecAmountFilter, bankRecDateAtom, bankRecMatchFilters, bankRecIncludeDraftJE, bankRecSearchText, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from './bankRecAtoms'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
@@ -109,9 +109,9 @@ export interface LinkedPayment {
     posting_date: string,
     party_type?: string,
     party?: string,
-    ////// Neoffice — two fields added (88a7d8b, 9bfe719). Our get_linked_payments also returns
-    ////// DRAFT Journal Entries; is_draft tells the list to render them differently and open the
-    ////// edit modal, user_remark is what a draft shows instead of a reference number.
+    //// Neoffice — two fields added (88a7d8b, 9bfe719). Our get_linked_payments also returns
+    //// DRAFT Journal Entries; is_draft tells the list to render them differently and open the
+    //// edit modal, user_remark is what a draft shows instead of a reference number.
     currency: string,
     is_draft?: number,  // 1 if draft Journal Entry, undefined otherwise
     user_remark?: string  // User remark for display (mainly for draft JEs)
@@ -134,20 +134,20 @@ export const useGetVouchersForTransaction = (transaction: UnreconciledTransactio
     const dates = useAtomValue(bankRecDateAtom)
 
     const matchFilters = useAtomValue(bankRecMatchFilters)
-    ////// Neoffice — added (88a7d8b): the Include Drafts switch feeds the request below.
+    //// Neoffice — added (88a7d8b): the Include Drafts switch feeds the request below.
     const includeDraftJE = useAtomValue(bankRecIncludeDraftJE)
 
-    ////// Neoffice — endpoint swapped (88a7d8b). Upstream calls ERPNext's
-    ////// bank_reconciliation_tool.get_linked_payments, which only returns SUBMITTED vouchers.
-    ////// Ours wraps it (mint/apis/bank_reconciliation.py) and merges the draft Journal Entries.
-    ////// Same arguments plus include_draft_je.
+    //// Neoffice — endpoint swapped (88a7d8b). Upstream calls ERPNext's
+    //// bank_reconciliation_tool.get_linked_payments, which only returns SUBMITTED vouchers.
+    //// Ours wraps it (mint/apis/bank_reconciliation.py) and merges the draft Journal Entries.
+    //// Same arguments plus include_draft_je.
     return useFrappeGetCall<{ message: LinkedPayment[] }>('mint.apis.bank_reconciliation.get_linked_payments', {
         bank_transaction_name: transaction.name,
         document_types: matchFilters ?? ['payment_entry', 'journal_entry'],
         from_date: dates.fromDate,
         to_date: dates.toDate,
-        ////// Neoffice — added argument and cache key (88a7d8b): the toggle has to be part of the SWR
-        ////// key, otherwise flipping it served the previous answer from cache.
+        //// Neoffice — added argument and cache key (88a7d8b): the toggle has to be part of the SWR
+        //// key, otherwise flipping it served the previous answer from cache.
         filter_by_reference_date: 0,
         include_draft_je: includeDraftJE ? 1 : 0
     }, `bank-reconciliation-vouchers-${transaction.name}-${dates.fromDate}-${dates.toDate}-${matchFilters.join(',')}-draft-${includeDraftJE}`, {

@@ -110,9 +110,9 @@ const LinkFieldCombobox = ({
     readOnly,
     disabled,
     filterFn,
-    ////// Neoffice — changed (f17f89f). Upstream builds the placeholder with a template literal,
-    ////// `Select ${doctype}`: the extractor cannot see it, so it stayed English in a French UI.
-    ////// _() with a {0} placeholder is extractable and translated.
+    //// Neoffice — changed (f17f89f). Upstream builds the placeholder with a template literal,
+    //// `Select ${doctype}`: the extractor cannot see it, so it stayed English in a French UI.
+    //// _() with a {0} placeholder is extractable and translated.
     placeholder = _("Select {0}", [doctype]),
     customQuery,
     searchfield,
@@ -228,16 +228,16 @@ const LinkFieldCombobox = ({
                         disabled={disabled || readOnly}
                         aria-expanded={open}
                         aria-readonly={readOnly}
-                        ////// Neoffice — min-w-0 added (e582a55): without it a long link title widened the button out
-                        ////// of its modal instead of being truncated by the span below.
+                        //// Neoffice — min-w-0 added (e582a55): without it a long link title widened the button out
+                        //// of its modal instead of being truncated by the span below.
                         className={cn("w-full justify-between font-normal group min-w-0",
                             readOnly ? "bg-muted" : ""
                             , buttonClassName)}>
-                        {/*//// Neoffice — wrapped in a truncating span (e582a55); upstream renders the bare title. */}
+                        {/* //// Neoffice — wrapped in a truncating span (e582a55); upstream renders the bare title. */}
                         <span className="truncate text-left">{linkTitle || placeholder}</span>
 
-                        {/*//// Neoffice — shrink-0 added (e582a55) so the icon pair keeps its width while the label */}
-                        {/*//// truncates; without it the chevron was the thing that got squeezed away. */}
+                        {/* //// Neoffice — shrink-0 added (e582a55) so the icon pair keeps its width while the label */}
+                        {/* //// truncates; without it the chevron was the thing that got squeezed away. */}
                         <div className="flex items-center gap-1 shrink-0">
                             {value && <a href={`/app/${slug(doctype)}/${value}`} target="_blank" className="group-hover:block hidden">
                                 <ExternalLink className="h-4 w-4 shrink-0 opacity-50" />
@@ -252,11 +252,11 @@ const LinkFieldCombobox = ({
                         ref={buttonRef}
                         disabled={disabled}
                         aria-expanded={open}
-                        ////// Neoffice — same min-w-0 (e582a55), read-only variant of the same button.
+                        //// Neoffice — same min-w-0 (e582a55), read-only variant of the same button.
                         className={cn("w-full justify-between font-normal min-w-0",
                             readOnly ? "bg-muted" : ""
                             , buttonClassName)}>
-                        {/*//// Neoffice — same truncating span (e582a55). */}
+                        {/* //// Neoffice — same truncating span (e582a55). */}
                         <span className="truncate text-left">{value || placeholder}</span>
 
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />

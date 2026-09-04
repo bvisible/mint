@@ -19,8 +19,8 @@ import {
 import { cn } from "@/lib/utils"
 import _ from "@/lib/translate"
 
-////// Neoffice — NOT ours: the onChange prop is upstream v1.5.0, hand-carried (89e7929); the
-////// statement importer needs to know when the company changes. Take upstream's at the merge.
+//// Neoffice — NOT ours: the onChange prop is upstream v1.5.0, hand-carried (89e7929); the
+//// statement importer needs to know when the company changes. Take upstream's at the merge.
 const CompanySelector = ({ onChange }: { onChange?: (company: string) => void }) => {
     const [open, setOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
@@ -35,7 +35,7 @@ const CompanySelector = ({ onChange }: { onChange?: (company: string) => void })
         setSelectedCompany(company)
         setSearchQuery("")
         setOpen(false)
-        ////// Neoffice — NOT ours: upstream v1.5.0, hand-carried (89e7929).
+        //// Neoffice — NOT ours: upstream v1.5.0, hand-carried (89e7929).
         onChange?.(company)
     }
 
@@ -47,8 +47,8 @@ const CompanySelector = ({ onChange }: { onChange?: (company: string) => void })
                 aria-expanded={open}
                 className="justify-between"
             >
-                {/*//// Neoffice — NOT ours: upstream v1.5.0 wraps the icon and the label in their own flex box */}
-                {/*//// so the chevron stays pinned right, hand-carried (89e7929). */}
+                {/* //// Neoffice — NOT ours: upstream v1.5.0 wraps the icon and the label in their own flex box */}
+                {/* //// so the chevron stays pinned right, hand-carried (89e7929). */}
                 <div className="flex items-center gap-2">
                     <Building2 />
                     {selectedCompany}

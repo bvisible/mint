@@ -34,10 +34,10 @@ const BankBalance = () => {
         return null
     }
     return (
-        ////// Neoffice — the balance strip was made responsive (1f2847e). Upstream splits it 80/20 with
-        ////// fixed widths and a hard border; embedded in the desk chrome the available width is much
-        ////// smaller and the figures overflowed, so the row wraps and the divider only shows from lg.
-        ////// Every hunk of this file below is the same density/responsive pass plus one _() wrap.
+        //// Neoffice — the balance strip was made responsive (1f2847e). Upstream splits it 80/20 with
+        //// fixed widths and a hard border; embedded in the desk chrome the available width is much
+        //// smaller and the figures overflowed, so the row wraps and the divider only shows from lg.
+        //// Every hunk of this file below is the same density/responsive pass plus one _() wrap.
         <div className="flex flex-wrap justify-between gap-y-4 gap-x-4">
             <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-6 gap-y-2 pr-4 lg:pr-8 lg:border-r-border lg:border-r">
                 <OpeningBalance />
@@ -55,10 +55,10 @@ const OpeningBalance = () => {
     const bankAccount = useAtomValue(selectedBankAccountAtom)
     const { data, isLoading } = useGetAccountOpeningBalance()
 
-    ////// Neoffice — min-w-48 to min-w-32 (1f2847e), same density pass.
+    //// Neoffice — min-w-48 to min-w-32 (1f2847e), same density pass.
     return <StatContainer className="min-w-32">
         <StatLabel>{_("Opening Balance")}</StatLabel>
-        {/*//// Neoffice — skeleton resized to match the smaller figures (1f2847e). */}
+        {/* //// Neoffice — skeleton resized to match the smaller figures (1f2847e). */}
         {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
     </StatContainer>
 }
@@ -68,7 +68,7 @@ const ClosingBalance = () => {
     const { data, isLoading } = useGetAccountClosingBalance()
 
     return (
-        ////// Neoffice — min-w-48 to min-w-36 (1f2847e), same density pass.
+        //// Neoffice — min-w-48 to min-w-36 (1f2847e), same density pass.
         <StatContainer className="min-w-36">
             <div className="flex items-start gap-1">
                 <StatLabel>
@@ -87,15 +87,15 @@ const ClosingBalance = () => {
                             <br />
                             {_("If your bank statement shows a different closing balance, it is because all transactions have not reconciled yet.")}
                             <br /><br />
-                            {/*//// Neoffice — sentence rebuilt with a _() placeholder (1f2847e). Upstream hard-codes the */}
-                            {/*//// English text around a <strong> tab name, which cannot be translated as one sentence. */}
+                            {/* //// Neoffice — sentence rebuilt with a _() placeholder (1f2847e). Upstream hard-codes the */}
+                            {/* //// English text around a <strong> tab name, which cannot be translated as one sentence. */}
                             {_("For more information, click on the {0} tab below.", [_("Bank Reconciliation Statement")])}
                         </Paragraph>
                     </HoverCardContent>
                 </HoverCard>
 
             </div>
-            {/*//// Neoffice — skeleton resized (1f2847e), same density pass. */}
+            {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
             {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
         </StatContainer>
     )
@@ -112,10 +112,10 @@ const Difference = () => {
 
     const isError = difference !== 0
 
-    ////// Neoffice — sm:min-w-56 to sm:min-w-32 (1f2847e), same density pass.
+    //// Neoffice — sm:min-w-56 to sm:min-w-32 (1f2847e), same density pass.
     return <StatContainer className="w-fit text-right sm:min-w-32">
         <StatLabel className="text-right">{_("Difference")}</StatLabel>
-        {/*//// Neoffice — skeleton resized (1f2847e), same density pass. */}
+        {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
         {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className={isError ? 'text-destructive font-mono' : 'font-mono'}>
             {formatCurrency(difference,
                 bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))
@@ -134,8 +134,8 @@ const ReconcileProgress = () => {
         ['docstatus', '=', 1],
         ['date', '<=', dates?.toDate],
         ['date', '>=', dates?.fromDate]
-    ////// Neoffice — NOT ours: one argument dropped from useFrappeGetDocCount when upstream v1.5.0
-    ////// moved to a newer frappe-react-sdk, hand-carried (89e7929). Take upstream's at the merge.
+    //// Neoffice — NOT ours: one argument dropped from useFrappeGetDocCount when upstream v1.5.0
+    //// moved to a newer frappe-react-sdk, hand-carried (89e7929). Take upstream's at the merge.
     ], false, undefined, {
         revalidateOnFocus: false
     })
@@ -146,12 +146,12 @@ const ReconcileProgress = () => {
 
     const progress = (totalCount ? reconciledCount / totalCount : 0) * 100
 
-    ////// Neoffice — fixed 18% width replaced by a min/max clamp (1f2847e): in the embedded shell
-    ////// the percentage collapsed the progress block to a few pixels on a laptop.
+    //// Neoffice — fixed 18% width replaced by a min/max clamp (1f2847e): in the embedded shell
+    //// the percentage collapsed the progress block to a few pixels on a laptop.
     return <div className="flex flex-col gap-1 items-end min-w-[180px] w-full lg:w-auto lg:min-w-[200px] lg:max-w-[260px]">
         <div>
-            {/*//// Neoffice — whitespace-nowrap added (1f2847e): the French wording is longer and wrapped */}
-            {/*//// mid-sentence in the narrower column. */}
+            {/* //// Neoffice — whitespace-nowrap added (1f2847e): the French wording is longer and wrapped */}
+            {/* //// mid-sentence in the narrower column. */}
             <span className="text-right font-medium text-sm whitespace-nowrap">{_("Your Progress")}: {reconciledCount} / {totalCount} {_("reconciled")}</span>
         </div>
         <div className="w-full">
@@ -182,14 +182,14 @@ const ClosingBalanceAsPerStatement = () => {
     const [isOpen, setIsOpen] = useState(false)
 
 
-    ////// Neoffice — min-w-48 to min-w-36 (1f2847e), same density pass.
+    //// Neoffice — min-w-48 to min-w-36 (1f2847e), same density pass.
     return <StatContainer className="min-w-36">
         <StatLabel>{_("Closing Balance as per statement")}</StatLabel>
         <div className="flex flex-col gap-2 items-start">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger>
                     <Tooltip>
-                        {/*//// Neoffice — gap and skeleton tightened (1f2847e), same density pass. */}
+                        {/* //// Neoffice — gap and skeleton tightened (1f2847e), same density pass. */}
                         <TooltipTrigger asChild>
                             <div className="flex items-center gap-3 underline cursor-pointer underline-offset-6">
                                 {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}

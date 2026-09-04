@@ -77,10 +77,10 @@ export const BANK_LOGOS: { keywords: string[], logo: string }[] = [
         keywords: ['UBS'],
         logo: 'assets/bank-logos/UBS.svg'
     },
-    ////// Neoffice — added (dd20206): the Swiss banks our clients actually use (Credit Suisse,
-    ////// PostFinance, Raiffeisen, ZKB, BCV, Banque Cantonale du Valais, Cembra). Upstream's list
-    ////// is Indian, Australian and US banks. Keep both lists at the merge; the SVG files live in
-    ////// frontend/public/assets/bank-logos/ and are listed in NEOFFICE_FORK_MARKERS.md.
+    //// Neoffice — added (dd20206): the Swiss banks our clients actually use (Credit Suisse,
+    //// PostFinance, Raiffeisen, ZKB, BCV, Banque Cantonale du Valais, Cembra). Upstream's list
+    //// is Indian, Australian and US banks. Keep both lists at the merge; the SVG files live in
+    //// frontend/public/assets/bank-logos/ and are listed in NEOFFICE_FORK_MARKERS.md.
     {
         keywords: ['Credit Suisse', 'Crédit Suisse', 'CS'],
         logo: 'assets/bank-logos/Credit_Suisse.svg'

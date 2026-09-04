@@ -1,5 +1,5 @@
-////// Neoffice — NOT ours: upstream v1.5.0 page, hand-carried (89e7929). Byte-identical to
-////// upstream/develop today; take upstream's at the merge.
+//// Neoffice — NOT ours: upstream v1.5.0 page, hand-carried (89e7929). Byte-identical to
+//// upstream/develop today; take upstream's at the merge.
 import BankPicker from "@/components/features/BankReconciliation/BankPicker"
 import { selectedBankAccountAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import CompanySelector from "@/components/features/BankReconciliation/CompanySelector"
