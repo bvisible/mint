@@ -1,10 +1,4 @@
 <!doctype html>
-<!--//// Neoffice — GENERATED FILE, do not edit: the Jinja entry point Frappe serves at /mint. -->
-<!--//// It is the vite output of frontend/index.html (commit the build pattern, see .gitignore -->
-<!--//// and CLAUDE.md); mint/www/mint.html is then copied from mint/public/mint/index.html by -->
-<!--//// yarn copy-html-entry. Upstream ignores both and rebuilds on install; our client VMs -->
-<!--//// have too little RAM for vite, so the build is committed. Mark the SOURCE -->
-<!--//// (frontend/index.html), never this file: the next build overwrites it. -->
 <html lang="en">
 
 <head>
@@ -20,6 +14,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Inter:wght@100..900&display=swap"
     rel="stylesheet">
+  <!-- //// Neoffice — everything from here to </style> is ours (711dfb1, 16eec35). -->
+  <!-- Upstream's index.html is a bare vite shell; we render /mint inside the native -->
+  <!-- Frappe chrome (sidebar + navbar) without loading desk.bundle.js, so the page has -->
+  <!-- to pull desk.bundle.css + neoffice_theme.css itself (URLs injected by -->
+  <!-- mint/www/mint.py) and re-declare the navbar/sidebar CSS that neoffice-theme.js -->
+  <!-- would normally inject at runtime. -->
   <!-- Frappe Desk CSS only, no JS bundle — enough to style FrappeNavbar/Sidebar -->
   {% if desk_css_url %}<link rel="stylesheet" href="{{ desk_css_url }}" />{% endif %}
   <link rel="stylesheet" href="{{ neoffice_theme_css_url }}" />
@@ -201,22 +201,29 @@
       min-height: 100vh;
     }
   </style>
-  <script type="module" crossorigin src="/assets/mint/mint/assets/index-CTHN8B0o.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/mint/mint/assets/index-DnvfkdTq.css">
+  <script type="module" crossorigin src="/assets/mint/mint/assets/index-Cmsjb8Sj.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/mint/mint/assets/index-D94MWfrW.css">
 </head>
 
 <body>
+  <!-- //// Neoffice — added. Frappe icons are <use href="#es-line-…"> references; with -->
+  <!-- no desk bundle nothing ever inlines the sprite <symbol> defs, so every icon in the -->
+  <!-- navbar/sidebar rendered empty. This div receives them (see loadIcons below). -->
   <!-- Container for inlined Frappe icon sprites (timeless + espresso + lucide)
        so that <use href="#es-line-..."> and <use href="#icon-..."> resolve to
        actual <symbol> defs. -->
   <div id="all-symbols" style="display: none; position: absolute; width: 0; height: 0;"></div>
   <div id="root"></div>
+  <!-- //// Neoffice — added inline script. Upstream ships no boot: the SPA is served by -->
+  <!-- our Jinja controller (mint/www/mint.py) which hands it a curated mini-boot, the -->
+  <!-- CSRF token and the message catalogue. -->
   <script>
     window.csrf_token = '{{ frappe.session.csrf_token }}';
     if (!window.frappe) window.frappe = {};
     frappe.boot = JSON.parse({{ boot }});
     frappe._messages = frappe.boot["__messages"];
 
+        //// Neoffice — added. See the note below: bracket notation is mandatory here.
     // Minimal i18n shim for the embedded shell — we don't load desk.bundle.js
     // so Frappe's full translate function never gets installed. This does
     // just enough for our React components:
@@ -271,6 +278,7 @@
       });
     })();
   </script>
+  <!-- //// Neoffice — file ends with a newline here; upstream's has none. -->
 </body>
 
 </html>
