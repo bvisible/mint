@@ -1,6 +1,10 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
+////// Neoffice — bankRecDraftJEModalAtom added to the import (9bfe719): this file is mixed, most
+////// hunks are upstream v1.5.0 hand-carried (89e7929) and the rest is our draft Journal Entry
+////// feature. Each marker below says which.
 import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
+////// Neoffice — NOT ours: upstream v1.5.0 (89e7929) added useRef for the search field.
 import { useMemo, useRef } from "react"
 import { getCompanyCurrency } from "@/lib/company"
 import ErrorBanner from "@/components/ui/error-banner"
@@ -8,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import Fuse from 'fuse.js'
 import { getSearchResults, LinkedPayment, UnreconciledTransaction, useGetRuleForTransaction, useGetUnreconciledTransactions, useGetVouchersForTransaction, useIsTransactionWithdrawal, useReconcileTransaction, useTransactionSearch } from "./utils"
 import { Input } from "@/components/ui/input"
+////// Neoffice — FileEdit added (9bfe719) for the Draft badge further down. Ours.
 import { AlertCircle, ArrowDownRight, ArrowRightIcon, ArrowRightLeft, ArrowUpRight, BadgeCheck, ChevronDown, DollarSign, FileEdit, Landmark, LandmarkIcon, ListIcon, Loader2, Receipt, ReceiptIcon, Search, User, XCircle, ZapIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -25,6 +30,7 @@ import _ from "@/lib/translate"
 import TransferModal from "./TransferModal"
 import BankEntryModal from "./BankEntryModal"
 import RecordPaymentModal from "./RecordPaymentModal"
+////// Neoffice — added (9bfe719): DraftJEModal is a file we added, no upstream equivalent.
 import DraftJEModal from "./DraftJEModal"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
@@ -33,6 +39,7 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { KeyboardMetaKeyIcon } from "@/components/ui/keyboard-keys"
 import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { useFrappeGetCall } from "frappe-react-sdk"
+////// Neoffice — NOT ours: upstream v1.5.0 empty-state primitives and router Link (89e7929).
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Link } from "react-router"
 
@@ -40,6 +47,8 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
     const selectedBank = useAtomValue(selectedBankAccountAtom)
 
     if (!selectedBank) {
+        ////// Neoffice — NOT ours: upstream v1.5.0 replaced a plain message with the Empty component
+        ////// (89e7929). Take upstream's.
         return <Empty className="bg-muted/30 h-64">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -65,6 +74,7 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
         <TransferModal />
         <BankEntryModal />
         <RecordPaymentModal />
+        {/*//// Neoffice — added (9bfe719): mounts our draft Journal Entry modal beside upstream's. */}
         <DraftJEModal />
     </>
 }
@@ -79,6 +89,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
     const groupSeparator = formatInfo.group_sep || ","
     const decimalSeparator = formatInfo.decimal_str || "."
 
+    ////// Neoffice — NOT ours: upstream v1.5.0 (89e7929), ref for the Clear Filters button.
     const inputRef = useRef<HTMLInputElement>(null)
 
     const { data: unreconciledTransactions, isLoading, error } = useGetUnreconciledTransactions()
@@ -123,6 +134,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         onFilterChange()
     }
 
+    ////// Neoffice — NOT ours: upstream v1.5.0 Clear Filters handler (89e7929).
     const onClearFilters = () => {
         setSearch('')
         if (inputRef.current) {
@@ -136,6 +148,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
     const hasFilters = search !== '' || typeFilter !== 'All' || amountFilter.value !== 0
 
     if (isLoading) {
+        ////// Neoffice — NOT ours: upstream v1.5.0 skeleton loading state (89e7929).
         return <UnreconciledTransactionsLoadingState />
     }
 
@@ -147,6 +160,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                 "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
             )}>
                 <Search className="w-5 h-5 text-muted-foreground" />
+                {/*//// Neoffice — NOT ours: upstream v1.5.0 rebuilt the search field around the ref (89e7929). */}
                 <Input
                     placeholder={_("Search")}
                     type='search'
@@ -165,6 +179,8 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                     decimalSeparator={decimalSeparator}
                     placeholder={`${currencySymbol}0${decimalSeparator}00`}
                     decimalsLimit={2}
+                    ////// Neoffice — NOT ours: upstream v1.5.0 (89e7929) drives the amount filter from the atom's
+                    ////// stringValue so the raw typing is preserved.
                     value={amountFilter.stringValue}
                     maxLength={12}
                     decimalScale={2}
@@ -207,6 +223,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
 
         <OlderUnreconciledTransactionsBanner />
 
+        {/*//// Neoffice — NOT ours: upstream v1.5.0 empty state with filter awareness (89e7929). */}
         {results.length === 0 && <NoTransactionsFoundBanner
             onClearFilters={hasFilters ? onClearFilters : undefined}
             text={hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")}
@@ -224,6 +241,9 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
     </div>
 }
 
+////// Neoffice — NOT ours: this whole component is upstream v1.5.0 (89e7929). ONE line in it is
+////// ours: the _("Clear Filters") wrap, upstream ships the bare English label. Take upstream's
+////// component at the merge and re-apply that wrap.
 const NoTransactionsFoundBanner = ({ text, description, onClearFilters }: { text: string, description?: string, onClearFilters?: () => void }) => {
 
     return <Empty className="h-64">
@@ -325,6 +345,7 @@ const VouchersSection = ({ contentHeight }: { contentHeight: number }) => {
 
 
     if (selectedTransactions.length === 0) {
+        ////// Neoffice — NOT ours: upstream v1.5.0 empty state (89e7929).
         return <Empty className="h-64 my-4">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -708,6 +729,8 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
         return <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Separator className="flex-1" />
+                {/*//// Neoffice — wrapped in _() (1f2847e); upstream ships the bare word. Note the identical */}
+                {/*//// span further down (around line 726) was NOT wrapped and is still untranslated. */}
                 <span>{_("or")}</span>
                 <Separator className="flex-1" />
             </div>
@@ -726,6 +749,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
             <span>or</span>
             <Separator className="flex-1" />
         </div>
+        {/*//// Neoffice — NOT ours: upstream v1.5.0 empty state for the voucher list (89e7929). */}
         {vouchers?.message.length === 0 && <Empty className="h-64 my-4">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -749,6 +773,7 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
 
     const selectedBank = useAtomValue(selectedBankAccountAtom)
     const selectedTransaction = useAtomValue(bankRecSelectedTransactionAtom(selectedBank?.name || ''))
+    ////// Neoffice — added (9bfe719): the setter that opens our draft Journal Entry modal.
     const setDraftJEModal = useSetAtom(bankRecDraftJEModalAtom)
 
     const { amountMatches, postingDateMatches, referenceDateMatches, referenceMatchesFull, referenceMatchesPartial, isSuggested } = useMemo(() => {
@@ -764,8 +789,13 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
         const amountMatches = voucher.paid_amount === transaction?.unallocated_amount
         const postingDateMatches = voucher.posting_date === transaction?.date
         const referenceDateMatches = voucher.reference_date === transaction?.date
+        ////// Neoffice — guarded (f84e328). Upstream compares reference_no without checking it exists,
+        ////// so a voucher with an empty reference matched every transaction whose own reference was
+        ////// empty, and the suggestion badge lit up on the wrong rows.
         const referenceMatchesFull = voucher.reference_no && (voucher.reference_no === transaction?.reference_number || voucher.reference_no === transaction?.description)
 
+        ////// Neoffice — same guard (f84e328): includes(undefined) throws on a voucher with no
+        ////// reference, which killed the whole voucher list.
         const referenceMatchesPartial = voucher.reference_no && (transaction?.reference_number?.includes(voucher.reference_no) || transaction?.description?.includes(voucher.reference_no))
 
 
@@ -781,6 +811,9 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
         if (!selectedTransaction) {
             return
         }
+        ////// Neoffice — added (9bfe719). Upstream reconciles a clicked voucher straight away; a DRAFT
+        ////// Journal Entry cannot be reconciled as-is, so it opens our edit-and-submit modal instead.
+        ////// Only reachable because our get_linked_payments also returns drafts.
         // If this is a draft Journal Entry, open the draft JE modal instead of reconciling directly
         if (voucher.is_draft === 1 && voucher.doctype === 'Journal Entry') {
             setDraftJEModal({
@@ -808,6 +841,8 @@ const VoucherItem = ({ voucher, index }: { voucher: LinkedPayment, index: number
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                         <Badge variant='secondary' className={cn("text-sm rounded-sm", isSuggested ? "bg-amber-100 text-amber-700" : "bg-secondary")}>{_(voucher.doctype)}</Badge>
+                        {/*//// Neoffice — added badge (9bfe719): marks the rows that are draft Journal Entries, which */}
+                        {/*//// upstream never shows in this list. */}
                         {voucher.is_draft === 1 && (
                             <Badge variant='outline' className="text-sm rounded-sm border-orange-400 text-orange-600 bg-orange-50">
                                 <FileEdit className="w-3 h-3 mr-1" />
@@ -922,6 +957,8 @@ const OlderUnreconciledTransactionsBanner = () => {
     if (data && data.message.count > 0) {
 
         return <div className="flex flex-col gap-2">
+            {/*//// Neoffice — NOT ours: upstream v1.5.0 re-nested this banner so the action sits on the */}
+            {/*//// right (89e7929). Take upstream's. */}
             <div className="border border-amber-500 rounded-md p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="min-w-8">
@@ -935,6 +972,8 @@ const OlderUnreconciledTransactionsBanner = () => {
                         )}
                         <span className="text-sm text-amber-600">{_("The opening balance might not match your bank statement. Would you like to reconcile them?")}</span>
                     </div>
+{/*//// Neoffice — NOT ours: same upstream v1.5.0 re-nesting (89e7929), the button block moved */}
+{/*//// out of the text column. */}
 
                 </div>
                 <div className="flex items-center gap-2 w-fit pl-4">

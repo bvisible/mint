@@ -12,9 +12,14 @@ import { Button } from "@/components/ui/button"
 import SelectedTransactionDetails from "./SelectedTransactionDetails"
 import { AccountFormField, CurrencyFormField, DataField, DateField, LinkFormField, PartyTypeFormField, SmallTextField } from "@/components/ui/form-elements"
 import { Form } from "@/components/ui/form"
+////// Neoffice — useEffect / useMemo / useState added (c85829f, 4aa971b) for the auto-focus and
+////// the VAT calculation state below. This file is heavily ours: the Swiss VAT split on
+////// deductions, the modal re-layout and the French wording. Take BOTH sides at the merge.
 import { ChangeEvent, useCallback, useContext, useEffect, useRef, useMemo, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+////// Neoffice — AlertCircleIcon and X added (4aa971b) for the VAT badge and the remove-VAT
+////// button in the deductions table.
 import { AlertCircleIcon, Plus, Trash2, X } from "lucide-react"
 import { flt, formatCurrency } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
@@ -36,6 +41,10 @@ import { FileDropzone } from "@/components/ui/file-dropzone"
 import { BankTransaction } from "@/types/Accounts/BankTransaction"
 import FileUploadBanner from "@/components/common/FileUploadBanner"
 
+////// Neoffice — added hook (4aa971b): calls our calculate_deductions_with_vat endpoint, which
+////// splits a TTC deduction into a base line plus a VAT line. Upstream posts the amount as
+////// typed and knows nothing about VAT.
+////// (Defect: the comment on the next line is in French, unlike the rest of the codebase.)
 // Hook pour calcul TVA sur les déductions
 const useDeductionsVatCalculation = () => {
     const { call } = useFrappePostCall<{
@@ -55,6 +64,8 @@ const RecordPaymentModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {/*//// Neoffice — width rewritten (e582a55). Upstream's min-w-[95vw] overflows once the modal */}
+            {/*//// renders inside the desk chrome; the clamp keeps it in the frame like the other modals. */}
             <DialogContent className='!max-w-[min(92vw,1300px)] w-[min(92vw,1300px)] sm:!max-w-[min(92vw,1300px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Record Payment")}</DialogTitle>
@@ -77,6 +88,7 @@ const RecordPaymentModalContent = () => {
 
     if (!selectedTransaction || !selectedBankAccount) {
         return <div className='p-4'>
+            {/*//// Neoffice — wrapped in _() (1f2847e); upstream ships the bare English string. */}
             <span className='text-center'>{_("No transaction selected")}</span>
         </div>
     }
@@ -329,6 +341,9 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
 
     }, [rule, setUnpaidInvoiceOpen])
 
+    ////// Neoffice — added (c85829f). The accountant opens this modal to type a party name, so the
+    ////// Party combobox is focused and opened once the dialog has mounted. It is reached by DOM
+    ////// position because the field components take no ref. Upstream focuses nothing.
     // Auto-focus on Party field when modal opens
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -441,6 +456,10 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
             <div className='flex flex-col gap-4'>
                 {error && <ErrorBanner error={error} />}
                 <div className='grid grid-cols-2 gap-4 items-start'>
+                    {/*//// Neoffice — the whole form was re-laid out (e582a55). Upstream puts the transaction card */}
+                    {/*//// in one column and a four-column party block in the other; ours surfaces Reference and */}
+                    {/*//// both dates first, in two columns, because that is the order the Swiss statement is read */}
+                    {/*//// in. Same fields, same names: at the merge take upstream's block and re-apply the order. */}
                     <div className='flex flex-col gap-3'>
                         <SelectedTransactionDetails transaction={selectedTransaction} />
                         <DataField name='reference_no' label={_("Reference")} isRequired inputProps={{ autoFocus: false }} />
@@ -492,12 +511,19 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
 
                 <Separator />
 
+                {/*//// Neoffice — a wrapper div was REMOVED here (e582a55): upstream nests the remarks and the */}
+                {/*//// attachments inside an extra flex column, which added a scrollbar inside the modal. The */}
+                {/*//// grid below holds the same two fields. */}
                 <div className="grid grid-cols-2 gap-4">
                     <SmallTextField
                         name='remarks'
                         label={_("Custom Remarks")}
+                        ////// Neoffice — wrapped in _() (e582a55); upstream ships the bare English description.
                         formDescription={_("This will be auto-populated if not set.")}
                     />
+                    {/*//// Neoffice — attachments block rebuilt (e582a55, from bc1a48f): the justificatif dropped */}
+                    {/*//// here is attached to the Payment Entry after it is created. The hand-written form-item div */}
+                    {/*//// replaces upstream's wrapper so the dropzone sits level with the remarks field. */}
                     <div
                         data-slot="form-item"
                         className="flex flex-col gap-2"
@@ -922,10 +948,14 @@ const GetUnpaidInvoicesButton = () => {
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             {partyType && party && <DialogTrigger asChild>
+                {/*//// Neoffice — wrapped in _() (1f2847e); upstream ships the bare English label. */}
                 <Button variant='outline' size='sm' type='button'>{_("Get Unpaid Invoices")}</Button>
             </DialogTrigger>}
+            {/*//// Neoffice — width rewritten (e582a55), same reason as the outer modal above. */}
             <DialogContent className='!max-w-[min(72vw,1000px)] w-[min(72vw,1000px)] sm:!max-w-[min(72vw,1000px)]'>
                 <DialogHeader>
+                    {/*//// Neoffice — wrapped in _() with placeholders (1f2847e). Upstream concatenates English */}
+                    {/*//// fragments around the party name and the amount, which cannot be translated as a sentence. */}
                     <DialogTitle>{_("Select Invoices")}</DialogTitle>
                     <DialogDescription>{_("Unpaid invoices from {0} for {1}.", [partyName ?? '', formatCurrency(amount)])}</DialogDescription>
                 </DialogHeader>
@@ -1118,13 +1148,16 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
         </Table> : null}
         <div className="flex justify-between items-center">
             <div className="flex gap-2">
+                {/*//// Neoffice — wrapped in _() (1f2847e); upstream ships the bare English labels. */}
                 <span className="text-muted-foreground">{_("Invoices")}: <span className="text-foreground font-mono font-medium">{selectedInvoices.length}</span></span> /
                 <span className="text-muted-foreground">{_("Total")}: <span className="text-foreground font-mono font-medium">{formatCurrency(selectedInvoices.reduce((acc, invoice) => acc + invoice.outstanding_amount, 0))}</span></span>
             </div>
             <DialogFooter className="pt-2">
                 <DialogClose asChild>
+                    {/*//// Neoffice — wrapped in _() (1f2847e). */}
                     <Button variant='ghost' disabled={allocateAmountToReferencesLoading}>{_("Cancel")}</Button>
                 </DialogClose>
+                {/*//// Neoffice — wrapped in _() (1f2847e). */}
                 <Button onClick={onSelect} disabled={allocateAmountToReferencesLoading}>{_("Select")}</Button>
             </DialogFooter>
         </div>
@@ -1137,15 +1170,21 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
 const OtherChargesSection = ({ currency }: { currency: string }) => {
 
     const { setTotalAllocatedAmount } = usePaymentEntryCalculations()
+    ////// Neoffice — setValue / watch and the VAT hook pulled in (4aa971b): the deductions table now
+    ////// rewrites its own rows when a VAT line is added or removed. Upstream only reads the form.
     const { getValues, control, setValue, watch } = useFormContext<PaymentEntry>()
     const { calculateVat } = useDeductionsVatCalculation()
 
+    ////// Neoffice — replace added to the field array (4aa971b): inserting a VAT line means
+    ////// rewriting the whole deductions array, not appending to it.
     const { fields, append, remove, replace } = useFieldArray({
         control: control,
         name: 'deductions'
     })
 
     const [selectedRows, setSelectedRows] = useState<number[]>([])
+    ////// Neoffice — added (4aa971b): the VAT call is a round trip to the server, so the header
+    ////// shows a Calculating VAT indicator and the company drives the tax templates.
     const [isCalculating, setIsCalculating] = useState(false)
 
     const company = watch('company')
@@ -1169,11 +1208,16 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
     }, [fields])
 
     const onRemove = useCallback(() => {
+        ////// Neoffice — rewritten (4aa971b). Upstream removes rows one index at a time, which shifts
+        ////// the remaining indexes and detached the VAT line from its base line; filtering and
+        ////// replacing the whole array keeps the pairs together.
         // Filter out selected rows
         const newDeductions = fields.filter((_, index) => !selectedRows.includes(index))
         replace(newDeductions)
         setSelectedRows([])
         setTotalAllocatedAmount()
+    ////// Neoffice — added (4aa971b): removing a VAT line has to put the tax back into its base
+    ////// line, otherwise the deduction total silently dropped by the VAT amount.
     }, [fields, selectedRows, replace, setTotalAllocatedAmount])
 
     const onRemoveVat = useCallback((index: number) => {
@@ -1198,11 +1242,14 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
             setValue(`deductions.${baseIndex}._is_base_for_vat`, false)
         }
 
+        ////// Neoffice — added (4aa971b), tail of the remove-VAT handler above.
         // Remove VAT line
         remove(index)
         setTotalAllocatedAmount()
     }, [fields, setValue, remove, setTotalAllocatedAmount])
 
+    ////// Neoffice — rewritten (c85829f, 4aa971b): upstream just appends an empty row; ours also
+    ////// focuses the Account field of the new row, because that is always the next thing typed.
     const onAdd = () => {
         append({
             account: '',
@@ -1211,6 +1258,8 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
             amount: 0
         } as PaymentEntryDeduction)
 
+        ////// Neoffice — added (c85829f): the row is focused through the DOM because the field
+        ////// components expose no ref. data-deduction-row exists for this.
         // Auto-focus on the Account field of the newly added row
         setTimeout(() => {
             const rows = document.querySelectorAll('[data-deduction-row]')
@@ -1226,6 +1275,9 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
         }, 100)
     }
 
+    ////// Neoffice — added (4aa971b): the whole VAT round trip. When the account or the amount of a
+    ////// deduction changes, the server splits it into base + VAT and the field array is replaced
+    ////// with the result. Nothing like this exists upstream.
     // Trigger VAT calculation when account or amount changes
     const handleVatCalculation = useCallback(async (index: number) => {
         const currentDeductions = getValues('deductions') || []
@@ -1284,8 +1336,10 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
 
     return <div className="flex flex-col gap-2">
         <div className="flex gap-2 items-center">
+            {/*//// Neoffice — wrapped in _() (1f2847e). */}
             <H4 className="text-base">{_("Other Charges / Deductions")}</H4>
             <TotalDeductions currency={currency} />
+            {/*//// Neoffice — added (4aa971b): the VAT split is a server call, so it needs a visible state. */}
             {isCalculating && <span className="text-xs text-muted-foreground">{_("Calculating VAT...")}</span>}
         </div>
         <Table>
@@ -1300,10 +1354,15 @@ const OtherChargesSection = ({ currency }: { currency: string }) => {
                     <TableHead>{_("Cost Center")} <span className="text-destructive">*</span></TableHead>
                     <TableHead>{_("Description")}</TableHead>
                     <TableHead className="text-right">{_("Amount")} <span className="text-destructive">*</span></TableHead>
+                    {/*//// Neoffice — added column (4aa971b): holds the VAT badge and the remove-VAT button. */}
                     <TableHead className="w-14"></TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
+                {/*//// Neoffice — the whole row renderer below is ours (4aa971b). Upstream draws one plain row */}
+                {/*//// per deduction; ours marks the base line and its generated VAT line, greys the VAT row's */}
+                {/*//// account and amount (they come from the tax template, not from the user), and offers to */}
+                {/*//// fold the VAT back into the base. At the merge keep both sides. */}
                 {fields.map((field, index) => {
                     const isVatLine = field._is_vat_line
                     const isBaseForVat = field._is_base_for_vat

@@ -6,24 +6,35 @@ import { UnreconciledTransaction, useGetRuleForTransaction, useRefreshUnreconcil
 import { useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form"
 import { JournalEntry } from "@/types/Accounts/JournalEntry"
 import { getCompanyCostCenter, getCompanyCurrency } from "@/lib/company"
+////// Neoffice — useFrappeFileUpload added (bc1a48f). This modal is heavily ours: the Swiss VAT
+////// preview step (10998d9, 9f68df2, 71db75b) and the justificatif attachment (bc1a48f,
+////// 16d00de). Upstream posts the entry straight away and attaches nothing.
 import { FrappeConfig, FrappeContext, useFrappeFileUpload, useFrappePostCall } from "frappe-react-sdk"
 import { toast } from "sonner"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Button } from "@/components/ui/button"
 import SelectedTransactionDetails from "./SelectedTransactionDetails"
 import { AccountFormField, CurrencyFormField, DataField, DateField, LinkFormField, PartyTypeFormField, SmallTextField } from "@/components/ui/form-elements"
+////// Neoffice — added (16d00de): our own drag-and-drop zone is built from a hidden Input plus
+////// a Label, instead of the shared FileDropzone upstream uses (removed below).
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Form } from "@/components/ui/form"
+////// Neoffice — useRef / useState / DragEvent added (16d00de) for that drop zone.
 import { useCallback, useContext, useMemo, useRef, useState, DragEvent } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+////// Neoffice — Paperclip / X / FileIcon / Upload added (16d00de), icons of the drop zone.
 import { ArrowDownRight, ArrowUpRight, Plus, Trash2, Paperclip, X, FileIcon, Upload } from "lucide-react"
 import { flt, formatCurrency } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import SelectedTransactionsTable from "./SelectedTransactionsTable"
 import { JournalEntryAccount } from "@/types/Accounts/JournalEntryAccount"
+////// Neoffice — upstream's FileUploadBanner and FileDropzone imports were REMOVED here
+////// (16d00de, 287ec03). The shared dropzone is multi-file and posts on drop; a bank entry
+////// takes exactly one justificatif, uploaded only once the Journal Entry exists and has a
+////// name to attach it to. Label moved up with the other UI imports.
 import { BankTransaction } from "@/types/Accounts/BankTransaction"
 
 const BankEntryModal = () => {
@@ -32,6 +43,8 @@ const BankEntryModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {/*//// Neoffice — width rewritten (e582a55), same clamp as the other modals: upstream's width */}
+            {/*//// overflows the desk chrome the SPA is embedded in. */}
             <DialogContent className='!max-w-[min(92vw,1300px)] w-[min(92vw,1300px)] sm:!max-w-[min(92vw,1300px)]'>
                 <DialogHeader>
                     <DialogTitle>{_("Bank Entry")}</DialogTitle>
@@ -53,6 +66,7 @@ const RecordBankEntryModalContent = () => {
 
     if (!selectedTransaction || !selectedBankAccount) {
         return <div className='p-4'>
+            {/*//// Neoffice — wrapped in _() (1f2847e); upstream ships the bare English string. */}
             <span className='text-center'>{_("No transaction selected")}</span>
         </div>
     }
@@ -151,6 +165,9 @@ const BulkBankEntryForm = ({ selectedTransactions }: { selectedTransactions: Unr
 
 
 interface BankEntryFormData extends Pick<JournalEntry, 'voucher_type' | 'cheque_date' | 'posting_date' | 'cheque_no' | 'user_remark'> {
+    ////// Neoffice — two fields added (10998d9): they are posted to create_bank_entry_and_reconcile
+    ////// and preview_bank_entry_with_vat, and decide whether the amounts are read as TTC and
+    ////// whether the VAT split runs at all. Upstream's form has no VAT.
     entries: JournalEntry['accounts'],
     is_vat_excluded?: boolean,
     disable_vat_calculation?: boolean
@@ -165,6 +182,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
 
     const setIsOpen = useSetAtom(bankRecRecordJournalEntryModalAtom)
 
+    ////// Neoffice — added state (10998d9, 9f68df2, 16d00de). Upstream submits the form directly;
+    ////// ours first renders a server-computed preview of the Journal Entry with its VAT lines,
+    ////// keeps a per-modal VAT override, and holds the selected file until the entry exists.
     const [previewData, setPreviewData] = useState<any>(null)
     const [vatDisabled, setVatDisabled] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -175,6 +195,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
 
     const onClose = () => {
         setIsOpen(false)
+        ////// Neoffice — added (10998d9, 16d00de). Everything down to the submit handler is ours: the
+        ////// close reset (a leftover preview reopened on the next transaction) and the drag-and-drop
+        ////// handlers of the attachment zone.
         setPreviewData(null)
         setVatDisabled(false)
         setSelectedFile(null)
@@ -355,15 +378,21 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
 
     const onReconcile = useRefreshUnreconciledTransactions()
 
+    ////// Neoffice — added call (10998d9): preview_bank_entry_with_vat is our endpoint. It computes
+    ////// the VAT split server-side and returns the Journal Entry lines WITHOUT saving anything.
     const { call: previewBankEntry, loading: previewLoading, error: previewError } = useFrappePostCall('mint.apis.bank_reconciliation.preview_bank_entry_with_vat')
     const { call: createBankEntry, loading: submitLoading, error: submitError } = useFrappePostCall('mint.apis.bank_reconciliation.create_bank_entry_and_reconcile')
 
     const setBankRecUnreconcileModalAtom = useSetAtom(bankRecUnreconcileModalAtom)
     const addToActionLog = useUpdateActionLog()
 
+    ////// Neoffice — loading and error now cover the three calls (preview, submit, upload).
     const loading = previewLoading || submitLoading || uploadLoading
     const error = previewError || submitError
 
+    ////// Neoffice — added (10998d9, 71db75b). Upstream's submit creates the entry; ours renders the
+    ////// preview first. The override argument exists because the VAT toggle has to re-preview with
+    ////// the new value immediately, before React has committed the state.
     const onPreview = (data: BankEntryFormData, overrideVatDisabled?: boolean) => {
         const vatDisabledValue = overrideVatDisabled !== undefined ? overrideVatDisabled : vatDisabled
         previewBankEntry({
@@ -382,9 +411,11 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
         })
     }
 
+    ////// Neoffice — async (bc1a48f): the file upload after creation has to be awaited.
     const onConfirmSubmit = async () => {
         const data = form.getValues()
 
+        ////// Neoffice — wrapped in try/catch and the two VAT flags added (10998d9, bc1a48f).
         try {
             const result = await createBankEntry({
                 bank_transaction_name: selectedTransaction.name,
@@ -393,6 +424,10 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                 disable_vat_calculation: vatDisabled  // Use state to disable VAT calculation
             })
 
+            ////// Neoffice — defensive (bc1a48f). create_bank_entry_and_reconcile now returns the Journal
+            ////// Entry NAME plus the bank transaction (we need the name to attach the file), where upstream
+            ////// returned the whole document. Both shapes are accepted so an instance running the older
+            ////// server does not break.
             const message = result?.message || result
 
             // Log the action for undo support
@@ -405,6 +440,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                         bankTransaction: message.transaction,
                         voucher: {
                             reference_doctype: "Journal Entry",
+                            ////// Neoffice — same two shapes handled in the action log entry (bc1a48f).
                             reference_name: message.journal_entry?.name || message.journal_entry,
                             reference_no: message.journal_entry?.cheque_no,
                             reference_date: message.journal_entry?.cheque_date,
@@ -414,6 +450,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                     }
                 ]
             })
+////// Neoffice — added (bc1a48f). The justificatif is uploaded and attached only once the
+////// Journal Entry exists: an upload keyed on a document that was never created leaves an
+////// orphan File on the site.
 
             // Get journal entry name from response
             const journalEntryName = message.journal_entry?.name || message.journal_entry
@@ -446,9 +485,13 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                     backgroundColor: "rgb(0, 138, 46)"
                 }
             })
+////// Neoffice — upstream's FileDropzone upload block was REMOVED here (16d00de, 287ec03): it
+////// looped over a files array and drove an isUploading flag this component no longer has.
+////// Replaced by the single-file upload just above.
 
             onReconcile(selectedTransaction)
             onClose()
+        ////// Neoffice — catch added around the whole create-and-attach sequence (bc1a48f).
         } catch (err) {
             console.error("Error creating bank entry:", err)
         }
@@ -458,6 +501,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
         setPreviewData(null)
     }
 
+    ////// Neoffice — added (9f68df2, 71db75b). Toggling VAT off re-runs the preview at once with the
+    ////// new value: an accountant flips it to check the effect, and a stale preview is worse than
+    ////// no preview. Upstream has no VAT and no toggle.
     const handleVatToggle = () => {
         const newVatDisabled = !vatDisabled
         setVatDisabled(newVatDisabled)
@@ -478,6 +524,8 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
     }
 
     return <Form {...form}>
+        {/*//// Neoffice — the form now submits to onPreview, not to the create call (10998d9). The entry */}
+        {/*//// is only written from the preview screen. */}
         <form onSubmit={form.handleSubmit((data) => onPreview(data))}>
             <div className='flex flex-col gap-4'>
                 {error && <ErrorBanner error={error} />}
@@ -518,6 +566,9 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                             name='user_remark'
                             label={_("Remarks")}
                         />
+                        {/*//// Neoffice — attachment zone rewritten (16d00de). Upstream drops a shared FileDropzone in; */}
+                        {/*//// ours is a hidden file input plus a drag target, so the file is held in state and uploaded */}
+                        {/*//// after the Journal Entry is created (see onConfirmSubmit above). */}
                         <div className='flex flex-col gap-2'>
                             <Label>{_("Attachment")}</Label>
                             <Input
@@ -586,6 +637,7 @@ const BankEntryForm = ({ selectedTransaction }: { selectedTransaction: Unreconci
                     <DialogClose asChild>
                         <Button variant={'outline'} disabled={loading}>{_("Cancel")}</Button>
                     </DialogClose>
+                    {/*//// Neoffice — the primary action is now Preview, not Submit (10998d9). */}
                     <Button type='submit' disabled={loading}>
                         {loading ? _("Loading...") : _("Preview")}
                     </Button>
@@ -737,15 +789,21 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
 
 
     return <div className="flex flex-col gap-2">
+        {/*//// Neoffice — table-fixed with a minimum width (5ba4a3d, 37d4ce0). With upstream's auto */}
+        {/*//// layout the Debit and Credit columns collapsed to a few pixels as soon as an account name */}
+        {/*//// was long, and the modal grew a horizontal scrollbar. */}
         <Table className="table-fixed min-w-[900px]">
             <TableHeader>
                 <TableRow>
+                    {/*//// Neoffice — explicit checkbox column width (37d4ce0), part of the fixed layout above. */}
                     <TableHead className="w-8"><Checkbox
                         disabled={fields.length === 0}
                         // Make this accessible to screen readers
                         aria-label={_("Select all")}
                         checked={selectedRows.length > 0 && selectedRows.length === fields.length}
                         onCheckedChange={onSelectAll} /></TableHead>
+                    {/*//// Neoffice — explicit column widths (5ba4a3d, 37d4ce0): they add up to 100% so the amounts */}
+                    {/*//// keep their room whatever the account label is. */}
                     <TableHead className="w-[18%]">{_("Party")}</TableHead>
                     <TableHead className="w-[22%]">{_("Account")}</TableHead>
                     <TableHead className="w-[14%]">{_("Cost Center")}</TableHead>
@@ -797,6 +855,8 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                         onAccountChange(event.target.value, index)
                                     }
                                 }}
+                                ////// Neoffice — w-full (37d4ce0): inside a fixed-width column the control must fill its cell,
+                                ////// otherwise it kept its intrinsic width and overflowed.
                                 buttonClassName="w-full"
                                 readOnly={index === 0}
                                 isRequired
@@ -809,6 +869,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 name={`entries.${index}.cost_center`}
                                 label={_("Cost Center")}
                                 filters={[["company", "=", company], ["is_group", "=", 0], ["disabled", "=", 0]]}
+                                ////// Neoffice — w-full (37d4ce0), same reason as the account field above.
                                 buttonClassName="w-full"
                                 readOnly={index === 0}
                                 hideLabel
@@ -821,6 +882,7 @@ const Entries = ({ company, isWithdrawal, currency }: { company: string, isWithd
                                 readOnly={index === 0}
                                 inputProps={{
                                     placeholder: _("e.g. Bank Charges"),
+                                    ////// Neoffice — w-full (37d4ce0), same reason.
                                     className: 'w-full',
                                     readOnly: index === 0
                                 }}
@@ -896,6 +958,7 @@ const PartyField = ({ index, onChange, readOnly }: { index: number, onChange: (v
             isRequired
             inputProps={{
                 disabled: true,
+                ////// Neoffice — w-full (37d4ce0), same reason, disabled party field.
                 className: 'rounded-l-none border-l-0 w-full'
             }}
             hideLabel
@@ -912,6 +975,7 @@ const PartyField = ({ index, onChange, readOnly }: { index: number, onChange: (v
         }}
         hideLabel
         readOnly={readOnly}
+        ////// Neoffice — w-full (37d4ce0), same reason, editable party field.
         buttonClassName="rounded-l-none border-l-0 w-full"
         doctype={party_type}
 
@@ -966,6 +1030,10 @@ const Summary = ({ currency, addRow }: { currency: string, addRow: () => void })
 
 }
 
+////// Neoffice — added: everything from here to the end of the file is ours (10998d9, 9f68df2,
+////// 71db75b). JournalEntryPreview renders what the server computed BEFORE anything is saved:
+////// the base lines, the VAT lines it extracted, the totals and the balance check, plus the
+////// toggle that turns the split off. Upstream never shows the entry before creating it.
 interface JournalEntryPreviewProps {
     preview: {
         voucher_type: string
