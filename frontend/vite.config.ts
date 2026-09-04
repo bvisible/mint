@@ -21,6 +21,10 @@ export default defineConfig({
 		outDir: '../mint/public/mint',
 		emptyOutDir: true,
 		target: 'es2015',
+		//// Neoffice — added (upstream has no rollupOptions). We build the SPA in GitHub
+		//// Actions (build-frontend.yml), outside a frappe-bench, where
+		//// ../../../sites/common_site_config.json and ../../../frappe/ do not exist; without
+		//// these externals rollup fails to resolve them and the build dies. Harmless in a bench.
 		rollupOptions: {
 			// Ignore Frappe bench-specific imports that don't exist in standalone builds
 			external: [

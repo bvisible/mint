@@ -1,3 +1,7 @@
+//// Neoffice — rewritten (92a1abf). Upstream does a bare module-scope
+//// require('../../../sites/common_site_config.json'); outside a bench (our CI build)
+//// that file is absent, the require throws and the whole vite build dies. Same port,
+//// same behaviour inside a bench — only guarded. Drop if upstream ever guards it.
 // Dev-only: read webserver_port from the bench's common_site_config.json
 // when running in a frappe-bench checkout. In production builds (CI) the
 // file is absent, so fall back to the default webserver port.

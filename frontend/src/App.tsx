@@ -1,9 +1,16 @@
 import { useEffect } from 'react'
+//// Neoffice — NOT ours: this import and the BankStatementImporter one below are
+//// upstream v1.5.0, hand-ported with the CSV importer (89e7929). Take upstream's at
+//// the merge. The imports after Toaster (toast, NeoCockpit, FrappeLayout, NoraLearn)
+//// ARE ours: /mint runs inside the Neoffice cockpit and carries the Nora Learn overlay.
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { FrappeProvider } from 'frappe-react-sdk'
 import BankReconciliation from './pages/BankReconciliation'
 import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
+//// Neoffice — added (2c514a4, 44c8b52). NeoCockpit is the shared Neoffice shell;
+//// FrappeLayout is the same shell fed by the mini-boot when embedded in Frappe;
+//// NoraLearnProvider is the in-app tutorial/Ask-NORA overlay. None exist upstream.
 import { toast } from 'sonner'
 import { NeoCockpit } from '@neoffice/frappe-sidebar-react'
 import { FrappeLayout } from './components/layout'
@@ -103,6 +110,9 @@ function App() {
 			}}
 			socketPort={import.meta.env.VITE_SOCKET_PORT}
 			siteName={window.frappe?.boot?.sitename ?? import.meta.env.VITE_SITE_NAME}>
+			{/* //// Neoffice — replaced upstream's bare <BankReconciliation /> render. Routes */}
+			{/* //// now go through the cockpit shell (Shell above) and the Nora Learn overlay; the */}
+			{/* //// Toaster loses theme='light' because the cockpit drives light/dark itself. */}
 			<NoraLearnProvider config={{
 				appName: 'mint',
 				navigate: (url) => { window.location.href = url },

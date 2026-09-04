@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#//// Neoffice — added file (no upstream equivalent): one-shot generator that turned
+#//// mint's main.pot into the French mint/locale/fr.po we ship (upstream ships EN + DE
+#//// only). Not imported by the app; kept so the catalogue can be regenerated.
 """
 Script to generate French translations for Mint application.
 Reads main.pot and creates fr.po with French translations.

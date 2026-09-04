@@ -141,6 +141,9 @@
   background: rgb(156 163 175);
 }
 
+/* //// Neoffice — added (e38d1a6). Upstream never runs Mint inside a frame that */
+/* redefines the shadcn tokens; ours does. Keep until the cockpit stops overriding */
+/* --background/--radius on its subtree. */
 /* NeoCockpit tab-bar fix -----------------------------------------------
    Inside the NeoCockpit frame an ancestor redefines --background/--radius, so
    shadcn's bg-background / rounded-md collapse to transparent / 0 on the active

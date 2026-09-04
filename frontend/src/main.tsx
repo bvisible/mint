@@ -4,6 +4,9 @@ import './index.css'
 import App from './App.tsx'
 import './lib/namespace'
 
+//// Neoffice — added (7e7e34c). Upstream calls frappe.model.sync(frappe.boot.docs)
+//// straight; our curated mini-boot (mint/api/boot.py) can legitimately omit `docs`
+//// on a fresh install, and the raw call threw before React ever mounted — white page.
 // Defensive sync — frappe.model.sync(frappe.boot.docs) throws when docs is
 // missing (the curated mini-boot might omit it on a fresh install before the
 // session has loaded meta). React still needs to mount in that case.
@@ -27,6 +30,8 @@ if (import.meta.env.DEV) {
     .then(response => response.json())
     .then((values) => {
       const v = JSON.parse(values.message)
+            //// Neoffice — bracket notation on _messages + safeSyncDocs instead of the raw
+            //// sync (16eec35): the shell needs the catalogue, and boot.docs may be absent.
       if (!window.frappe) window.frappe = {}
       // @ts-expect-error - frappe will be available
       frappe.boot = v
@@ -40,6 +45,7 @@ if (import.meta.env.DEV) {
       )
     })
 } else {
+    //// Neoffice — was frappe.model.sync(frappe.boot.docs); guarded, same reason.
   safeSyncDocs()
   createRoot(document.getElementById('root') as HTMLElement).render(
     <StrictMode>

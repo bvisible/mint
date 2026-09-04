@@ -1,3 +1,6 @@
+<!-- //// Neoffice — added file (no upstream equivalent): repo guide for Claude Code on -->
+<!-- this fork. Deliberately NOT shipped to instances (see .gitignore, commit 690eed9); -->
+<!-- it documents the commit-the-build pipeline this branch runs on. -->
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
