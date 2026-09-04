@@ -1,3 +1,5 @@
+#//// Neoffice — NOT ours: upstream v1.5.0 child-table controller, carried by hand (89e7929).
+#//// Byte-identical to upstream/develop. Take upstream's at the merge, drop this marker.
 # Copyright (c) 2026, The Commit Company (Algocode Technologies Pvt. Ltd.) and contributors
 # For license information, please see license.txt
 

@@ -1,3 +1,7 @@
+#//// Neoffice — NOT ours: this whole file is upstream v1.5.0, carried by hand (89e7929,
+#//// then the v1.5.2 fixes in 2bdac9c) because we had not merged upstream's branch. It is
+#//// identical to upstream/develop except for trailing spaces an editor stripped in
+#//// get_column_mapping. At the next merge take upstream's file and drop this marker.
 import frappe
 import re
 from frappe.utils.csvutils import read_csv_content

@@ -1,3 +1,8 @@
+#//// Neoffice — added file (no upstream equivalent): Swiss VAT split for bank entries
+#//// (10998d9, 4aa971b). Upstream books the amount the user typed as one line. Our
+#//// accountants type the TTC amount off the statement, so every line whose account carries a
+#//// tax template is split into a base line plus a VAT line, with ROUND_HALF_UP to the
+#//// centime, and companies on the flat-rate method are skipped entirely.
 import frappe
 from typing import Optional, Dict, Any
 from decimal import Decimal, ROUND_HALF_UP

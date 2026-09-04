@@ -55,6 +55,9 @@ add_to_apps_screen = [
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+#//// Neoffice — un-commented and filled (9885988). Upstream ships no list JS; our Mint
+#//// Bank Statement Import list view carries the bank-file import action, which lives in
+#//// mint_bank_statement_import_list.js (a file we added, no upstream equivalent).
 doctype_list_js = {
 	"Mint Bank Statement Import": "mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js"
 }

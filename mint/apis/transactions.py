@@ -12,6 +12,10 @@ def get_bank_transactions(bank_account, from_date=None, to_date=None, all_transa
         # differ between journal entry lines (which can cause get_allocated_amount()
         # to incorrectly calculate allocations in ERPNext's subtract_allocations function)
         filters.append(["unallocated_amount", ">", 0.0])
+        #//// Neoffice — added (4748808). Upstream keeps only unallocated_amount > 0. ERPNext's
+        #//// subtract_allocations mis-counts the allocation when the Journal Entry lines carry
+        #//// different accounting dimensions, so a fully reconciled transaction kept a residual
+        #//// unallocated amount and reappeared in the list. status is the second lock.
         filters.append(["status", "=", "Unreconciled"])
     if to_date:
         filters.append(["date", "<=", to_date])
