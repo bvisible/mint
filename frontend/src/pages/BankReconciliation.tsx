@@ -11,6 +11,8 @@ import MatchAndReconcile from "@/components/features/BankReconciliation/MatchAnd
 import RuleConfigureButton from "@/components/features/BankReconciliation/Rules/RuleConfigureButton"
 import Settings from "@/components/features/Settings/Settings"
 import ActionLog from "@/components/features/ActionLog/ActionLog"
+////// Neoffice — added (e38d1a6). FavoriteStar is ours: it pins /mint in the Neoffice cockpit's
+////// favourites, a cockpit feature upstream does not have.
 import FavoriteStar from "@/components/features/BankReconciliation/FavoriteStar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -37,6 +39,10 @@ const BankReconciliation = () => {
         <div className="p-4 flex flex-col gap-4">
             <div ref={ref} className="flex flex-col gap-4">
                 <div className="flex justify-between">
+                    {/*//// Neoffice — rewritten header (031d31d, a822171, 1f2847e, e38d1a6). Upstream shows its own */}
+                    {/*//// Mint wordmark; embedded in the Neoffice desk the page carries the Neoffice logo linking */}
+                    {/*//// back to /app/home, then the page title and the favourite star. Cosmetic but ours: */}
+                    {/*//// at the merge keep both sides and re-apply the logo block. */}
                     <H1 className="text-sm font-medium flex items-center gap-2 whitespace-nowrap shrink-0">
                         <a href="/app/home">
                             <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-7" />

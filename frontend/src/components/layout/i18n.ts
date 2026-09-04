@@ -1,3 +1,7 @@
+////// Neoffice — added file (no upstream equivalent): typed accessor for the window shim that
+////// frontend/index.html installs when the desk bundle is absent (16eec35). WARNING: nothing
+////// imports t() today — components use lib/translate instead. Its docstring is also in
+////// French, unlike the rest of the codebase. Decide at the merge: wire it up or delete it.
 /**
  * Helper d'accès au shim `window.__` défini dans index.html.
  *

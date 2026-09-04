@@ -1,3 +1,6 @@
+////// Neoffice — added file (no upstream equivalent): the shell /mint renders inside when it is
+////// served from the Frappe desk (711dfb1, then 2c514a4 / 166aa08 which swapped the local copy
+////// for the shared NeoCockpit package). Upstream's SPA is standalone and has no chrome.
 /**
  * FrappeLayout — Frappe-embedded shell (/mint/*).
  *

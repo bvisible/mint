@@ -1,3 +1,5 @@
+////// Neoffice — NOT ours: upstream v1.5.0 generated type, hand-carried (89e7929).
+////// Byte-identical to upstream/develop today; take upstream's at the merge.
 
 export interface MintBankStatementImportLog{
 	name: string

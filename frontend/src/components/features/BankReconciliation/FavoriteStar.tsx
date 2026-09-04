@@ -1,3 +1,5 @@
+////// Neoffice — added file (no upstream equivalent): pins /mint in the Neoffice cockpit's
+////// favourites (e38d1a6), through the desk's own favourite API. Upstream has no cockpit.
 import { useFrappeGetCall, useFrappePostCall } from "frappe-react-sdk"
 import { Star } from "lucide-react"
 import _ from "@/lib/translate"

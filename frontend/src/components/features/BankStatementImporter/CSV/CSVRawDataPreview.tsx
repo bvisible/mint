@@ -1,3 +1,6 @@
+////// Neoffice — upstream v1.5.0 component, hand-carried (89e7929). Ours differs from
+////// upstream/develop by ONE line only: the "Header Row" tooltip is wrapped in _() so it can
+////// be translated. At the merge take upstream's file and re-apply that single wrap.
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { ArrowDownRightIcon, ArrowUpRightIcon, BanknoteIcon, CalendarIcon, DollarSignIcon, FileTextIcon, ListIcon, ReceiptIcon } from "lucide-react"

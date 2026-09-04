@@ -1,3 +1,7 @@
+////// Neoffice — added file (no upstream equivalent): the first hand-written copy of the Frappe
+////// desk sidebar for the embedded shell (ffe2aeb). WARNING, DEAD CODE: 2c514a4 replaced it
+////// with the shared NeoCockpit component and says it deleted this file, but it is still here
+////// and nothing imports it. Delete it at the merge unless someone claims it.
 import { useState, useEffect, useMemo } from 'react'
 import {
     Briefcase,

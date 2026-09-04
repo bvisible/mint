@@ -105,6 +105,9 @@ const BankTransactionUnreconcileModalContent = () => {
                 </TableBody>
             </Table>
             <div className="py-4">
+                {/*//// Neoffice — sentence rebuilt with a _() placeholder (1f2847e). Upstream concatenates two */}
+                {/*//// English fragments around a bold word, which cannot be translated as one sentence and */}
+                {/*//// produced word-salad French. Same rendered markup. */}
                 {vouchersWhichWillBeCancelled && vouchersWhichWillBeCancelled?.length > 0 && <span dangerouslySetInnerHTML={{ __html: _("The following documents will be {0}:", [`<strong>${_("cancelled")}</strong>`]) }} />}
                 {vouchersWhichWillBeCancelled && vouchersWhichWillBeCancelled?.length > 0 && <ol className="ml-6 list-disc [&>li]:mt-2">
                     {vouchersWhichWillBeCancelled?.map((voucher) => {

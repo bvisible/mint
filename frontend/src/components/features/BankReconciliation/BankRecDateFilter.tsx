@@ -146,6 +146,8 @@ const BankRecDateFilter = () => {
             <PopoverContent className="w-84 p-0" align='start'>
                 <Command>
 
+                    {/*//// Neoffice — placeholder wrapped in _() (1f2847e); upstream ships the English literal, so */}
+                    {/*//// it stayed English in a French desk. */}
                     <CommandInput placeholder={_("e.g. Last 3 weeks")} onValueChange={setValue} value={value} />
                     <CommandList className='max-h-fit'>
                         <CommandEmpty className='text-left p-2 hover:bg-muted'>

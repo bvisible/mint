@@ -40,6 +40,9 @@ const SelectedTransactionDetails = ({ transaction, showAccount = false, account 
                             <div className='flex flex-col'> {bank?.logo ? <img
                                 src={`/assets/mint/mint/${bank.logo}`}
                                 alt={bank.bank}
+                                ////// Neoffice — bank logo constrained (e582a55). Upstream lets the <img> size itself; the
+                                ////// Swiss logos we added (PostFinance, Raiffeisen, ZKB) are much wider than the Indian ones
+                                ////// and blew the detail card open. Box only, no behaviour change.
                                 className="object-left object-contain"
                                 style={{ maxWidth: '96px', maxHeight: '28px', width: 'auto', height: 'auto' }}
                             /> :

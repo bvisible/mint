@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { FrappeProvider } from 'frappe-react-sdk'
 import BankReconciliation from './pages/BankReconciliation'
+////// Neoffice — NOT ours: upstream v1.5.0 route, hand-ported (89e7929). See the note above.
 import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
 //// Neoffice — added (2c514a4, 44c8b52). NeoCockpit is the shared Neoffice shell;

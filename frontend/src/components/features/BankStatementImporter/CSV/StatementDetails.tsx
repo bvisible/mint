@@ -1,3 +1,6 @@
+////// Neoffice — upstream v1.5.0 component, hand-carried (89e7929, then the v1.5.2 date-format
+////// fixes in 2bdac9c). Ours differs from upstream/develop by ONE line only: the "GL Account"
+////// tooltip is wrapped in _(). At the merge take upstream's file and re-apply that wrap.
 import _ from '@/lib/translate'
 import { GetStatementDetailsResponse } from '../import_utils'
 import { flt, formatCurrency } from '@/lib/numbers'

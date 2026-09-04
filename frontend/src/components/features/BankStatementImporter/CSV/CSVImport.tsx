@@ -1,3 +1,5 @@
+////// Neoffice — NOT ours: upstream v1.5.0, hand-carried (89e7929) because we had not merged
+////// upstream's branch. Byte-identical to upstream/develop today; take upstream's at the merge.
 import { useGetStatementDetails } from '../import_utils'
 import CSVRawDataPreview from './CSVRawDataPreview'
 import StatementDetails from './StatementDetails'
