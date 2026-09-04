@@ -1,3 +1,7 @@
+////// Neoffice — added file (no upstream equivalent): a CHF glyph meant to replace the dollar
+////// sign in the transaction list for the Swiss market (58eeb8c). WARNING, DEAD CODE: nothing
+////// imports it any more — the v1.5.0 hand-port (89e7929) restored upstream's
+////// BankTransactionList and the icon was lost with it. Decide at the merge: re-wire or drop.
 import { SVGProps } from "react"
 
 export const ChfIcon = (props: SVGProps<SVGSVGElement>) => {
