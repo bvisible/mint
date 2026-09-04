@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--//// Neoffice — added file (no upstream equivalent): Banque Cantonale Vaudoise logo (dd20206). -->
-<!--//// Upstream ships Indian, Australian and US bank logos only. Referenced by keyword from -->
-<!--//// frontend/src/components/features/BankReconciliation/logos.ts and copied into the built -->
-<!--//// SPA under mint/public/mint/assets/bank-logos/ by the vite build. -->
+<!-- //// Neoffice — added file (no upstream equivalent): Banque Cantonale Vaudoise logo (dd20206). -->
+<!-- //// Upstream ships Indian, Australian and US bank logos only. Referenced by keyword from -->
+<!-- //// frontend/src/components/features/BankReconciliation/logos.ts and copied into the built -->
+<!-- //// SPA under mint/public/mint/assets/bank-logos/ by the vite build. -->
 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 283.46 80.42">
   <defs>
     <style>

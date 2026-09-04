@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--//// Neoffice — added file (no upstream equivalent): PostFinance logo (dd20206). -->
-<!--//// Upstream ships Indian, Australian and US bank logos only. Referenced by keyword from -->
-<!--//// frontend/src/components/features/BankReconciliation/logos.ts and copied into the built -->
-<!--//// SPA under mint/public/mint/assets/bank-logos/ by the vite build. -->
+<!-- //// Neoffice — added file (no upstream equivalent): PostFinance logo (dd20206). -->
+<!-- //// Upstream ships Indian, Australian and US bank logos only. Referenced by keyword from -->
+<!-- //// frontend/src/components/features/BankReconciliation/logos.ts and copied into the built -->
+<!-- //// SPA under mint/public/mint/assets/bank-logos/ by the vite build. -->
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
