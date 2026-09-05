@@ -10,9 +10,15 @@ Run with: python mint/apis/test_vat_calculations_standalone.py
 
 from decimal import Decimal, ROUND_HALF_UP
 
+# //// Neoffice — imports the real functions instead of duplicating them (13577b4 "chore: the residues of
+# //// the marking pass, in one lot"): the copies below were identical to vat_utils.py, docstrings aside,
+# //// so they could never catch a regression made there.
 # The functions under test come from the module itself: a copy would prove nothing
 # (tracker #229 - the three copies were identical to vat_utils, docstrings aside).
 from mint.apis.vat_utils import calculate_vat_amount, excluding_vat_price, to_decimal
+# //// Neoffice — removed the to_decimal/excluding_vat_price/calculate_vat_amount copies that used to
+# //// follow this comment (13577b4 "chore: the residues of the marking pass, in one lot"): replaced by
+# //// the import above.
 
 
 # Copy of utility functions for standalone testing

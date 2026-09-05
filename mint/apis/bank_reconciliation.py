@@ -522,6 +522,7 @@ def calculate_deductions_with_vat(
     is_vat_excluded: bool = False,
     disable_vat_calculation: bool = False
 ) -> dict:
+    # //// Neoffice — RULE #00: French docstring made English (13577b4 "chore: the residues of the marking pass, in one lot").
     """
     Compute the deductions, extracting the VAT automatically.
 

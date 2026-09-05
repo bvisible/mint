@@ -746,6 +746,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
     return <div className="relative space-y-2">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Separator className="flex-1" />
+            {/* //// Neoffice — this "or" now goes through _() like the first one above (13577b4 "chore: the residues of the marking pass, in one lot"). */}
             <span>{_("or")}</span>
             <Separator className="flex-1" />
         </div>
