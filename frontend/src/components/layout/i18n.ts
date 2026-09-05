@@ -3,7 +3,7 @@
 //// imports t() today — components use lib/translate instead. Its docstring is also in
 //// French, unlike the rest of the codebase. Decide at the merge: wire it up or delete it.
 /**
- * Helper d'accès au shim `window.__` défini dans index.html.
+ * Access helper for the `window.__` shim defined in index.html.
  *
  * Le shim fait : lookup dans `frappe._messages`, fallback sur la string source.
  * Supporte les placeholders positionnels `{0}` et le pattern `Source|Context`.

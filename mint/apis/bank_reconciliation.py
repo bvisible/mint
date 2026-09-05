@@ -523,7 +523,7 @@ def calculate_deductions_with_vat(
     disable_vat_calculation: bool = False
 ) -> dict:
     """
-    Calcule les déductions avec extraction TVA automatique.
+    Compute the deductions, extracting the VAT automatically.
 
     Pour chaque déduction:
     - Si compte a taxable_account: split en HT + ligne TVA

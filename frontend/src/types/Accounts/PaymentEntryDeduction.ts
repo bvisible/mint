@@ -25,7 +25,7 @@ export interface PaymentEntryDeduction{
 //// from. Never persisted. Upstream's type ends at description.
 //// (Defect: the comment on the next line is in French, unlike the rest of the codebase.)
 
-	// Marqueurs TVA (non persistés en DB - UI only)
+	// VAT markers (not persisted in the DB - UI only)
 	/** Indicates this is an auto-generated VAT line */
 	_is_vat_line?: boolean
 	/** Indicates this deduction has VAT extracted */

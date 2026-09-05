@@ -45,7 +45,7 @@ import FileUploadBanner from "@/components/common/FileUploadBanner"
 //// splits a TTC deduction into a base line plus a VAT line. Upstream posts the amount as
 //// typed and knows nothing about VAT.
 //// (Defect: the comment on the next line is in French, unlike the rest of the codebase.)
-// Hook pour calcul TVA sur les déductions
+// Hook computing the VAT on the deductions
 const useDeductionsVatCalculation = () => {
     const { call } = useFrappePostCall<{
         message: {

@@ -1,7 +1,7 @@
 # //// Neoffice — the module docstring below is ours (711dfb1); upstream's file starts at
 # //// `import frappe`. It describes the context keys the Jinja template needs to render /mint
 # //// inside the native Frappe chrome. (Defect: it is written in French, unlike the rest.)
-"""Controller Jinja pour la page /mint (et toutes ses sous-routes).
+"""Jinja controller for the /mint page (and all its sub-routes).
 
 On peuple le contexte avec :
   - boot               → window.frappe.boot pour FrappeSidebar/Navbar + frappe-react-sdk

@@ -746,7 +746,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
     return <div className="relative space-y-2">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Separator className="flex-1" />
-            <span>or</span>
+            <span>{_("or")}</span>
             <Separator className="flex-1" />
         </div>
         {/* //// Neoffice — NOT ours: upstream v1.5.0 empty state for the voucher list (89e7929). */}

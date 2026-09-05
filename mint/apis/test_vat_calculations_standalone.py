@@ -10,41 +10,12 @@ Run with: python mint/apis/test_vat_calculations_standalone.py
 
 from decimal import Decimal, ROUND_HALF_UP
 
+# The functions under test come from the module itself: a copy would prove nothing
+# (tracker #229 - the three copies were identical to vat_utils, docstrings aside).
+from mint.apis.vat_utils import calculate_vat_amount, excluding_vat_price, to_decimal
+
 
 # Copy of utility functions for standalone testing
-def to_decimal(value: float, precision: int = 2) -> float:
-    """Round a number to the specified precision"""
-    if value is None or value == 0:
-        return 0.0
-    decimal_value = Decimal(str(value))
-    quantize_pattern = Decimal('0.1') ** precision
-    rounded = decimal_value.quantize(quantize_pattern, rounding=ROUND_HALF_UP)
-    return float(rounded)
-
-
-def excluding_vat_price(price_with_tax: float, vat_rate: float, precision: int = 2) -> float:
-    """Calculate price excluding VAT from price including VAT"""
-    if not price_with_tax or price_with_tax == 0:
-        return 0.0
-    if not vat_rate or vat_rate == 0:
-        return price_with_tax
-    divisor = 1 + (vat_rate / 100)
-    if divisor <= 0:
-        return price_with_tax
-    return to_decimal(price_with_tax / divisor, precision)
-
-
-def calculate_vat_amount(price: float, vat_rate: float, is_vat_excluded: bool = True, precision: int = 2) -> float:
-    """Calculate VAT amount"""
-    if not price or price == 0:
-        return 0.0
-    if not vat_rate or vat_rate == 0:
-        return 0.0
-    if is_vat_excluded:
-        return to_decimal(price * vat_rate / 100, precision)
-    else:
-        price_without_vat = excluding_vat_price(price, vat_rate, precision)
-        return to_decimal(price - price_without_vat, precision)
 
 
 def test_to_decimal():

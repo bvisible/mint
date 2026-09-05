@@ -22,3 +22,5 @@ mint/public/node_modules
 # //// CLAUDE.md is unshipped on purpose (690eed9) — it documents that pipeline.
 # mint/www/mint.html
 # CLAUDE.md  # 2026-05-07 unshipped to document commit-the-build pipeline
+# //// Neoffice — macOS AppleDouble sidecars; one (`mint/public/._mint`) was committed by 89e7929.
+._*
