@@ -13,12 +13,12 @@ app_license = "agpl-3.0"
 # consumed by the embedded FrappeSidebar/FrappeNavbar React components.
 # Without it, the sidebar renders without icons and the navbar loses its
 # theme. Same dependency as bvisible/neoconstruction.
-#//// Neoffice — org/repo form on purpose (upstream has no such dependency).
-#//// frappe/installer.py runs parse_app_name() on every required_apps entry
-#//// BEFORE the "already installed" check; a bare name is looked up under the
-#//// frappe/ and erpnext/ GitHub orgs -> 404 for a private app ->
-#//// InvalidRemoteException aborts every install-app. "org/repo" is split
-#//// locally into the package name, no network involved.
+# //// Neoffice — org/repo form on purpose (upstream has no such dependency).
+# //// frappe/installer.py runs parse_app_name() on every required_apps entry
+# //// BEFORE the "already installed" check; a bare name is looked up under the
+# //// frappe/ and erpnext/ GitHub orgs -> 404 for a private app ->
+# //// InvalidRemoteException aborts every install-app. "org/repo" is split
+# //// locally into the package name, no network involved.
 required_apps = ["bvisible/neoffice_theme"]
 
 # Each item in the list will be shown as an app in the apps page
@@ -55,9 +55,9 @@ add_to_apps_screen = [
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
-#//// Neoffice — un-commented and filled (9885988). Upstream ships no list JS; our Mint
-#//// Bank Statement Import list view carries the bank-file import action, which lives in
-#//// mint_bank_statement_import_list.js (a file we added, no upstream equivalent).
+# //// Neoffice — un-commented and filled (9885988). Upstream ships no list JS; our Mint
+# //// Bank Statement Import list view carries the bank-file import action, which lives in
+# //// mint_bank_statement_import_list.js (a file we added, no upstream equivalent).
 doctype_list_js = {
 	"Mint Bank Statement Import": "mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js"
 }

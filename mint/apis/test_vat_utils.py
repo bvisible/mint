@@ -1,5 +1,5 @@
-#//// Neoffice — added file (no upstream equivalent): unit tests for vat_utils.py, our own
-#//// module. Upstream ships no VAT logic and no test for it.
+# //// Neoffice — added file (no upstream equivalent): unit tests for vat_utils.py, our own
+# //// module. Upstream ships no VAT logic and no test for it.
 """
 Unit tests for VAT calculation utilities
 

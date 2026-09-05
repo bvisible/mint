@@ -1,7 +1,7 @@
-#//// Neoffice — added file (no upstream equivalent): the bank-statement OCR bridge to NORA.
-#//// Upstream's importer parses CSV/Excel only, and its PDF path went to Google Document AI
-#//// (a Google account and client data leaving Switzerland). This routes the same extraction
-#//// through our own ocr_process and records every run as a Document Scan for traceability.
+# //// Neoffice — added file (no upstream equivalent): the bank-statement OCR bridge to NORA.
+# //// Upstream's importer parses CSV/Excel only, and its PDF path went to Google Document AI
+# //// (a Google account and client data leaving Switzerland). This routes the same extraction
+# //// through our own ocr_process and records every run as a Document Scan for traceability.
 """
 Nora OCR Integration for Mint
 Replaces Google Document AI for bank statement parsing

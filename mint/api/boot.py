@@ -1,8 +1,8 @@
-#//// Neoffice — added file (no upstream equivalent): the curated mini-boot the embedded
-#//// Frappe chrome runs on (711dfb1, 7e7e34c, 16eec35, 46cc218, 19d0c21, 2dae000, f3cec27).
-#//// /mint renders the native sidebar and navbar WITHOUT desk.bundle.js, so nothing fills
-#//// frappe.boot; this builds a small, stable subset instead of the ~150 KB session payload
-#//// whose shape moves with the installed apps. Read by mint/www/mint.py.
+# //// Neoffice — added file (no upstream equivalent): the curated mini-boot the embedded
+# //// Frappe chrome runs on (711dfb1, 7e7e34c, 16eec35, 46cc218, 19d0c21, 2dae000, f3cec27).
+# //// /mint renders the native sidebar and navbar WITHOUT desk.bundle.js, so nothing fills
+# //// frappe.boot; this builds a small, stable subset instead of the ~150 KB session payload
+# //// whose shape moves with the installed apps. Read by mint/www/mint.py.
 """Mini-boot for the Frappe Desk shell (sidebar + navbar) embedded in /mint.
 
 Frappe Desk bundles (billing.bundle.js, nora_debug.js, etc.) expect certain

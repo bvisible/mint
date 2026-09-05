@@ -1,17 +1,17 @@
 import frappe
 from frappe import _
-#//// Neoffice — added (4713d8c). preview_bank_entry_with_vat below coerces every debit and
-#//// credit through flt: the SPA posts amounts as strings and a bare sum() of them silently
-#//// concatenated. Upstream imports no flt here.
+# //// Neoffice — added (4713d8c). preview_bank_entry_with_vat below coerces every debit and
+# //// credit through flt: the SPA posts amounts as strings and a bare sum() of them silently
+# //// concatenated. Upstream imports no flt here.
 from frappe.utils import flt
 import json
 import datetime
 from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool import create_payment_entry_bts, create_journal_entry_bts
 from erpnext.accounts.party import get_party_account
 from erpnext import get_default_cost_center
-#//// Neoffice — added (10998d9). vat_utils.py is a file we added: Swiss VAT is extracted
-#//// from the TTC amount the SPA posts and split into a base line plus a tax line before the
-#//// Journal Entry is built. Upstream books the amounts as received, VAT never enters here.
+# //// Neoffice — added (10998d9). vat_utils.py is a file we added: Swiss VAT is extracted
+# //// from the TTC amount the SPA posts and split into a base line plus a tax line before the
+# //// Journal Entry is built. Upstream books the amounts as received, VAT never enters here.
 from mint.apis.vat_utils import calculate_journal_entry_with_vat
 
 @frappe.whitelist()
@@ -256,9 +256,9 @@ def create_bulk_bank_entry_and_reconcile(bank_transactions: list[str|int],
                 "debit_in_account_currency": transactions_details.unallocated_amount,
                 "debit": transactions_details.unallocated_amount,
                 "credit_in_account_currency": 0,
-                #//// Neoffice — backport of upstream v1.5.2 (cherry-pick, 2bdac9c), drop at the merge:
-                #//// upstream repeated the "debit" key in this dict literal, so the second one overwrote the
-                #//// first and the bank line of a bulk split was written with debit 0.
+                # //// Neoffice — backport of upstream v1.5.2 (cherry-pick, 2bdac9c), drop at the merge:
+                # //// upstream repeated the "debit" key in this dict literal, so the second one overwrote the
+                # //// first and the bank line of a bulk split was written with debit 0.
                 "credit": 0,
             })
 
@@ -283,8 +283,8 @@ def create_bulk_bank_entry_and_reconcile(bank_transactions: list[str|int],
 
 
 @frappe.whitelist(methods=['POST'])
-#//// Neoffice — whitespace only: upstream's line ends with a trailing space, an editor
-#//// stripped it. Take upstream's line at the merge.
+# //// Neoffice — whitespace only: upstream's line ends with a trailing space, an editor
+# //// stripped it. Take upstream's line at the merge.
 def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
                                     cheque_date: str | datetime.date,
                                     posting_date: str | datetime.date,
@@ -292,16 +292,16 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
                                     entries: list,
                                     user_remark: str = None,
                                     voucher_type: str = "Bank Entry",
-                                    #//// Neoffice — the two parameters below are ours (10998d9). is_vat_excluded says whether the
-                                    #//// SPA sent HT or TTC amounts; disable_vat_calculation is the escape hatch for companies on
-                                    #//// the Swiss flat-rate method, where no VAT is extracted. Upstream's signature ends at
-                                    #//// dimensions, so this whole parameter block conflicts at the merge: keep both sides.
+                                    # //// Neoffice — the two parameters below are ours (10998d9). is_vat_excluded says whether the
+                                    # //// SPA sent HT or TTC amounts; disable_vat_calculation is the escape hatch for companies on
+                                    # //// the Swiss flat-rate method, where no VAT is extracted. Upstream's signature ends at
+                                    # //// dimensions, so this whole parameter block conflicts at the merge: keep both sides.
                                     dimensions: dict = None,
                                     is_vat_excluded: bool = False,
                                     disable_vat_calculation: bool = False):
-    #//// Neoffice — the Args: block inside the docstring below is ours, added with the two VAT
-    #//// parameters (10998d9). The marker sits outside the docstring on purpose: a comment put
-    #//// inside it would become part of the documented text.
+    # //// Neoffice — the Args: block inside the docstring below is ours, added with the two VAT
+    # //// parameters (10998d9). The marker sits outside the docstring on purpose: a comment put
+    # //// inside it would become part of the documented text.
     """
         Create a bank entry and reconcile it with the bank transaction
 
@@ -330,8 +330,8 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
 
     default_cost_center = get_default_cost_center(company)
 
-    #//// Neoffice — added (52f898c). is_withdrawal drives the VAT direction (input tax on a
-    #//// withdrawal, output tax on a deposit) for calculate_journal_entry_with_vat below.
+    # //// Neoffice — added (52f898c). is_withdrawal drives the VAT direction (input tax on a
+    # //// withdrawal, output tax on a deposit) for calculate_journal_entry_with_vat below.
     is_withdrawal = bank_transaction.withdrawal > 0.0
 
     bank_entry = frappe.get_doc({
@@ -346,9 +346,9 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
     
     if not dimensions:
         dimensions = {}
-    #//// Neoffice — added (10998d9). Upstream loops straight over `entries`; we first run them
-    #//// through calculate_journal_entry_with_vat, which turns each TTC line into a base line
-    #//// plus a VAT line, and the loop below iterates the result instead of the raw input.
+    # //// Neoffice — added (10998d9). Upstream loops straight over `entries`; we first run them
+    # //// through calculate_journal_entry_with_vat, which turns each TTC line into a base line
+    # //// plus a VAT line, and the loop below iterates the result instead of the raw input.
 
     # Calculate entries with VAT if applicable
     processed_entries = calculate_journal_entry_with_vat(
@@ -362,9 +362,9 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
     for entry in processed_entries:
         # Check if this account is a Income or Expense Account
         # If it is, and no cost center is added, select the company default cost center
-        #//// Neoffice — changed (10998d9). Upstream reads cost_center from the entry only. Our SPA
-        #//// sends one cost center for the whole voucher, in `dimensions`; without this fallback
-        #//// every P&L line silently took the company default instead of the chosen one.
+        # //// Neoffice — changed (10998d9). Upstream reads cost_center from the entry only. Our SPA
+        # //// sends one cost center for the whole voucher, in `dimensions`; without this fallback
+        # //// every P&L line silently took the company default instead of the chosen one.
         cost_center = entry.get("cost_center") or dimensions.get("cost_center")
 
         if not cost_center:
@@ -404,13 +404,13 @@ def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
     # Return transaction, journal entry name and bank_transaction for file attachments
     return {
         "transaction": transaction,
-        #//// Neoffice — changed here, and everything from this return down to
-        #//// create_bulk_payment_entry_and_reconcile is ours. Upstream returns the whole bank_entry
-        #//// document; we return its name plus the bank transaction so the SPA can attach the
-        #//// uploaded justificatif afterwards (bc1a48f). preview_bank_entry_with_vat (e08aff5,
-        #//// 4713d8c, 52f898c) renders the VAT split before anything is saved, and
-        #//// calculate_deductions_with_vat (4aa971b) does the same for Payment Entry deductions.
-        #//// Neither exists upstream.
+        # //// Neoffice — changed here, and everything from this return down to
+        # //// create_bulk_payment_entry_and_reconcile is ours. Upstream returns the whole bank_entry
+        # //// document; we return its name plus the bank transaction so the SPA can attach the
+        # //// uploaded justificatif afterwards (bc1a48f). preview_bank_entry_with_vat (e08aff5,
+        # //// 4713d8c, 52f898c) renders the VAT split before anything is saved, and
+        # //// calculate_deductions_with_vat (4aa971b) does the same for Payment Entry deductions.
+        # //// Neither exists upstream.
         "journal_entry": bank_entry.name,
         "bank_transaction": bank_transaction_name
     }
@@ -705,10 +705,10 @@ def get_account_defaults(account: str):
     """
         Get the default cost center and write off account for an account
     """
-    #//// Neoffice — guarded (10998d9). Upstream unpacks frappe.db.get_value(...) straight into
-    #//// two names. Our SPA calls this endpoint on every keystroke of the account field, so it
-    #//// arrives with an empty or not-yet-existing account and the unpack raised TypeError on
-    #//// None. Same return value in the normal case.
+    # //// Neoffice — guarded (10998d9). Upstream unpacks frappe.db.get_value(...) straight into
+    # //// two names. Our SPA calls this endpoint on every keystroke of the account field, so it
+    # //// arrives with an empty or not-yet-existing account and the unpack raised TypeError on
+    # //// None. Same return value in the normal case.
     if not account:
         return ""
 
@@ -781,11 +781,11 @@ def search_for_transfer_transaction(transaction_id: str | int):
 
     return None
 
-#//// Neoffice — added: everything from here to the end of the file is ours (88a7d8b, 9bfe719,
-#//// a401621, 23db5d9). ERPNext's get_linked_payments only returns SUBMITTED vouchers, so a
-#//// draft Journal Entry could never be matched against a bank line. get_linked_payments
-#//// wraps it and merges get_draft_journal_entries; submit_draft_je_and_reconcile then
-#//// submits the draft and reconciles in one call. Upstream calls ERPNext's endpoint direct.
+# //// Neoffice — added: everything from here to the end of the file is ours (88a7d8b, 9bfe719,
+# //// a401621, 23db5d9). ERPNext's get_linked_payments only returns SUBMITTED vouchers, so a
+# //// draft Journal Entry could never be matched against a bank line. get_linked_payments
+# //// wraps it and merges get_draft_journal_entries; submit_draft_je_and_reconcile then
+# //// submits the draft and reconciles in one call. Upstream calls ERPNext's endpoint direct.
 
 @frappe.whitelist(methods=['GET'])
 def get_linked_payments(

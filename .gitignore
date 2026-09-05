@@ -6,19 +6,19 @@ tags
 node_modules
 __pycache__
 
-#//// Neoffice — commit-the-build. Upstream ignores its vite output (mint/public/mint
-#//// and mint/www/mint.html) and rebuilds on every install; our client VMs have 2 GB of
-#//// RAM and vite dies there, so the built SPA is committed and instances only pull it.
-#//// The two upstream lines are kept commented out, not deleted, so the next merge sees
-#//// exactly what upstream ignored. Drop this and restore them the day instances build.
+# //// Neoffice — commit-the-build. Upstream ignores its vite output (mint/public/mint
+# //// and mint/www/mint.html) and rebuilds on every install; our client VMs have 2 GB of
+# //// RAM and vite dies there, so the built SPA is committed and instances only pull it.
+# //// The two upstream lines are kept commented out, not deleted, so the next merge sees
+# //// exactly what upstream ignored. Drop this and restore them the day instances build.
 # 2026-05-07 (NORA #28) — frontend build outputs are committed on this branch.
 # See docs/COMMIT-BUILD-PATTERN.md in neoffice-devops.
 # (Mint writes vite output to public/mint/ instead of public/frontend/, see
 # vite.config.ts --base=/assets/mint/mint/.)
 # mint/public/mint
 mint/public/node_modules
-#//// Neoffice — same commit-the-build reason: mint/www/mint.html is the Jinja entry
-#//// copied out of the vite build (yarn copy-html-entry) and is committed with it.
-#//// CLAUDE.md is unshipped on purpose (690eed9) — it documents that pipeline.
+# //// Neoffice — same commit-the-build reason: mint/www/mint.html is the Jinja entry
+# //// copied out of the vite build (yarn copy-html-entry) and is committed with it.
+# //// CLAUDE.md is unshipped on purpose (690eed9) — it documents that pipeline.
 # mint/www/mint.html
 # CLAUDE.md  # 2026-05-07 unshipped to document commit-the-build pipeline

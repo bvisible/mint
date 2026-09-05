@@ -1,9 +1,9 @@
 # Copyright (c) 2025, The Commit Company (Algocode Technologies Pvt. Ltd.) and contributors
 # For license information, please see license.txt
 
-#//// Neoffice — added (5bb4045). content_hash below is a SHA of the uploaded CAMT file: the
-#//// bank re-sends the same statement, and without the hash every re-upload created the whole
-#//// batch of Bank Transactions a second time. Upstream imports no hashlib.
+# //// Neoffice — added (5bb4045). content_hash below is a SHA of the uploaded CAMT file: the
+# //// bank re-sends the same statement, and without the hash every re-upload created the whole
+# //// batch of Bank Transactions a second time. Upstream imports no hashlib.
 import hashlib
 import frappe
 from frappe import _
@@ -22,10 +22,10 @@ class MintBankStatementImport(Document):
 
 		amended_from: DF.Link | None
 		bank_account: DF.Link
-		#//// Neoffice — auto-generated type stubs for the fields WE added to the doctype JSON
-		#//// (bank_statement_id, closing_balance, content_hash, currency, document_scan_name,
-		#//// document_status). Do not hand-merge this block: take upstream's, re-apply the JSON
-		#//// fields listed in NEOFFICE_FORK_MARKERS.md, then let bench regenerate it.
+		# //// Neoffice — auto-generated type stubs for the fields WE added to the doctype JSON
+		# //// (bank_statement_id, closing_balance, content_hash, currency, document_scan_name,
+		# //// document_status). Do not hand-merge this block: take upstream's, re-apply the JSON
+		# //// fields listed in NEOFFICE_FORK_MARKERS.md, then let bench regenerate it.
 		bank_statement_id: DF.Data | None
 		closing_balance: DF.Currency | None
 		content_hash: DF.Data | None
@@ -34,8 +34,8 @@ class MintBankStatementImport(Document):
 		document_status: DF.Literal["Draft", "Submitted", "Cancelled"]
 		error: DF.Code | None
 		file: DF.Attach | None
-		#//// Neoffice — same auto-generated block: file_type gained "XML" (CAMT.053 import, 5bb4045)
-		#//// and import_summary / ocr_status / opening_balance are fields we added. Regenerate.
+		# //// Neoffice — same auto-generated block: file_type gained "XML" (CAMT.053 import, 5bb4045)
+		# //// and import_summary / ocr_status / opening_balance are fields we added. Regenerate.
 		file_type: DF.Literal["PDF", "XML"]
 		import_summary: DF.SmallText | None
 		ocr_status: DF.Literal["", "Pending", "Processing", "Completed", "Failed"]
@@ -44,19 +44,19 @@ class MintBankStatementImport(Document):
 		transactions: DF.Table[MintBankStatementImportTransactions]
 	# end: auto-generated types
 
-	#//// Neoffice — added method (6d264d7). docstatus is an integer the list view cannot show as
-	#//// a label, so the Draft/Submitted/Cancelled state is mirrored into a real field the list
-	#//// and the SPA can display and filter on. No upstream equivalent.
+	# //// Neoffice — added method (6d264d7). docstatus is an integer the list view cannot show as
+	# //// a label, so the Draft/Submitted/Cancelled state is mirrored into a real field the list
+	# //// and the SPA can display and filter on. No upstream equivalent.
 	def update_document_status(self):
 		"""Update document_status field based on docstatus."""
 		status_map = {0: "Draft", 1: "Submitted", 2: "Cancelled"}
 		self.document_status = status_map.get(self.docstatus, "Draft")
 
 	def before_validate(self):
-		#//// Neoffice — before_validate rewritten. Upstream's body is only the string-amount loop,
-		#//// which is now guarded by file_type == "PDF" because a CAMT XML carries real numbers and
-		#//// the parser would have mangled them. The currency lookup is upstream's own v1.5.x fix,
-		#//// hand-carried (89e7929); the status line is ours (6d264d7).
+		# //// Neoffice — before_validate rewritten. Upstream's body is only the string-amount loop,
+		# //// which is now guarded by file_type == "PDF" because a CAMT XML carries real numbers and
+		# //// the parser would have mangled them. The currency lookup is upstream's own v1.5.x fix,
+		# //// hand-carried (89e7929); the status line is ours (6d264d7).
 		# Update document_status based on docstatus
 		self.update_document_status()
 		# Set currency from bank account (upstream fix)
@@ -82,20 +82,20 @@ class MintBankStatementImport(Document):
 		else:
 			return string_amount.lower().replace("dr", "").replace(" ", ""), "Withdrawal"
 
-	#//// Neoffice — replaces upstream's process_file()/process_pdf() (d4f7f73, f715b79). Those
-	#//// called mint.apis.google_ai.run_bank_statement_processor: a Google Document AI account,
-	#//// with client bank statements leaving Switzerland, and a synchronous call that timed out
-	#//// on a long PDF. Extraction now runs asynchronously through NORA's OCR (mint/apis/
-	#//// nora_ocr.py) and this method only fills the child table from whatever it returns.
+	# //// Neoffice — replaces upstream's process_file()/process_pdf() (d4f7f73, f715b79). Those
+	# //// called mint.apis.google_ai.run_bank_statement_processor: a Google Document AI account,
+	# //// with client bank statements leaving Switzerland, and a synchronous call that timed out
+	# //// on a long PDF. Extraction now runs asynchronously through NORA's OCR (mint/apis/
+	# //// nora_ocr.py) and this method only fills the child table from whatever it returns.
 	def _populate_transactions(self, transactions: list):
 		"""
 		#//// Neoffice — docstring of the replacement method above; upstream's described the Google
 		#//// Document AI call. Marker placed outside the docstring on purpose.
 		Populate the transactions child table from extracted data.
 		"""
-		#//// Neoffice — added (70b41ab). OCR returns rows with no date (page headers, carried-over
-		#//// balances); date is mandatory on the child table, so the whole import threw on save.
-		#//// The sort below is upstream's and unchanged.
+		# //// Neoffice — added (70b41ab). OCR returns rows with no date (page headers, carried-over
+		# //// balances); date is mandatory on the child table, so the whole import threw on save.
+		# //// The sort below is upstream's and unchanged.
 		# Filter out transactions without a valid date (mandatory field)
 		transactions = [tx for tx in transactions if tx.get("date")]
 		# Order the transactions by date
@@ -116,15 +116,15 @@ class MintBankStatementImport(Document):
 				frappe.throw(_("All rows must have an amount and a type. Missing in row {0}").format(transaction.get("idx")))
 
 	def on_submit(self):
-		#//// Neoffice — added (6d264d7). db_set because on_submit runs after the docstatus write.
+		# //// Neoffice — added (6d264d7). db_set because on_submit runs after the docstatus write.
 		# Update document_status to Submitted
 		self.db_set("document_status", "Submitted")
 
 		if not self.transactions:
-			#//// Neoffice — on_submit rewritten. Upstream throws "No transactions found" on an empty
-			#//// statement; a bank legitimately sends a statement with nothing new on it, and the throw
-			#//// left the document stuck in Draft for ever (465751a, b1e7d14). The XML branch routes
-			#//// CAMT.053 files to _submit_xml_transactions (5bb4045); PDF keeps upstream's flow.
+			# //// Neoffice — on_submit rewritten. Upstream throws "No transactions found" on an empty
+			# //// statement; a bank legitimately sends a statement with nothing new on it, and the throw
+			# //// left the document stuck in Draft for ever (465751a, b1e7d14). The XML branch routes
+			# //// CAMT.053 files to _submit_xml_transactions (5bb4045); PDF keeps upstream's flow.
 			# No transactions at all — mark as completed
 			self.db_set("status", "Completed")
 			self.db_set("import_summary", _("No transactions to import"))
@@ -143,8 +143,8 @@ class MintBankStatementImport(Document):
 				"date": transaction.get("date"),
 				"status": "Unreconciled",
 				"bank_account": self.bank_account,
-				#//// Neoffice — added: without it the Bank Transaction inherits the company currency, which
-				#//// is wrong for a EUR or USD account. Upstream's own v1.5.x fix, hand-carried (89e7929).
+				# //// Neoffice — added: without it the Bank Transaction inherits the company currency, which
+				# //// is wrong for a EUR or USD account. Upstream's own v1.5.x fix, hand-carried (89e7929).
 				"currency": self.currency,
 				"withdrawal": transaction.get("amount") if transaction.get("type") == "Withdrawal" else 0,
 				"deposit": transaction.get("amount") if transaction.get("type") == "Deposit" else 0,
@@ -155,16 +155,16 @@ class MintBankStatementImport(Document):
 			bank_tx.submit()
 			transaction.imported = 1
 
-		#//// Neoffice — added: everything from here to the end of the file is ours. In order:
-		#//// the Document Scan bookkeeping (0de6b82) and the immediate rule-engine run (ea5b757);
-		#//// _submit_xml_transactions and the CAMT.053 pipeline (5bb4045, 279ef1f, 6807af9, 0371e5a,
-		#//// 3c28563, 844e616, 8b4d1c9, 3fd1b32, 957a5b9, d458754) — parse the XML, match each line
-		#//// against open invoices, reuse an existing Payment Entry instead of creating a duplicate,
-		#//// de-duplicate on reference then on description+date+amount, and set clearance_date;
-		#//// plus the helpers _link_payment_entry_to_bt, _fail_with_context, parse_xml_content,
-		#//// _find_existing_payment_entry, _find_existing_bank_transaction*, _read_file_content,
-		#//// _find_bank_account_by_iban and _build_description. Upstream has none of this: its
-		#//// importer stops at creating Bank Transactions.
+		# //// Neoffice — added: everything from here to the end of the file is ours. In order:
+		# //// the Document Scan bookkeeping (0de6b82) and the immediate rule-engine run (ea5b757);
+		# //// _submit_xml_transactions and the CAMT.053 pipeline (5bb4045, 279ef1f, 6807af9, 0371e5a,
+		# //// 3c28563, 844e616, 8b4d1c9, 3fd1b32, 957a5b9, d458754) — parse the XML, match each line
+		# //// against open invoices, reuse an existing Payment Entry instead of creating a duplicate,
+		# //// de-duplicate on reference then on description+date+amount, and set clearance_date;
+		# //// plus the helpers _link_payment_entry_to_bt, _fail_with_context, parse_xml_content,
+		# //// _find_existing_payment_entry, _find_existing_bank_transaction*, _read_file_content,
+		# //// _find_bank_account_by_iban and _build_description. Upstream has none of this: its
+		# //// importer stops at creating Bank Transactions.
 		# Update linked Document Scan status to Processed
 		if self.document_scan_name:
 			frappe.db.set_value("Document Scan", self.document_scan_name, "status", "Processed")
@@ -716,6 +716,6 @@ def _build_description(txn):
 	if not lines and unique_ref:
 		lines.append(unique_ref)
 
-	#//// Neoffice — end of the added block above (d458754): CAMT AddtlNtryInf gives a far richer
-	#//// description than the bare reference. Upstream's file ended at transaction.imported = 1.
+	# //// Neoffice — end of the added block above (d458754): CAMT AddtlNtryInf gives a far richer
+	# //// description than the bare reference. Upstream's file ended at transaction.imported = 1.
 	return "\n".join(lines)
