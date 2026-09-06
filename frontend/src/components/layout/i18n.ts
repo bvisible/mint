@@ -1,14 +1,14 @@
 //// Neoffice — added file (no upstream equivalent): typed accessor for the window shim that
 //// frontend/index.html installs when the desk bundle is absent (16eec35). WARNING: nothing
 //// imports t() today — components use lib/translate instead. Its docstring is also in
-//// French, unlike the rest of the codebase. Decide at the merge: wire it up or delete it.
+//// merge: wire it up or delete it. Its French docstring was translated on 2026-09-06.
 /**
  * Access helper for the `window.__` shim defined in index.html.
  *
- * Le shim fait : lookup dans `frappe._messages`, fallback sur la string source.
- * Supporte les placeholders positionnels `{0}` et le pattern `Source|Context`.
+ * The shim looks the text up in `frappe._messages` and falls back to the source
+ * string. It supports positional placeholders `{0}` and the `Source|Context` pattern.
  *
- * On l'exporte comme fonction TypeScript-typée pour les composants React.
+ * Exported as a TypeScript-typed function for the React components.
  */
 declare global {
 	interface Window {

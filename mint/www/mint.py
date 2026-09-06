@@ -1,15 +1,15 @@
 # //// Neoffice — the module docstring below is ours (711dfb1); upstream's file starts at
 # //// `import frappe`. It describes the context keys the Jinja template needs to render /mint
-# //// inside the native Frappe chrome. (Defect: it is written in French, unlike the rest.)
+# //// inside the native Frappe chrome.
 """Jinja controller for the /mint page (and all its sub-routes).
 
-On peuple le contexte avec :
-  - boot               → window.frappe.boot pour FrappeSidebar/Navbar + frappe-react-sdk
-  - csrf_token         → pour les appels POST vers /api/method/*
-  - desk_css_url       → asset hashé `desk.bundle.css` (Frappe core)
-  - neoffice_theme_css_url → asset `neoffice-theme.css` (theme shell)
+The context it fills in:
+  - boot                   -> window.frappe.boot, for FrappeSidebar/Navbar and frappe-react-sdk
+  - csrf_token             -> for the POST calls to /api/method/*
+  - desk_css_url           -> the hashed `desk.bundle.css` asset (Frappe core)
+  - neoffice_theme_css_url -> the `neoffice-theme.css` asset (theme shell)
 
-Pattern aligné avec apps/neoconstruction/neoconstruction/www/neoconstruction.py.
+Same pattern as apps/neoconstruction/neoconstruction/www/neoconstruction.py.
 """
 import frappe
 import json

@@ -1,7 +1,7 @@
 # //// Neoffice — added file (no upstream equivalent): the same VAT arithmetic re-implemented
 # //// without frappe so the rounding can be checked with plain python, off a bench.
-# //// (Defect worth knowing at the merge: it COPIES the functions instead of importing them,
-# //// so it cannot catch a change made in vat_utils.py.)
+# //// It imports the real functions from vat_utils.py since 13577b4: it used to COPY them,
+# //// which meant it could never catch a change made there (tracker #229).
 """
 Standalone tests for VAT calculation logic (no Frappe dependencies)
 

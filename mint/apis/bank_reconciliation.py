@@ -522,15 +522,17 @@ def calculate_deductions_with_vat(
     is_vat_excluded: bool = False,
     disable_vat_calculation: bool = False
 ) -> dict:
-    # //// Neoffice — RULE #00: French docstring made English (13577b4 "chore: the residues of the marking pass, in one lot").
+    # //// Neoffice — RULE #00: the docstring and the inline comments of this function
+    # //// are English. A first pass claimed this and left half the docstring in French;
+    # //// finished 2026-09-06 (tracker #229).
     """
     Compute the deductions, extracting the VAT automatically.
 
-    Pour chaque déduction:
-    - Si compte a taxable_account: split en HT + ligne TVA
-    - Sinon: retourne tel quel
+    For each deduction:
+    - account has a taxable_account: split into a net line + a VAT line
+    - otherwise: returned as is
 
-    Réutilise: get_account_tax_info(), excluding_vat_price() de vat_utils.py
+    Reuses get_account_tax_info() and excluding_vat_price() from vat_utils.py
 
     Args:
         deductions: List of deduction dictionaries with 'account', 'amount', 'cost_center', 'description'
@@ -551,7 +553,7 @@ def calculate_deductions_with_vat(
         calculate_vat_amount
     )
 
-    # Vérifier si forfait (pas de TVA)
+    # Flat-rate method: no VAT to extract
     if company:
         vat_method = get_company_vat_method(company)
         if vat_method and "Flat" in vat_method:
@@ -568,7 +570,7 @@ def calculate_deductions_with_vat(
             result_deductions.append(deduction)
             continue
 
-        # Récupérer info TVA du compte
+        # VAT information of the account
         tax_info = get_account_tax_info(account)
 
         if not tax_info:
@@ -577,23 +579,23 @@ def calculate_deductions_with_vat(
 
         has_vat = True
 
-        # Extraction TVA
+        # VAT extraction
         if is_vat_excluded:
-            # Mode HT: montant = base, calculer TVA dessus
+            # Net mode: the amount IS the base, compute the VAT on top
             base_amount = amount
             vat_amount = calculate_vat_amount(base_amount, tax_info["tax_rate"], True)
         else:
-            # Mode TTC: montant inclut TVA, extraire base
+            # Gross mode: the amount includes VAT, extract the base
             base_amount = excluding_vat_price(amount, tax_info["tax_rate"])
             vat_amount = amount - base_amount
 
-        # Ajouter déduction base (montant HT)
+        # The base deduction, net of VAT
         base_deduction = deduction.copy()
         base_deduction["amount"] = base_amount
         base_deduction["_is_base_for_vat"] = True
         result_deductions.append(base_deduction)
 
-        # Ajouter ligne TVA
+        # The VAT line
         vat_deduction = {
             "account": tax_info["tax_account"],
             "amount": vat_amount,

@@ -729,8 +729,8 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
         return <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Separator className="flex-1" />
-                {/* //// Neoffice — wrapped in _() (1f2847e); upstream ships the bare word. Note the identical */}
-                {/* //// span further down (around line 726) was NOT wrapped and is still untranslated. */}
+                {/* //// Neoffice — wrapped in _() (1f2847e); upstream ships the bare word. The identical */}
+                {/* //// span further down carries the same wrapper since 13577b4 (tracker #229). */}
                 <span>{_("or")}</span>
                 <Separator className="flex-1" />
             </div>
