@@ -231,7 +231,7 @@ done
 gh run list --workflow build-frontend.yml --limit 3 --json status,conclusion,headSha
 
 # 4. HEAD de chaque instance déployée
-for s in osiris dmis; do
+for s in osiris $CLIENT_INSTANCES; do
   ssh $s 'cd /home/neoffice/frappe-bench/apps/mint && git log -1 --oneline'
 done
 ```
