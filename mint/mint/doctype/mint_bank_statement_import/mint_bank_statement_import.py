@@ -161,6 +161,8 @@ class MintBankStatementImport(Document):
 		# //// 3c28563, 844e616, 8b4d1c9, 3fd1b32, 957a5b9, d458754) — parse the XML, match each line
 		# //// against open invoices, reuse an existing Payment Entry instead of creating a duplicate,
 		# //// de-duplicate on reference then on description+date+amount, and set clearance_date;
+		# //// de-duplication counts repeated reference+amount keys, because a batch-booked payment
+		# //// order puts one bank reference on every line (_find_existing_bank_transaction);
 		# //// plus the helpers _link_payment_entry_to_bt, _fail_with_context, parse_xml_content,
 		# //// _find_existing_payment_entry, _find_existing_bank_transaction*, _read_file_content,
 		# //// _find_bank_account_by_iban and _build_description. Upstream has none of this: its
@@ -191,6 +193,7 @@ class MintBankStatementImport(Document):
 			"errors": 0,
 		}
 
+		occurrences = {}
 		for transaction in self.transactions:
 			stats["total"] += 1
 			is_withdrawal = transaction.credit_debit == "DBIT"
@@ -198,13 +201,20 @@ class MintBankStatementImport(Document):
 			reference = transaction.unique_reference or transaction.reference or ""
 
 			try:
-				# Check for exact duplicates by reference (same batch reference = true duplicate)
+				# A batch-booked payment order shares ONE bank reference across all its
+				# lines, so reference + amount is not unique: two payments of the same
+				# amount in the same batch are two lines, not a duplicate. The n-th
+				# occurrence of a key in this file is a duplicate only if n Bank
+				# Transactions already carry that key (see _find_existing_bank_transaction).
+				key = (str(transaction.date), reference, amount, is_withdrawal)
+				occurrences[key] = occurrences.get(key, 0) + 1
 				existing_bt = _find_existing_bank_transaction(
 					self.bank_account,
 					transaction.date,
 					reference,
 					amount,
 					is_withdrawal,
+					occurrence=occurrences[key],
 				)
 				if existing_bt:
 					transaction.db_set("status", "Existing")
@@ -250,13 +260,15 @@ class MintBankStatementImport(Document):
 					try:
 						import ast
 						matches = ast.literal_eval(invoice_matches) if isinstance(invoice_matches, str) else invoice_matches
+						if matches and len(matches) > 1 and is_withdrawal:
+							matches = _narrow_to_proposed_invoice(matches, amount)
 						if matches and len(matches) == 1:
 							# Single invoice match — auto-create PE only if exact amount
 							invoice_name = matches[0]
 							if not is_withdrawal:
 								# Customer payment (CRDT)
 								sinv = frappe.get_doc("Sales Invoice", invoice_name)
-								if abs(amount - sinv.outstanding_amount) <= 0.01 and not frappe.db.exists("Payment Entry", {"reference_no": reference, "paid_amount": amount, "docstatus": 1}):
+								if abs(amount - sinv.outstanding_amount) <= 0.01 and not _payment_entry_exists_for(reference, amount, "Sales Invoice", invoice_name):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
 										"payment_type": "Receive",
@@ -288,7 +300,7 @@ class MintBankStatementImport(Document):
 							else:
 								# Supplier payment (DBIT) — create PE if invoice has outstanding
 								pinv = frappe.get_doc("Purchase Invoice", invoice_name)
-								if pinv.outstanding_amount > 0 and not frappe.db.exists("Payment Entry", {"reference_no": reference, "paid_amount": amount, "docstatus": 1}):
+								if pinv.outstanding_amount > 0 and not _payment_entry_exists_for(reference, amount, "Purchase Invoice", invoice_name):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
 										"payment_type": "Pay",
@@ -479,6 +491,7 @@ def parse_xml_content(docname):
 	# Clear existing transactions and populate with parsed data
 	doc.transactions = []
 	stats = {"total": 0, "to_process": 0, "duplicates": 0}
+	occurrences = {}
 
 	for txn in transactions:
 		is_debit = txn.get("credit_debit") == "DBIT"
@@ -486,12 +499,16 @@ def parse_xml_content(docname):
 		reference = txn.get("unique_reference", "")
 		stats["total"] += 1
 
-		# Check for existing Bank Transaction (pre-dedup)
+		# Check for existing Bank Transaction (pre-dedup), counting repeated
+		# keys the same way _submit_xml_transactions does
 		existing_bt = None
 		status = "To Process"
 		if reference and doc.bank_account:
+			key = (str(txn.get("date")), reference, amount, is_debit)
+			occurrences[key] = occurrences.get(key, 0) + 1
 			existing_bt = _find_existing_bank_transaction(
-				doc.bank_account, txn.get("date"), reference, amount, is_debit
+				doc.bank_account, txn.get("date"), reference, amount, is_debit,
+				occurrence=occurrences[key],
 			)
 			if existing_bt:
 				status = "Existing"
@@ -633,8 +650,17 @@ def _find_existing_bank_transaction_by_description(bank_account, date, descripti
 	return frappe.db.get_value("Bank Transaction", filters, "name")
 
 
-def _find_existing_bank_transaction(bank_account, date, reference_number, amount, is_withdrawal):
-	"""Find the existing Bank Transaction name if it exists (for dedup tracking)."""
+def _find_existing_bank_transaction(bank_account, date, reference_number, amount, is_withdrawal, occurrence=1):
+	"""Return the Bank Transaction that already accounts for the `occurrence`-th
+	line of this statement carrying (date, reference, amount), or None.
+
+	The key is not unique: a batch-booked payment order ("Paiement groupé") puts the
+	same bank reference on every line of the batch, so two payments of the same
+	amount in one order share it. Returning the first match for both dropped the
+	second line as a duplicate — its Bank Transaction was never created and its
+	invoice stayed unpaid. Counting occurrences keeps a real re-import idempotent
+	(n lines, n existing transactions) while importing every line the first time.
+	"""
 	if not reference_number:
 		return None
 
@@ -650,7 +676,63 @@ def _find_existing_bank_transaction(bank_account, date, reference_number, amount
 	else:
 		filters["deposit"] = amount
 
-	return frappe.db.get_value("Bank Transaction", filters, "name")
+	existing = frappe.get_all("Bank Transaction", filters=filters, pluck="name", order_by="creation asc")
+	if len(existing) >= occurrence:
+		return existing[occurrence - 1]
+	return None
+
+
+def _payment_entry_exists_for(reference, amount, reference_doctype, invoice_name):
+	"""True if a submitted Payment Entry with this bank reference and amount already
+	settles this very invoice.
+
+	Checking reference + amount alone is wrong for a batch-booked payment order: every
+	line shares the batch reference, so the first payment of an amount blocked the
+	automatic entry of every other invoice paid for the same amount in that batch.
+	"""
+	pe = frappe.qb.DocType("Payment Entry")
+	per = frappe.qb.DocType("Payment Entry Reference")
+	rows = (
+		frappe.qb.from_(pe)
+		.join(per).on(per.parent == pe.name)
+		.select(pe.name)
+		.where(pe.docstatus == 1)
+		.where(pe.reference_no == reference)
+		.where(pe.paid_amount == amount)
+		.where(per.reference_doctype == reference_doctype)
+		.where(per.reference_name == invoice_name)
+		.limit(1)
+		.run()
+	)
+	return bool(rows)
+
+
+def _narrow_to_proposed_invoice(invoice_names, amount):
+	"""Among several purchase invoices matched by one bank debit, keep the one the
+	payment order actually sent: still in a payment run (is_proposed) with exactly
+	this amount outstanding.
+
+	Suppliers who reuse one QR reference for recurring bills (instalments, monthly
+	tax advances) make the reference match every one of them. The line was then left
+	for manual reconciliation, where picking the newest bill settled the wrong one
+	and left the invoice that had really been paid open. Returns the input unchanged
+	when the payment run does not single one out.
+	"""
+	if not frappe.db.has_column("Purchase Invoice", "is_proposed"):
+		return invoice_names
+
+	candidates = frappe.get_all(
+		"Purchase Invoice",
+		filters={
+			"name": ["in", list(invoice_names)],
+			"docstatus": 1,
+			"is_proposed": 1,
+			"outstanding_amount": [">", 0],
+		},
+		fields=["name", "outstanding_amount"],
+	)
+	exact = [c.name for c in candidates if abs(float(c.outstanding_amount) - amount) <= 0.01]
+	return exact if len(exact) == 1 else invoice_names
 
 
 def _read_file_content(file_url):
