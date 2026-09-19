@@ -193,6 +193,9 @@ class MintBankStatementImport(Document):
 			"errors": 0,
 		}
 
+		# //// Neoffice — count key occurrences so a batch-booked payment order (one bank
+		# //// reference on every line) doesn't collapse same-amount lines into duplicates
+		# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 		occurrences = {}
 		for transaction in self.transactions:
 			stats["total"] += 1
@@ -201,6 +204,9 @@ class MintBankStatementImport(Document):
 			reference = transaction.unique_reference or transaction.reference or ""
 
 			try:
+				# //// Neoffice — occurrence-keyed dedup, not key-only, so line N of a
+				# //// batch-booked payment order isn't mistaken for line N-1's duplicate
+				# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 				# A batch-booked payment order shares ONE bank reference across all its
 				# lines, so reference + amount is not unique: two payments of the same
 				# amount in the same batch are two lines, not a duplicate. The n-th
@@ -214,6 +220,7 @@ class MintBankStatementImport(Document):
 					reference,
 					amount,
 					is_withdrawal,
+					# //// Neoffice — see the block marker above: occurrence-aware dedup
 					occurrence=occurrences[key],
 				)
 				if existing_bt:
@@ -260,6 +267,11 @@ class MintBankStatementImport(Document):
 					try:
 						import ast
 						matches = ast.literal_eval(invoice_matches) if isinstance(invoice_matches, str) else invoice_matches
+						# //// Neoffice — a debit whose QR reference matches several purchase
+						# //// invoices (suppliers reusing one reference for recurring bills)
+						# //// is narrowed to the one the payment run actually proposed, instead
+						# //// of risking a manual pick that settles the wrong invoice
+						# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 						if matches and len(matches) > 1 and is_withdrawal:
 							matches = _narrow_to_proposed_invoice(matches, amount)
 						if matches and len(matches) == 1:
@@ -268,6 +280,11 @@ class MintBankStatementImport(Document):
 							if not is_withdrawal:
 								# Customer payment (CRDT)
 								sinv = frappe.get_doc("Sales Invoice", invoice_name)
+								# //// Neoffice — check reference+amount against this invoice, not just
+								# //// frappe.db.exists(reference, amount): a batch-booked payment order
+								# //// shares one reference across lines, so the old check on the first
+								# //// invoice paid at that amount blocked every other one in the batch
+								# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 								if abs(amount - sinv.outstanding_amount) <= 0.01 and not _payment_entry_exists_for(reference, amount, "Sales Invoice", invoice_name):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
@@ -300,6 +317,9 @@ class MintBankStatementImport(Document):
 							else:
 								# Supplier payment (DBIT) — create PE if invoice has outstanding
 								pinv = frappe.get_doc("Purchase Invoice", invoice_name)
+								# //// Neoffice — same per-invoice check as the customer branch above:
+								# //// a shared batch reference must not block other invoices in the batch
+								# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 								if pinv.outstanding_amount > 0 and not _payment_entry_exists_for(reference, amount, "Purchase Invoice", invoice_name):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
@@ -491,6 +511,9 @@ def parse_xml_content(docname):
 	# Clear existing transactions and populate with parsed data
 	doc.transactions = []
 	stats = {"total": 0, "to_process": 0, "duplicates": 0}
+	# //// Neoffice — same occurrence-count dedup as _submit_xml_transactions, needed
+	# //// because a batch-booked payment order repeats one bank reference on every line
+	# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 	occurrences = {}
 
 	for txn in transactions:
@@ -504,6 +527,9 @@ def parse_xml_content(docname):
 		existing_bt = None
 		status = "To Process"
 		if reference and doc.bank_account:
+			# //// Neoffice — see the occurrences marker above: pass the n-th occurrence
+			# //// of this key so a duplicate check matches _submit_xml_transactions
+			# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 			key = (str(txn.get("date")), reference, amount, is_debit)
 			occurrences[key] = occurrences.get(key, 0) + 1
 			existing_bt = _find_existing_bank_transaction(
@@ -650,6 +676,11 @@ def _find_existing_bank_transaction_by_description(bank_account, date, descripti
 	return frappe.db.get_value("Bank Transaction", filters, "name")
 
 
+# //// Neoffice — added the `occurrence` parameter and rewrote the docstring: the
+# //// function used to return the FIRST Bank Transaction match for a key, which is
+# //// wrong once a batch-booked payment order puts the same reference on several
+# //// lines of the same amount (5f69a55 "fix(bank import): keep every line of a
+# //// batch-booked payment order")
 def _find_existing_bank_transaction(bank_account, date, reference_number, amount, is_withdrawal, occurrence=1):
 	"""Return the Bank Transaction that already accounts for the `occurrence`-th
 	line of this statement carrying (date, reference, amount), or None.
@@ -676,6 +707,13 @@ def _find_existing_bank_transaction(bank_account, date, reference_number, amount
 	else:
 		filters["deposit"] = amount
 
+	# //// Neoffice ▼▼▼ — occurrence-based lookup below, plus the two new helper functions
+	# //// _payment_entry_exists_for and _narrow_to_proposed_invoice: all three exist to stop
+	# //// a batch-booked payment order (one shared bank reference on every line) from being
+	# //// mistaken for duplicate transactions or from blocking Payment Entry auto-creation
+	# //// for other invoices in the same batch, and to settle the right invoice when one QR
+	# //// reference matches several bills reused by the same supplier
+	# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 	existing = frappe.get_all("Bank Transaction", filters=filters, pluck="name", order_by="creation asc")
 	if len(existing) >= occurrence:
 		return existing[occurrence - 1]
@@ -733,6 +771,7 @@ def _narrow_to_proposed_invoice(invoice_names, amount):
 	)
 	exact = [c.name for c in candidates if abs(float(c.outstanding_amount) - amount) <= 0.01]
 	return exact if len(exact) == 1 else invoice_names
+# //// Neoffice ▲▲▲
 
 
 def _read_file_content(file_url):
