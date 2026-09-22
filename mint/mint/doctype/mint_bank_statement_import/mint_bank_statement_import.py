@@ -532,6 +532,8 @@ def parse_xml_content(docname):
 			# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
 			key = (str(txn.get("date")), reference, amount, is_debit)
 			occurrences[key] = occurrences.get(key, 0) + 1
+			# //// Neoffice — `occurrence=` added; upstream passed no occurrence at all, so
+			# //// the n-th line of a batch booking matched the 1st one and was dropped
 			existing_bt = _find_existing_bank_transaction(
 				doc.bank_account, txn.get("date"), reference, amount, is_debit,
 				occurrence=occurrences[key],
