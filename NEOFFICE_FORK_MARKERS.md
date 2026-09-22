@@ -156,6 +156,20 @@ which vite carries through into the build output (five marker lines survive in
 `frontend/public/assets/bank-logos/*.svg`, and their markers come from the source files.
 **Mark the source, never the artifact.**
 
+That rule was prose, and the guard cannot read prose: `fork_markers.py` collects path patterns
+from the first column of a table headed `| Artifact |`, and finding none it kept asking for a
+marker in these files. The marker pass duly wrote one, `build-frontend` rewrote the same files
+minutes later, and the bot's rebase conflicted on them — losing the whole marker commit,
+including the legitimate marker it had just written in the Python of the same range (run of
+2026-09-22, `8b13a55655..75fcd9fb7c`; the same failure on 09-16 and 09-19). The table below
+states the decision above in the form the guard reads.
+
+| Artifact | Why it carries no marker of its own |
+|---|---|
+| `mint/public/mint/index.html` | vite's entry point, rewritten by `build-frontend` on every frontend change: the asset hashes in its `<script>` and `<link>` move at each build, so a marker written beside them is wiped by the next one. What marks it are the five marker lines of `frontend/index.html`, which vite carries through. |
+| `mint/www/mint.html` | the same document, copied from the one above by `yarn copy-html-entry` at the end of every build. Same hashes, same reason. |
+| `mint/public/mint/assets/**` | vite's bundles, named by content hash and regenerated whole at every build — nothing hand-written can survive there. The bank-logo SVGs are copies of `frontend/public/assets/bank-logos/`, and carry their sources' markers. |
+
 ---
 
 ### Hunks that cannot carry a marker in place
