@@ -327,7 +327,7 @@ export const useGetBankAccounts = (onSuccess?: (data?: Omit<SelectedBank, 'logo'
             const logo = findBankLogo(bank)
             return {
                 ...bank,
-                logo: logo && !logo.mark ? logo.logo : undefined,
+                logo: logo && !logo.mark ? logo.logo : undefined, //// Neoffice — a symbol alone is no logo
                 logo_mark: logo?.mark ? logo.logo : undefined
             }
         }) ?? []

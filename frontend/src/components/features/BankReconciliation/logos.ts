@@ -105,34 +105,38 @@ export const BANK_LOGOS: BankLogo[] = [
     },
     {
         keywords: ['PostFinance', 'Post Finance', 'Postfinance'],
-        bic: ['POFI'],
+        bic: ['POFI'], //// Neoffice — found by BIC or IBAN first (Swiss block above, 01.10)
         logo: 'assets/bank-logos/PostFinance.svg'
     },
     {
+        //// Neoffice — was « Raiffeisen Schweiz / Suisse / CH », « Banque Raiffeisen »: a bank named
+        //// « Raiffeisen » matched none of them (01.10).
         keywords: ['Raiffeisen'],
         bic: ['RAIF'],
         logo: 'assets/bank-logos/Raiffeisen_Schweiz.svg'
     },
     {
         keywords: ['Zürcher Kantonalbank', 'ZKB', 'Zurcher Kantonalbank', 'Zuercher Kantonalbank'],
-        bic: ['ZKBK'],
+        bic: ['ZKBK'], //// Neoffice — found by BIC or IBAN first (Swiss block above, 01.10)
         logo: 'assets/bank-logos/Zuercher_Kantonalbank.svg'
     },
     {
+        //// Neoffice — moved before the Vaud bank, whose « BCV » « BCVS » contains (01.10).
         keywords: ['Banque Cantonale du Valais', 'Walliser Kantonalbank', 'BCVs', 'BCVS', 'WKB'],
         bic: ['BCVS'],
         logo: 'assets/bank-logos/Banque_Cantonale_du_Valais.svg'
     },
     {
         keywords: ['Banque Cantonale Vaudoise', 'BCV'],
-        bic: ['BCVL'],
+        bic: ['BCVL'], //// Neoffice — found by BIC or IBAN first (Swiss block above, 01.10)
         logo: 'assets/bank-logos/BCV.svg'
     },
     {
         keywords: ['Cembra', 'Cembra Money Bank'],
-        bic: ['CMBN'],
+        bic: ['CMBN'], //// Neoffice — found by BIC or IBAN first (Swiss block above, 01.10)
         logo: 'assets/bank-logos/Cembra.svg'
     },
+    //// Neoffice — added (01.10): the other cantonal banks, then the Swiss banks next most used.
     {
         keywords: ['Aargauische Kantonalbank', 'AKB'],
         bic: ['KBAG'],
