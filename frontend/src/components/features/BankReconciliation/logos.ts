@@ -484,11 +484,11 @@ export const BANK_LOGOS: BankLogo[] = [
 
 //// Neoffice — added (01.10): the logo of a bank account, for every place Mint shows one. A Swiss
 //// bank is found by the BIC of its Bank record first, then by the IID of the account's IBAN
-//// (swissBankCodes.ts), and only then by its name: the fleet's banks are named « Raiffeisen »,
+//// (`bank_iid`, sent by get_list; swissBankCodes.ts), and only then by its name: the fleet's banks are named « Raiffeisen »,
 //// « BCVS », « Banque Cantonal du Valais », « Banque »... A keyword of four letters or fewer is an
 //// acronym and matches a whole word only (« BCV » is not in « BCVS », « CS » not in a word).
-export const findBankLogo = (bank: { bank?: string | null, bic?: string | null, iban?: string | null }) => {
-    for (const code of [bicBankCode(bank.bic), ibanBankCode(bank.iban)]) {
+export const findBankLogo = (bank: { bank?: string | null, bic?: string | null, bank_iid?: string | null }) => {
+    for (const code of [bicBankCode(bank.bic), iidBankCode(bank.bank_iid)]) {
         const byCode = code ? BANK_LOGOS.find((entry) => entry.bic?.includes(code)) : undefined
         if (byCode) return byCode
     }
@@ -502,12 +502,8 @@ const bicBankCode = (bic?: string | null) => {
     return /^[A-Z]{4}$/.test(code) ? code : undefined
 }
 
-// The 5th to 9th character of a Swiss or Liechtenstein IBAN name its bank.
-const ibanBankCode = (iban?: string | null) => {
-    const compact = (iban ?? '').replace(/\s/g, '').toUpperCase()
-    if (!/^(CH|LI)\d{7}/.test(compact)) return undefined
-    return SWISS_IID_BANK_CODES.get(Number(compact.slice(4, 9)))
-}
+//// Neoffice — the IID (5th to 9th character of a Swiss or Liechtenstein IBAN) names its bank.
+const iidBankCode = (iid?: string | null) => (iid && /^\d{5}$/.test(iid) ? SWISS_IID_BANK_CODES.get(Number(iid)) : undefined)
 
 const nameHas = (name: string, keyword: string) => {
     if (keyword.length > 4) return name.includes(keyword)

@@ -299,9 +299,9 @@ export const useReconcileTransaction = () => {
 
 interface BankAccountWithCurrency extends Pick<BankAccount, 'name' | 'bank' | 'account_name' | 'is_credit_card' | 'company' | 'account' | 'account_type' | 'account_subtype' | 'bank_account_no' | 'last_integration_date'> {
     account_currency?: string
-    //// Neoffice — iban and bic added (mint.apis.bank_account.get_list): they name a Swiss bank.
-    iban?: string | null
+    //// Neoffice — bic and bank_iid added (mint.apis.bank_account.get_list): they name a Swiss bank.
     bic?: string | null
+    bank_iid?: string | null
 }
 
 export const useGetBankAccounts = (onSuccess?: (data?: Omit<SelectedBank, 'logo'>[]) => void, filterFn?: (bank: SelectedBank) => boolean) => {
