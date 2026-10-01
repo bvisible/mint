@@ -56,6 +56,10 @@ function App() {
 		base.target = '_top'
 		document.head.appendChild(base)
 		document.documentElement.classList.add('mint-embedded')
+		//// Neoffice — <html> too: the desk's stylesheet paints it with --bg-color, the desk's page
+		//// background, one shade darker than the card the frame sits on (Jérémy, 01.10: « la même
+		//// couleur »). Both transparent, the frame shows the card itself, dark mode included.
+		document.documentElement.style.setProperty('background', 'transparent', 'important')
 		document.body.style.setProperty('background', 'transparent', 'important')
 	}, [])
 
