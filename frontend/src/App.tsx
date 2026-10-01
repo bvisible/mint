@@ -17,6 +17,8 @@ import { NeoCockpit } from '@neoffice/frappe-sidebar-react'
 import { FrappeLayout } from './components/layout'
 import { NoraLearnProvider } from '@neoffice/nora-learn-react'
 import '@neoffice/nora-learn-react/styles'
+//// Neoffice — added: Mint framed in a tab of the desk (lib/embedded.ts).
+import { EMBEDDED, outerWindow } from './lib/embedded'
 
 // Frappe integration flag — set by mint/www/mint.html before the bundle loads.
 // When true, we wrap routes in the FrappeLayout (native sidebar + navbar)
@@ -38,9 +40,23 @@ function App() {
 			if (import.meta.env.DEV) {
 				return
 			}
-			window.location.href = '/login?redirect-to=/mint'
+			//// Neoffice — framed in the desk, the login replaces the desk, not the frame.
+			outerWindow().location.href = '/login?redirect-to=/mint'
 			return
 		}
+	}, [])
+
+	//// Neoffice — framed in a tab of the desk: no page of its own around it. The desk's links
+	//// (a document, the home page) open in the desk rather than inside the frame - the router's
+	//// own links are unaffected, it handles their clicks itself - and the page lets the desk's
+	//// background show through.
+	useEffect(() => {
+		if (!EMBEDDED) return
+		const base = document.createElement('base')
+		base.target = '_top'
+		document.head.appendChild(base)
+		document.documentElement.classList.add('mint-embedded')
+		document.body.style.setProperty('background', 'transparent', 'important')
 	}, [])
 
 	// //// NEOFFICE PATCH — Bridge Frappe theme onto html[data-theme]
@@ -97,7 +113,10 @@ function App() {
 		</BrowserRouter>
 	)
 
-	const Shell = FRAPPE_INTEGRATION ? (
+	//// Neoffice — framed in the desk, the routes alone: the desk draws the menu and the tabs.
+	const Shell = EMBEDDED ? (
+		Routing
+	) : FRAPPE_INTEGRATION ? (
 		<FrappeLayout>{Routing}</FrappeLayout>
 	) : (
 		// standalone vite dev — same NeoCockpit shell, just without the mini-boot
@@ -116,7 +135,7 @@ function App() {
 			{/* //// Toaster loses theme='light' because the cockpit drives light/dark itself. */}
 			<NoraLearnProvider config={{
 				appName: 'mint',
-				navigate: (url) => { window.location.href = url },
+				navigate: (url) => { outerWindow().location.href = url },
 				getCurrentRoute: () => window.location.pathname,
 				showAlert: (msg, variant) => {
 					if (variant === 'success') toast.success(msg)

@@ -18,6 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { H1 } from "@/components/ui/typography"
 import _ from "@/lib/translate"
+//// Neoffice — added: framed in a tab of the desk (lib/embedded.ts).
+import { EMBEDDED } from "@/lib/embedded"
 import { useLayoutEffect, useRef, useState } from "react"
 
 
@@ -43,13 +45,19 @@ const BankReconciliation = () => {
                     {/* //// Mint wordmark; embedded in the Neoffice desk the page carries the Neoffice logo linking */}
                     {/* //// back to /app/home, then the page title and the favourite star. Cosmetic but ours: */}
                     {/* //// at the merge keep both sides and re-apply the logo block. */}
+                    {/* //// Neoffice — framed in a tab of the desk (lib/embedded.ts), the desk already */}
+                    {/* //// shows its logo and holds the tab: the page keeps its title alone. */}
                     <H1 className="text-sm font-medium flex items-center gap-2 whitespace-nowrap shrink-0">
-                        <a href="/app/home">
-                            <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-7" />
-                        </a>
-                        <span className="text-gray-400">|</span>
+                        {!EMBEDDED && (
+                            <>
+                                <a href="/app/home">
+                                    <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-7" />
+                                </a>
+                                <span className="text-gray-400">|</span>
+                            </>
+                        )}
                         {_("Bank Reconciliation")}
-                        <FavoriteStar />
+                        {!EMBEDDED && <FavoriteStar />}
                     </H1>
                     <div className="flex items-center gap-2">
                         <TooltipProvider>
