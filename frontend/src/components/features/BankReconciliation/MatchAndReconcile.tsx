@@ -960,7 +960,9 @@ const OlderUnreconciledTransactionsBanner = () => {
         return <div className="flex flex-col gap-2">
             {/* //// Neoffice — NOT ours: upstream v1.5.0 re-nested this banner so the action sits on the */}
             {/* //// right (89e7929). Take upstream's. */}
-            <div className="border border-amber-500 rounded-md p-4 flex items-center justify-between">
+            {/* //// Neoffice — ours: flex-wrap and gap-3. At the width of a desk tab the text stood in a */}
+            {/* //// column of two words beside the button (01.10); the button now goes below it. */}
+            <div className="border border-amber-500 rounded-md p-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                     <div className="min-w-8">
                         <AlertCircle className="w-6 h-6 text-amber-600" />
@@ -977,7 +979,8 @@ const OlderUnreconciledTransactionsBanner = () => {
 {/* //// out of the text column. */}
 
                 </div>
-                <div className="flex items-center gap-2 w-fit pl-4">
+                {/* //// Neoffice — ml-auto: wrapped below the text, the action keeps to the right. */}
+                <div className="flex items-center gap-2 w-fit pl-4 ml-auto">
                     <Button
                         size='sm'
                         type='button'
