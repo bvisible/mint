@@ -1,4 +1,17 @@
-export const BANK_LOGOS: { keywords: string[], logo: string }[] = [
+//// Neoffice — added: SWISS_IID_BANK_CODES (the bank of a Swiss IBAN, from SIX's bank master).
+import { SWISS_IID_BANK_CODES } from './swissBankCodes'
+
+//// Neoffice — the entry type is ours: upstream inlines `{ keywords, logo }`. `bic` (first four
+//// letters of a BIC) finds a Swiss bank by its BIC or IBAN (findBankLogo, at the bottom);
+//// `mark` says the file is the bank's symbol alone, shown beside its name, not as a logo.
+export interface BankLogo {
+    keywords: string[]
+    logo: string
+    bic?: string[]
+    mark?: boolean
+}
+
+export const BANK_LOGOS: BankLogo[] = [
     // US + International
     {
         keywords: ['American Express', 'Amex'],
@@ -75,39 +88,196 @@ export const BANK_LOGOS: { keywords: string[], logo: string }[] = [
     // Switzerland
     {
         keywords: ['UBS'],
+        //// Neoffice — bic added (01.10): a Swiss bank is found by its BIC or IBAN before its name.
+        bic: ['UBSW'],
         logo: 'assets/bank-logos/UBS.svg'
     },
-    //// Neoffice — added (dd20206): the Swiss banks our clients actually use (Credit Suisse,
-    //// PostFinance, Raiffeisen, ZKB, BCV, Banque Cantonale du Valais, Cembra). Upstream's list
-    //// is Indian, Australian and US banks. Keep both lists at the merge; the SVG files live in
-    //// frontend/public/assets/bank-logos/ and are listed in NEOFFICE_FORK_MARKERS.md.
+    //// Neoffice — added (dd20206, 01.10): the Swiss banks, matched by BIC and by the IID of the
+    //// IBAN before their name (findBankLogo). The keywords were too narrow: « Raiffeisen » alone
+    //// matched nothing and « BCVS » took the Vaud bank's logo (fleet survey, 01.10). The order
+    //// matters: Valais before Vaud, Swiss Raiffeisen before upstream's German Raiffeisenbanken.
+    //// Upstream's list has no Swiss bank but UBS. Keep both lists at the merge; the SVG files live
+    //// in frontend/public/assets/bank-logos/, each with its source and licence in a comment.
     {
         keywords: ['Credit Suisse', 'Crédit Suisse', 'CS'],
+        bic: ['CRES'],
         logo: 'assets/bank-logos/Credit_Suisse.svg'
     },
     {
         keywords: ['PostFinance', 'Post Finance', 'Postfinance'],
+        bic: ['POFI'],
         logo: 'assets/bank-logos/PostFinance.svg'
     },
     {
-        keywords: ['Raiffeisen Schweiz', 'Raiffeisen Suisse', 'Raiffeisen CH', 'Banque Raiffeisen'],
+        keywords: ['Raiffeisen'],
+        bic: ['RAIF'],
         logo: 'assets/bank-logos/Raiffeisen_Schweiz.svg'
     },
     {
         keywords: ['Zürcher Kantonalbank', 'ZKB', 'Zurcher Kantonalbank', 'Zuercher Kantonalbank'],
+        bic: ['ZKBK'],
         logo: 'assets/bank-logos/Zuercher_Kantonalbank.svg'
     },
     {
-        keywords: ['Banque Cantonale Vaudoise', 'BCV'],
-        logo: 'assets/bank-logos/BCV.svg'
-    },
-    {
-        keywords: ['Banque Cantonale du Valais', 'BCVs', 'BCVS'],
+        keywords: ['Banque Cantonale du Valais', 'Walliser Kantonalbank', 'BCVs', 'BCVS', 'WKB'],
+        bic: ['BCVS'],
         logo: 'assets/bank-logos/Banque_Cantonale_du_Valais.svg'
     },
     {
+        keywords: ['Banque Cantonale Vaudoise', 'BCV'],
+        bic: ['BCVL'],
+        logo: 'assets/bank-logos/BCV.svg'
+    },
+    {
         keywords: ['Cembra', 'Cembra Money Bank'],
+        bic: ['CMBN'],
         logo: 'assets/bank-logos/Cembra.svg'
+    },
+    {
+        keywords: ['Aargauische Kantonalbank', 'AKB'],
+        bic: ['KBAG'],
+        logo: 'assets/bank-logos/Aargauische_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Appenzeller Kantonalbank', 'APPKB'],
+        bic: ['AIKA'],
+        logo: 'assets/bank-logos/Appenzeller_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Basellandschaftliche Kantonalbank', 'BLKB'],
+        bic: ['BLKB'],
+        logo: 'assets/bank-logos/Basellandschaftliche_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Basler Kantonalbank', 'BKB'],
+        bic: ['BKBB'],
+        logo: 'assets/bank-logos/Basler_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Berner Kantonalbank', 'Banque Cantonale Bernoise', 'BEKB', 'BCBE'],
+        bic: ['KBBE'],
+        logo: 'assets/bank-logos/Berner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Banque Cantonale de Fribourg', 'Freiburger Kantonalbank', 'BCF', 'FKB'],
+        bic: ['BEFR'],
+        logo: 'assets/bank-logos/Banque_Cantonale_de_Fribourg.svg'
+    },
+    {
+        keywords: ['Banque Cantonale de Genève', 'Banque Cantonale de Geneve', 'BCGE'],
+        bic: ['BCGE'],
+        logo: 'assets/bank-logos/Banque_Cantonale_de_Geneve_icon.svg',
+        mark: true
+    },
+    {
+        keywords: ['Glarner Kantonalbank', 'GLKB'],
+        bic: ['GLKB'],
+        logo: 'assets/bank-logos/Glarner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Graubündner Kantonalbank', 'Graubuendner Kantonalbank', 'GKB'],
+        bic: ['GRKB'],
+        logo: 'assets/bank-logos/Graubuendner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Banque Cantonale du Jura', 'BCJ'],
+        bic: ['BCJU'],
+        logo: 'assets/bank-logos/Banque_Cantonale_du_Jura.svg'
+    },
+    {
+        keywords: ['Luzerner Kantonalbank', 'LUKB'],
+        bic: ['LUKB'],
+        logo: 'assets/bank-logos/Luzerner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Banque Cantonale Neuchâteloise', 'Banque Cantonale Neuchateloise', 'BCN'],
+        bic: ['BCNN'],
+        logo: 'assets/bank-logos/Banque_Cantonale_Neuchateloise.svg'
+    },
+    {
+        keywords: ['Nidwaldner Kantonalbank', 'NKB'],
+        bic: ['NIKA'],
+        logo: 'assets/bank-logos/Nidwaldner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Obwaldner Kantonalbank', 'OKB'],
+        bic: ['OBWK'],
+        logo: 'assets/bank-logos/Obwaldner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['St. Galler Kantonalbank', 'St.Galler Kantonalbank', 'SGKB'],
+        bic: ['KBSG'],
+        logo: 'assets/bank-logos/St_Galler_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Schaffhauser Kantonalbank', 'SHKB'],
+        bic: ['SHKB'],
+        logo: 'assets/bank-logos/Schaffhauser_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Schwyzer Kantonalbank', 'SZKB'],
+        bic: ['KBSZ'],
+        logo: 'assets/bank-logos/Schwyzer_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Thurgauer Kantonalbank', 'TKB'],
+        bic: ['KBTG'],
+        logo: 'assets/bank-logos/Thurgauer_Kantonalbank.svg'
+    },
+    {
+        keywords: ['BancaStato', 'Banca dello Stato', 'Tessiner Kantonalbank'],
+        bic: ['BSCT'],
+        logo: 'assets/bank-logos/BancaStato.svg'
+    },
+    {
+        keywords: ['Urner Kantonalbank', 'UKB'],
+        bic: ['URKN'],
+        logo: 'assets/bank-logos/Urner_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Zuger Kantonalbank', 'Zuger KB'],
+        bic: ['KBZG'],
+        logo: 'assets/bank-logos/Zuger_Kantonalbank.svg'
+    },
+    {
+        keywords: ['Migros Bank', 'Banque Migros', 'Banca Migros'],
+        bic: ['MIGR'],
+        logo: 'assets/bank-logos/Migros_Bank.svg'
+    },
+    {
+        keywords: ['Bank Cler', 'Banque Cler', 'Banca Cler'],
+        bic: ['BCLR'],
+        logo: 'assets/bank-logos/Bank_Cler.svg'
+    },
+    {
+        keywords: ['WIR Bank', 'Banque WIR'],
+        bic: ['WIRB'],
+        logo: 'assets/bank-logos/WIR_Bank.svg'
+    },
+    {
+        keywords: ['Swissquote'],
+        bic: ['SWQB'],
+        logo: 'assets/bank-logos/Swissquote.svg'
+    },
+    {
+        keywords: ['Julius Bär', 'Julius Baer'],
+        bic: ['BAER'],
+        logo: 'assets/bank-logos/Julius_Baer.svg'
+    },
+    {
+        keywords: ['Vontobel'],
+        bic: ['VONT'],
+        logo: 'assets/bank-logos/Vontobel.svg'
+    },
+    {
+        keywords: ['Lombard Odier'],
+        bic: ['LOCY'],
+        logo: 'assets/bank-logos/Lombard_Odier.svg'
+    },
+    {
+        keywords: ['EFG Bank', 'EFG International'],
+        bic: ['EFGB'],
+        logo: 'assets/bank-logos/EFG.svg'
     },
     {
         keywords: ['US Bank', 'USBank', 'U.S. Bank', 'U.S. Bancorp'],
@@ -307,3 +477,36 @@ export const BANK_LOGOS: { keywords: string[], logo: string }[] = [
         logo: "assets/bank-logos/Prime_Bank.png"
     }
 ]
+
+//// Neoffice — added (01.10): the logo of a bank account, for every place Mint shows one. A Swiss
+//// bank is found by the BIC of its Bank record first, then by the IID of the account's IBAN
+//// (swissBankCodes.ts), and only then by its name: the fleet's banks are named « Raiffeisen »,
+//// « BCVS », « Banque Cantonal du Valais », « Banque »... A keyword of four letters or fewer is an
+//// acronym and matches a whole word only (« BCV » is not in « BCVS », « CS » not in a word).
+export const findBankLogo = (bank: { bank?: string | null, bic?: string | null, iban?: string | null }) => {
+    for (const code of [bicBankCode(bank.bic), ibanBankCode(bank.iban)]) {
+        const byCode = code ? BANK_LOGOS.find((entry) => entry.bic?.includes(code)) : undefined
+        if (byCode) return byCode
+    }
+    const name = (bank.bank ?? '').toLowerCase()
+    if (!name) return undefined
+    return BANK_LOGOS.find((entry) => entry.keywords.some((keyword) => nameHas(name, keyword.toLowerCase())))
+}
+
+const bicBankCode = (bic?: string | null) => {
+    const code = (bic ?? '').replace(/\s/g, '').slice(0, 4).toUpperCase()
+    return /^[A-Z]{4}$/.test(code) ? code : undefined
+}
+
+// The 5th to 9th character of a Swiss or Liechtenstein IBAN name its bank.
+const ibanBankCode = (iban?: string | null) => {
+    const compact = (iban ?? '').replace(/\s/g, '').toUpperCase()
+    if (!/^(CH|LI)\d{7}/.test(compact)) return undefined
+    return SWISS_IID_BANK_CODES.get(Number(compact.slice(4, 9)))
+}
+
+const nameHas = (name: string, keyword: string) => {
+    if (keyword.length > 4) return name.includes(keyword)
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`, 'u').test(name)
+}

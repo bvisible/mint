@@ -8,7 +8,8 @@ import { BankTransaction } from '@/types/Accounts/BankTransaction'
 import { BankAccount } from '@/types/Accounts/BankAccount'
 import dayjs from 'dayjs'
 import { toast } from 'sonner'
-import { BANK_LOGOS } from './logos'
+//// Neoffice — findBankLogo replaces the keyword search inlined below (BIC and IBAN first, 01.10).
+import { findBankLogo } from './logos'
 import { getErrorMessage } from '@/lib/frappe'
 import { useCurrentCompany } from '@/hooks/useCurrentCompany'
 import _ from '@/lib/translate'
@@ -298,6 +299,9 @@ export const useReconcileTransaction = () => {
 
 interface BankAccountWithCurrency extends Pick<BankAccount, 'name' | 'bank' | 'account_name' | 'is_credit_card' | 'company' | 'account' | 'account_type' | 'account_subtype' | 'bank_account_no' | 'last_integration_date'> {
     account_currency?: string
+    //// Neoffice — iban and bic added (mint.apis.bank_account.get_list): they name a Swiss bank.
+    iban?: string | null
+    bic?: string | null
 }
 
 export const useGetBankAccounts = (onSuccess?: (data?: Omit<SelectedBank, 'logo'>[]) => void, filterFn?: (bank: SelectedBank) => boolean) => {
@@ -317,10 +321,14 @@ export const useGetBankAccounts = (onSuccess?: (data?: Omit<SelectedBank, 'logo'
     const banks = useMemo(() => {
         // Match the bank account to the logo
         const banksWithLogos = data?.message.map((bank) => {
-            const logo = BANK_LOGOS.find((logo) => logo.keywords.some((keyword) => bank.bank?.toLowerCase().includes(keyword.toLowerCase())))
+            //// Neoffice — findBankLogo (logos.ts): by BIC, then IBAN, then name. A bank whose file
+            //// is its symbol alone (BCGE) has no logo: every place falls back to its name, and the
+            //// bank picker shows the symbol beside it (logo_mark).
+            const logo = findBankLogo(bank)
             return {
                 ...bank,
-                logo: logo?.logo
+                logo: logo && !logo.mark ? logo.logo : undefined,
+                logo_mark: logo?.mark ? logo.logo : undefined
             }
         }) ?? []
 

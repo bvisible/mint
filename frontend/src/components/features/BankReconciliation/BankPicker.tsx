@@ -100,7 +100,13 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
         /> : <div className={cn("rounded-md flex items-center h-10 gap-2", {
             "h-6 mb-2": size === 'sm',
         })}>
-            <Landmark size={size === 'sm' ? '16px' : '30px'} />
+            {/* //// Neoffice — the bank's symbol in place of the generic icon when no full logo */}
+            {/* //// exists (BCGE: its symbol alone, beside its name; logos.ts, 01.10). */}
+            {bank.logo_mark ? <img
+                src={`/assets/mint/mint/${bank.logo_mark}`}
+                alt=""
+                style={size === 'sm' ? { width: '16px', height: '16px' } : { width: '30px', height: '30px' }}
+            /> : <Landmark size={size === 'sm' ? '16px' : '30px'} />}
             <H4 className={cn("text-base mb-0", {
                 'text-xs': size === 'sm',
             })}>{bank.bank}</H4>

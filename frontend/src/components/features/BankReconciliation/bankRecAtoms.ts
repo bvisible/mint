@@ -9,6 +9,11 @@ import { JournalEntry } from "@/types/Accounts/JournalEntry";
 
 export interface SelectedBank extends Pick<BankAccount, 'name' | 'bank' | 'is_credit_card' | 'company' | 'account_name' | 'bank_account_no' | 'account' | 'account_type' | 'integration_id' | 'is_default' | 'last_integration_date'> {
     logo?: string,
+    //// Neoffice — added (01.10): the bank's symbol when no full logo exists (BCGE), and the
+    //// IBAN and BIC findBankLogo reads.
+    logo_mark?: string,
+    iban?: string | null,
+    bic?: string | null,
     account_currency?: string
 }
 export const selectedBankAccountAtom = atom<SelectedBank | null>(null)

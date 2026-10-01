@@ -1,8 +1,10 @@
 import frappe
-# //// Neoffice — NOTHING in this file is our intent: it is upstream code carried by hand.
+# //// Neoffice — almost nothing in this file is our intent: it is upstream code carried by hand.
 # //// This import and the str | datetime.date hint at the bottom come from the v1.5.0
 # //// port (89e7929); the get_list rewrite below is a byte-identical backport of upstream
-# //// 5ba8c6b. At the next merge take upstream's bank_account.py and drop every marker.
+# //// 5ba8c6b. At the next merge take upstream's bank_account.py and drop those markers,
+# //// EXCEPT the two marked « (01.10) » in get_list (iban and bic, for the bank logos): ours,
+# //// re-apply them on upstream's version.
 import datetime
 
 @frappe.whitelist(methods=["GET"])
@@ -24,12 +26,17 @@ def get_list(company: str, show_disabled: bool = False):
     bank_accounts = frappe.get_list("Bank Account", 
                                     filters=filters, 
                                     order_by="is_default desc",
-                                    fields=["name", "account", "company", "account_name", "is_default", "bank", "account_type", "account_subtype", "bank_account_no", "last_integration_date", "is_credit_card"])
+                                    fields=["name", "account", "company", "account_name", "is_default", "bank", "account_type", "account_subtype", "bank_account_no", "last_integration_date", "is_credit_card",
+                                            # //// Neoffice — iban added (01.10): with the bic below it names a Swiss
+                                            # //// bank whatever the Bank record is called (logos.ts, findBankLogo).
+                                            "iban"])
 
     # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge: account_currency
     # //// was a column of the dropped join, it is now read per row from the Account cache.
     for bank_account in bank_accounts:
         bank_account.account_currency = frappe.get_cached_value("Account", bank_account.account, "account_currency")
+        # //// Neoffice — added (01.10): the BIC of the account's bank, for its logo (findBankLogo).
+        bank_account.bic = frappe.get_cached_value("Bank", bank_account.bank, "swift_number") if bank_account.bank else None
 
     # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge: the stray
     # //// blank line and the renamed return come from upstream's commit verbatim.
