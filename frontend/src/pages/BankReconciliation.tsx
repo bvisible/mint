@@ -57,6 +57,8 @@ const BankReconciliation = () => {
                             </>
                         )}
                         {_("Bank Reconciliation")}
+                        {/* //// Neoffice — framed in a desk tab, the star would pin /mint, a page the */}
+                        {/* //// reader no longer visits: the tab is the place, so the star goes. */}
                         {!EMBEDDED && <FavoriteStar />}
                     </H1>
                     <div className="flex items-center gap-2">
