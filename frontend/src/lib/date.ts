@@ -5,6 +5,15 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+//// Neoffice — dayjs ships its locales as separate modules and only "en" is built in: without them
+//// every month name, abbreviation and ordinal ("Do") of a formatted date stays English whatever the
+//// language of the user ("Au 3rd Oct 2026" in a French UI). The languages Neoffice is used in are
+//// registered here (registering does not switch the global locale), and the user's language is applied
+//// per call in formatDate / getTimeago below.
+import 'dayjs/locale/fr';
+import 'dayjs/locale/de';
+import 'dayjs/locale/it';
+import 'dayjs/locale/es';
 import _ from './translate';
 
 dayjs.extend(utc);
@@ -15,6 +24,11 @@ dayjs.extend(quarterOfYear);
 dayjs.extend(customParseFormat);
 
 const FRAPPE_DATE_FORMAT = "YYYY-MM-DD"
+
+//// Neoffice — added helper (no upstream equivalent): the user's language as boot sends it ("fr", "de",
+//// "pt-BR"…). dayjs ignores a locale it has not registered and keeps English, so an unknown language is
+//// harmless.
+const getUserLanguage = (): string => window?.frappe?.boot?.lang || 'en'
 
 export const getUserDateFormat = () => {
 
@@ -152,7 +166,8 @@ const toUserTimezone = (timestamp: string) => {
 
 export const getTimeago = (date?: string) => {
     if (date) {
-        const userDate = toUserTimezone(date)
+        //// Neoffice — relative times ("3 days ago") follow the user's language too, see the locale imports.
+        const userDate = toUserTimezone(date).locale(getUserLanguage())
         return userDate.fromNow()
     }
     return ''
@@ -165,7 +180,10 @@ export const formatDate = (date?: string | Date, format?: string) => {
     }
 
     if (date) {
-        return dayjs(date).format(format)
+        //// Neoffice — upstream formats with dayjs's built-in English locale, so "Do MMM YYYY" printed
+        //// "3rd Oct 2026" in a French UI. The user's language is applied to this one instance: the global
+        //// locale is left alone.
+        return dayjs(date).locale(getUserLanguage()).format(format)
     }
     return ''
 }
