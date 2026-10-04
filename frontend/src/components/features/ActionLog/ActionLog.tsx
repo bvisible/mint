@@ -193,11 +193,12 @@ const Row = ({ item, index, isLast, action }: { item: ActionLogItem, index: numb
                 </div>
                 <div className='flex justify-end items-center gap-2'>
                     <div className='text-right flex flex-col gap-2'>
+                        {/* //// Neoffice — the DocType name is translated, not printed raw ("Sales Invoice :" in a French UI). */}
                         <a
                             href={`/app/${slug(item.voucher.reference_doctype)}/${item.voucher.reference_name}`}
                             target='_blank'
                             className='underline underline-offset-4'>
-                            {["Payment Entry", "Journal Entry"].includes(item.voucher.reference_doctype) ? "" : _("{} :", [item.voucher.reference_doctype])} {item.voucher.reference_name}
+                            {["Payment Entry", "Journal Entry"].includes(item.voucher.reference_doctype) ? "" : _("{} :", [_(item.voucher.reference_doctype)])} {item.voucher.reference_name}
                         </a>
                         {item.voucher.reference_doctype === "Payment Entry" && item.voucher.doc && <PaymentEntryDetails item={item} />}
                         {item.voucher.reference_doctype === "Journal Entry" && <JournalEntryDetails item={item} bank={bank} />}
@@ -423,7 +424,8 @@ const CancelActionLogItem = ({ item, type, timestamp, bank }: { item: ActionLogI
         </Tooltip>
         <AlertDialogContent className='min-w-3xl'>
             <AlertDialogHeader>
-                <AlertDialogTitle>{type === 'match' ? _("Unmatch Transaction?") : _("Undo {}?", [item.voucher.reference_doctype])}</AlertDialogTitle>
+                {/* //// Neoffice — the DocType name is translated, not printed raw ("Undo Sales Invoice?"); the description just below already does this. */}
+                <AlertDialogTitle>{type === 'match' ? _("Unmatch Transaction?") : _("Undo {}?", [_(item.voucher.reference_doctype)])}</AlertDialogTitle>
                 <AlertDialogDescription>{type === 'match' ? _("Are you sure you want to unmatch the voucher from this transaction?") : _("Are you sure you want to cancel this {} {}?", [_(item.voucher.reference_doctype), item.voucher.reference_name])}</AlertDialogDescription>
             </AlertDialogHeader>
             {error && <ErrorBanner error={error} />}

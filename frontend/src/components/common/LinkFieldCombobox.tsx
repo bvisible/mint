@@ -113,7 +113,8 @@ const LinkFieldCombobox = ({
     //// Neoffice — changed (f17f89f). Upstream builds the placeholder with a template literal,
     //// `Select ${doctype}`: the extractor cannot see it, so it stayed English in a French UI.
     //// _() with a {0} placeholder is extractable and translated.
-    placeholder = _("Select {0}", [doctype]),
+    //// The DocType name itself is translated too: it went into the sentence raw ("Sélectionner Customer").
+    placeholder = _("Select {0}", [_(doctype)]),
     customQuery,
     searchfield,
     searchAPIPath = "frappe.desk.search.search_link",
@@ -283,7 +284,8 @@ const LinkFieldCombobox = ({
                                 <a href={`/app/${slug(doctype)}/new-${slug(doctype)}-1`}
                                     target="_blank"
                                     className="hover:underline underline-offset-4 cursor-pointer flex justify-between items-center">
-                                    {_("Create New {0}", [doctype])}
+                                    {/* //// Neoffice — the DocType name goes into the sentence translated, not raw ("Créer Customer"). */}
+                                    {_("Create New {0}", [_(doctype)])}
 
                                     <ExternalLink />
                                 </a>
