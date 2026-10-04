@@ -1082,21 +1082,27 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
                         stayed English whatever the user language; every other label in this file goes
                         through _(). We pass them through _() too. */}
                     <TableHead>
+                        {/* //// Neoffice — see the block marker above: bare header text never went through _(), now it does (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers") */}
                         {_("Type")}
                     </TableHead>
                     <TableHead>
+                        {/* //// Neoffice — see the block marker above: bare header text never went through _(), now it does (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers") */}
                         {_("Name")}
                     </TableHead>
                     <TableHead>
+                        {/* //// Neoffice — see the block marker above: bare header text never went through _(), now it does (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers") */}
                         {_("Invoice No")}
                     </TableHead>
                     <TableHead>
+                        {/* //// Neoffice — see the block marker above: bare header text never went through _(), now it does (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers") */}
                         {_("Due Date")}
                     </TableHead>
                     <TableHead className="text-right">
+                        {/* //// Neoffice — see the block marker above: bare header text never went through _(), now it does (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers") */}
                         {_("Grand Total")}
                     </TableHead>
                     <TableHead className="text-right">
+                        {/* //// Neoffice — see the block marker above: bare header text never went through _(), now it does (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers") */}
                         {_("Outstanding")}
                     </TableHead>
                 </TableRow>

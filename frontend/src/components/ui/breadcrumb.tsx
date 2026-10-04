@@ -96,6 +96,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <MoreHorizontal className="size-4" />
+      {/* //// Neoffice — see the marker on the translate import above: the screen-reader label was bare English text in upstream, so it stayed English in other languages; it now goes through _() (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers"). */}
       <span className="sr-only">{_("More")}</span>
     </span>
   )

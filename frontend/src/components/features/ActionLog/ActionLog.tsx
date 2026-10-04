@@ -198,6 +198,7 @@ const Row = ({ item, index, isLast, action }: { item: ActionLogItem, index: numb
                             href={`/app/${slug(item.voucher.reference_doctype)}/${item.voucher.reference_name}`}
                             target='_blank'
                             className='underline underline-offset-4'>
+                            {/* //// Neoffice — see the block marker above: the reference line translates the DocType name before interpolating it, instead of printing the raw English name (631ef5c "fix(i18n): DocType names go into translated sentences translated, not raw"). */}
                             {["Payment Entry", "Journal Entry"].includes(item.voucher.reference_doctype) ? "" : _("{} :", [_(item.voucher.reference_doctype)])} {item.voucher.reference_name}
                         </a>
                         {item.voucher.reference_doctype === "Payment Entry" && item.voucher.doc && <PaymentEntryDetails item={item} />}

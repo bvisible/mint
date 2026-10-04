@@ -97,9 +97,13 @@ def import_statement(file_url: str, bank_account: str):
         frappe.throw(_("You do not have permission to import bank transactions"), title=_("Permission Denied"))
     
     if not frappe.has_permission("Bank Transaction", "create"):
+        # //// Neoffice — see the block marker above: the throw title now goes through _() too
+        # //// (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers").
         frappe.throw(_("You do not have permission to import bank transactions"), title=_("Permission Denied"))
     
     if not frappe.has_permission("Bank Transaction", "submit"):
+        # //// Neoffice — see the block marker above: the throw title now goes through _() too
+        # //// (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers").
         frappe.throw(_("You do not have permission to import and submit bank transactions"), title=_("Permission Denied"))
 
     
@@ -110,6 +114,8 @@ def import_statement(file_url: str, bank_account: str):
         frappe.throw(_("The bank account is not a company account. Please select a company account"), title=_("Invalid Bank Account"))
     
     if disabled:
+        # //// Neoffice — see the markers above: the throw title now goes through _() too
+        # //// (54d0d0a "fix(i18n): pass bare UI strings and throw titles through the translate helpers").
         frappe.throw(_("The bank account is disabled. Please enable it"), title=_("Disabled Bank Account"))
     
     currency = frappe.get_value("Account", account, "account_currency")
