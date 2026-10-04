@@ -1078,23 +1078,26 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
                             }
                         }} />
                     </TableHead>
+                    {/* //// Neoffice — upstream wrote these six column headers as bare JSX text, so they
+                        stayed English whatever the user language; every other label in this file goes
+                        through _(). We pass them through _() too. */}
                     <TableHead>
-                        Type
+                        {_("Type")}
                     </TableHead>
                     <TableHead>
-                        Name
+                        {_("Name")}
                     </TableHead>
                     <TableHead>
-                        Invoice No
+                        {_("Invoice No")}
                     </TableHead>
                     <TableHead>
-                        Due Date
+                        {_("Due Date")}
                     </TableHead>
                     <TableHead className="text-right">
-                        Grand Total
+                        {_("Grand Total")}
                     </TableHead>
                     <TableHead className="text-right">
-                        Outstanding
+                        {_("Outstanding")}
                     </TableHead>
                 </TableRow>
             </TableHeader>

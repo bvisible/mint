@@ -8,7 +8,9 @@ frappe.pages['bank-reconciliation'].on_page_load = function (wrapper) {
 		single_column: true,
 	});
 
-	page.set_primary_action("Open Bank Reconciliation", function () {
+	//// Neoffice — upstream passed the button label as a bare string, which set_primary_action does not
+	//// translate; it stayed English. We wrap it in __().
+	page.set_primary_action(__("Open Bank Reconciliation"), function () {
 		window.location.href = '/mint';
 	});
 }

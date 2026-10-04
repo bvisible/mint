@@ -91,23 +91,26 @@ def import_statement(file_url: str, bank_account: str):
     Given a file path and bank account, try to import the statement
     """
 
+    # //// Neoffice — upstream translated the message of each throw below but not its title, so the dialog
+    # //// header stayed English next to a French body. The titles go through _() as well.
     if not frappe.has_permission("Bank Transaction", "write"):
-        frappe.throw(_("You do not have permission to import bank transactions"), title="Permission Denied")
+        frappe.throw(_("You do not have permission to import bank transactions"), title=_("Permission Denied"))
     
     if not frappe.has_permission("Bank Transaction", "create"):
-        frappe.throw(_("You do not have permission to import bank transactions"), title="Permission Denied")
+        frappe.throw(_("You do not have permission to import bank transactions"), title=_("Permission Denied"))
     
     if not frappe.has_permission("Bank Transaction", "submit"):
-        frappe.throw(_("You do not have permission to import and submit bank transactions"), title="Permission Denied")
+        frappe.throw(_("You do not have permission to import and submit bank transactions"), title=_("Permission Denied"))
 
     
 
     company, account, is_company_account, disabled = frappe.get_value("Bank Account", bank_account, ["company", "account", "is_company_account", "disabled"])
+    # //// Neoffice — same as above: the throw titles were left untranslated.
     if not is_company_account:
-        frappe.throw(_("The bank account is not a company account. Please select a company account"), title="Invalid Bank Account")
+        frappe.throw(_("The bank account is not a company account. Please select a company account"), title=_("Invalid Bank Account"))
     
     if disabled:
-        frappe.throw(_("The bank account is disabled. Please enable it"), title="Disabled Bank Account")
+        frappe.throw(_("The bank account is disabled. Please enable it"), title=_("Disabled Bank Account"))
     
     currency = frappe.get_value("Account", account, "account_currency")
     # Create the bank transactions, submit them and then store the closing balance if any
@@ -174,7 +177,8 @@ def get_data(file_path: str):
     content = file_doc.get_content()
 
     if extension.lower() not in (".csv", ".xlsx", ".xls"):
-        frappe.throw(_("Import template should be of type .csv, .xlsx or .xls"), title="Invalid File Type")
+        # //// Neoffice — the throw title was left untranslated (see import_statement).
+        frappe.throw(_("Import template should be of type .csv, .xlsx or .xls"), title=_("Invalid File Type"))
 
     if extension.lower() == ".csv":
         data = read_csv_content(content)

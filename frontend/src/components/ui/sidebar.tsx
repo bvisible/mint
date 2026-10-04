@@ -194,8 +194,10 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            {/* //// Neoffice — upstream left the mobile sidebar's screen-reader title and description as
+                bare English text; this file already imports _(), we use it. */}
+            <SheetTitle>{_("Sidebar")}</SheetTitle>
+            <SheetDescription>{_("Displays the mobile sidebar.")}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -272,7 +274,8 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      {/* //// Neoffice — upstream left this screen-reader label as bare English text; we use _(). */}
+      <span className="sr-only">{_("Toggle Sidebar")}</span>
     </Button>
   )
 }

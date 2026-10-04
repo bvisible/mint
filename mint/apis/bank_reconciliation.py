@@ -729,7 +729,9 @@ def get_account_defaults(account: str):
 def get_party_details(company: str, party_type: str, party: str | int):
 
     if not frappe.db.exists(party_type, party):
-        frappe.throw(_("{0} {1} does not exist").format(party_type, party))
+        # //// Neoffice — upstream injected the raw DocType name ("Customer") into a translated template,
+        # //// so the message read half French, half English. We translate the DocType name too.
+        frappe.throw(_("{0} {1} does not exist").format(_(party_type), party))
 
     party_account = get_party_account(party_type, party, company)
     _party_name = "title" if party_type == "Shareholder" else party_type.lower() + "_name"

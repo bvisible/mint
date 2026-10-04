@@ -443,7 +443,9 @@ const CashPicker = ({ company, selectedAccount, setSelectedAccount }: { company:
                 <Banknote size='24px' />
             </div>
             <div className='flex flex-col gap-1'>
-                <span className='font-semibold text-sm'>Cash</span>
+                {/* //// Neoffice — upstream left this account label as bare JSX, English whatever the
+                    user language; the file already imports _(), we use it. */}
+                <span className='font-semibold text-sm'>{_("Cash")}</span>
                 <span className='text-xs text-muted-foreground'>{data?.message?.default_cash_account}</span>
             </div>
         </div>

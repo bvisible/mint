@@ -620,7 +620,9 @@ const ConfigureAccountsModalContent = () => {
                         </TableCell>
                         <TableCell className="align-top text-muted-foreground">
                             <span className="px-2">
-                                Bank GL Account
+                                {/* //// Neoffice — upstream left this row label as bare JSX, English whatever
+                                    the user language; the file already imports _(), we use it. */}
+                                {_("Bank GL Account")}
                             </span>
                         </TableCell>
                         <TableCell className="align-top">

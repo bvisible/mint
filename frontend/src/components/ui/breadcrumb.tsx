@@ -3,6 +3,9 @@ import { Slot as SlotPrimitive } from "radix-ui"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+//// Neoffice — added: the screen-reader-only labels below were bare English text in upstream;
+//// we route them through the shared translate helper like the rest of the SPA.
+import _ from "@/lib/translate"
 
 function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
   return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
@@ -93,7 +96,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <MoreHorizontal className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{_("More")}</span>
     </span>
   )
 }

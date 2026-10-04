@@ -71,7 +71,9 @@ def create_document_processor(processor_type_key: str = "BANK_STATEMENT"):
 	        dict: A dictionary containing the processor details.
 	"""
 	if processor_type_key not in PROCESSOR_TYPES_CONFIG:
-		frappe.throw(f"Invalid processor type: {processor_type_key}")
+		# //// Neoffice — upstream threw an f-string that never went through _(), so the message stayed
+		# //// English. One translatable template, the value is formatted after the translation.
+		frappe.throw(_("Invalid processor type: {0}").format(processor_type_key))
 
 	settings = frappe.get_single("Mint Settings")
 	if not settings.google_project_id:

@@ -264,7 +264,9 @@ const EmptyState = ({ onSelect, value }: { onSelect: (fromDate: string, toDate: 
                     </span>}
             </div> :
             <span className='text-sm text-muted-foreground'>
-                No results found
+                {/* //// Neoffice — upstream left this empty-state text as bare JSX, English whatever the
+                    user language; the file already imports _(), we use it. */}
+                {_("No results found")}
             </span>
         }
     </div>
