@@ -81,6 +81,27 @@ def _load_ui_translations() -> dict:
         return {}
 
 
+# //// Neoffice — added (semantic collisions). The SPA reads ONE flat dictionary: every installed app's French,
+# //// merged in load order, so a bare English key is won by whichever app loads last. mint's bank sense of
+# //// `Transfer` (« Virement »: money moving between two bank accounts) lost it to the generic « Transférer »
+# //// that ERPNext's asset/share transfers and our softphone need. The SPA is a committed build and cannot
+# //// pass a translation context, so the dictionary handed to it carries mint's sense under the bare key,
+# //// looked up through its context. A language without the context entry keeps its bare word (Frappe's
+# //// own fallback), so nothing changes for it.
+def _keep_bank_senses(messages: dict) -> None:
+    """Put mint's own sense of a bare key back into the dictionary handed to the SPA.
+
+    One explicit `_()` call per sense: `bench generate-pot-file` then extracts the context and
+    `update-po-files` keeps its French.
+    """
+    from frappe import _
+
+    for text, word in (
+        ("Transfer", _("Transfer", context="Bank transfer")),
+    ):
+        messages[text] = word
+
+
 def _apply_neoffice_theme_filters(bootinfo) -> None:
     """Apply neoffice_theme's `extend_bootinfo` filters explicitly.
 
@@ -190,6 +211,8 @@ def get_navbar_boot() -> dict:
     # translate any UI string it ships.
     messages = dict(full.get("__messages") or {})
     messages.update(_load_ui_translations())
+    # //// Neoffice — added: see _keep_bank_senses().
+    _keep_bank_senses(messages)
     boot["__messages"] = messages
     return boot
 

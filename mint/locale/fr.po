@@ -271,10 +271,20 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annuler"
 
+# //// Neoffice — the bare key `Check` read « Chèque » (upstream's machine translation) and, loaded last, imposed it
+# //// on the tick-box type of frappe, LMS and our own apps. The bare key now says the commonest sense;
+# //// this app's own label keeps its word under its DocType context just below.
 #. Label of a Select field in DocType 'Mint Bank Transaction Description Rules'
 #: mint/mint/doctype/mint_bank_transaction_description_rules/mint_bank_transaction_description_rules.json
 msgid "Check"
-msgstr "Chèque"
+msgstr "Case à cocher"
+
+# //// Neoffice — `Check` labels the Select that picks how a rule tests a bank description (Contains / Starts With /
+# //// Ends With / Regex), not a bank cheque: upstream's « Chèque » was wrong. Anchored in
+# //// mint/i18n_anchors.py so that update-po-files keeps it.
+msgctxt "Mint Bank Transaction Description Rules"
+msgid "Check"
+msgstr "Critère"
 
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:225
 msgid "Checks and Deposits incorrectly cleared"
@@ -897,9 +907,11 @@ msgstr "Solde d'ouverture"
 msgid "Original amount"
 msgstr "Montant initial"
 
+# //// Neoffice — the invoice table of the payment dialog heads its amount-still-due column `Outstanding`: upstream's
+# //// « En attente » (pending) is wrong for an amount. Same word as pos_next's, so the bare key agrees.
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:599
 msgid "Outstanding"
-msgstr "En attente"
+msgstr "Solde dû"
 
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:220
 msgid "Outstanding Checks and Deposits to clear"
@@ -1555,6 +1567,9 @@ msgstr "Transaction non rapprochée"
 msgid "Transactions"
 msgstr "Transactions"
 
+# //// Neoffice — bare key released to the commonest sense (ERPNext asset, share and material transfers, call transfer
+# //// in our softphone). mint's own sense, moving money between two bank accounts, stays « Virement »
+# //// through the two contexts just below.
 #. Option for the 'Classify As' (Select) field in DocType 'Mint Bank
 #. Transaction Rule'
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:362
@@ -1564,6 +1579,18 @@ msgstr "Transactions"
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:119
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:283
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json
+msgid "Transfer"
+msgstr "Transférer"
+
+# //// Neoffice — the SPA's own sense: mint/api/boot.py puts this word under the bare key of the SPA's dictionary,
+# //// whatever app loads last.
+msgctxt "Bank transfer"
+msgid "Transfer"
+msgstr "Virement"
+
+# //// Neoffice — option of the `Classify As` Select of Mint Bank Transaction Rule. Anchored in
+# //// mint/i18n_anchors.py so that update-po-files keeps it.
+msgctxt "Mint Bank Transaction Rule"
 msgid "Transfer"
 msgstr "Virement"
 
@@ -2342,8 +2369,11 @@ msgstr "Sélectionnez un compte bancaire"
 msgid "{0} new, {1} already imported"
 msgstr "{0} nouvelles, {1} déjà importées"
 
+# //// Neoffice — upstream's « Doublon » sat on the bare key `Duplicate`, which nothing in this app translates (the status
+# //// is only compared in code). It still won the bare key and printed « Doublon » on frappe's own
+# //// Duplicate menu of every form.
 msgid "Duplicate"
-msgstr "Doublon"
+msgstr "Dupliquer"
 
 msgid "Pending"
 msgstr "En attente"
