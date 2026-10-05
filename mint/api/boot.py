@@ -61,6 +61,13 @@ NAVBAR_BOOT_KEYS = (
     # main.tsx calls `frappe.model.sync(frappe.boot.docs)` so this MUST be set
     # — otherwise React never mounts (Object.sync throws on undefined.docs).
     "docs",
+    # The cockpit reads the same keys as in Drive or LMS (neoffice_theme.cockpit_boot.COCKPIT_BOOT_KEYS): remote
+    # assistance, Simple mode and its spaces, and the workspaces only advanced mode has. Without them /mint drew
+    # advanced mode's row of icons in Simple mode, where the desk shows the logo and NORA only (2026-10-05).
+    "neo_assist",
+    "neo_mode",
+    "neo_simple_spaces",
+    "neoffice_advanced_only_workspaces",
 )
 
 
@@ -103,45 +110,19 @@ def _keep_bank_senses(messages: dict) -> None:
 
 
 def _apply_neoffice_theme_filters(bootinfo) -> None:
-    """Apply neoffice_theme's `extend_bootinfo` filters explicitly.
+    """Run the `extend_bootinfo` hooks the desk runs, so this page gets what /app/home gets.
 
-    extend_bootinfo hooks normally run inside `frappe.boot.get_bootinfo()`,
-    but in the website-page context the bootinfo we get back here is missing
-    the filters that Desk would normally have applied. Calling them by hand
-    ensures `/mint` shows the SAME app_data + workspaces + form_width as
-    `/app/home` (no Mode simplifié, no Fiduciary, etc.).
+    frappe.sessions.get() fires them for the desk; get_bootinfo() does not. They give the same
+    app_data, workspaces and form width as /app/home, and the keys the cockpit reads in every other
+    app (neoffice_theme.cockpit_boot.get_cockpit_boot runs them the same way): Simple mode and its
+    spaces, remote assistance. A hand-picked list of the theme's filters lagged behind its hooks,
+    and Simple mode never reached this page (2026-10-05).
 
-    Fail open: if neoffice_theme is missing or any filter throws, return the
-    bootinfo unmodified rather than break the SPA boot.
+    Fail open per hook: one broken hook must not break the SPA boot.
     """
-    try:
-        from neoffice_theme.boot_override import (
-            filter_apps_by_interface_mode,
-            filter_apps_by_user_visibility,
-            filter_workspaces_by_interface_mode,
-            inject_user_form_width,
-            apply_workspace_custom_titles,
-            fix_module_wise_workspaces,
-            inject_instance_config,
-        )
-    except Exception:
-        return
-
-    # Order matches neoffice_theme/hooks.py::extend_bootinfo so the SPA
-    # payload is byte-identical to /app/home. Filters first, then the
-    # title remap (else we'd rename entries about to be filtered out),
-    # then the breadcrumb cross-reference fix last.
-    for fn in (
-        filter_apps_by_interface_mode,
-        filter_apps_by_user_visibility,
-        filter_workspaces_by_interface_mode,
-        inject_user_form_width,
-        apply_workspace_custom_titles,
-        fix_module_wise_workspaces,
-        inject_instance_config,
-    ):
+    for hook in frappe.get_hooks("extend_bootinfo"):
         try:
-            fn(bootinfo)
+            frappe.get_attr(hook)(bootinfo=bootinfo)
         except Exception:
             continue
 
