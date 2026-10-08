@@ -20,7 +20,8 @@ interface FrappeLayoutProps {
 export function FrappeLayout({ children }: FrappeLayoutProps) {
 	return (
 		// Mint is the finance surface: pin the Finance module in the menu
-		<NeoCockpit env="spa" defaultApp="Finance">
+		//// Neoffice — tabApp: the browser tab takes the brand's Mint icon from the theme, not mint's own favicon (#1316).
+		<NeoCockpit env="spa" defaultApp="Finance" tabApp="mint">
 			<div className="page-content">{children}</div>
 		</NeoCockpit>
 	)
