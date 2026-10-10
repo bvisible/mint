@@ -268,6 +268,7 @@ class MintBankStatementImport(Document):
 				# Try to auto-create Payment Entry from invoice matches
 				invoice_matches = transaction.invoice_matches
 				party_match = transaction.party_match
+				# //// Neoffice — see the draft_pe block marker above: #1410, skip when a draft PE already matches
 				if invoice_matches and party_match and not draft_pe:
 					try:
 						import ast
@@ -609,6 +610,7 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 	Covers: Payment Proposal PEs, manually created PEs, etc."""
 	from datetime import timedelta
 
+	# //// Neoffice — see the docstatus param marker above: #1410, draft lookup uses the same query
 	# 1. Match by exact reference_no + amount
 	pe = frappe.db.get_value("Payment Entry",
 		{"reference_no": reference, "paid_amount": amount, "docstatus": docstatus, "company": company}, "name")
@@ -625,6 +627,7 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 			import ast as _ast
 			inv_list = _ast.literal_eval(transaction.invoice_matches) if isinstance(transaction.invoice_matches, str) else transaction.invoice_matches
 			if inv_list:
+				# //// Neoffice — see the docstatus param marker above: #1410, draft lookup uses the same query
 				for inv_name in inv_list:
 					pe = frappe.db.get_value("Payment Entry",
 						{"reference_no": inv_name, "docstatus": docstatus, "company": company}, "name")
@@ -658,6 +661,7 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 		)
 
 		if party:
+			# //// Neoffice — see the docstatus param marker above: #1410, draft lookup uses the same query
 			pes = frappe.get_all("Payment Entry",
 				filters={
 					"docstatus": docstatus,

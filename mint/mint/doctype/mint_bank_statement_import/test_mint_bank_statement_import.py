@@ -1,6 +1,8 @@
 # Copyright (c) 2025, The Commit Company (Algocode Technologies Pvt. Ltd.) and Contributors
 # See license.txt
 
+# //// Neoffice — imports needed by TestFindExistingPaymentEntry below (#1410, #1411): mocking
+# //// frappe.db and reaching the importer module to test _find_existing_payment_entry directly.
 from unittest.mock import patch
 
 import frappe
