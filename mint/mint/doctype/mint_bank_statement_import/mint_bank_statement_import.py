@@ -260,10 +260,15 @@ class MintBankStatementImport(Document):
 					transaction.db_set("imported", 1)
 					continue
 
+				# //// Neoffice — #1410: a draft Payment Entry that the rules above would have matched is not
+				# //// worked around by a second, validated one: the line stays to be handled by hand.
+				draft_pe = _find_existing_payment_entry(
+					reference, transaction, amount, is_withdrawal, company, docstatus=0
+				)
 				# Try to auto-create Payment Entry from invoice matches
 				invoice_matches = transaction.invoice_matches
 				party_match = transaction.party_match
-				if invoice_matches and party_match:
+				if invoice_matches and party_match and not draft_pe:
 					try:
 						import ast
 						matches = ast.literal_eval(invoice_matches) if isinstance(invoice_matches, str) else invoice_matches
@@ -320,7 +325,12 @@ class MintBankStatementImport(Document):
 								# //// Neoffice — same per-invoice check as the customer branch above:
 								# //// a shared batch reference must not block other invoices in the batch
 								# //// (5f69a55 "fix(bank import): keep every line of a batch-booked payment order")
-								if pinv.outstanding_amount > 0 and not _payment_entry_exists_for(reference, amount, "Purchase Invoice", invoice_name):
+								# //// Neoffice — #1410: check the amount against the invoice, as the customer branch above does.
+								# //// A debit that recognised ONE purchase invoice by its reference used to create and submit a
+								# //// payment at the bank's amount whatever the invoice still owed: -0.01 left 0.01 open, +0.01
+								# //// settled it with an entry of 1081.01. A line that does not settle the invoice exactly stays
+								# //// to be handled by hand.
+								if pinv.outstanding_amount > 0 and abs(amount - pinv.outstanding_amount) <= 0.01 and not _payment_entry_exists_for(reference, amount, "Purchase Invoice", invoice_name):
 									pe = frappe.get_doc({
 										"doctype": "Payment Entry",
 										"payment_type": "Pay",
@@ -498,7 +508,11 @@ def parse_xml_content(docname):
 	account = frappe.get_cached_value("Bank Account", doc.bank_account, "account")
 
 	# Parse transactions
-	result = read_camt053(xml_string, account)
+	# //// Neoffice — #1409: skip_booked_entries=0. The reader used to drop, without a message, every line whose
+	# //// bank reference was the reference_no of ANY Payment Entry (any status, any amount): a returning statement
+	# //// of a payment proposal came back as "0 transactions", the entries were never cleared. Mint de-duplicates
+	# //// on Bank Transactions itself (_find_existing_bank_transaction), so every line must reach it.
+	result = read_camt053(xml_string, account, skip_booked_entries=0)
 	transactions = result.get("transactions", [])
 
 	# Update document fields
@@ -587,14 +601,17 @@ def parse_xml_content(docname):
 	}
 
 
-def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, company):
+# //// Neoffice — #1410: the `docstatus` parameter (default 1, unchanged). 0 looks for a DRAFT entry that the
+# //// same rules would have matched, so that the import leaves the line to be handled by hand instead of creating
+# //// a second entry beside the draft (validating the draft afterwards is then refused).
+def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, company, docstatus=1):
 	"""Find existing Payment Entry that matches this bank transaction.
 	Covers: Payment Proposal PEs, manually created PEs, etc."""
 	from datetime import timedelta
 
 	# 1. Match by exact reference_no + amount
 	pe = frappe.db.get_value("Payment Entry",
-		{"reference_no": reference, "paid_amount": amount, "docstatus": 1, "company": company}, "name")
+		{"reference_no": reference, "paid_amount": amount, "docstatus": docstatus, "company": company}, "name")
 	if pe:
 		# Verify not already linked to another Bank Transaction
 		already_linked = frappe.db.exists("Bank Transaction Payments",
@@ -610,7 +627,7 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 			if inv_list:
 				for inv_name in inv_list:
 					pe = frappe.db.get_value("Payment Entry",
-						{"reference_no": inv_name, "docstatus": 1, "company": company}, "name")
+						{"reference_no": inv_name, "docstatus": docstatus, "company": company}, "name")
 					if pe:
 						return pe
 		except:
@@ -629,15 +646,21 @@ def _find_existing_payment_entry(reference, transaction, amount, is_withdrawal, 
 
 		# Find party
 		party = None
-		if is_withdrawal:
-			party = frappe.db.get_value("Supplier", {"supplier_name": party_name}, "name")
-		else:
-			party = frappe.db.get_value("Customer", {"customer_name": party_name}, "name")
+		# //// Neoffice — #1411: party_match (set by the statement analysis) is the NAME of the Supplier/Customer
+		# //// document, while the counterparty read from the file is a display name. Looking only at
+		# //// supplier_name/customer_name made this rule inert on a site whose parties are named by series
+		# //// ("SUP-00012"): the party was recognised at analysis and never found here. Try the document
+		# //// name first, then the display name.
+		party_doctype = "Supplier" if is_withdrawal else "Customer"
+		display_field = "supplier_name" if is_withdrawal else "customer_name"
+		party = frappe.db.exists(party_doctype, party_name) or frappe.db.get_value(
+			party_doctype, {display_field: party_name}, "name"
+		)
 
 		if party:
 			pes = frappe.get_all("Payment Entry",
 				filters={
-					"docstatus": 1,
+					"docstatus": docstatus,
 					"payment_type": payment_type,
 					"party_type": party_type,
 					"party": party,
