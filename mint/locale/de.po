@@ -1059,13 +1059,15 @@ msgstr ""
 #. Label of a Link in the Mint Workspace
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json
 #: mint/mint/workspace/mint/mint.json
+# //// Neoffice — no brand on the customer's screen, as in French and English (Daniel, 12.10.2026).
 msgid "Mint Bank Statement Import"
-msgstr "Mint Kontoauszug Import"
+msgstr "Kontoauszug-Import"
 
 #. Name of a DocType
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json
+# //// Neoffice — same.
 msgid "Mint Bank Statement Import Transactions"
-msgstr "Mint Kontoauszug Import Transaktionen"
+msgstr "Kontoauszug-Import Transaktionen"
 
 #. Name of a DocType
 #: mint/mint/doctype/mint_bank_transaction_description_rules/mint_bank_transaction_description_rules.json
