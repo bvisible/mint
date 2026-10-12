@@ -1,0 +1,19 @@
+# //// Neoffice — added file (no upstream equivalent): English labels that differ from the document name.
+# The customer never heard of « Mint » (the name of the reconciliation engine): the button read « Add Mint Bank Statement
+# Import » (Daniel, 12.10.2026). The DocType keeps its name (it cannot take « Bank Statement Import », which ERPNext owns);
+# only what the screen says changes, as the French catalogue already does.
+msgid ""
+msgstr ""
+"Project-Id-Version: Mint VERSION\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mint Bank Statement Import"
+msgstr "Bank Statement Import"
+
+msgid "Mint Bank Statement Import Transactions"
+msgstr "Bank Statement Import Transactions"
