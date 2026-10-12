@@ -275,8 +275,9 @@ TRANSLATIONS = {
     "Min Amount": "Montant minimum",
     "Min amount cannot be greater than max amount.": "Le montant minimum ne peut pas être supérieur au montant maximum.",
     "Minimum Amount": "Montant minimum",
-    "Mint Bank Statement Import": "Import de relevé bancaire Mint",
-    "Mint Bank Statement Import Transactions": "Transactions d'import de relevé bancaire Mint",
+    # //// Neoffice — no « Mint » on the customer's screen (Daniel, 12.10.2026): keep in step with locale/fr.po.
+    "Mint Bank Statement Import": "Import de relevé bancaire",
+    "Mint Bank Statement Import Transactions": "Transactions d'import de relevé bancaire",
     "Mint Bank Transaction Description Rules": "Règles de description de transaction bancaire Mint",
     "Mint Bank Transaction Rule": "Règle de transaction bancaire Mint",
     "Mint Settings": "Paramètres Mint",
