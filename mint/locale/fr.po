@@ -2639,3 +2639,37 @@ msgstr "Analyse du relevé bancaire démarrée"
 
 msgid "Bank statement import created"
 msgstr "Import du relevé bancaire créé"
+# //// Neoffice — translations added by our fork (12.10.2026): labels and messages that read in English on a French screen.
+#: mint/setup/install.py
+msgid "Is Rule Evaluated"
+msgstr "Règle évaluée"
+#: mint/apis/bank_reconciliation.py
+msgid "Voucher Created"
+msgstr "Écriture créée"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Closing Balance as of {}"
+msgstr "Solde de clôture au {}"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Import {0} transactions"
+msgstr "Importer {0} transactions"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Importing {0} transactions"
+msgstr "Import de {0} transactions en cours"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Open {0} in a new tab"
+msgstr "Ouvrir {0} dans un nouvel onglet"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Amount column has \"CR\"/\"DR\" values"
+msgstr "La colonne Montant contient des valeurs « CR »/« DR »"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Transaction type column has \"CR\"/\"DR\" values"
+msgstr "La colonne Type de transaction contient des valeurs « CR »/« DR »"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "Transaction type column has \"Deposit\"/\"Withdrawal\" values"
+msgstr "La colonne Type de transaction contient des valeurs « Deposit »/« Withdrawal »"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "We've found {0} existing transactions in the system that conflict with the transactions in the statement file. Are you sure you want to proceed with the import?"
+msgstr "Nous avons trouvé {0} transactions existantes dans le système qui sont en conflit avec celles du fichier de relevé. Voulez-vous vraiment poursuivre l’import ?"
+#: BankStatementImporter/CSV/StatementDetails.tsx
+msgid "{0} transactions will be imported into the system. Please review the details below and click the 'Import' button to proceed."
+msgstr "{0} transactions seront importées dans le système. Vérifiez les détails ci-dessous, puis cliquez sur le bouton « Importer » pour continuer."
