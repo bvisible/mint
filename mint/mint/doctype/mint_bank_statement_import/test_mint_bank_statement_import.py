@@ -8,6 +8,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
+# //// Neoffice — the importer module itself, so that TestFindExistingPaymentEntry reaches _find_existing_payment_entry (#1410, #1411).
 from mint.mint.doctype.mint_bank_statement_import import mint_bank_statement_import as importer
 
 
