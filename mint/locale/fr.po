@@ -806,13 +806,16 @@ msgstr ""
 #. Label of a Link in the Mint Workspace
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json
 #: mint/mint/workspace/mint/mint.json
+# //// Neoffice — the customer never heard of « Mint » (the name of the reconciliation engine): the button read
+# //// « Ajouter Import de relevé bancaire Mint » (Daniel, 12.10.2026). The document is an « Import de relevé bancaire ».
 msgid "Mint Bank Statement Import"
-msgstr "Import de relevé bancaire Mint"
+msgstr "Import de relevé bancaire"
 
 #. Name of a DocType
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json
+# //// Neoffice — same: the lines of an « Import de relevé bancaire » carry no brand either.
 msgid "Mint Bank Statement Import Transactions"
-msgstr "Transactions d'import de relevé bancaire Mint"
+msgstr "Transactions d'import de relevé bancaire"
 
 #. Name of a DocType
 #: mint/mint/doctype/mint_bank_transaction_description_rules/mint_bank_transaction_description_rules.json
