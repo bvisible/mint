@@ -1,7 +1,9 @@
 # //// Neoffice — NOT ours: this whole file is upstream v1.5.0, carried by hand (89e7929,
 # //// then the v1.5.2 fixes in 2bdac9c) because we had not merged upstream's branch. It is
 # //// identical to upstream/develop except for trailing spaces an editor stripped in
-# //// get_column_mapping. At the next merge take upstream's file and drop this marker.
+# //// get_column_mapping, and for the short-row padding of get_transaction_rows (#1501, marked
+# //// in place; upstream still reads the missing cell). At the next merge take upstream's
+# //// file, keep that padding unless upstream has its own, and drop this marker.
 import frappe
 import re
 from frappe.utils.csvutils import read_csv_content
@@ -300,7 +302,18 @@ def get_transaction_rows(data: list[list[str]], header_index: int, column_mappin
 
     column_map_keys = column_mapping.keys()
 
+    # //// Neoffice — a row shorter than the header (a totals line, a footer, the trailing empty cells an export drops) raised
+    # //// IndexError on the first column it lacked, and the whole import failed with « list index out of range » (#1501).
+    # //// A missing cell reads as empty; a row with no date, or no amount, is skipped below exactly as before.
+    width = max(column_mapping.values(), default=-1) + 1
+    # //// END Neoffice ////
+
     for row_index, row in enumerate(valid_rows):
+
+        # //// Neoffice — see above (#1501).
+        if len(row) < width:
+            row = [*row, *([None] * (width - len(row)))]
+        # //// END Neoffice ////
 
         date = row[column_mapping["Date"]] if "Date" in column_map_keys else None
         amount = row[column_mapping["Amount"]] if "Amount" in column_map_keys else None
