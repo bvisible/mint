@@ -11,7 +11,7 @@ import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
 //// Neoffice — added (2c514a4, 44c8b52). NeoCockpit is the shared Neoffice shell;
 //// FrappeLayout is the same shell fed by the mini-boot when embedded in Frappe;
-//// NoraLearnProvider is the in-app tutorial/Ask-NORA overlay. None exist upstream.
+//// NoraLearnProvider is the in-app tutorial overlay. None exist upstream.
 import { toast } from 'sonner'
 import { NeoCockpit } from '@neoffice/frappe-sidebar-react'
 import { FrappeLayout } from './components/layout'
