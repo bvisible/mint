@@ -109,6 +109,24 @@ class TestGapRule(GapImportCase):
 				follow_up.set_gap_rule(line.bank_transaction, "automatic")
 			self.assertIsNone(gap_rule.get(COMPANY, self._customer()))
 
+	def test_the_share_counts_what_the_customer_already_paid_on_the_invoice(self):
+		# an advance of half of what is owed, then 60 % of the rest: the customer has paid 80 % of the invoice in all (as the
+		# invoices it settled before say), not the 30 % that this payment alone is of the invoice
+		from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
+
+		owed = self._owed("Sales Invoice", self.sales)
+		with as_role("accountant"):
+			advance = get_payment_entry("Sales Invoice", self.sales, party_amount=flt(owed * 0.5, 2))
+			advance.reference_no = f"ADV-{frappe.generate_hash(length=8)}"
+			advance.reference_date = nowdate()
+			advance.insert()
+			advance.submit()
+		_statement, line, owed_now, part = self._partial(0.6)
+		total = flt(frappe.db.get_value("Sales Invoice", self.sales, "grand_total"))
+		answer = follow_up.set_gap_rule(line.bank_transaction, "suggest", account=GAP_ACCOUNT)
+		self.assertAlmostEqual(answer["share"], flt((total - owed_now + part) / total * 100, 1), places=1)
+		self.assertGreater(answer["share"] - flt(part / total * 100, 1), 10)
+
 	def test_a_rule_is_for_a_short_payment_of_a_customer(self):
 		owed = self._owed("Sales Invoice", self.sales)
 		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed - 0.03, 2)))

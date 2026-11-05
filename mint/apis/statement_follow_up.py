@@ -506,16 +506,13 @@ def get_gap_decision(
 		credit_preview = gap_credit_note.preview(
 			verdict.company, customer, bank_line.date, verdict.gap, account if credit else None
 		)
-		total = frappe.db.get_value("Sales Invoice", invoice, "grand_total")
-		history = gap_credit_note.history(
-			verdict.company, customer, invoice, flt(verdict.amount) / flt(total) if flt(total) else 0
-		)
+		share = gap_credit_note.share_paid(invoice, verdict.amount)
+		history = gap_credit_note.history(verdict.company, customer, invoice, share)
 		if credit and credit_preview["blocker"]:
 			blocker = credit_preview["blocker"]
 		# the rule of this customer, if a person made one, and the draft the rule had the import prepare
 		from mint.apis import gap_rule
 
-		share = flt(verdict.amount) / flt(total) if flt(total) else 0
 		rule = gap_rule.get(verdict.company, customer)
 		rule_info = gap_rule.summary(rule, share)
 		if rule and gap_rule.matches(rule, share):
@@ -600,6 +597,12 @@ def decide_gap(
 
 	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
 	editable = verdict.kind in ("rounding", "accepted_rebate", "partial")
+	share = None
+	if invoice_type == "Sales Invoice" and verdict.kind == "partial":
+		# measured BEFORE the payment is booked: the payments already made on the invoice plus this one
+		from mint.apis import gap_credit_note
+
+		share = gap_credit_note.share_paid(invoice, verdict.amount)
 	credit = _as_flag(credit_note)
 	settle_flag = _as_flag(settle_in_full) and verdict.kind == "partial" and not credit
 	if credit and not (verdict.kind == "partial" and invoice_type == "Sales Invoice"):
@@ -637,14 +640,13 @@ def decide_gap(
 		draft = line.credit_note if line.credit_note and frappe.db.get_value("Sales Invoice", line.credit_note, "docstatus") == 0 else None
 		made = make_credit_note(verdict, invoice, bank_line.date, account or None, draft=draft)
 	# one more confirmation of the customer's rule, when there is one for this handling at this share
-	if invoice_type == "Sales Invoice" and verdict.kind == "partial" and (credit or settle_flag):
+	if share is not None and (credit or settle_flag):
 		from mint.apis import gap_rule
 
-		total = frappe.db.get_value("Sales Invoice", invoice, "grand_total")
 		gap_rule.confirm(
 			verdict.company,
 			frappe.db.get_value("Sales Invoice", invoice, "customer"),
-			flt(verdict.amount) / flt(total) if flt(total) else 0,
+			share,
 			"credit_note" if credit else "gap",
 		)
 	note_decision(bank_transaction, "passed_gap", made)
@@ -674,8 +676,8 @@ def set_gap_rule(bank_transaction: str, mode: str, action: str = "credit_note", 
 	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
 	if verdict.kind != "partial":
 		frappe.throw(_("A rule is for the short payments of a customer."))
-	customer, total = frappe.db.get_value("Sales Invoice", invoice, ["customer", "grand_total"])
-	share = flt(verdict.amount) / flt(total) if flt(total) else 0
+	customer = frappe.db.get_value("Sales Invoice", invoice, "customer")
+	share = gap_credit_note.share_paid(invoice, verdict.amount)
 	existing = gap_rule.get(verdict.company, customer)
 	frappe.has_permission("Payment Gap Rule", "write" if existing else "create", throw=True)
 	seeded = gap_credit_note.history(verdict.company, customer, invoice, share)["closed_by_credit"] if action == "credit_note" else 0

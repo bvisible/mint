@@ -111,8 +111,8 @@ def handle_at_import(verdict, invoice: str, transaction, bank_transaction: str, 
 
 	if verdict.kind != "partial":
 		return False
-	customer, total = frappe.db.get_value("Sales Invoice", invoice, ["customer", "grand_total"])
-	share = flt(verdict.amount) / flt(total) if flt(total) else 0
+	customer = frappe.db.get_value("Sales Invoice", invoice, "customer")
+	share = gap_credit_note.share_paid(invoice, verdict.amount)
 	rule = get(verdict.company, customer)
 	if not rule or rule.mode == "suggest" or not matches(rule, share, strict=True):
 		return False

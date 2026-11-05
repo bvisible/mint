@@ -245,6 +245,25 @@ def settle(company: str, customer: str, invoice: str, credit_note: str, amount: 
 	doc.reconcile()
 
 
+def share_paid(invoice: str, amount: float) -> float:
+	"""The share of the invoice the customer will have paid once this payment is booked: the payments already made on
+	it plus this one, over its total. It is the measure history() reads on the invoices the customer already settled, so
+	the payment that completes an advance is not mistaken for a short one."""
+	total = flt(frappe.db.get_value("Sales Invoice", invoice, "grand_total"))
+	if not total:
+		return 0
+	before = frappe.db.sql(
+		"""
+		select ifnull(sum(per.allocated_amount), 0)
+		from `tabPayment Entry Reference` per
+		join `tabPayment Entry` pe on pe.name = per.parent and pe.docstatus = 1 and pe.payment_type = 'Receive'
+		where per.reference_doctype = 'Sales Invoice' and per.reference_name = %s
+		""",
+		invoice,
+	)[0][0]
+	return (flt(before) + flt(amount)) / total
+
+
 def history(company: str, customer: str, invoice: str, share: float) -> dict:
 	"""What this customer's own invoices say about a payment at this share: how many of its latest paid invoices were
 	paid at the same share, and how many of those had the rest closed by something else than a payment (a credit note)."""
