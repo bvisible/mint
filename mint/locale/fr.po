@@ -3782,3 +3782,17 @@ msgstr "{0} n'a pas été préparé pour cette ligne bancaire."
 #, python-brace-format
 msgid "{0}: {1} asked, {2} still owed."
 msgstr "{0} : montant demandé {1}, reste dû {2}."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:286
+msgid "Not an invoice? A sum paid to nothing, a fee, a withdrawal: use Bank Entry, Transfer or Record a payment above."
+msgstr "Ce n'est pas une facture ? Une somme reçue ou versée sans facture, des frais, un retrait : utilisez Écriture bancaire, Virement ou Enregistrer un paiement ci-dessus."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:204
+#, python-brace-format
+msgid "Pick the {0} that paid: its open invoices come next."
+msgstr "Choisissez le {0} concerné : ses factures ouvertes viennent ensuite."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:207
+#, python-brace-format
+msgid "{0} has no open invoice in this currency."
+msgstr "{0} n'a aucune facture ouverte dans cette devise."
