@@ -19,14 +19,29 @@
 # ////   duplicate      the bank line already existed, nothing was created
 # ////   failed         the import could not handle the line
 # ////   cancelled      the bank line was cancelled afterwards
+# ////   not_imported   the import is still a draft: nothing was created yet
+# ////
+# //// An import made before its lines carried their bank line (`bank_transaction`) is followed all the same: the bank
+# //// line is found by the key the import itself uses to spot a duplicate (account, date, reference, amount, direction).
 
 import frappe
 from frappe import _
-from frappe.utils import now_datetime
+from frappe.utils import flt, now_datetime
 
 IMPORT = "Mint Bank Statement Import"
 LINE = "Mint Bank Statement Import Transactions"
-STATES = ("passed_alone", "handled", "left_open", "to_decide", "to_match", "duplicate", "failed", "cancelled")
+STATES = (
+	"passed_alone",
+	"handled",
+	"left_open",
+	"to_decide",
+	"to_match",
+	"duplicate",
+	"failed",
+	"cancelled",
+	"not_imported",
+)
+NOT_COUNTED = ("duplicate", "not_imported")
 WAITING = ("to_decide", "to_match")
 DECISIONS = ("passed_gap", "left_open")
 
@@ -37,6 +52,8 @@ def classify(line, bank_line) -> str:
 		return "duplicate"
 	if line.status == "Error":
 		return "failed"
+	if line.status in ("To Process", "", None):
+		return "not_imported"
 	if not bank_line:
 		return "to_match"
 	if bank_line.docstatus == 2 or bank_line.status == "Cancelled":
@@ -63,6 +80,42 @@ def _bank_lines(names) -> dict:
 
 def _bank_line_of(line) -> str | None:
 	return line.get("bank_transaction") or line.get("existing_bank_transaction") or None
+
+
+def _resolve_missing_links(bank_account: str, lines) -> None:
+	"""Give the lines of an older import their bank line, found by the import's own duplicate key (n-th line with a key
+	is the n-th bank line with it, as the import counts them)."""
+	missing = [
+		line
+		for line in lines
+		if not _bank_line_of(line) and line.status not in ("Existing", "Error", "To Process", "", None)
+	]
+	references = {line.unique_reference or line.reference for line in missing} - {None, ""}
+	if not missing or not references:
+		return
+	rows = frappe.get_all(
+		"Bank Transaction",
+		filters={"bank_account": bank_account, "reference_number": ("in", list(references)), "docstatus": ("!=", 2)},
+		fields=["name", "date", "reference_number", "deposit", "withdrawal"],
+		order_by="creation asc",
+		limit_page_length=0,
+	)
+	pool = {}
+	for row in rows:
+		key = (str(row.date), row.reference_number, flt(row.withdrawal or row.deposit, 2), flt(row.withdrawal) > 0)
+		pool.setdefault(key, []).append(row.name)
+	seen = {}
+	for line in missing:
+		key = (
+			str(line.date),
+			line.unique_reference or line.reference,
+			flt(line.amount, 2),
+			line.credit_debit == "DBIT",
+		)
+		rank = seen.get(key, 0)
+		seen[key] = rank + 1
+		if rank < len(pool.get(key, [])):
+			line.bank_transaction = pool[key][rank]
 
 
 def _check_rights(import_name: str | None = None):
@@ -105,6 +158,7 @@ def get_import_overview(name: str) -> dict:
 	"""One import told line by line: where it came from, how far along it is, and what became of each line."""
 	_check_rights(name)
 	statement = frappe.get_doc(IMPORT, name)
+	_resolve_missing_links(statement.bank_account, statement.transactions)
 	bank_lines = _bank_lines([_bank_line_of(line) for line in statement.transactions])
 	lines, counts = [], dict.fromkeys(STATES, 0)
 	for line in statement.transactions:
@@ -147,8 +201,8 @@ def get_import_overview(name: str) -> dict:
 
 
 def _progress(counts: dict) -> dict:
-	"""How many lines there were to handle, how many still wait. Duplicates created nothing, so they do not count."""
-	total = sum(count for state, count in counts.items() if state != "duplicate")
+	"""How many lines there were to handle, how many still wait. Duplicates created nothing and a draft imported nothing, so they do not count."""
+	total = sum(count for state, count in counts.items() if state not in NOT_COUNTED)
 	waiting = sum(counts[state] for state in WAITING)
 	return {"total": total, "waiting": waiting, "done": total - waiting}
 
@@ -175,14 +229,24 @@ def list_imports(bank_account: str | None = None, start: int = 0, limit: int = 2
 		fields=[
 			"parent",
 			"status",
+			"date",
+			"amount",
+			"credit_debit",
+			"unique_reference",
+			"reference",
+			"idx",
 			"payment_entry",
 			"difference_kind",
 			"decision",
 			"bank_transaction",
 			"existing_bank_transaction",
 		],
+		order_by="parent, idx",
 		limit_page_length=0,
 	)
+	accounts = {statement.name: statement.bank_account for statement in statements}
+	for name in names:
+		_resolve_missing_links(accounts[name], [line for line in lines if line.parent == name])
 	bank_lines = _bank_lines([_bank_line_of(line) for line in lines])
 	counts = {name: dict.fromkeys(STATES, 0) for name in names}
 	for line in lines:

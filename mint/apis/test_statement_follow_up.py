@@ -16,7 +16,7 @@ from mint.mint.doctype.mint_bank_statement_import import mint_bank_statement_imp
 
 
 class TestStatementFollowUp(GapImportCase):
-	def _reconcile_by_hand(self, statement, idx=0):  # role-check: ok what the reconciliation books runs as the system here
+	def _reconcile_by_hand(self, statement, idx=0, bank_line=None):  # role-check: ok what the reconciliation books runs as the system here
 		"""What a person does afterwards: the entry of the gap, linked to the bank line of the import line."""
 		line = statement.transactions[idx]
 		self._settings(payment_gap_automatic=1)
@@ -25,7 +25,7 @@ class TestStatementFollowUp(GapImportCase):
 			verdict, "Sales Invoice", self.sales, self.ledger, line.date, line.unique_reference, "by hand"
 		)
 		importer._link_payment_entry_to_bt(
-			frappe.get_doc("Bank Transaction", line.bank_transaction), entry, reconciliation_type="Voucher Created"
+			frappe.get_doc("Bank Transaction", bank_line or line.bank_transaction), entry, reconciliation_type="Voucher Created"
 		)
 		return entry
 
@@ -103,6 +103,36 @@ class TestStatementFollowUp(GapImportCase):
 		second = self._import(dict(line))
 		overview = self._overview(second)
 		self.assertEqual(overview["lines"][0]["state"], "duplicate")
+		self.assertEqual(overview["progress"], {"total": 0, "waiting": 0, "done": 0})
+
+	def test_an_import_made_before_the_link_existed_is_followed_by_the_duplicate_key(self):  # role-check: ok see _reconcile_by_hand
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, owed - 0.03))
+		# an older import: its line does not carry the bank line it created
+		frappe.db.set_value(
+			"Mint Bank Statement Import Transactions", statement.transactions[0].name, "bank_transaction", None
+		)
+		statement.reload()
+		found = self._overview(statement)["lines"][0]
+		self.assertEqual(found["state"], "to_decide")
+		self.assertTrue(found["bank_transaction"])
+		self._reconcile_by_hand(statement, bank_line=found["bank_transaction"])
+		self.assertEqual(self._overview(statement)["lines"][0]["state"], "handled")
+		listed = next(item for item in follow_up.list_imports(self.bank_account) if item["name"] == statement.name)
+		self.assertEqual(listed["counts"]["handled"], 1)
+
+	def test_a_draft_has_imported_nothing_yet(self):
+		draft = frappe.get_doc(
+			{
+				"doctype": "Mint Bank Statement Import",
+				"bank_account": self.bank_account,
+				"file_type": "XML",
+				"currency": "CHF",
+				"transactions": [self._line("Sales Invoice", self.sales, 10)],
+			}
+		).insert()
+		overview = self._overview(draft)
+		self.assertEqual(overview["lines"][0]["state"], "not_imported")
 		self.assertEqual(overview["progress"], {"total": 0, "waiting": 0, "done": 0})
 
 	# -- the list ---------------------------------------------------------------------------------------------------
