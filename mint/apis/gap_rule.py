@@ -39,6 +39,14 @@ def matches(rule, share: float, strict: bool = False) -> bool:
 	return abs(flt(rule.share) / 100 - share) <= SAME_SHARE + 1e-9
 
 
+def account_for(rule, share: float) -> str | None:
+	"""The account the rule of the customer names for the credit note, when the rule is for a payment like this one: it is
+	the account of the card and of the draft the import prepared, so nobody has to choose it again."""
+	if rule and not rule.disabled and rule.action == "credit_note" and rule.account and matches(rule, share):
+		return rule.account
+	return None
+
+
 def summary(rule, share: float) -> dict:
 	"""What the card shows of the rule of this customer for a payment at this share."""
 	if not rule:

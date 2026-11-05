@@ -234,6 +234,20 @@ class TestGapRule(GapImportCase):
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 		self.assertEqual(frappe.db.count("Mint Bank Statement Import Transactions", {"credit_note": ("is", "set")}) >= 1, True)
 
+	def test_the_account_of_the_rule_is_the_one_of_the_card_and_of_the_validation(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_rule
+		# the company has no gap account of its own: only the rule names the account, and nobody picks it again
+		_owed, part = self._owed_part()
+		income = frappe.db.get_value("Account", {"company": COMPANY, "root_type": "Income", "is_group": 0, "disabled": 0})
+		self._settings(payment_gap_account=None)
+		self._rule(part, mode="suggest", account=income)
+		with _only_for("tabSales Invoice Item` it", []):
+			_statement, line, _o, _p = self._partial()
+			decision = follow_up.get_gap_decision(line.bank_transaction, credit_note=1)
+			self.assertEqual((decision["blocker"], decision["account"], decision["can_pass"]), ("", income, True))
+			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1)
+		self.assertEqual(frappe.db.get_value("Sales Invoice Item", {"parent": answer["credit_note"]}, "income_account"), income)
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
 	# -- the rights --------------------------------------------------------------------------------------------------------
 
 	def test_somebody_without_the_right_cannot_make_a_rule(self):

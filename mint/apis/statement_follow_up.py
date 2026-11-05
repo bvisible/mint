@@ -501,19 +501,18 @@ def get_gap_decision(
 	customer = frappe.db.get_value(invoice_type, invoice, "customer") if invoice_type == "Sales Invoice" else None
 	credit_preview = history = rule_info = proposal = draft = None
 	if creditable and customer:
-		from mint.apis import gap_credit_note
+		from mint.apis import gap_credit_note, gap_rule
 
-		credit_preview = gap_credit_note.preview(
-			verdict.company, customer, bank_line.date, verdict.gap, account if credit else None
-		)
+		# the rule of this customer, if a person made one: its account is the one of the credit note until somebody picks another
 		share = gap_credit_note.share_paid(invoice, verdict.amount)
+		rule = gap_rule.get(verdict.company, customer)
+		credit_preview = gap_credit_note.preview(
+			verdict.company, customer, bank_line.date, verdict.gap, (account or gap_rule.account_for(rule, share)) if credit else None
+		)
 		history = gap_credit_note.history(verdict.company, customer, invoice, share)
 		if credit and credit_preview["blocker"]:
 			blocker = credit_preview["blocker"]
-		# the rule of this customer, if a person made one, and the draft the rule had the import prepare
-		from mint.apis import gap_rule
-
-		rule = gap_rule.get(verdict.company, customer)
+		# and the draft the rule had the import prepare
 		rule_info = gap_rule.summary(rule, share)
 		if rule and gap_rule.matches(rule, share):
 			proposal = rule.action
@@ -609,15 +608,12 @@ def decide_gap(
 		frappe.throw(_("A credit note of the balance is for the short payment of a sales invoice."))
 	if credit:
 		# what can refuse the credit note is checked BEFORE the payment is booked: nothing is written for a refusal
-		from mint.apis import gap_credit_note
+		from mint.apis import gap_credit_note, gap_rule
 
-		blocker = gap_credit_note.preview(
-			verdict.company,
-			frappe.db.get_value("Sales Invoice", invoice, "customer"),
-			bank_line.date,
-			verdict.gap,
-			account or None,
-		)["blocker"]
+		customer = frappe.db.get_value("Sales Invoice", invoice, "customer")
+		# nobody picked an account: the one the customer's rule names (the account of the draft it prepared)
+		account = account or gap_rule.account_for(gap_rule.get(verdict.company, customer), share)
+		blocker = gap_credit_note.preview(verdict.company, customer, bank_line.date, verdict.gap, account or None)["blocker"]
 		if blocker:
 			frappe.throw(blocker)
 	entry = payment_gap.book(
