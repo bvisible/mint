@@ -923,6 +923,14 @@ def create_import_from_document_scan(document_scan_name: str, bank_account: str 
     import json
 
     scan = frappe.get_doc("Document Scan", document_scan_name)
+    # //// Neoffice — the scan is named by the request and everything below ignores permissions (the import is
+    # //// inserted and the scan reconfigured and restarted with ignore_permissions): without these three
+    # //// rights any signed-in account, a portal customer included, could import the file of another user's scan.
+    scan.check_permission("write")
+    frappe.has_permission("Mint Bank Statement Import", ptype="create", throw=True)
+    if bank_account:
+        frappe.has_permission("Bank Account", ptype="read", doc=bank_account, throw=True)
+
     if not scan.source_file:
         frappe.throw(_("This Document Scan has no source file to import."))
 

@@ -11,6 +11,7 @@
 # //// (frappe/tests/roles.py), never Administrator.
 
 import unittest
+from unittest.mock import patch
 
 import frappe
 from frappe.permissions import add_user_permission
@@ -133,6 +134,15 @@ class TestMintEndpointsAnswerOnlyToWhoMayRead(FrappeTestCase):
 		with as_role("portal_customer", customer=self.own_customer):
 			with self.assertRaises(frappe.PermissionError):
 				statement_import.get_statement_details(self.probe_url, self.bank_account)
+
+	def test_a_portal_customer_cannot_import_someone_elses_document_scan(self):
+		scan = frappe.get_all("Document Scan", pluck="name", limit=1)
+		if not scan:
+			self.skipTest("no Document Scan on this site")
+		# The OCR is queued, never run: the test must not reach a service outside.
+		with as_role("portal_customer", customer=self.own_customer), patch.object(frappe, "enqueue"):
+			with self.assertRaises(frappe.PermissionError):
+				nora_ocr.create_import_from_document_scan(scan[0], self.bank_account)
 
 	def test_a_portal_customer_cannot_start_the_rule_evaluation(self):
 		with as_role("portal_customer", customer=self.own_customer):
