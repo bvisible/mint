@@ -248,6 +248,64 @@ class TestGapRule(GapImportCase):
 		self.assertEqual(frappe.db.get_value("Sales Invoice Item", {"parent": answer["credit_note"]}, "income_account"), income)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 
+	# -- what Nora reads and does ------------------------------------------------------------------------------------------
+
+	def _paid(self, *shares, closed=True):
+		"""Invoices of the customer as if each had been paid at these shares (the latest first); `closed`: the rest was closed by
+		something else than a payment (a credit note), else it is still owed."""
+		return [
+			frappe._dict(name=f"INV-{i}", grand_total=100.0, outstanding_amount=0.0 if closed else 100.0 * (1 - share), paid=100.0 * share)
+			for i, share in enumerate(shares)
+		]
+
+	def test_the_usual_share_is_the_one_most_invoices_agree_on(self):
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(0.8, 0.5, 0.79, 1.0, 0.81, 1.0)):
+			share = gap_credit_note.usual_share(COMPANY, self._customer())
+		self.assertAlmostEqual(share, 0.8, places=1)
+		# invoices paid in full say nothing about a customer who pays less; no invoice at all says nothing either
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(1.0, 1.0)):
+			self.assertIsNone(gap_credit_note.usual_share(COMPANY, self._customer()))
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=[]):
+			self.assertIsNone(gap_credit_note.usual_share(COMPANY, self._customer()))
+
+	def test_the_overview_tells_the_rule_the_habit_and_the_credit_note(self):
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(0.8, 0.8, 0.8, 0.5)):
+			told = gap_rule.overview(COMPANY, self._customer())
+		self.assertFalse(told["rule"]["exists"])
+		self.assertEqual((told["habit"]["share"], told["habit"]["same_share"]), (80.0, 3))
+		self.assertIn("account", told["credit_note"])
+
+	def test_the_plan_takes_the_share_of_the_habit_and_refuses_what_the_document_would_refuse(self):
+		customer = self._customer()
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(0.8, 0.8, 0.8, closed=False)):
+			fine = gap_rule.plan(COMPANY, customer, "draft", "credit_note", account=GAP_ACCOUNT)
+			# the rest of those invoices is still owed: nothing confirms the handling yet, so no level by itself
+			refused = gap_rule.plan(COMPANY, customer, "automatic", "credit_note", account=GAP_ACCOUNT)
+		self.assertEqual((fine["change"], fine["share"], fine["share_from_habit"], fine["problems"]), ("create", 80.0, True, []))
+		self.assertTrue(refused["problems"])
+		self.assertFalse(refused["automatic_available"])
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(0.8, 0.8, 0.8, closed=True)):
+			# three invoices at that share that ended as a credit note: the handling was confirmed three times by the office
+			allowed = gap_rule.plan(COMPANY, customer, "automatic", "credit_note", account=GAP_ACCOUNT)
+		self.assertEqual((allowed["problems"], allowed["automatic_available"], allowed["confirmed_times"]), ([], True, 3))
+		bad = gap_rule.plan(COMPANY, customer, "teleport", "credit_note")
+		self.assertTrue(bad["problems"])
+		self.assertFalse(frappe.db.exists("Payment Gap Rule", {"customer": customer}))
+
+	def test_apply_makes_the_rule_and_changes_it_and_the_share_said_replaces_the_usual_one(self):
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(0.8, 0.8, 0.8)):
+			made = gap_rule.apply(COMPANY, self._customer(), "suggest", "credit_note", account=GAP_ACCOUNT)
+			self.assertEqual((made["mode"], made["share"]), ("suggest", 80.0))
+			changed = gap_rule.apply(COMPANY, self._customer(), "draft", "credit_note", share=75)
+		self.assertEqual((changed["mode"], changed["share"]), ("draft", 75.0))
+		self.assertEqual(frappe.db.count("Payment Gap Rule", {"customer": self._customer()}), 1)
+
+	def test_apply_without_a_share_and_without_a_habit_is_refused_in_a_sentence(self):
+		with patch.object(gap_credit_note, "_paid_invoices", return_value=[]):
+			with self.assertRaises(frappe.ValidationError):
+				gap_rule.apply(COMPANY, self._customer(), "draft", "credit_note")
+		self.assertFalse(frappe.db.exists("Payment Gap Rule", {"customer": self._customer()}))
+
 	# -- the rights --------------------------------------------------------------------------------------------------------
 
 	def test_somebody_without_the_right_cannot_make_a_rule(self):

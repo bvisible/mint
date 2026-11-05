@@ -259,10 +259,9 @@ def share_paid(invoice: str, amount: float) -> float:
 	return (total - flt(row.outstanding_amount) + flt(amount)) / total
 
 
-def history(company: str, customer: str, invoice: str, share: float) -> dict:
-	"""What this customer's own invoices say about a payment at this share: how many of its latest paid invoices were
-	paid at the same share, and how many of those had the rest closed by something else than a payment (a credit note)."""
-	rows = frappe.db.sql(
+def _paid_invoices(company: str, customer: str, exclude: str = "") -> list:
+	"""The latest invoices of the customer that received a payment, with what was paid on each (payment entries)."""
+	return frappe.db.sql(
 		f"""
 		select si.name, si.grand_total, si.outstanding_amount, paid.amount as paid
 		from `tabSales Invoice` si
@@ -278,9 +277,15 @@ def history(company: str, customer: str, invoice: str, share: float) -> dict:
 		order by si.posting_date desc, si.creation desc
 		limit {int(HISTORY)}
 		""",
-		{"company": company, "customer": customer, "invoice": invoice},
+		{"company": company, "customer": customer, "invoice": exclude},
 		as_dict=True,
 	)
+
+
+def history(company: str, customer: str, invoice: str, share: float) -> dict:
+	"""What this customer's own invoices say about a payment at this share: how many of its latest paid invoices were
+	paid at the same share, and how many of those had the rest closed by something else than a payment (a credit note)."""
+	rows = _paid_invoices(company, customer, invoice)
 	same = [r for r in rows if abs(flt(r.paid) / flt(r.grand_total) - share) <= SAME_SHARE]
 	# closed by something else than a payment: nothing left to pay, and the payments are less than the invoice
 	closed = [r for r in same if abs(flt(r.outstanding_amount)) <= 0.01 and flt(r.paid) < flt(r.grand_total) - 0.01]
@@ -291,3 +296,14 @@ def history(company: str, customer: str, invoice: str, share: float) -> dict:
 		"share": flt(share * 100, 1),
 		"proposal": "credit_note" if len(same) >= AT_LEAST and len(closed) >= AT_LEAST else None,
 	}
+
+
+def usual_share(company: str, customer: str) -> float | None:
+	"""The share of its invoices this customer usually pays, as a fraction: the one that most of its latest paid invoices
+	are within two points of, among those paid in part. None when none of them was paid in part (or none was paid)."""
+	shares = [flt(r.paid) / flt(r.grand_total) for r in _paid_invoices(company, customer)]
+	# an invoice paid in full says nothing about a customer who pays less
+	shares = [share for share in shares if share < 0.995]
+	if not shares:
+		return None
+	return max(shares, key=lambda share: sum(abs(share - other) <= SAME_SHARE for other in shares))
