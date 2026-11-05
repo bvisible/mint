@@ -24,9 +24,11 @@
 # //// An import made before its lines carried their bank line (`bank_transaction`) is followed all the same: the bank
 # //// line is found by the key the import itself uses to spot a duplicate (account, date, reference, amount, direction).
 
+import ast
+
 import frappe
 from frappe import _
-from frappe.utils import flt, now_datetime
+from frappe.utils import flt, getdate, now_datetime
 
 IMPORT = "Mint Bank Statement Import"
 LINE = "Mint Bank Statement Import Transactions"
@@ -305,3 +307,298 @@ def note_decision(bank_transaction: str, decision: str) -> bool:
 			update_modified=False,
 		)
 	return bool(rows)
+
+
+# -- deciding a gap, from the bank reconciliation ---------------------------------------------------------------------
+# The import announces, the bank reconciliation decides: a line whose invoice was recognised but whose sum did not settle
+# it waits there like any other bank line, with the verdict in words and the choice of a person.
+
+BANK_LINE_FIELDS = [
+	"name",
+	"bank_account",
+	"date",
+	"deposit",
+	"withdrawal",
+	"unallocated_amount",
+	"status",
+	"docstatus",
+	"reference_number",
+	"currency",
+	"company",
+]
+
+
+def _import_line_of(bank_transaction: str):
+	"""The import line that created this bank line, or None (the bank line came from somewhere else)."""
+	rows = frappe.get_all(
+		LINE,
+		filters={"bank_transaction": bank_transaction, "parenttype": IMPORT},
+		fields=[
+			"name",
+			"parent",
+			"idx",
+			"invoice_matches",
+			"party_match",
+			"party_name",
+			"difference_kind",
+			"difference_amount",
+			"decision",
+			"decided_by",
+			"decided_on",
+			"remittance_reference",
+		],
+		order_by="creation desc",
+		limit_page_length=1,
+	)
+	return rows[0] if rows else None
+
+
+def _invoice_of(line, bank_line):
+	"""The ONE invoice the import recognised: a sales invoice for a deposit, a purchase invoice for a withdrawal."""
+	try:
+		matches = ast.literal_eval(line.invoice_matches) if line.invoice_matches else []
+	except (ValueError, SyntaxError):
+		matches = []
+	if not isinstance(matches, (list, tuple)) or len(matches) != 1:
+		return None, None
+	doctype = "Sales Invoice" if flt(bank_line.deposit) > 0 else "Purchase Invoice"
+	return (doctype, matches[0]) if frappe.db.exists(doctype, matches[0]) else (None, None)
+
+
+def _is_open(bank_line) -> bool:
+	return bool(bank_line) and bank_line.docstatus == 1 and bank_line.status not in ("Reconciled", "Settled", "Cancelled")
+
+
+def _amount_of(bank_line) -> float:
+	return flt(bank_line.unallocated_amount) or flt(bank_line.deposit) or flt(bank_line.withdrawal)
+
+
+@frappe.whitelist()
+def get_lines_to_decide(bank_account: str) -> list[dict]:
+	"""The bank lines of an account that came from an import with a gap nobody has decided yet."""
+	_check_rights()
+	frappe.has_permission("Bank Account", "read", bank_account, throw=True)
+	return frappe.db.sql(
+		f"""
+		select bt.name as bank_transaction, t.parent as statement_import, t.idx, t.difference_kind as kind,
+			t.difference_amount as gap, t.party_name as party
+		from `tab{LINE}` t
+		join `tab{IMPORT}` i on i.name = t.parent and i.docstatus != 2 and i.bank_account = %(account)s
+		join `tabBank Transaction` bt on bt.name = t.bank_transaction and bt.docstatus = 1
+			and bt.status not in ('Reconciled', 'Settled', 'Cancelled')
+		where t.parenttype = %(doctype)s and ifnull(t.difference_kind, '') not in ('', 'exact')
+			and ifnull(t.decision, '') != 'left_open'
+		order by bt.date desc, t.parent desc, t.idx
+		""",
+		{"account": bank_account, "doctype": IMPORT},
+		as_dict=True,
+	)
+
+
+def _discount_terms_of(invoice_type: str, invoice: str, on) -> dict:
+	"""The percentage and the last day of the early payment discount still open on `on`, when the terms carry one."""
+	rows = frappe.get_all(
+		"Payment Schedule",
+		filters={"parent": invoice, "parenttype": invoice_type},
+		fields=["discount", "discount_type", "discount_date"],
+		order_by="idx",
+	)
+	for row in rows:
+		if flt(row.discount) and row.discount_date and getdate(row.discount_date) >= getdate(on):
+			return {
+				"discount_percent": flt(row.discount) if row.discount_type == "Percentage" else None,
+				"discount_date": row.discount_date,
+			}
+	return {"discount_percent": None, "discount_date": None}
+
+
+def _as_flag(value) -> bool:
+	return str(value).lower() in ("1", "true")
+
+
+def _account_blocker(company: str, account: str | None) -> str:
+	"""Why the account a person typed cannot take the gap, or an empty string (the message is said, not raised)."""
+	if not account:
+		return ""
+	from mint.apis import payment_gap
+
+	try:
+		payment_gap.check_account(company, account)
+	except frappe.ValidationError as error:
+		frappe.clear_last_message()
+		return str(error)
+	return ""
+
+
+@frappe.whitelist()
+def get_gap_decision(bank_transaction: str, account: str | None = None, settle_in_full: int | str = 0) -> dict | None:
+	"""What a person is asked to decide for this bank line, with the verdict worked out now (the invoice may have moved
+	since the import). None when the line did not come from an import, has no recognised invoice, or is dealt with.
+
+	`account` and `settle_in_full` are what the person is trying: the rows the gap would be booked as (VAT cut from the
+	account by the same function the payment window uses) come back, nothing is written."""
+	_check_rights()
+	frappe.has_permission("Bank Transaction", "read", bank_transaction, throw=True)
+	bank_line = frappe.db.get_value("Bank Transaction", bank_transaction, BANK_LINE_FIELDS, as_dict=True)
+	if not _is_open(bank_line):
+		return None
+	line = _import_line_of(bank_transaction)
+	if not line:
+		return None
+	invoice_type, invoice = _invoice_of(line, bank_line)
+	if not invoice:
+		return None
+	from mint.apis import payment_gap
+
+	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
+	settle = _as_flag(settle_in_full) and verdict.kind == "partial"
+	editable = verdict.kind in ("rounding", "accepted_rebate", "partial")
+	account = (account or None) if editable else None
+	blocker = ""
+	if verdict.kind in ("", "overpaid"):
+		blocker = verdict.reason or _("More came in than is owed: that is never passed by itself.")
+	else:
+		blocker = _account_blocker(verdict.company, account) or payment_gap.account_problem(verdict, account, settle)
+	settings = payment_gap.get_settings(verdict.company)
+	rows = []
+	if not blocker and verdict.kind not in ("", "overpaid", "exact"):
+		rows = payment_gap.preview(verdict, frappe.get_doc(invoice_type, invoice), account, settle)
+	return {
+		"bank_transaction": bank_transaction,
+		"statement_import": line.parent,
+		"invoice_type": invoice_type,
+		"invoice": invoice,
+		"party": line.party_name or line.party_match,
+		"verdict": {
+			key: verdict[key]
+			for key in ("kind", "gap", "amount", "outstanding", "discount", "currency", "reason")
+		},
+		"can_pass": not blocker and verdict.kind not in ("", "exact"),
+		"blocker": blocker,
+		"account_editable": editable,
+		"default_account": settings.account if editable else None,
+		"account": account or (settings.account if editable else None),
+		"settle_in_full": settle,
+		"can_settle": verdict.kind == "partial"
+		and not _account_blocker(verdict.company, account)
+		and not payment_gap.account_problem(verdict, account, True),
+		"deductions": [
+			{"account": row.get("account"), "amount": flt(row.get("amount"), 2), "description": row.get("description")}
+			for row in rows
+		],
+		"decision": line.decision,
+		"decided_by": line.decided_by,
+		"decided_on": line.decided_on,
+		**_discount_terms_of(invoice_type, invoice, bank_line.date),
+	}
+
+
+@frappe.whitelist(methods=["POST"])
+def decide_gap(
+	bank_transaction: str, decision: str, account: str | None = None, settle_in_full: int | str = 0
+) -> dict:
+	"""A person passes the gap of a bank line (the entry is made, linked to the line) or leaves it open.
+
+	`account` is the account the person chose for the gap instead of the company's; `settle_in_full` settles a short
+	payment beyond what the company accepts, the gap being passed on that account instead of left open."""
+	if decision not in DECISIONS:
+		frappe.throw(_("Unknown decision {0}.").format(decision))
+	_check_rights()
+	frappe.has_permission("Bank Transaction", "write", bank_transaction, throw=True)
+	bank_line = frappe.db.get_value("Bank Transaction", bank_transaction, BANK_LINE_FIELDS, as_dict=True)
+	if not _is_open(bank_line):
+		frappe.throw(_("This bank line is already dealt with."))
+	line = _import_line_of(bank_transaction)
+	if not line:
+		frappe.throw(_("This bank line did not come from an import."))
+	if decision == "left_open":
+		note_decision(bank_transaction, "left_open")
+		return {"bank_transaction": bank_transaction, "payment_entry": None}
+
+	invoice_type, invoice = _invoice_of(line, bank_line)
+	if not invoice:
+		frappe.throw(_("No invoice was recognised for this line."))
+	frappe.has_permission("Payment Entry", "create", throw=True)
+	frappe.has_permission(invoice_type, "read", invoice, throw=True)
+
+	from mint.apis import payment_gap
+	from mint.mint.doctype.mint_bank_statement_import.mint_bank_statement_import import _link_payment_entry_to_bt
+
+	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
+	editable = verdict.kind in ("rounding", "accepted_rebate", "partial")
+	entry = payment_gap.book(
+		verdict,
+		invoice_type,
+		invoice,
+		frappe.get_cached_value("Bank Account", bank_line.bank_account, "account"),
+		bank_line.date,
+		bank_line.reference_number or "",
+		_("{0} - Payment for {1}").format(line.party_name or line.party_match, invoice),
+		by_person=True,
+		account=(account or None) if editable else None,
+		settle_in_full=_as_flag(settle_in_full) and verdict.kind == "partial",
+	)
+	_link_payment_entry_to_bt(
+		frappe.get_doc("Bank Transaction", bank_transaction), entry, reconciliation_type="Voucher Created"
+	)
+	note_decision(bank_transaction, "passed_gap")
+	return {"bank_transaction": bank_transaction, "payment_entry": entry}
+
+
+# -- what the person who deposited the file reads when the import is done -----------------------------------------------
+
+DESK_IMPORTS = "/app/accounting?tab=reconcile&screen=%2Fmint%2Fstatement-imports"
+
+
+def result_message(stats: dict, currency: str) -> str:
+	"""The window after an import: what passed by itself, what waits and where to go to deal with it."""
+	to_match = max(stats["unreconciled"] - stats["to_decide"], 0)
+	waiting = stats["to_decide"] + to_match
+	read = stats["total"]
+
+	def row(tone: str, label: str, text: str) -> str:
+		return f'<div style="margin-bottom:10px"><span class="indicator-pill {tone}">{label}</span> {text}</div>'
+
+	rows = [f"<p>{frappe.utils.escape_html(_('{0} lines read in the file.').format(read))}</p>"]
+	if stats["auto_matched"]:
+		text = _("Booked.")
+		if stats["passed_with_gap"]:
+			text = _("Booked, {0} of them with a small gap ({1} in all).").format(
+				stats["passed_with_gap"], frappe.utils.fmt_money(stats["gap_total"], currency=currency)
+			)
+		rows.append(row("green", _("{0} passed by themselves").format(stats["auto_matched"]), text))
+	if stats["to_decide"]:
+		rows.append(
+			row(
+				"orange",
+				_("{0} to decide").format(stats["to_decide"]),
+				_("A gap waits for your decision in the bank reconciliation."),
+			)
+		)
+	if to_match:
+		rows.append(
+			row(
+				"orange",
+				_("{0} to match").format(to_match),
+				_("No invoice recognised: they wait like any bank line not reconciled."),
+			)
+		)
+	if stats["duplicates"]:
+		rows.append(
+			row(
+				"gray",
+				_("{0} already in the bank").format(stats["duplicates"]),
+				_("Nothing was created for them."),
+			)
+		)
+	if stats["errors"]:
+		rows.append(row("red", _("{0} not handled").format(stats["errors"]), _("See the error log.")))
+	links = [f'<a href="{DESK_IMPORTS}">{frappe.utils.escape_html(_("See all the imports"))}</a>']
+	if waiting:
+		links.insert(
+			0,
+			f'<a class="btn btn-primary btn-sm" href="{DESK_IMPORTS}">'
+			f"{frappe.utils.escape_html(_('Settle the {0} that wait').format(waiting))}</a>",
+		)
+	rows.append("<p>" + " &nbsp; ".join(links) + "</p>")
+	return "".join(rows)

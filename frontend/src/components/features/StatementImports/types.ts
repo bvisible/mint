@@ -61,3 +61,46 @@ export type ImportOverview = Omit<StatementImport, "creation" | "owner" | "impor
     summary: string | null,
     lines: ImportLine[],
 }
+
+/** A bank line that came from an import with a gap nobody has decided yet (get_lines_to_decide). */
+export type LineToDecide = {
+    bank_transaction: string,
+    statement_import: string,
+    idx: number,
+    kind: string,
+    gap: number,
+    party: string | null,
+}
+
+/** What a person is asked to decide for one bank line, the verdict worked out now (get_gap_decision). */
+export type GapDecision = {
+    bank_transaction: string,
+    statement_import: string,
+    invoice_type: "Sales Invoice" | "Purchase Invoice",
+    invoice: string,
+    party: string | null,
+    verdict: {
+        kind: string,
+        gap: number,
+        amount: number,
+        outstanding: number,
+        discount: number,
+        currency: string,
+        reason: string,
+    },
+    can_pass: boolean,
+    blocker: string,
+    decision: string | null,
+    decided_by: string | null,
+    decided_on: string | null,
+    discount_percent: number | null,
+    discount_date: string | null,
+    /** The gap may be passed on another account than the company's (a rounding, a rebate, a short payment settled). */
+    account_editable: boolean,
+    default_account: string | null,
+    account: string | null,
+    settle_in_full: boolean,
+    can_settle: boolean,
+    /** The rows the gap would be booked as, the VAT cut from the account included (nothing is written yet). */
+    deductions: { account: string, amount: number, description: string | null }[],
+}

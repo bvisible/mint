@@ -5,7 +5,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
 //// Neoffice — NOT ours: upstream v1.5.0 (89e7929) added useRef for the search field.
-import { useMemo, useRef } from "react"
+import { useMemo, useRef, useState } from "react"
 import { getCompanyCurrency } from "@/lib/company"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Separator } from "@/components/ui/separator"
@@ -42,6 +42,10 @@ import { useFrappeGetCall } from "frappe-react-sdk"
 //// Neoffice — NOT ours: upstream v1.5.0 empty-state primitives and router Link (89e7929).
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Link } from "react-router"
+//// Neoffice — added: the gap decision of a bank line that came from an import (filter, row chip, card).
+import { useLinesToDecide } from "@/components/features/StatementImports/useLinesToDecide"
+import GapDecisionCard from "@/components/features/StatementImports/GapDecisionCard"
+import { kindLabel } from "@/components/features/StatementImports/utils"
 
 const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
     const selectedBank = useAtomValue(selectedBankAccountAtom)
@@ -99,6 +103,10 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
 
     const [search, setSearch] = useTransactionSearch()
 
+    //// Neoffice — the filter « To decide »: the lines of an import whose invoice was recognised but whose sum left a gap.
+    const [toDecideOnly, setToDecideOnly] = useState(false)
+    const { lines: toDecide, byBankLine: gapByBankLine } = useLinesToDecide(bankAccount?.name)
+
     const searchIndex = useMemo(() => {
 
         if (!unreconciledTransactions) {
@@ -114,9 +122,11 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
 
     const results = useMemo(() => {
 
-        return getSearchResults(searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message)
+        const found = getSearchResults(searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message)
+        //// Neoffice — only the lines that wait for a gap decision, when that filter is on.
+        return toDecideOnly ? found.filter((transaction) => gapByBankLine.has(transaction.name)) : found
 
-    }, [searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message])
+    }, [searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message, toDecideOnly, gapByBankLine])
 
     const setSelectedTransaction = useSetAtom(bankRecSelectedTransactionAtom(bankAccount?.name || ''))
 
@@ -142,10 +152,13 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         }
         setTypeFilter('All')
         setAmountFilter({ value: 0, stringValue: '' })
+        //// Neoffice — the clear button also drops the « To decide » filter.
+        setToDecideOnly(false)
         onFilterChange()
     }
 
-    const hasFilters = search !== '' || typeFilter !== 'All' || amountFilter.value !== 0
+    //// Neoffice — the « To decide » filter counts as a filter (empty state, clear button).
+    const hasFilters = search !== '' || typeFilter !== 'All' || amountFilter.value !== 0 || toDecideOnly
 
     if (isLoading) {
         //// Neoffice — NOT ours: upstream v1.5.0 skeleton loading state (89e7929).
@@ -217,6 +230,17 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+            {/* //// Neoffice — added: the filter « To decide », shown when a line waits for a gap decision. */}
+            {toDecide.length > 0 && (
+                <Button
+                    variant="outline"
+                    className={cn("h-9", toDecideOnly && "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100")}
+                    aria-pressed={toDecideOnly}
+                    onClick={() => { setToDecideOnly((current) => !current); onFilterChange() }}>
+                    {_("To decide")}
+                    <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-amber-200 px-1.5 text-xs font-semibold text-amber-950">{toDecide.length}</span>
+                </Button>
+            )}
         </div>
 
         {error && <ErrorBanner error={error} />}
@@ -291,6 +315,9 @@ const UnreconciledTransactionItem = ({ transaction }: { transaction: Unreconcile
 
     const currency = transaction.currency ?? selectedBank?.account_currency ?? getCompanyCurrency(selectedBank?.company ?? '')
 
+    //// Neoffice — the gap this line left on its invoice, when it came from an import and nobody has decided yet.
+    const gap = useLinesToDecide(selectedBank?.name).byBankLine.get(transaction.name)
+
     const handleSelectTransaction = (event: React.MouseEvent<HTMLDivElement>) => {
         // If the user is pressing the shift key, add/remove the transaction from the selected transactions
         if (event.shiftKey) {
@@ -326,6 +353,11 @@ const UnreconciledTransactionItem = ({ transaction }: { transaction: Unreconcile
                             <ZapIcon className="w-4 h-4" /> {transaction.matched_rule}</Badge>}
                     </div>
                     <span className="text-sm">{transaction.description}</span>
+                    {/* //// Neoffice — the gap chip: amber, like the state « To decide » of the imports page. */}
+                    {gap && <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                        <span className="size-1.5 rounded-full bg-amber-600" />
+                        {_("Gap of {0}: {1}", [formatCurrency(Math.abs(gap.gap), currency), kindLabel(gap.kind)])}
+                    </span>}
                 </div>
                 <div className="gap-1 flex flex-col items-end min-w-36 h-full text-right">
                     {isWithdrawal ? <ArrowUpRight className="w-6 h-6 text-destructive" /> : <ArrowDownRight className="w-6 h-6 text-green-600" />}
@@ -557,6 +589,8 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                 <MatchFilters />
             </div>
         </TooltipProvider>
+        {/* //// Neoffice — added: a gap left by an import waits here for a person's decision. */}
+        <GapDecisionCard key={transaction.name} transaction={transaction} />
         {transaction.matched_rule && <RuleAction transaction={transaction} />}
         <VouchersForTransaction transaction={transaction} contentHeight={contentHeight} />
     </div>

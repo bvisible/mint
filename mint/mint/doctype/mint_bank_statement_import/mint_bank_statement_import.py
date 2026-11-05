@@ -417,8 +417,13 @@ class MintBankStatementImport(Document):
 		self.db_set("import_summary", summary)
 		self.db_set("status", "Completed")
 
+		# //// Neoffice — the window after the import says what passed by itself, what waits and where to deal with it
+		# //// (statement_follow_up.result_message); the one-line summary above stays on the import.
+		from mint.apis.statement_follow_up import result_message
+
 		frappe.msgprint(
-			summary,
+			# //// Neoffice — result_message instead of the one-line summary.
+			result_message(stats, self.currency),
 			title=_("XML Import Complete"),
 			indicator="green" if stats["errors"] == 0 else "orange",
 		)

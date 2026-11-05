@@ -161,17 +161,40 @@ def _decide_automatic(verdict, settings):
 		verdict.automatic = True
 
 
-def book(verdict, invoice_type: str, invoice_name: str, ledger_account: str, on, reference: str, remark: str) -> str:
-	"""The Payment Entry of an automatic verdict, made by ERPNext's get_payment_entry and submitted. Its name."""
+def book(
+	verdict,
+	invoice_type: str,
+	invoice_name: str,
+	ledger_account: str,
+	on,
+	reference: str,
+	remark: str,
+	by_person: bool = False,
+	account: str | None = None,
+	settle_in_full: bool = False,
+) -> str:
+	"""The Payment Entry of a verdict, made by ERPNext's get_payment_entry and submitted. Its name.
+
+	An automatic verdict is booked by the import, nobody in front of the screen. `by_person` stands for a person who
+	looked at the verdict and decided: the switches of the company then say nothing, but what cannot be booked cleanly
+	still is not (an overpayment, a gap with no account to go to).
+
+	`account` is the account a person chose for the gap instead of the company's. `settle_in_full` is a person's choice
+	for a payment that came in short beyond what the company accepts: the invoice is settled and the gap, with its VAT
+	cut from the account, is passed on that account, instead of being left open on the invoice."""
 	from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
 
-	if not verdict.automatic or verdict.kind in ("", "overpaid"):
+	if verdict.kind in ("", "overpaid") or not (verdict.automatic or by_person):
 		frappe.throw(_("This payment is not to be passed by itself: {0}").format(verdict.reason or verdict.kind))
+	if account:
+		check_account(verdict.company, account)
+	if by_person:
+		_check_the_gap_has_an_account(verdict, account, settle_in_full)
 	invoice = frappe.get_doc(invoice_type, invoice_name)
 	receiving = invoice_type == "Sales Invoice"
 	on = getdate(on)
 
-	if verdict.kind in ("early_discount", "partial", "exact"):
+	if verdict.kind in ("early_discount", "exact") or (verdict.kind == "partial" and not settle_in_full):
 		# ERPNext deducts the discount by itself inside the window of the payment terms: the plan says what to hand it
 		# so that the entry pays exactly the sum the bank moved, with or without the discount (see payment_terms).
 		from erpnextswiss.erpnextswiss.payment_terms import assert_pays_the_row, entry_plan
@@ -200,7 +223,7 @@ def book(verdict, invoice_type: str, invoice_name: str, ledger_account: str, on,
 		# What Payment Entry wants: for a Receive, difference = allocated - received, so a shortfall is a positive
 		# deduction; for a Pay, difference = paid - allocated, so the same shortfall is a negative one.
 		signed = verdict.gap if receiving else -verdict.gap
-		for deduction in _deductions(verdict, invoice, signed):
+		for deduction in _deductions(verdict, invoice, signed, account):
 			pe.append("deductions", deduction)
 
 	pe.posting_date = on
@@ -212,15 +235,65 @@ def book(verdict, invoice_type: str, invoice_name: str, ledger_account: str, on,
 	return pe.name
 
 
-def _deductions(verdict, invoice, signed) -> list[dict]:
+def account_problem(verdict, account: str | None = None, settle_in_full: bool = False) -> str:
+	"""Why a gap cannot be booked by a person, or an empty string: a gap goes to an account of the company, and the
+	account that is missing is said instead of the entry failing on it."""
+	settings = get_settings(verdict.company)
+	passes_as_deduction = verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind == "partial" and settle_in_full)
+	if passes_as_deduction and not (account or settings.account):
+		return _("The company has no payment gap account.")
+	if verdict.kind == "early_discount" and not frappe.get_cached_value(
+		"Company", verdict.company, "default_discount_account"
+	):
+		return _("The company has no early payment discount account.")
+	return ""
+
+
+def _check_the_gap_has_an_account(verdict, account=None, settle_in_full=False):
+	problem = account_problem(verdict, account, settle_in_full)
+	if problem:
+		frappe.throw(problem)
+
+
+def check_account(company: str, account: str):
+	"""The account a person chose for a gap: an income or expense account of this company that can be posted to."""
+	row = frappe.db.get_value(
+		"Account", account, ["company", "is_group", "disabled", "root_type", "account_type"], as_dict=True
+	)
+	if not row or row.company != company:
+		frappe.throw(_("Account {0} does not belong to company {1}").format(account, company))
+	if row.is_group or row.disabled:
+		frappe.throw(_("Account {0} cannot be posted to.").format(account))
+	if row.root_type not in ("Income", "Expense") or row.account_type in ("Receivable", "Payable", "Bank", "Cash"):
+		frappe.throw(_("A payment gap goes to an income or expense account, not {0}.").format(account))
+
+
+def preview(verdict, invoice, account: str | None = None, settle_in_full: bool = False) -> list[dict]:
+	"""The rows that the gap will be booked as, VAT included, the way the entry will carry them (nothing is written)."""
+	receiving = invoice.doctype == "Sales Invoice"
+	signed = verdict.gap if receiving else -verdict.gap
+	if verdict.kind == "early_discount":
+		return [
+			{
+				"account": frappe.get_cached_value("Company", verdict.company, "default_discount_account"),
+				"amount": signed,
+				"description": _("Payment gap of {0}").format(invoice.name),
+			}
+		]
+	if verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind == "partial" and settle_in_full):
+		return _deductions(verdict, invoice, signed, account)
+	return []
+
+
+def _deductions(verdict, invoice, signed, account: str | None = None) -> list[dict]:
 	settings = get_settings(verdict.company)
 	deduction = {
-		"account": settings.account,
+		"account": account or settings.account,
 		"cost_center": frappe.get_cached_value("Company", verdict.company, "cost_center"),
 		"amount": signed,
 		"description": _("Payment gap of {0}").format(invoice.name),
 	}
-	if verdict.kind != "accepted_rebate":
+	if verdict.kind == "rounding":
 		# a rounding of a few centimes carries no VAT line
 		return [deduction]
 	# The VAT is cut from the account, as the reconciliation screen does, but an invoice that carries no VAT gets none.

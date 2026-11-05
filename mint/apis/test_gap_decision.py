@@ -1,0 +1,194 @@
+# //// Neoffice — added file (no upstream equivalent).
+# ////
+# //// A PERSON DECIDES THE GAP OF A BANK LINE: THE FILTER, THE VERDICT IN WORDS, PASSING IT OR LEAVING IT OPEN.
+# ////
+# //// Played on real invoices of the site through the import itself, then through the calls the bank reconciliation
+# //// makes. The company's switches are OFF throughout: a person who decides does not need them.
+
+import frappe
+from frappe.tests.roles import as_role
+from frappe.utils import flt
+
+from mint.apis import statement_follow_up as follow_up
+from mint.apis.test_payment_gap_import import COMPANY, GAP_ACCOUNT, GapImportCase
+
+
+class TestGapDecision(GapImportCase):
+	def _a_line_with_a_gap(self, gap=0.03):
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed - gap, 2)))
+		return statement, statement.transactions[0].bank_transaction
+
+	def _states(self, statement):
+		return [line["state"] for line in follow_up.get_import_overview(statement.name)["lines"]]
+
+	# -- the filter and the verdict ---------------------------------------------------------------------------------------
+
+	def test_the_lines_waiting_for_a_decision_are_listed_with_their_gap(self):
+		statement, bank_line = self._a_line_with_a_gap(0.03)
+		listed = {row.bank_transaction: row for row in follow_up.get_lines_to_decide(self.bank_account)}
+		self.assertEqual((listed[bank_line].kind, flt(listed[bank_line].gap, 2)), ("rounding", 0.03))
+
+	def test_the_verdict_is_worked_out_now_and_says_what_a_person_may_do(self):
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["invoice"], self.sales)
+		self.assertEqual((decision["verdict"]["kind"], flt(decision["verdict"]["gap"], 2)), ("rounding", 0.03))
+		self.assertTrue(decision["can_pass"])
+		self.assertEqual(decision["blocker"], "")
+
+	def test_an_overpayment_can_only_be_left_open(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, owed + 5))
+		bank_line = statement.transactions[0].bank_transaction
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "overpaid")
+		self.assertFalse(decision["can_pass"])
+		self.assertTrue(decision["blocker"])
+		with self.assertRaises(frappe.ValidationError):
+			follow_up.decide_gap(bank_line, "passed_gap")
+
+	def test_a_gap_with_no_account_to_go_to_says_so_instead_of_failing(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		frappe.db.set_value("Neoffice Company Settings", "AlpInnovate SA", "payment_gap_account", None)
+		frappe.db.set_value("Company", "AlpInnovate SA", "default_discount_account", None)
+		frappe.clear_document_cache("Company", "AlpInnovate SA")
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertFalse(decision["can_pass"])
+		self.assertIn("account", decision["blocker"])
+		with self.assertRaises(frappe.ValidationError):
+			follow_up.decide_gap(bank_line, "passed_gap")
+
+	# -- the decision -------------------------------------------------------------------------------------------------------
+
+	def test_passing_the_gap_books_it_links_the_bank_line_and_notes_who_decided(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested below
+		statement, bank_line = self._a_line_with_a_gap(0.03)
+		owed = self._owed("Sales Invoice", self.sales)
+		answer = follow_up.decide_gap(bank_line, "passed_gap")
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual([(d.account, flt(d.amount, 2)) for d in entry.deductions], [(GAP_ACCOUNT, 0.03)])
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Reconciled")
+		line = follow_up.get_import_overview(statement.name)["lines"][0]
+		self.assertEqual((line["state"], line["decision"], line["decided_by"]), ("handled", "passed_gap", "Administrator"))
+		self.assertTrue(line["decided_on"])
+		self.assertNotIn(bank_line, [row.bank_transaction for row in follow_up.get_lines_to_decide(self.bank_account)])
+		self.assertGreater(owed, 0)
+
+	def test_a_partial_payment_is_booked_for_what_came_in_and_the_rest_stays_open(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		owed = self._owed("Sales Invoice", self.sales)
+		part = flt(owed / 2, 2)
+		statement = self._import(self._line("Sales Invoice", self.sales, part))
+		bank_line = statement.transactions[0].bank_transaction
+		self.assertEqual(follow_up.get_gap_decision(bank_line)["verdict"]["kind"], "partial")
+		follow_up.decide_gap(bank_line, "passed_gap")
+		self.assertEqual(self._owed("Sales Invoice", self.sales), flt(owed - part, 2))
+		self.assertEqual(self._states(statement), ["handled"])
+
+	def test_leaving_it_open_creates_nothing_and_leaves_the_list_of_what_waits(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		statement, bank_line = self._a_line_with_a_gap(0.03)
+		owed = self._owed("Sales Invoice", self.sales)
+		self.assertEqual(follow_up.decide_gap(bank_line, "left_open")["payment_entry"], None)
+		self.assertEqual(self._owed("Sales Invoice", self.sales), owed)
+		self.assertEqual(self._states(statement), ["left_open"])
+		self.assertNotIn(bank_line, [row.bank_transaction for row in follow_up.get_lines_to_decide(self.bank_account)])
+
+	def test_a_line_already_dealt_with_is_not_decided_twice(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		follow_up.decide_gap(bank_line, "passed_gap")
+		with self.assertRaises(frappe.ValidationError):
+			follow_up.decide_gap(bank_line, "passed_gap")
+		self.assertIsNone(follow_up.get_gap_decision(bank_line))
+
+	def test_a_line_that_did_not_come_from_an_import_has_nothing_to_decide(self):
+		self.assertIsNone(follow_up.get_gap_decision(frappe.db.get_value("Bank Transaction", {"docstatus": 1})))
+
+	# -- the account of the gap -----------------------------------------------------------------------------------------------
+
+	def _another_account(self, **filters):
+		account = frappe.db.get_value(
+			"Account",
+			{"company": COMPANY, "is_group": 0, "disabled": 0, "name": ("!=", GAP_ACCOUNT), **(filters or {"root_type": "Expense"})},
+		)
+		if not account:
+			self.skipTest("no other account of that kind on this site")
+		return account
+
+	def test_the_card_previews_the_rows_of_the_account_a_person_tries_without_booking_anything(self):
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		owed = self._owed("Sales Invoice", self.sales)
+		other = self._another_account()
+		decision = follow_up.get_gap_decision(bank_line, account=other)
+		self.assertEqual([(row["account"], row["amount"]) for row in decision["deductions"]], [(other, 0.03)])
+		self.assertEqual((decision["account"], decision["default_account"]), (other, GAP_ACCOUNT))
+		self.assertTrue(decision["account_editable"])
+		self.assertEqual(self._owed("Sales Invoice", self.sales), owed)
+		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Unreconciled")
+
+	def test_a_person_can_pass_the_gap_on_another_account(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		other = self._another_account()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", account=other)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual([(d.account, flt(d.amount, 2)) for d in entry.deductions], [(other, 0.03)])
+
+	def test_an_account_that_cannot_take_a_gap_is_refused_and_said(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		receivable = self._another_account(account_type="Receivable")
+		decision = follow_up.get_gap_decision(bank_line, account=receivable)
+		self.assertFalse(decision["can_pass"])
+		self.assertIn("income or expense", decision["blocker"])
+		with self.assertRaises(frappe.ValidationError):
+			follow_up.decide_gap(bank_line, "passed_gap", account=receivable)
+
+	def test_a_short_payment_can_be_settled_in_full_with_the_gap_passed_on_an_account(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		owed = self._owed("Sales Invoice", self.sales)
+		part = flt(owed * 0.6, 2)
+		statement = self._import(self._line("Sales Invoice", self.sales, part))
+		bank_line = statement.transactions[0].bank_transaction
+		decision = follow_up.get_gap_decision(bank_line, settle_in_full=1)
+		self.assertTrue(decision["can_settle"])
+		self.assertAlmostEqual(sum(row["amount"] for row in decision["deductions"]), flt(owed - part, 2), places=2)
+		answer = follow_up.decide_gap(bank_line, "passed_gap", settle_in_full=1)
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual(flt(entry.paid_amount, 2), part)
+		self.assertAlmostEqual(sum(flt(d.amount) for d in entry.deductions), flt(owed - part, 2), places=2)
+
+	def test_settling_in_full_is_offered_for_a_partial_payment_only(self):
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		self.assertFalse(follow_up.get_gap_decision(bank_line)["can_settle"])
+
+	# -- the rights -----------------------------------------------------------------------------------------------------------
+
+	def test_somebody_who_cannot_write_the_bank_line_cannot_decide_it(self):
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		with as_role("Guest"):
+			for call in (
+				lambda: follow_up.decide_gap(bank_line, "left_open"),
+				lambda: follow_up.get_gap_decision(bank_line),
+				lambda: follow_up.get_lines_to_decide(self.bank_account),
+			):
+				with self.assertRaises(frappe.PermissionError):
+					call()
+
+	# -- the window after an import ------------------------------------------------------------------------------------------
+
+	def test_the_window_after_an_import_counts_each_kind_and_points_at_what_waits(self):
+		stats = {
+			"total": 30,
+			"auto_matched": 22,
+			"passed_with_gap": 3,
+			"gap_total": 0.09,
+			"to_decide": 3,
+			"unreconciled": 5,
+			"duplicates": 3,
+			"errors": 0,
+		}
+		html = follow_up.result_message(stats, "CHF")
+		for text in ("30 lines read", "22 passed by themselves", "3 to decide", "2 to match", "3 already in the bank"):
+			self.assertIn(text, html)
+		self.assertIn("Settle the 5 that wait", html)
+		self.assertIn("statement-imports", html)
+		quiet = follow_up.result_message({**stats, "to_decide": 0, "unreconciled": 0}, "CHF")
+		self.assertNotIn("Settle the", quiet)
