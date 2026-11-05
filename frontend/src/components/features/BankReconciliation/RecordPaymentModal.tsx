@@ -1,4 +1,5 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
+//// Neoffice — bankRecRecordPaymentPrefillAtom added (c635ba9 "fix(bank reconciliation): ... 'Record another way' opens on the invoice's party") so the gap card can open this form pre-filled with the invoice's party.
 import { bankRecRecordPaymentModalAtom, bankRecRecordPaymentPrefillAtom, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from "./bankRecAtoms"
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog"
 import _ from "@/lib/translate"
@@ -317,6 +318,7 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
             bank_account: selectedTransaction.bank_account,
             company: selectedTransaction?.company,
             // If the money is paid, it's usually to a supplier. If it's received, it's usually from a customer
+            //// Neoffice — see the block marker above: prefill opens form on the invoice's party (c635ba9).
             party_type: prefill?.party_type ?? rule?.party_type ?? (isWithdrawal ? 'Supplier' : 'Customer'),
             party: prefill?.party ?? rule?.party ?? '',
             // If the transaction is a withdrawal, set the paid from to the selected bank account
@@ -1184,6 +1186,7 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
                 <span className="text-muted-foreground">{_("Invoices")}: <span className="text-foreground font-mono font-medium">{selectedInvoices.length}</span></span> /
                 <span className="text-muted-foreground">{_("Total")}: <span className="text-foreground font-mono font-medium">{formatCurrency(selectedInvoices.reduce((acc, invoice) => acc + invoice.outstanding_amount, 0))}</span></span>
             </div>
+            {/* //// Neoffice — see the block marker above: footer made static so it sits inside the sticky bar instead of fixing to the viewport (c635ba9). */}
             <DialogFooter className="static m-0 border-0 bg-transparent p-0">
                 <DialogClose asChild>
                     {/* //// Neoffice — wrapped in _() (1f2847e). */}
