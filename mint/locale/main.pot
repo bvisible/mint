@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-05 08:02+0000\n"
-"PO-Revision-Date: 2026-11-05 08:02+0000\n"
+"POT-Creation-Date: 2026-11-05 08:36+0000\n"
+"PO-Revision-Date: 2026-11-05 08:36+0000\n"
 "Last-Translator: support@thecommit.company\n"
 "Language-Team: support@thecommit.company\n"
 "MIME-Version: 1.0\n"
@@ -42,6 +42,10 @@ msgstr ""
 
 #: mint/apis/nora_ocr.py:410
 msgid "A Document Scan with this name already exists"
+msgstr ""
+
+#: mint/apis/payment_gap.py:157
+msgid "A partial payment is validated by a person."
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:559
@@ -175,7 +179,7 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:116
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:118
 #, python-brace-format
 msgid "All rows must have an amount and a type. Missing in row {0}"
 msgstr ""
@@ -204,7 +208,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1365
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1466
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:25
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:78
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:79
 #: frontend/src/pages/BankStatementImporter.tsx:177
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:37
@@ -232,12 +236,12 @@ msgstr ""
 msgid "Amount matches the selected transaction"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:161
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:215
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:164
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:220
 msgid "Amount or reference"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:280
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:287
 msgid "An amount is not valid."
 msgstr ""
 
@@ -317,7 +321,7 @@ msgstr ""
 #. Option for the 'Maps To' (Select) field in DocType 'Mint Bank Statement
 #. Import Template Columns'
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:327
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:138
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:139
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:33
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 msgid "Balance"
@@ -550,7 +554,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1167
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:143
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:374
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:103
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:104
 msgid "Cancel"
 msgstr ""
 
@@ -563,11 +567,11 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:465
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:529
 msgid "Cannot parse a submitted or cancelled document"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:477
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:541
 msgid "Cannot read file"
 msgstr ""
 
@@ -599,11 +603,11 @@ msgstr ""
 msgid "Cheque/Reference Number"
 msgstr ""
 
-#: frontend/src/pages/PartyReconciliation.tsx:54
+#: frontend/src/pages/PartyReconciliation.tsx:57
 msgid "Choose a customer to reconcile its payments and credit notes with its invoices."
 msgstr ""
 
-#: frontend/src/pages/PartyReconciliation.tsx:54
+#: frontend/src/pages/PartyReconciliation.tsx:57
 msgid "Choose a supplier to reconcile its payments and debit notes with its invoices."
 msgstr ""
 
@@ -795,8 +799,8 @@ msgstr ""
 msgid "Continue in background"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:121
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:37
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:122
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:38
 msgid "Copied"
 msgstr ""
 
@@ -805,8 +809,8 @@ msgstr ""
 msgid "Copied to clipboard"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:121
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:87
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:122
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:88
 msgid "Copy the reference"
 msgstr ""
 
@@ -829,12 +833,12 @@ msgstr ""
 msgid "Cost Center is required"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:121
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:39
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:122
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:40
 msgid "Could not copy"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:477
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:541
 msgid "Could not read file content"
 msgstr ""
 
@@ -872,7 +876,7 @@ msgstr ""
 msgid "Create a new rule to automatically classify transactions."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:63
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:64
 msgid "Created"
 msgstr ""
 
@@ -933,8 +937,8 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:19
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:221
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:278
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:168
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:222
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:172
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:228
 #: frontend/src/pages/BankStatementImporter.tsx:172
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:26
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
@@ -1055,7 +1059,7 @@ msgstr ""
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:292
 #: frontend/src/components/features/BankReconciliation/BankTransactionUnreconcileModal.tsx:82
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:223
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:229
 msgid "Document"
 msgstr ""
 
@@ -1079,7 +1083,7 @@ msgstr ""
 msgid "Document Type"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:465
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:529
 msgid "Document cannot be parsed"
 msgstr ""
 
@@ -1129,7 +1133,7 @@ msgstr ""
 msgid "Drop some files here, or click to select files"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:170
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:194
 msgid "Due"
 msgstr ""
 
@@ -1215,7 +1219,7 @@ msgstr ""
 msgid "Excel/CSV"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:96
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:97
 msgid "Exchange difference"
 msgstr ""
 
@@ -1308,7 +1312,7 @@ msgstr ""
 msgid "File Type"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:471
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:535
 msgid "File type must be XML"
 msgstr ""
 
@@ -1347,6 +1351,12 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionDetails.tsx:72
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:146
 msgid "GL Account"
+msgstr ""
+
+#. Label of a Currency field in DocType 'Mint Bank Statement Import
+#. Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:161
+msgid "Gap Amount"
 msgstr ""
 
 #. Label of a Section Break field in DocType 'Mint Settings'
@@ -1430,7 +1440,7 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:499
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:563
 #, python-brace-format
 msgid "IBAN in XML ({0}) points to {1}, but {2} is selected. Using selected account."
 msgstr ""
@@ -1552,8 +1562,8 @@ msgstr ""
 msgid "Invalid regex pattern."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:169
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:77
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:173
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:78
 msgid "Invoice"
 msgstr ""
 
@@ -1574,7 +1584,7 @@ msgstr ""
 msgid "Invoices"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:270
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:277
 msgid "Invoices ticked"
 msgstr ""
 
@@ -1735,7 +1745,7 @@ msgid "Mint Bank Statement Import Template Columns"
 msgstr ""
 
 #. Name of a DocType
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:151
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:180
 msgid "Mint Bank Statement Import Transactions"
 msgstr ""
 
@@ -1763,7 +1773,7 @@ msgstr ""
 msgid "Mint Transaction Rule Accounts"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:508
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:572
 msgid "Missing IBAN"
 msgstr ""
 
@@ -1771,7 +1781,7 @@ msgstr ""
 msgid "Missing document_scan_name"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:468
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:532
 msgid "Missing file"
 msgstr ""
 
@@ -1782,6 +1792,10 @@ msgstr ""
 
 #: frontend/src/components/ui/breadcrumb.tsx:100
 msgid "More"
+msgstr ""
+
+#: mint/apis/payment_gap.py:145
+msgid "More came in than is owed: that is never passed by itself."
 msgstr ""
 
 #: frontend/src/components/features/PartyReconciliation/utils.ts:23
@@ -1835,15 +1849,15 @@ msgstr ""
 msgid "No invoice linked"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:589
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:656
 msgid "No new transactions to import"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:67
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:68
 msgid "No open documents."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:204
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:208
 msgid "No open invoice."
 msgstr ""
 
@@ -1877,7 +1891,7 @@ msgstr ""
 msgid "No transactions found for the given filters."
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:130
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:132
 msgid "No transactions to import"
 msgstr ""
 
@@ -1908,11 +1922,11 @@ msgstr ""
 msgid "Not Started"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:261
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:267
 msgid "Nothing to apply."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:67
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:68
 msgid "Nothing to reconcile."
 msgstr ""
 
@@ -1959,11 +1973,11 @@ msgstr ""
 msgid "Only submitted vouchers can be cleared."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:58
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:59
 msgid "Only those with something to reconcile"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:136
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:137
 msgid "Open"
 msgstr ""
 
@@ -1971,12 +1985,12 @@ msgstr ""
 msgid "Open Bank Reconciliation"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:120
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:84
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:121
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:85
 msgid "Open in a new tab"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:158
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:161
 msgid "Open invoices"
 msgstr ""
 
@@ -2115,11 +2129,11 @@ msgstr ""
 msgid "Party is required create a payment entry."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:275
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:282
 msgid "Party still due after"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:276
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:283
 msgid "Party to apply after"
 msgstr ""
 
@@ -2148,10 +2162,12 @@ msgstr ""
 msgid "Payment Document"
 msgstr ""
 
+#. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
 #. Option for the 'Classify As' (Select) field in DocType 'Mint Bank
 #. Transaction Rule'
 #: frontend/src/components/features/BankReconciliation/MatchFilters.tsx:39
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:268
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:168
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:87
 msgid "Payment Entry"
 msgstr ""
@@ -2160,15 +2176,25 @@ msgstr ""
 msgid "Payment Entry Created"
 msgstr ""
 
+#. Label of a Select field in DocType 'Mint Bank Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:153
+msgid "Payment Gap"
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:160
 msgid "Payment Recorded"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:76
+#: mint/apis/payment_gap.py:221
+#, python-brace-format
+msgid "Payment gap of {0}"
+msgstr ""
+
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:77
 msgid "Payment, credit note or entry"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:212
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:217
 msgid "Payments, credit notes and entries"
 msgstr ""
 
@@ -2191,11 +2217,11 @@ msgstr ""
 msgid "Please attach a file"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:468
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:532
 msgid "Please attach an XML file first"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:508
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:572
 #, python-brace-format
 msgid "Please check your IBAN. It is missing: {0}"
 msgstr ""
@@ -2350,18 +2376,18 @@ msgid "Recommended Action"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:913
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:282
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:63
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:104
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:289
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:64
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:105
 msgid "Reconcile"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:203
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:354
 #: frontend/src/components/features/BankReconciliation/utils.ts:276
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:272
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:52
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:92
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:279
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:53
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:93
 msgid "Reconciled"
 msgstr ""
 
@@ -2382,7 +2408,7 @@ msgstr ""
 msgid "Reconciling"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:104
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:105
 msgid "Reconciling…"
 msgstr ""
 
@@ -2443,8 +2469,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:553
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:465
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:316
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:224
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:59
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:60
 #: frontend/src/pages/BankStatementImporter.tsx:192
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:64
@@ -2518,6 +2543,11 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:609
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:700
 msgid "Remarks"
+msgstr ""
+
+#. Label of a Data field in DocType 'Mint Bank Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:146
+msgid "Remittance Reference"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:936
@@ -2651,11 +2681,11 @@ msgstr ""
 msgid "Search Results"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:53
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:54
 msgid "Search a customer"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:53
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:54
 msgid "Search a supplier"
 msgstr ""
 
@@ -2763,7 +2793,7 @@ msgstr ""
 msgid "Show Only Exact Amount"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:119
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:120
 msgid "Show details"
 msgstr ""
 
@@ -2771,7 +2801,7 @@ msgstr ""
 msgid "Sidebar"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:89
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:90
 msgid "Since"
 msgstr ""
 
@@ -2837,11 +2867,11 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:273
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:280
 msgid "Still due on the ticked invoices"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:93
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:94
 msgid "Still due on these invoices"
 msgstr ""
 
@@ -2922,6 +2952,18 @@ msgstr ""
 msgid "The bank account is not a company account. Please select a company account"
 msgstr ""
 
+#: mint/apis/payment_gap.py:155
+msgid "The company has no early payment discount account."
+msgstr ""
+
+#: mint/apis/payment_gap.py:151
+msgid "The company has no payment gap account."
+msgstr ""
+
+#: mint/apis/payment_gap.py:147
+msgid "The company has not switched on passing payment gaps by itself."
+msgstr ""
+
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:191
 msgid "The date format detected in the statement file. This is used to parse the date values."
 msgstr ""
@@ -2951,16 +2993,34 @@ msgstr ""
 msgid "The following documents will be {0}:"
 msgstr ""
 
+#. Description of the 'Gap Amount' (Currency) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:163
+msgid "The invoice balance minus the payment: positive when less came in than is owed."
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:836
 #, python-brace-format
 msgid "The invoice is not fully allocated as there is a difference of {0}."
+msgstr ""
+
+#: mint/apis/payment_gap.py:149
+msgid "The invoice is not in the currency of the company."
+msgstr ""
+
+#: mint/apis/payment_gap.py:111
+msgid "The invoice is not open."
+msgstr ""
+
+#: mint/apis/payment_gap.py:159
+msgid "The invoice is not recognised without doubt: a person validates the partial payment."
 msgstr ""
 
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.py:80
 msgid "The last account row must not have any debit or credit amounts set."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:144
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:145
 #, python-brace-format
 msgid "The ledger says {0}, the open documents say {1}: a difference of {2}."
 msgstr ""
@@ -2975,6 +3035,12 @@ msgstr ""
 
 #: frontend/src/pages/BankStatementImporter.tsx:193
 msgid "The reference number of the transaction"
+msgstr ""
+
+#. Description of the 'Remittance Reference' (Data) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:148
+msgid "The structured reference of the payment (QR or creditor reference) as the statement carries it."
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:513
@@ -3085,7 +3151,7 @@ msgstr ""
 msgid "This is what the system expects the closing balance to be in your bank statement."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:64
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:65
 msgid "This is what will be written. Nothing is changed until you confirm."
 msgstr ""
 
@@ -3093,8 +3159,13 @@ msgstr ""
 msgid "This method is only meant for developer mode"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:150
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:151
 msgid "This party also has balances on other accounts, which are reconciled separately:"
+msgstr ""
+
+#: mint/apis/payment_gap.py:169
+#, python-brace-format
+msgid "This payment is not to be passed by itself: {0}"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/IncorrectlyClearedEntries.tsx:97
@@ -3114,17 +3185,17 @@ msgstr ""
 msgid "This will just suggest creating a new entry, and will not automatically create it."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:122
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:185
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:239
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:123
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:188
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:244
 msgid "Tick"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:280
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:287
 msgid "Tick at least one invoice and one payment, credit note or entry."
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:271
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:278
 msgid "Ticked to use"
 msgstr ""
 
@@ -3138,15 +3209,15 @@ msgstr ""
 msgid "To Process"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:137
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:138
 msgid "To apply"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:171
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:174
 msgid "To settle"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:225
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:230
 msgid "To use"
 msgstr ""
 
@@ -3352,15 +3423,15 @@ msgstr ""
 msgid "Unreconciled Transactions"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:122
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:123
 msgid "Untick"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:274
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:281
 msgid "Unused on the ticked lines"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:94
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:95
 msgid "Unused on these payments and credits"
 msgstr ""
 
@@ -3473,6 +3544,12 @@ msgstr ""
 msgid "We've found {0} existing transactions in the system that conflict with the transactions in the statement file. Are you sure you want to proceed with the import?"
 msgstr ""
 
+#. Description of the 'Payment Gap' (Select) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:156
+msgid "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:633
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:638
 msgid "Will be auto-populated"
@@ -3500,7 +3577,7 @@ msgstr ""
 msgid "Withdrawal"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:471
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:535
 msgid "Wrong file type"
 msgstr ""
 
@@ -3515,7 +3592,7 @@ msgstr ""
 msgid "XML Details"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:395
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:419
 msgid "XML Import Complete"
 msgstr ""
 
@@ -3556,7 +3633,13 @@ msgstr ""
 msgid "Your Progress"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:60
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "accepted_rebate"
+msgstr ""
+
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:61
 msgid "attachment(s)"
 msgstr ""
 
@@ -3570,10 +3653,22 @@ msgstr ""
 msgid "e.g. Last 3 weeks"
 msgstr ""
 
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "early_discount"
+msgstr ""
+
 #. Option for the 'Google Processor Location' (Select) field in DocType 'Mint
 #. Settings'
 #: mint/mint/doctype/mint_settings/mint_settings.json:28
 msgid "eu"
+msgstr ""
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "exact"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:734
@@ -3586,8 +3681,26 @@ msgstr ""
 msgid "or click to browse"
 msgstr ""
 
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "overpaid"
+msgstr ""
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "partial"
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:155
 msgid "reconciled"
+msgstr ""
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "rounding"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:416
@@ -3604,28 +3717,29 @@ msgstr ""
 msgid "us"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:306
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:346
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:312
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:356
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:456
 #, python-brace-format
 msgid "{0} - Payment for {1}"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:383
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:398
 #, python-brace-format
 msgid "{0} auto-matched"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:378
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:393
 #, python-brace-format
 msgid "{0} created"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:381
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:396
 #, python-brace-format
 msgid "{0} duplicates skipped"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:387
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:411
 #, python-brace-format
 msgid "{0} errors"
 msgstr ""
@@ -3640,22 +3754,37 @@ msgstr ""
 msgid "{0} is not a voucher this tool can clear"
 msgstr ""
 
+#: mint/apis/payment_gap.py:90
+#, python-brace-format
+msgid "{0} is not an invoice a payment can settle."
+msgstr ""
+
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:487
 #, python-brace-format
 msgid "{0} new, {1} already imported"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:81
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:82
 #, python-brace-format
 msgid "{0} open invoice(s)"
 msgstr ""
 
-#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:85
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:402
+#, python-brace-format
+msgid "{0} passed with a gap (total {1})"
+msgstr ""
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:86
 #, python-brace-format
 msgid "{0} to apply"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:385
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:407
+#, python-brace-format
+msgid "{0} to decide"
+msgstr ""
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:409
 #, python-brace-format
 msgid "{0} to review in Mint"
 msgstr ""
@@ -3677,7 +3806,7 @@ msgstr ""
 msgid "{0} transactions found"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:377
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:392
 #, python-brace-format
 msgid "{0} transactions processed"
 msgstr ""
@@ -3727,10 +3856,6 @@ msgstr ""
 msgid "Bank Transactions between {0} and {1}"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:371
-msgid "Error uploading attachments"
-msgstr ""
-
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:56
 msgid "Invalid file type"
 msgstr ""
@@ -3749,8 +3874,4 @@ msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:130
 msgid "There are no transactions in the system for the selected bank account and dates."
-msgstr ""
-
-#: frontend/src/components/features/ActionLog/ActionLog.tsx:96
-msgid "You have not performed any reconciliation actions in this session yet."
 msgstr ""

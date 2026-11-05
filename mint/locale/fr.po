@@ -2921,3 +2921,124 @@ msgstr "{0} {1} n'est plus ouvert(e) : une autre personne l'a rapproché(e), ou 
 #, python-brace-format
 msgid "{0} {1}: {2} asked, {3} left. Reload the party."
 msgstr "{0} {1} : {2} demandé, {3} restant. Rechargez le tiers."
+
+#: mint/apis/payment_gap.py:157
+msgid "A partial payment is validated by a person."
+msgstr "Un paiement partiel est validé par une personne."
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "accepted_rebate"
+msgstr "rabais accepté"
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "early_discount"
+msgstr "escompte"
+
+#. Label of a Currency field in DocType 'Mint Bank Statement Import
+#. Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:161
+msgid "Gap Amount"
+msgstr "Montant de l'écart"
+
+#: mint/apis/payment_gap.py:145
+msgid "More came in than is owed: that is never passed by itself."
+msgstr "Il est reçu plus que ce qui est dû : cela n'est jamais comptabilisé automatiquement."
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "overpaid"
+msgstr "trop-perçu"
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "partial"
+msgstr "partiel"
+
+#. Label of a Select field in DocType 'Mint Bank Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:153
+msgid "Payment Gap"
+msgstr "Écart de paiement"
+
+#: mint/apis/payment_gap.py:221
+#, python-brace-format
+msgid "Payment gap of {0}"
+msgstr "Écart de paiement de {0}"
+
+#. Label of a Data field in DocType 'Mint Bank Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:146
+msgid "Remittance Reference"
+msgstr "Référence de paiement"
+
+#. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:154
+msgid "rounding"
+msgstr "arrondi"
+
+#: mint/apis/payment_gap.py:155
+msgid "The company has no early payment discount account."
+msgstr "La société n'a pas de compte d'escompte."
+
+#: mint/apis/payment_gap.py:151
+msgid "The company has no payment gap account."
+msgstr "La société n'a pas de compte pour les écarts de paiement."
+
+#: mint/apis/payment_gap.py:147
+msgid "The company has not switched on passing payment gaps by itself."
+msgstr "La société n'a pas activé la comptabilisation automatique des écarts de paiement."
+
+#. Description of the 'Gap Amount' (Currency) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:163
+msgid "The invoice balance minus the payment: positive when less came in than is owed."
+msgstr "Le solde de la facture moins le paiement : positif lorsque le paiement reçu est inférieur au montant dû."
+
+#: mint/apis/payment_gap.py:149
+msgid "The invoice is not in the currency of the company."
+msgstr "La facture n'est pas dans la devise de la société."
+
+#: mint/apis/payment_gap.py:111
+msgid "The invoice is not open."
+msgstr "La facture n'est pas ouverte."
+
+#: mint/apis/payment_gap.py:159
+msgid "The invoice is not recognised without doubt: a person validates the partial payment."
+msgstr "La facture n'est pas reconnue sans équivoque : une personne valide le paiement partiel."
+
+#. Description of the 'Remittance Reference' (Data) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:148
+msgid "The structured reference of the payment (QR or creditor reference) as the statement carries it."
+msgstr "La référence structurée du paiement (QR ou référence créancier), telle que le relevé la porte."
+
+#: mint/apis/payment_gap.py:169
+#, python-brace-format
+msgid "This payment is not to be passed by itself: {0}"
+msgstr "Ce paiement ne doit pas être comptabilisé automatiquement : {0}"
+
+#. Description of the 'Payment Gap' (Select) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:156
+msgid "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
+msgstr "Ce que représente le paiement pour la facture sur laquelle il a été rapproché, lorsqu'il ne la solde pas au centime près."
+
+#: mint/apis/payment_gap.py:90
+#, python-brace-format
+msgid "{0} is not an invoice a payment can settle."
+msgstr "{0} n'est pas une facture qu'un paiement peut solder."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:402
+#, python-brace-format
+msgid "{0} passed with a gap (total {1})"
+msgstr "{0} comptabilisées avec un écart (total {1})"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:407
+#, python-brace-format
+msgid "{0} to decide"
+msgstr "{0} à décider"
