@@ -103,6 +103,8 @@ def _document(company: str, customer: str, on, rate: float, d: frappe._dict, acc
 			"currency": _company_currency(company),
 			"conversion_rate": 1,
 			"taxes_and_charges": d.tax_template,
+			# the credit note settles exactly the balance: a total rounded to five centimes would leave a few cents open on it
+			"disable_rounded_total": 1,
 		}
 	)
 	doc.append(

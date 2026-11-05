@@ -158,6 +158,19 @@ class TestGapCreditNote(GapImportCase):
 		line = follow_up.get_import_overview(statement.name)["lines"][0]
 		self.assertEqual((line["state"], line["decision"], line["credit_note"]), ("handled", "passed_gap", note.name))
 
+	def test_a_company_that_rounds_to_five_centimes_leaves_nothing_open_on_the_credit_note(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+		# a gap of 0.01 beyond a multiple of 0.05: a rounded total would be 0.01 off the balance the invoice is settled by
+		frappe.db.set_value("Currency", "CHF", "smallest_currency_fraction_value", 0.05)
+		frappe.db.set_single_value("Global Defaults", "disable_rounded_total", 0)
+		self.addCleanup(lambda: frappe.db.value_cache.pop("Currency", None))
+		owed = self._owed("Sales Invoice", self.sales)
+		gap = flt(int(owed * 0.4 * 20) / 20 + 0.01, 2)
+		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed - gap, 2)))
+		answer = follow_up.decide_gap(statement.transactions[0].bank_transaction, "passed_gap", credit_note=1)
+		note = frappe.db.get_value("Sales Invoice", answer["credit_note"], ["grand_total", "rounded_total", "outstanding_amount"], as_dict=True)
+		self.assertEqual((flt(note.grand_total, 2), flt(note.rounded_total, 2), flt(note.outstanding_amount, 2)), (-gap, 0, 0))
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
 	def test_the_credit_note_goes_to_the_account_the_person_chose(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
 		_statement, bank_line, _owed, _part = self._partial(0.7)
 		other = frappe.db.get_value(
