@@ -25,6 +25,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { useAtom } from "jotai"
 import { bankRecTabAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import StatementImportsPanel from "@/components/features/StatementImports/StatementImportsPanel"
+//// Neoffice — added: the three reports behind one tab.
+import ReportsMenu from "@/components/features/BankReconciliation/ReportsMenu"
 
 
 //// Neoffice — changed: takes the tab to open on (the old address of the imports opens the bank files tab) and keeps the tab shown
@@ -87,16 +89,23 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
             </div>
             {/* //// Neoffice — changed: controlled by the atom (upstream: defaultValue="Match and Reconcile"). */}
             <Tabs value={tab} onValueChange={setTab}>
-                {/* //// Neoffice — framed in a desk tab, five tabs do not fit the page's width: */}
-                {/* //// centred, they overflowed both edges and the first was cut. They wrap instead. */}
+                {/* //// Neoffice — framed in a desk tab, six tabs do not fit the page's width: they overflowed both edges, then */}
+                {/* //// wrapped on a second line. The three reports go behind one « Reports » tab (ReportsMenu), so the strip stays on one line; */}
+                {/* //// the wrap stays as a safety net for a very narrow frame. */}
                 <TabsList className={EMBEDDED ? "w-full h-auto flex-wrap justify-start" : "w-full"}>
                     <TabsTrigger value="Match and Reconcile">{_("Match and Reconcile")}</TabsTrigger>
                     {/* //// Neoffice — added: the bank files that came in, and how to bring one in. */}
                     <TabsTrigger value="Bank Files">{_("Bank Files")}</TabsTrigger>
-                    <TabsTrigger value="Bank Reconciliation Statement">{_("Bank Reconciliation Statement")}</TabsTrigger>
                     <TabsTrigger value="Bank Transactions">{_("Bank Transactions")}</TabsTrigger>
-                    <TabsTrigger value="Bank Clearance Summary">{_("Bank Clearance Summary")}</TabsTrigger>
-                    <TabsTrigger value="Incorrectly Cleared Entries">{_("Incorrectly Cleared Entries")}</TabsTrigger>
+                    <ReportsMenu
+                        reports={[
+                            { value: "Bank Reconciliation Statement", label: _("Bank Reconciliation Statement") },
+                            { value: "Bank Clearance Summary", label: _("Bank Clearance Summary") },
+                            { value: "Incorrectly Cleared Entries", label: _("Incorrectly Cleared Entries") },
+                        ]}
+                        value={tab}
+                        onSelect={setTab}
+                    />
                 </TabsList>
                 <TabsContent value="Match and Reconcile">
                     <MatchAndReconcile contentHeight={remainingHeightAfterTabs} />

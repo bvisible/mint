@@ -3838,3 +3838,7 @@ msgstr "Importer un relevé bancaire (XML ou PDF)"
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:96
 msgid "Back to bank files"
 msgstr "Retour aux fichiers bancaires"
+
+#: frontend/src/components/features/BankReconciliation/ReportsMenu.tsx:21
+msgid "Reports"
+msgstr "Rapports"
