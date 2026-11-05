@@ -57,13 +57,15 @@ const BankBalance = () => {
 //// Neoffice — added: the label of a figure with, behind an info icon, where it comes from. Nobody could tell what the
 //// four figures were (Daniel, 05.11: « je ne comprends pas d'où il prend ces valeurs »); the sentence is not shown all
 //// the time, it would cost a line of the screen.
-const LabelWithInfo = ({ label, info }: { label: string, info?: React.ReactNode }) => (
+const LabelWithInfo = ({ label, title, info }: { label: string, title?: string, info?: React.ReactNode }) => (
     <div className="flex items-start gap-1">
         <StatLabel>{label}</StatLabel>
         {info && <HoverCard openDelay={100}>
             <HoverCardTrigger><Info size='14px' className="text-secondary-foreground/80" /></HoverCardTrigger>
             <HoverCardContent className="w-80" align="start" side="bottom">
-                <Paragraph className="text-sm">{info}</Paragraph>
+                {/* //// Neoffice — the full wording of the figure is the title of the hover (the label itself is short). */}
+                {title && <H4 className="text-base">{title}</H4>}
+                <Paragraph className="mt-1 text-sm">{info}</Paragraph>
             </HoverCardContent>
         </HoverCard>}
     </div>
@@ -75,7 +77,7 @@ const OpeningBalance = () => {
 
     //// Neoffice — min-w-48 to min-w-32 (1f2847e), same density pass.
     return <StatContainer className="min-w-32">
-        <LabelWithInfo label={_("Opening Balance")} info={_("Calculated the same way, the day before the period starts.")} />
+        <LabelWithInfo label={_("Opening")} title={_("Opening Balance")} info={_("Calculated the same way, the day before the period starts.")} />
         {/* //// Neoffice — skeleton resized to match the smaller figures (1f2847e). */}
         {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
     </StatContainer>
@@ -90,7 +92,8 @@ const ClosingBalance = () => {
         <StatContainer className="min-w-36">
             <div className="flex items-start gap-1">
                 <StatLabel>
-                    {_("Closing Balance as per system")}
+                    {/* //// Neoffice — short label (it was « Closing Balance as per system »): the strip fits one line. */}
+                    {_("Closing")} · {_("System")}
                 </StatLabel>
                 <HoverCard openDelay={100}>
                     <HoverCardTrigger>
@@ -228,7 +231,8 @@ const ClosingBalanceAsPerStatement = () => {
     //// Neoffice — min-w-48 to min-w-36 (1f2847e), same density pass.
     return <StatContainer className="min-w-36">
         <LabelWithInfo
-            label={_("Closing Balance as per statement")}
+            label={`${_("Closing")} · ${_("Statement")}`}
+            title={_("Closing Balance as per statement")}
             info={data?.message?.source === "file"
                 ? _("From the statement file imported, as of {0}.", [statementDay])
                 : data?.message?.source === "typed"
