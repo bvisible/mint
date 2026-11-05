@@ -47,6 +47,8 @@ const BankBalance = () => {
                 <ClosingBalance />
                 <ClosingBalanceAsPerStatement />
                 <Difference />
+                {/* //// Neoffice — the amount still to deal with, as one more figure of the single band. */}
+                <ToProcess />
             </div>
 
             <ReconcileProgress />
@@ -145,6 +147,31 @@ const Difference = () => {
     </StatContainer>
 }
 
+//// Neoffice — added: the amount still to deal with is the sum of the lines the tables below show, in and out apart
+//// (Daniel, 05.11: next to the number of entries, the amount to process), as one more figure of the strip.
+const ToProcess = () => {
+    const bankAccount = useAtomValue(selectedBankAccountAtom)
+    const { data: unreconciledTransactions, isLoading } = useGetUnreconciledTransactions()
+    const { deposits, withdrawals } = useMemo(() => {
+        let deposits = 0
+        let withdrawals = 0
+        for (const transaction of unreconciledTransactions?.message ?? []) {
+            const left = flt(transaction.unallocated_amount ?? (transaction.deposit || transaction.withdrawal), 2)
+            if (flt(transaction.deposit) > 0) deposits += left
+            else withdrawals += left
+        }
+        return { deposits, withdrawals }
+    }, [unreconciledTransactions])
+    const currency = bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? '')
+
+    return <StatContainer className="min-w-36">
+        <LabelWithInfo label={_("Still to deal with")} />
+        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <span className="whitespace-nowrap font-mono text-sm font-semibold tabular-nums">
+            +{formatCurrency(deposits, currency)} <span className="text-muted-foreground">·</span> −{formatCurrency(withdrawals, currency)}
+        </span>}
+    </StatContainer>
+}
+
 const ReconcileProgress = () => {
 
     const bankAccount = useAtomValue(selectedBankAccountAtom)
@@ -167,34 +194,14 @@ const ReconcileProgress = () => {
     const reconciledCount = (totalCount ?? 0) - (unreconciledTransactions?.message?.length ?? 0)
 
     const progress = (totalCount ? reconciledCount / totalCount : 0) * 100
-    //// Neoffice — the amount still to deal with is the sum of the lines the tables below show, in and out apart
-    //// (Daniel, 05.11: next to the number of entries, the amount to process).
-    const toProcess = useMemo(() => {
-        let deposits = 0
-        let withdrawals = 0
-        for (const transaction of unreconciledTransactions?.message ?? []) {
-            const left = flt(transaction.unallocated_amount ?? (transaction.deposit || transaction.withdrawal), 2)
-            if (flt(transaction.deposit) > 0) deposits += left
-            else withdrawals += left
-        }
-        return { deposits, withdrawals }
-    }, [unreconciledTransactions])
-    const currency = bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? '')
-
     //// Neoffice — fixed 18% width replaced by a min/max clamp (1f2847e): in the embedded shell
     //// the percentage collapsed the progress block to a few pixels on a laptop.
-    return <div className="flex flex-col gap-1 items-end min-w-[180px] w-full lg:w-auto lg:min-w-[240px]">
+    return <div className="flex flex-col gap-1 items-end min-w-[150px] w-full lg:w-auto lg:min-w-[170px]">
         <div className="flex flex-wrap items-baseline justify-end gap-x-3">
             {/* //// Neoffice — whitespace-nowrap added (1f2847e): the French wording is longer and wrapped */}
             {/* //// mid-sentence in the narrower column. */}
-            <span className="text-right font-medium text-sm whitespace-nowrap">{_("Your Progress")}: {reconciledCount} / {totalCount} {_("reconciled")}</span>
-            {/* //// Neoffice — the amount still to deal with, in and out, on the same line as the count. */}
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {_("Still to deal with")}:{" "}
-                <span className="font-mono tabular-nums text-foreground">+{formatCurrency(toProcess.deposits, currency)}</span>
-                {" · "}
-                <span className="font-mono tabular-nums text-foreground">−{formatCurrency(toProcess.withdrawals, currency)}</span>
-            </span>
+            {/* //// Neoffice — the count alone (the amounts left are the figure « Still to deal with » of the strip). */}
+            <span className="text-right font-medium text-sm whitespace-nowrap">{reconciledCount} / {totalCount} {_("reconciled")}</span>
         </div>
         <div className="w-full">
             <Progress value={progress} max={100} />
