@@ -3623,3 +3623,164 @@ msgstr "Valider le brouillon et rapprocher"
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:52
 msgid "What becomes of the balance when this customer pays less than the invoice, beyond a small gap."
 msgstr "Ce que devient le solde lorsque ce client paie moins que la facture, au-delà d'un petit écart."
+
+#: mint/apis/line_invoices.py:272
+msgid "A payment in a foreign currency is recorded in the payment window."
+msgstr "Un paiement en devise étrangère s'enregistre dans la fenêtre de paiement."
+
+#: mint/apis/line_invoices.py:269
+msgid "An invoice appears twice in the split."
+msgstr "Une facture figure deux fois dans la répartition."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:169
+msgid "Correct it in its tab if needed, validate it, then come back here."
+msgstr "Corrigez-le dans son onglet si nécessaire, validez-le, puis revenez ici."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:178
+msgid "Delete the draft"
+msgstr "Supprimer le brouillon"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:164
+msgid "Draft waiting"
+msgstr "Brouillon en attente"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:119
+#, python-brace-format
+msgid "Draft {0} prepared: correct it in its tab, validate it, then come back here."
+msgstr "Brouillon {0} préparé : corrigez-le dans son onglet, validez-le, puis revenez ici."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:141
+msgid "Found by the IBAN of the payer."
+msgstr "Trouvé par l'IBAN du payeur."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:242
+msgid "Left to split"
+msgstr "Reste à répartir"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:141
+msgid "Named by the import."
+msgstr "Désigné par l'import."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:133
+msgid "No invoice recognised"
+msgstr "Aucune facture reconnue"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:133
+msgid "One payment, several invoices"
+msgstr "Un paiement, plusieurs factures"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:108
+msgid "Payment recorded, invoices settled and bank line reconciled"
+msgstr "Paiement enregistré, factures réglées et ligne bancaire rapprochée"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:124
+msgid "Payment validated and bank line reconciled"
+msgstr "Paiement validé et ligne bancaire rapprochée"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:133
+msgid "Pick the invoices this payment settles"
+msgstr "Choisissez les factures que ce paiement règle"
+
+#: mint/apis/line_invoices.py:267
+msgid "Pick the invoices this payment settles."
+msgstr "Choisissez les factures que ce paiement règle."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:255
+msgid "Prepare the draft"
+msgstr "Préparer le brouillon"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:168
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "Prepared by {0} on {1}: {2} on {3}."
+msgstr "Préparé par {0} le {1} : {2} sur {3}."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:176
+#, python-brace-format
+msgid "Reconcile with {0}"
+msgstr "Rapprocher avec {0}"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:207
+msgid "Same amount: pick this one"
+msgstr "Même montant : choisir celle-ci"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:193
+msgid "Settled by this payment"
+msgstr "Réglée par ce paiement"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:238
+#, python-brace-format
+msgid "Split over {0} invoices"
+msgstr "Répartition sur {0} factures"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:140
+msgid "The import recognised no invoice."
+msgstr "L'import n'a reconnu aucune facture."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:135
+#, python-brace-format
+msgid "The import recognised {0} invoices."
+msgstr "L'import a reconnu {0} factures."
+
+#: mint/apis/line_invoices.py:292
+#, python-brace-format
+msgid "The invoices add up to {0}, the payment is {1}."
+msgstr "Les factures totalisent {0}, le paiement s'élève à {1}."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:148
+msgid "The open invoices of the party, the oldest first. Tick the ones this payment settles: the amount is split between them and stays editable. A draft is opened in its own tab so that you can correct it by hand before validating."
+msgstr "Les factures ouvertes du tiers, de la plus ancienne à la plus récente. Cochez celles que ce paiement règle : le montant se répartit entre elles et reste modifiable. Un brouillon s'ouvre dans son propre onglet, pour que vous puissiez le corriger à la main avant de le valider."
+
+#: mint/apis/line_invoices.py:355
+#, python-brace-format
+msgid "The payment is {0}, the bank line {1}."
+msgstr "Le paiement est {0}, la ligne bancaire {1}."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:138
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "The reference {0} is that of an invoice already paid, on {1}. This payment does not settle it."
+msgstr "La référence {0} est celle d'une facture déjà réglée, le {1}. Ce paiement ne la règle pas."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:139
+#, python-brace-format
+msgid "The reference {0} is that of an invoice already paid. This payment does not settle it."
+msgstr "La référence {0} est celle d'une facture déjà réglée. Ce paiement ne la règle pas."
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:206
+msgid "The same amount as the payment"
+msgstr "Le même montant que le paiement"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:176
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:254
+msgid "Validate and reconcile"
+msgstr "Valider et rapprocher"
+
+#: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:164
+msgid "Validated, to reconcile"
+msgstr "Validé, à rapprocher"
+
+#: mint/apis/line_invoices.py:368
+#, python-brace-format
+msgid "{0} is not a draft."
+msgstr "{0} n'est pas un brouillon."
+
+#: mint/apis/line_invoices.py:282
+#, python-brace-format
+msgid "{0} is not an open invoice of {1}."
+msgstr "{0} n'est pas une facture ouverte de {1}."
+
+#: mint/apis/line_invoices.py:284
+#, python-brace-format
+msgid "{0} is not in the currency of the payment."
+msgstr "{0} n'est pas dans la devise du paiement."
+
+#: mint/apis/line_invoices.py:338
+#, python-brace-format
+msgid "{0} was not prepared for this bank line."
+msgstr "{0} n'a pas été préparé pour cette ligne bancaire."
+
+#: mint/apis/line_invoices.py:287
+#, python-brace-format
+msgid "{0}: {1} asked, {2} still owed."
+msgstr "{0} : montant demandé {1}, reste dû {2}."
