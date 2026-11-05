@@ -38,17 +38,29 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
         if (initialTab) setTab(initialTab)
     }, [initialTab, setTab])
 
-    const [headerHeight, setHeaderHeight] = useState(0)
-
     const ref = useRef<HTMLDivElement>(null)
+    const tabsRef = useRef<HTMLDivElement>(null)
 
+    //// Neoffice — the room left under the tabs, MEASURED: upstream subtracted a guessed 324 px from the window's height, which was
+    //// wrong whenever the header wrapped or the frame was low, and the lists overflowed it (Daniel, 05.11). It follows the window
+    //// and the header (the bank cards and the balances change its height).
+    const [remainingHeightAfterTabs, setRoom] = useState(() => Math.max(300, window.innerHeight - 340))
     useLayoutEffect(() => {
-        if (ref.current) {
-            setHeaderHeight(ref.current.clientHeight)
+        const measure = () => {
+            const tabs = tabsRef.current
+            if (!tabs) return
+            const top = tabs.getBoundingClientRect().bottom + window.scrollY + 8
+            setRoom(Math.max(300, Math.round(window.innerHeight - top - 12)))
+        }
+        measure()
+        window.addEventListener("resize", measure)
+        const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure)
+        if (observer && ref.current) observer.observe(ref.current)
+        return () => {
+            window.removeEventListener("resize", measure)
+            observer?.disconnect()
         }
     }, [])
-
-    const remainingHeightAfterTabs = window.innerHeight - headerHeight - 324
 
     return (
         <div className="p-4 flex flex-col gap-4">
@@ -92,7 +104,7 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                 {/* //// Neoffice — framed in a desk tab, six tabs do not fit the page's width: they overflowed both edges, then */}
                 {/* //// wrapped on a second line. The three reports go behind one « Reports » tab (ReportsMenu), so the strip stays on one line; */}
                 {/* //// the wrap stays as a safety net for a very narrow frame. */}
-                <TabsList className={EMBEDDED ? "w-full h-auto flex-wrap justify-start" : "w-full"}>
+                <TabsList ref={tabsRef} className={EMBEDDED ? "w-full h-auto flex-wrap justify-start" : "w-full"}>
                     <TabsTrigger value="Match and Reconcile">{_("Match and Reconcile")}</TabsTrigger>
                     {/* //// Neoffice — added: the bank files that came in, and how to bring one in. */}
                     <TabsTrigger value="Bank Files">{_("Bank Files")}</TabsTrigger>

@@ -69,13 +69,18 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
     }
 
     return <>
-        <div className={`flex items-start space-x-2`} >
-            <div className="flex-1">
+        {/* //// Neoffice — the two columns are as tall as the room left under the tabs (measured by the page), each one scrolling inside:
+            the list had a fixed minimum of 400 px that overflowed any frame less than ~900 px high, with its last lines below the
+            visible part and no way to see them (Daniel, 05.11). */}
+        <div className={`flex items-start space-x-2`} style={{ height: contentHeight }}>
+            <div className="flex h-full min-h-0 flex-1 flex-col">
                 <H4 className="text-sm font-medium">{_("Unreconciled Transactions")}</H4>
-                <UnreconciledTransactions contentHeight={contentHeight} />
+                <div className="min-h-0 flex-1">
+                    <UnreconciledTransactions />
+                </div>
             </div>
-            <Separator orientation="vertical" style={{ minHeight: `${contentHeight}px` }} />
-            <div className="flex-1 px-1">
+            <Separator orientation="vertical" className="h-full" />
+            <div className="h-full min-h-0 flex-1 overflow-y-auto px-1">
                 <H4 className="text-sm font-medium">{_("Match or Create")}</H4>
                 <VouchersSection contentHeight={contentHeight} />
             </div>
@@ -89,7 +94,7 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
 }
 
 
-const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) => {
+const UnreconciledTransactions = () => {
     const bankAccount = useAtomValue(selectedBankAccountAtom)
 
     const currency = bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? '')
@@ -201,7 +206,7 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         return <UnreconciledTransactionsLoadingState />
     }
 
-    return <div className="space-y-1">
+    return <div className="flex h-full flex-col gap-1">
         <div className="flex py-2 w-full gap-2">
             <label className="sr-only">{_("Search transactions")}</label>
             <div className={cn("flex items-center gap-2 w-full rounded-md dark:bg-input/30 border-input border bg-transparent px-2 text-base shadow-xs transition-[color,box-shadow] outline-none",
@@ -305,14 +310,17 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
             text={fileDone ? _("Everything is dealt with") : hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")}
             description={fileDone ? undefined : hasFilters ? _("Try adjusting your search or filter criteria.") : _("Import your bank statement to get started.")} />}
 
-        <Virtuoso
-            data={results}
-            itemContent={(_index, transaction) => (
-                <UnreconciledTransactionItem transaction={transaction} />
-            )}
-            style={{ minHeight: Math.max(contentHeight - 80, 400) }}
-            totalCount={results?.length}
-        />
+        {/* //// Neoffice — the list takes what is left of its column (it was a fixed minimum of 400 px). */}
+        <div className="min-h-0 flex-1">
+            <Virtuoso
+                data={results}
+                itemContent={(_index, transaction) => (
+                    <UnreconciledTransactionItem transaction={transaction} />
+                )}
+                style={{ height: '100%' }}
+                totalCount={results?.length}
+            />
+        </div>
 
     </div>
 }
@@ -445,7 +453,7 @@ const VouchersSection = ({ contentHeight }: { contentHeight: number }) => {
         return <OptionsForMultipleTransactions transactions={selectedTransactions} />
     }
 
-    return <div style={{ minHeight: contentHeight }} className="mt-2">
+    return <div className="mt-2">
         <OptionsForSingleTransaction transaction={selectedTransactions[0]} contentHeight={contentHeight} />
     </div>
 }
@@ -853,7 +861,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
             itemContent={(index, voucher) => (
                 <VoucherItem voucher={voucher} index={index} />
             )}
-            style={{ height: contentHeight }}
+            style={{ height: Math.max(320, Math.round(contentHeight * 0.85)) }}
             totalCount={vouchers?.message.length}
         />
     </div >
