@@ -41,7 +41,8 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { useFrappeGetCall } from "frappe-react-sdk"
 //// Neoffice — NOT ours: upstream v1.5.0 empty-state primitives and router Link (89e7929).
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
-import { Link } from "react-router"
+//// Neoffice — the router Link is gone with upstream's importer button (see NoTransactionsFoundBanner); the deposit helper takes its place.
+import { depositStatement } from "@/components/features/StatementImports/depositStatement"
 //// Neoffice — added: the gap decision of a bank line that came from an import (filter, row chip, card).
 import { useLinesToDecide } from "@/components/features/StatementImports/useLinesToDecide"
 import GapDecisionCard from "@/components/features/StatementImports/GapDecisionCard"
@@ -275,6 +276,8 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
 //// ours: the _("Clear Filters") wrap, upstream ships the bare English label. Take upstream's
 //// component at the merge and re-apply that wrap.
 const NoTransactionsFoundBanner = ({ text, description, onClearFilters }: { text: string, description?: string, onClearFilters?: () => void }) => {
+    //// Neoffice — the bank account of the page, for the statement deposit below (upstream's banner had no need of it).
+    const bankAccount = useAtomValue(selectedBankAccountAtom)
 
     return <Empty className="h-64">
         <EmptyHeader>
@@ -286,10 +289,9 @@ const NoTransactionsFoundBanner = ({ text, description, onClearFilters }: { text
         </EmptyHeader>
         <EmptyContent>
             {onClearFilters ? <Button type='button' size='sm' variant='outline' onClick={onClearFilters}>{_("Clear Filters")}</Button> :
-                <Button type='button' asChild size='sm' variant='outline'>
-                    <Link to="/statement-importer">
-                        {_("Import Bank Statement")}
-                    </Link>
+                //// Neoffice — upstream v1.5.0 linked its CSV/Excel importer here (89e7929); we only import bank statements (XML or PDF), deposited in the desk form: a CSV is not handled yet.
+                <Button type='button' size='sm' variant='outline' onClick={() => depositStatement(bankAccount?.name)}>
+                    {_("Import Bank Statement")}
                 </Button>}
         </EmptyContent>
     </Empty>

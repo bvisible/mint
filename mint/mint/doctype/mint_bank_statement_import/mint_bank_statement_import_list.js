@@ -8,6 +8,14 @@
 frappe.listview_settings["Mint Bank Statement Import"] = {
     add_fields: ["status", "ocr_status", "docstatus"],
 
+    // the list is where a deposited file lands, but the lines of each file are dealt with on the reconciliation page
+    // (its bank files tab): a way there from here, so that the person does not stay in the doctype
+    onload: function(listview) {
+        listview.page.add_inner_button(__("Back to bank files"), () => {
+            frappe.router.push_state("/app/accounting?tab=reconcile&screen=%2Fmint%2Fstatement-imports");
+        });
+    },
+
     get_indicator: function(doc) {
         // Show indicator based on docstatus first, then processing status
         if (doc.docstatus === 0) {

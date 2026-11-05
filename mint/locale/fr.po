@@ -3830,3 +3830,11 @@ msgstr "Relevé de la banque (XML ou PDF)"
 #, python-brace-format
 msgid "Waiting ({0})"
 msgstr "En attente ({0})"
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:20
+msgid "Import a bank statement (XML or PDF)"
+msgstr "Importer un relevé bancaire (XML ou PDF)"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:96
+msgid "Back to bank files"
+msgstr "Retour aux fichiers bancaires"

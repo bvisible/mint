@@ -29,7 +29,8 @@ import { cn } from "@/lib/utils"
 import { useDebounceValue } from "usehooks-ts"
 import { useMemo, useState } from "react"
 //// Neoffice — NOT ours: upstream v1.5.0 (89e7929). Take upstream's.
-import { Link } from "react-router"
+//// Neoffice — the router Link of upstream's importer button is gone (see the button below); the deposit helper takes its place.
+import { depositStatement } from "@/components/features/StatementImports/depositStatement"
 import { TableVirtuoso } from "react-virtuoso"
 
 const BankTransactions = () => {
@@ -135,13 +136,11 @@ const BankTransactionListView = () => {
                     __html: _("Below is a list of all bank transactions imported in the system for the bank account {0} between {1} and {2}.", [`<strong>${bankAccount?.account_name}</strong>`, `<strong>${formattedFromDate}</strong>`, `<strong>${formattedToDate}</strong>`])
                 }} />
             </Paragraph>
-{/* //// Neoffice — NOT ours: upstream v1.5.0 link to its statement importer (89e7929). */}
+{/* //// Neoffice — upstream v1.5.0 linked its CSV/Excel importer here (89e7929); we only import bank statements (XML or PDF), deposited in the desk form: a CSV is not handled yet. Take upstream's link back when it is. */}
 
-            <Button size='sm' variant='outline' asChild>
-                <Link to="/statement-importer">
-                    <ImportIcon />
-                    {_("Import Bank Statement")}
-                </Link>
+            <Button size='sm' variant='outline' onClick={() => depositStatement(bankAccount?.name)}>
+                <ImportIcon />
+                {_("Import Bank Statement")}
             </Button>
         </div>
 

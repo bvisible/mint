@@ -4806,3 +4806,11 @@ msgstr ""
 msgid "{} invoices"
 msgstr ""
 
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:20
+msgid "Import a bank statement (XML or PDF)"
+msgstr ""
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:96
+msgid "Back to bank files"
+msgstr ""

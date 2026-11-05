@@ -87,6 +87,15 @@ frappe.ui.form.on("Mint Bank Statement Import", {
         //// gone (client statements leaving Switzerland, plus a synchronous call that timed out) and
         //// process_file no longer exists on the controller. Replaced by the buttons above.
 
+        //// Neoffice — added: the way back from the form to where the lines of the file are dealt with (the
+        //// reconciliation page, on its bank files tab). The import is deposited here, but what becomes of
+        //// its lines is decided there: without this button the person stayed in the doctype.
+        if (!frm.is_new()) {
+            frm.add_custom_button(__("Back to bank files"), () => {
+                frappe.router.push_state("/app/accounting?tab=reconcile&screen=%2Fmint%2Fstatement-imports");
+            });
+        }
+
 
     //// Neoffice — added handlers (b714fd5, 5bb4045). file() re-detects PDF vs CAMT XML from the
     //// attachment and repaints the file card; upstream reacts to no field at all.
