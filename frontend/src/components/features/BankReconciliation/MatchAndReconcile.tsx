@@ -5,7 +5,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
 //// Neoffice — NOT ours: upstream v1.5.0 (89e7929) added useRef for the search field.
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { getCompanyCurrency } from "@/lib/company"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Separator } from "@/components/ui/separator"
@@ -106,6 +106,10 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
     //// Neoffice — the filter « To decide »: the lines of an import whose invoice was recognised but whose sum left a gap.
     const [toDecideOnly, setToDecideOnly] = useState(false)
     const { lines: toDecide, byBankLine: gapByBankLine } = useLinesToDecide(bankAccount?.name)
+    //// Neoffice — the last gap decided: the filter has nothing left to show and its chip is gone, so it is dropped.
+    useEffect(() => {
+        if (toDecideOnly && toDecide.length === 0) setToDecideOnly(false)
+    }, [toDecideOnly, toDecide.length])
 
     const searchIndex = useMemo(() => {
 

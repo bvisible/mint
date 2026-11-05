@@ -111,7 +111,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                         <td className="py-0.5 text-right font-mono tabular-nums">{formatCurrency(verdict.amount, verdict.currency)}</td>
                     </tr>
                     <tr className="border-t border-amber-200">
-                        <td className="pt-1 font-medium">{verdict.kind === "partial" ? _("Stays open") : _("Gap")}</td>
+                        <td className="pt-1 font-medium">{verdict.kind === "partial" ? _("Stays open") : _("Gap Amount")}</td>
                         <td className="pt-1 text-right font-mono font-medium tabular-nums">{formatCurrency(Math.abs(verdict.gap), verdict.currency)}</td>
                     </tr>
                 </tbody>
