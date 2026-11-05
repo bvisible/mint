@@ -769,7 +769,9 @@ def search_for_transfer_transaction(transaction_id: str | int):
     
     days = frappe.db.get_single_value("Mint Settings", "transfer_match_days")
 
-    if not days:
+    # //// Neoffice — 0 is a value (match the same day only), not "not set": `if not days` gave four days either
+    # //// side to whoever had set 0. The field defaults to 4. ERPNext v16 fixed the same line (erpnext#58766).
+    if days is None:
         days = 4
 
     min_date = frappe.utils.add_days(date, -days)
