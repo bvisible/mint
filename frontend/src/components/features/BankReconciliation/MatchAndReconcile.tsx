@@ -296,7 +296,8 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
 
         {error && <ErrorBanner error={error} />}
 
-        <OlderUnreconciledTransactionsBanner />
+        {/* //// Neoffice — not while the list is the lines of one file: the older lines are not the person's business there. */}
+        {!importFilter && <OlderUnreconciledTransactionsBanner />}
 
         {/* //// Neoffice — NOT ours: upstream v1.5.0 empty state with filter awareness (89e7929). */}
         {results.length === 0 && <NoTransactionsFoundBanner
