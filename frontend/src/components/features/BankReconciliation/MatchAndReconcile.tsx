@@ -75,10 +75,12 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
         <div className={`flex items-start space-x-2`} style={{ height: contentHeight }}>
             <div className="flex h-full min-h-0 flex-1 flex-col">
                 <H4 className="text-sm font-medium">{_("Unreconciled Transactions")}</H4>
+                {/* //// Neoffice — wraps the list so it scrolls inside the column's measured height instead of the room marker above (f642280). */}
                 <div className="min-h-0 flex-1">
                     <UnreconciledTransactions />
                 </div>
             </div>
+            {/* //// Neoffice — h-full instead of a minHeight style, to follow the column's measured height (f642280, see marker above). */}
             <Separator orientation="vertical" className="h-full" />
             <div className="h-full min-h-0 flex-1 overflow-y-auto px-1">
                 <H4 className="text-sm font-medium">{_("Match or Create")}</H4>
@@ -94,6 +96,7 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
 }
 
 
+//// Neoffice — contentHeight prop dropped: the column's height is now set by the parent's style (see marker above), so the list fills it with h-full rather than receiving a pixel value (f642280).
 const UnreconciledTransactions = () => {
     const bankAccount = useAtomValue(selectedBankAccountAtom)
 
@@ -206,6 +209,7 @@ const UnreconciledTransactions = () => {
         return <UnreconciledTransactionsLoadingState />
     }
 
+    //// Neoffice — flex column filling the parent's measured height, replacing the old space-y-1 (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
     return <div className="flex h-full flex-col gap-1">
         <div className="flex py-2 w-full gap-2">
             <label className="sr-only">{_("Search transactions")}</label>
@@ -453,6 +457,7 @@ const VouchersSection = ({ contentHeight }: { contentHeight: number }) => {
         return <OptionsForMultipleTransactions transactions={selectedTransactions} />
     }
 
+    //// Neoffice — dropped the minHeight: contentHeight style, which no longer applies now that the column's own height is measured by the page (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
     return <div className="mt-2">
         <OptionsForSingleTransaction transaction={selectedTransactions[0]} contentHeight={contentHeight} />
     </div>
@@ -861,6 +866,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
             itemContent={(index, voucher) => (
                 <VoucherItem voucher={voucher} index={index} />
             )}
+            //// Neoffice — capped to 85% of the measured column height (min 320px) instead of using it in full, to leave room for the options above this list (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
             style={{ height: Math.max(320, Math.round(contentHeight * 0.85)) }}
             totalCount={vouchers?.message.length}
         />

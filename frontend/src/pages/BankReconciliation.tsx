@@ -38,7 +38,9 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
         if (initialTab) setTab(initialTab)
     }, [initialTab, setTab])
 
+    //// Neoffice — headerHeight state removed, superseded by the measured room below (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
     const ref = useRef<HTMLDivElement>(null)
+    //// Neoffice — added: ref on the TabsList (set below) to measure where the tabs end, used instead of the guessed header height (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
     const tabsRef = useRef<HTMLDivElement>(null)
 
     //// Neoffice — the room left under the tabs, MEASURED: upstream subtracted a guessed 324 px from the window's height, which was
