@@ -19,6 +19,9 @@ import { NoraLearnProvider } from '@neoffice/nora-learn-react'
 import '@neoffice/nora-learn-react/styles'
 //// Neoffice — added: Mint framed in a tab of the desk (lib/embedded.ts).
 import { EMBEDDED, outerWindow } from './lib/embedded'
+//// Neoffice — added: the party reconciliation screen, and the bridge that lets the desk's tabs move this frame.
+import PartyReconciliation from './pages/PartyReconciliation'
+import DeskBridge from './lib/deskBridge'
 
 // Frappe integration flag — set by mint/www/mint.html before the bundle loads.
 // When true, we wrap routes in the FrappeLayout (native sidebar + navbar)
@@ -109,9 +112,13 @@ function App() {
 
 	const Routing = (
 		<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
+			{/* //// Neoffice — tells the desk which screen the frame shows and moves it when a tab asks. */}
+			<DeskBridge />
 			<Routes>
 				<Route index element={<BankReconciliation />} />
 				<Route path="/statement-importer" element={<BankStatementImporter />} />
+				{/* //// Neoffice — added: reconciling a party's payments with its invoices. */}
+				<Route path="/party-reconciliation" element={<PartyReconciliation />} />
 				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>
 		</BrowserRouter>

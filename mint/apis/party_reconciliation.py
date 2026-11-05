@@ -213,15 +213,21 @@ def get_party_detail(company: str, party_type: str, party: str, account: str | N
 	}
 
 
-def _pick(rows: list[dict], chosen: list, kind_key: str, name_key: str, amount_key: str) -> list[dict]:
-	"""The rows the user ticked, each with the amount to use, refused when it is no longer what the screen showed."""
-	by_key = {(row[kind_key], row[name_key]): row for row in rows}
+def _pick(rows: list[dict], chosen: list, kind_key: str, name_key: str, amount_key: str, row_key: str | None = None) -> list[dict]:
+	"""The rows the user ticked, each with the amount to use, refused when it is no longer what the screen showed.
+
+	A journal entry can have several open lines for one party: for those the line is part of the key."""
+
+	def key_of(item) -> tuple:
+		return (item.get(kind_key), item.get(name_key), (item.get(row_key) or None) if row_key else None)
+
+	by_key = {key_of(row): row for row in rows}
 	picked = []
 	seen = set()
 	for choice in chosen:
-		key = (choice.get(kind_key), choice.get(name_key))
+		key = key_of(choice)
 		if key in seen:
-			frappe.throw(_("{0} {1} is chosen twice.").format(_(key[0]), key[1]))
+			frappe.throw(_("{0} {1} is chosen twice.").format(_(key[0] or ""), key[1]))
 		seen.add(key)
 		row = by_key.get(key)
 		if not row:
@@ -233,7 +239,7 @@ def _pick(rows: list[dict], chosen: list, kind_key: str, name_key: str, amount_k
 		amount = flt(choice.get("amount")) or available
 		if amount <= 0 or amount > available + CENT:
 			frappe.throw(
-				_("{0} {1}: {2} asked, {3} left. Reload the party.").format(_(key[0]), key[1], amount, available),
+				_("{0} {1}: {2} asked, {3} left. Reload the party.").format(_(key[0] or ""), key[1], amount, available),
 				title=_("The party has changed"),
 			)
 		picked.append({**row, amount_key: min(amount, available)})
@@ -242,7 +248,7 @@ def _pick(rows: list[dict], chosen: list, kind_key: str, name_key: str, amount_k
 
 def _voucher_key(row) -> tuple:
 	"""A payment row: the voucher and, for a journal entry, the line of it."""
-	return (row.get("reference_type"), row.get("reference_name"), row.get("reference_row"))
+	return (row.get("reference_type"), row.get("reference_name"), row.get("reference_row") or None)
 
 
 def _allocate(company: str, party_type: str, party: str, account: str | None, invoices, payments):
@@ -257,7 +263,7 @@ def _allocate(company: str, party_type: str, party: str, account: str | None, in
 	)
 	payment_rows = [_plain(r) for r in doc.payments]
 	rows_by_key = {_voucher_key(r): r for r in payment_rows}
-	chosen_payments = _pick(payment_rows, payments, "reference_type", "reference_name", "amount")
+	chosen_payments = _pick(payment_rows, payments, "reference_type", "reference_name", "amount", "reference_row")
 
 	# Each voucher the allocation will change is one the user may write; the invoices only have to be readable.
 	for row in chosen_payments:
