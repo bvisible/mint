@@ -96,16 +96,24 @@ class TestLineInvoices(GapImportCase):
 		shown = line_invoices.get_candidates(bank_line)
 		self.assertEqual((shown["party"], shown["party_source"]), (customer, "iban"))
 
-	def test_a_payer_nobody_knows_gets_the_search_for_the_party_and_then_its_invoices(self):
+	def test_a_payer_nobody_knows_gets_the_search_for_the_party_when_the_reference_failed(self):
+		a, _b, _owed_a, owed_b = self._two()
+		frappe.db.set_value("Sales Invoice", a, "outstanding_amount", 0)
+		bank_line = self._bank_line(owed_b, invoices=[a], party_match="", party_name="NOBODY KNOWS THIS NAME")
+		shown = line_invoices.get_candidates(bank_line)
+		# no party, so no invoice of anybody is listed: the person says who it is
+		self.assertEqual((shown["reason"], shown["show"], shown["party"], shown["invoices"]), ("paid", True, None, []))
+		chosen = line_invoices.get_candidates(bank_line, party=self._customer())
+		self.assertEqual((chosen["party"], chosen["party_source"]), (self._customer(), "chosen"))
+		self.assertIn(self.sales if self.sales != a else _b, [row["name"] for row in chosen["invoices"]])
+		self.assertTrue(chosen["party_label"])
+
+	def test_a_line_with_nobody_and_nothing_is_not_an_invoice_and_gets_no_card(self):
+		# a sum paid to nothing, a fee, a private withdrawal: the buttons of the window (bank entry, transfer, payment) are for it
 		owed = self._owed("Sales Invoice", self.sales)
 		bank_line = self._bank_line(owed, invoices=[], party_match="", party_name="NOBODY KNOWS THIS NAME")
 		shown = line_invoices.get_candidates(bank_line)
-		# no party, so no invoice of anybody is listed: the person says who it is
-		self.assertEqual((shown["show"], shown["party"], shown["invoices"]), (True, None, []))
-		chosen = line_invoices.get_candidates(bank_line, party=self._customer())
-		self.assertEqual((chosen["party"], chosen["party_source"]), (self._customer(), "chosen"))
-		self.assertIn(self.sales, [row["name"] for row in chosen["invoices"]])
-		self.assertTrue(chosen["party_label"])
+		self.assertEqual((shown["reason"], shown["party"], shown["show"]), ("none", None, False))
 
 	def test_a_line_with_one_open_invoice_is_the_business_of_the_gap_card_not_of_this_one(self):
 		# a payment that does not settle the invoice (the import passes an exact one by itself): the card of the gap is for it

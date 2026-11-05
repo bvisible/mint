@@ -282,6 +282,9 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
                 )}
                 <Button variant="link" className="px-0" onClick={() => setRecordPaymentOpen(true)}>{_("Record another way")}</Button>
             </div>
+            {entries.length === 0 && (
+                <p className="text-xs text-muted-foreground">{_("Not an invoice? A sum paid to nothing, a fee, a withdrawal: use Bank Entry, Transfer or Record a payment above.")}</p>
+            )}
         </div>
     )
 }

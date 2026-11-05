@@ -190,9 +190,13 @@ def get_candidates(bank_transaction: str, party: str | None = None) -> dict | No
 	party_label = (
 		frappe.db.get_value(party_type, chosen_party, "customer_name" if receiving else "supplier_name") if chosen_party else None
 	)
-	# shown whenever the import left the line with no single invoice: with the party found, its open invoices; without, the
-	# search for the party (the person says who it is, then the invoices of that person come)
-	show = bool(drafts or submitted) or (bool(line) and reason in ("none", "paid", "several"))
+	# Shown where it helps: a reference that failed (an invoice already paid) or several invoices, with the party found its
+	# open invoices, without it the search for the party; and a line with no reference whose party was found and has open
+	# invoices. Not on a line with nobody and nothing: a good half of the lines of a bank (fees, fuel, private withdrawals,
+	# transfers, a sum paid to nothing) are not invoices at all and keep the window's own buttons (bank entry, transfer, payment).
+	show = bool(drafts or submitted) or (
+		bool(line) and (reason in ("paid", "several") or (reason == "none" and bool(chosen_party) and bool(invoices)))
+	)
 	return {
 		"bank_transaction": bank_transaction,
 		"show": show,
