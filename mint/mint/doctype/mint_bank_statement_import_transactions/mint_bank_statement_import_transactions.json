@@ -139,13 +139,42 @@
    "fieldtype": "Currency",
    "label": "Matched Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "remittance_reference",
+   "fieldtype": "Data",
+   "label": "Remittance Reference",
+   "read_only": 1,
+   "description": "The structured reference of the payment (QR or creditor reference) as the statement carries it."
+  },
+  {
+   "fieldname": "difference_kind",
+   "fieldtype": "Select",
+   "label": "Payment Gap",
+   "options": "\nexact\nrounding\nearly_discount\naccepted_rebate\npartial\noverpaid",
+   "read_only": 1,
+   "description": "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
+  },
+  {
+   "fieldname": "difference_amount",
+   "fieldtype": "Currency",
+   "label": "Gap Amount",
+   "read_only": 1,
+   "description": "The invoice balance minus the payment: positive when less came in than is owed."
+  },
+  {
+   "fieldname": "payment_entry",
+   "fieldtype": "Link",
+   "label": "Payment Entry",
+   "options": "Payment Entry",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-04-04 20:30:00.000000",
+ "modified": "2026-11-05 10:30:00.000000",
  "modified_by": "Administrator",
  "module": "Mint",
  "name": "Mint Bank Statement Import Transactions",

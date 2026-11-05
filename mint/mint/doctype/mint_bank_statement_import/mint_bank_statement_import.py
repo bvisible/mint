@@ -8,6 +8,8 @@ import hashlib
 import frappe
 from frappe import _
 from frappe.model.document import Document
+# //// Neoffice — fmt_money: the import summary names the total of the gaps it let pass
+from frappe.utils import fmt_money
 
 
 class MintBankStatementImport(Document):
@@ -191,6 +193,10 @@ class MintBankStatementImport(Document):
 			"auto_matched": 0,
 			"unreconciled": 0,
 			"errors": 0,
+			# //// Neoffice — payment gaps (see mint.apis.payment_gap): passed by themselves / left to a person
+			"passed_with_gap": 0,
+			"gap_total": 0.0,
+			"to_decide": 0,
 		}
 
 		# //// Neoffice — count key occurrences so a batch-booked payment order (one bank
@@ -320,6 +326,10 @@ class MintBankStatementImport(Document):
 									transaction.db_set("status", "Paid")
 									transaction.db_set("imported", 1)
 									continue
+								# //// Neoffice — a payment that does not settle the invoice to the cent is judged by the decider
+								# //// shared with the reconciliation screens (rounding, early discount, accepted rebate, partial).
+								elif _pass_the_gap(transaction, bank_tx, "Sales Invoice", invoice_name, account, stats):
+									continue
 							else:
 								# Supplier payment (DBIT) — create PE if invoice has outstanding
 								pinv = frappe.get_doc("Purchase Invoice", invoice_name)
@@ -359,6 +369,11 @@ class MintBankStatementImport(Document):
 									transaction.db_set("status", "Paid")
 									transaction.db_set("imported", 1)
 									continue
+								# //// Neoffice — see the sales branch above: the decider judges what is not exact to the cent.
+								elif pinv.outstanding_amount > 0 and _pass_the_gap(
+									transaction, bank_tx, "Purchase Invoice", invoice_name, account, stats
+								):
+									continue
 					except Exception as e:
 						frappe.log_error("Auto Payment Entry creation failed", str(e))
 
@@ -381,6 +396,15 @@ class MintBankStatementImport(Document):
 			summary_parts.append(_("{0} duplicates skipped").format(stats["duplicates"]))
 		if stats["auto_matched"]:
 			summary_parts.append(_("{0} auto-matched").format(stats["auto_matched"]))
+		# //// Neoffice — the gaps the company let pass by themselves, and the ones left to a person
+		if stats["passed_with_gap"]:
+			summary_parts.append(
+				_("{0} passed with a gap (total {1})").format(
+					stats["passed_with_gap"], fmt_money(stats["gap_total"], currency=self.currency)
+				)
+			)
+		if stats["to_decide"]:
+			summary_parts.append(_("{0} to decide").format(stats["to_decide"]))
 		if stats["unreconciled"]:
 			summary_parts.append(_("{0} to review in Mint").format(stats["unreconciled"]))
 		if stats["errors"]:
@@ -402,6 +426,46 @@ class MintBankStatementImport(Document):
 		# with is_rule_evaluated=0 until the hourly scheduler picks them up.
 		from mint.apis.rules import run_rule_evaluation
 		run_rule_evaluation()
+
+
+# //// Neoffice — added function: what the import does with a line whose invoice is recognised but whose sum is not to the cent.
+def _pass_the_gap(transaction, bank_tx, invoice_type: str, invoice_name: str, ledger_account: str, stats: dict) -> bool:
+	"""Judge the line with the payment gap decider; book it when the company lets that kind of gap pass by itself.
+
+	True when a Payment Entry was made and linked (the caller moves on to the next line). Otherwise the verdict is kept on
+	the line, for the person who decides afterwards, and the line stays « Imported »."""
+	from mint.apis import payment_gap
+
+	reference = transaction.unique_reference or transaction.reference or ""
+	amount = float(transaction.amount or 0)
+	verdict = payment_gap.judge(invoice_type, invoice_name, amount, transaction.date, transaction.remittance_reference)
+	if verdict.kind in ("", "exact"):
+		# nothing to decide: an exact line is the caller's own path, a closed invoice is not a gap
+		return False
+
+	transaction.db_set({"difference_kind": verdict.kind, "difference_amount": verdict.gap})
+	if verdict.automatic and not _payment_entry_exists_for(reference, amount, invoice_type, invoice_name):
+		party = transaction.party_name or transaction.party_match
+		entry = payment_gap.book(
+			verdict,
+			invoice_type,
+			invoice_name,
+			ledger_account,
+			transaction.date,
+			reference,
+			_("{0} - Payment for {1}").format(party, invoice_name),
+		)
+		bank_tx.reload()
+		_link_payment_entry_to_bt(bank_tx, entry, reconciliation_type="Voucher Created")
+		transaction.db_set({"payment_entry": entry, "status": "Paid", "imported": 1})
+		stats["auto_matched"] += 1
+		stats["passed_with_gap"] += 1
+		stats["gap_total"] += abs(verdict.gap)
+		return True
+
+	stats["to_decide"] += 1
+	return False
+
 
 
 def _link_payment_entry_to_bt(bank_tx, payment_entry_name: str, reconciliation_type: str = "Matched"):
@@ -581,6 +645,9 @@ def parse_xml_content(docname):
 			"invoice_matches": str(invoice_matches) if invoice_matches else "",
 			"party_match": party_match or "",
 			"matched_amount": matched_amount,
+			# //// Neoffice — the structured reference (QR / creditor reference) the reader matched the invoice on: the
+			# //// payment gap decider validates a partial payment by itself only when it equals the invoice's own.
+			"remittance_reference": str(txn.get("transaction_reference") or "")[:140],
 		})
 
 	# Auto-submit when there are no new transactions to process

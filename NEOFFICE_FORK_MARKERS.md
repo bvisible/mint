@@ -113,6 +113,10 @@ it); `file` becomes `hidden` (same reason); `bank_account.reqd` 1 → 0 and `sta
 Mixed. **Ours only** (all added for the CAMT.053 flow, `5bb4045` → `957a5b9`):
 `unique_reference`, `party_name`, `party_iban`, `credit_debit`, `status`,
 `existing_bank_transaction`, `invoice_matches`, `party_match`, `matched_amount`.
+Added for the payment gaps (05.11, `mint/apis/payment_gap.py`): `remittance_reference` (the structured
+reference the reader matched the invoice on), `difference_kind` / `difference_amount` (what the decider
+found when the sum did not settle the invoice to the cent) and `payment_entry` (the entry the import made).
+Pure additions; they leave with the import doctype when the move to `banking/` renames it.
 The `columns` widths and the `in_list_view` flips on `reference`, `imported` and
 `string_amount` are **upstream's** v1.5.0 (`89e7929`). No upstream field removed.
 
