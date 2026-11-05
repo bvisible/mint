@@ -50,7 +50,8 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
             const tabs = tabsRef.current
             if (!tabs) return
             const top = tabs.getBoundingClientRect().bottom + window.scrollY + 8
-            setRoom(Math.max(300, Math.round(window.innerHeight - top - 12)))
+            // the page's own bottom padding (16 px) and a little air
+            setRoom(Math.max(300, Math.round(window.innerHeight - top - 24)))
         }
         measure()
         window.addEventListener("resize", measure)
