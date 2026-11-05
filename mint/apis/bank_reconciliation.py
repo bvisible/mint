@@ -637,7 +637,9 @@ def create_bulk_payment_entry_and_reconcile(bank_transaction_names: list[str | i
     output = []
 
     for bank_transaction_name in bank_transaction_names:
-        bank_transaction = frappe.db.get_value("Bank Transaction", bank_transaction_name, ["name", "deposit", "withdrawal", "bank_account", "currency", "unallocated_amount", "date", "reference_number", "description"], as_dict=True)
+        # //// Neoffice — "company" was missing from this list while the entry below reads bank_transaction.company:
+        # //// the Payment Entry was built without the company of the bank line (ERPNext v16 added it too, #59144).
+        bank_transaction = frappe.db.get_value("Bank Transaction", bank_transaction_name, ["name", "deposit", "withdrawal", "bank_account", "company", "currency", "unallocated_amount", "date", "reference_number", "description"], as_dict=True)
 
         transaction_account = frappe.get_cached_value("Bank Account", bank_transaction.bank_account, "account")
 
@@ -649,7 +651,7 @@ def create_bulk_payment_entry_and_reconcile(bank_transaction_names: list[str | i
         else:
             paid_from = account
             paid_to = transaction_account
-        
+
         payment_entry_doc = frappe.get_doc({
             "doctype": "Payment Entry",
             "payment_type": "Pay" if is_withdrawal else "Receive",
@@ -660,17 +662,18 @@ def create_bulk_payment_entry_and_reconcile(bank_transaction_names: list[str | i
             "party": party,
             "paid_from": paid_from,
             "paid_to": paid_to,
+            # //// Neoffice — the base amounts and both exchange rates were forced to the amount of the line and
+            # //// to 1 here: wrong as soon as an account is not in the currency of the company. They come from
+            # //// set_multi_currency_amounts below (ERPNext v16, frappe/erpnext#59144, not in v15-hotfix).
             "paid_amount": bank_transaction.unallocated_amount,
-            "base_paid_amount": bank_transaction.unallocated_amount,
             "received_amount": bank_transaction.unallocated_amount,
-            "base_received_amount": bank_transaction.unallocated_amount,
-            "target_exchange_rate": 1,
-            "source_exchange_rate": 1,
             "reference_date": bank_transaction.date,
             "posting_date": bank_transaction.date,
             "reference_no": (bank_transaction.reference_number or bank_transaction.description or '')[:140],
         })
 
+        # //// Neoffice — real rates and party-side amount when an account is in a foreign currency.
+        set_multi_currency_amounts(payment_entry_doc)
         payment_entry_doc.insert()
         payment_entry_doc.submit()
 
@@ -698,6 +701,9 @@ def create_payment_entry_and_reconcile(bank_transaction_name: str | int,
         **payment_entry_doc,
         "doctype": "Payment Entry",
     })
+    # //// Neoffice — the SPA's own defaults post both exchange rates as 1 (RecordPaymentModal): the real
+    # //// rates are set here, the server being the one place that knows the currency of both accounts.
+    set_multi_currency_amounts(payment_entry)
     payment_entry.insert()
     payment_entry.submit()
     transaction = reconcile_vouchers(bank_transaction_name, json.dumps([{
@@ -710,6 +716,45 @@ def create_payment_entry_and_reconcile(bank_transaction_name: str | int,
         "transaction": transaction,
         "payment_entry": payment_entry,
     }
+
+
+# //// Neoffice — added: ERPNext v16's set_multi_currency_amounts (frappe/erpnext#59144), which v15-hotfix did
+# //// not receive, with one difference: when both accounts are in the currency of the company nothing is
+# //// touched, so the plain CHF case keeps exactly what the SPA posts (deductions included). The party-side
+# //// amount is derived from the bank-side one, which is the amount the bank statement states; Payment Entry
+# //// books any rounding residual to the exchange gain/loss account when it validates.
+def set_multi_currency_amounts(pe):
+    """Set the real exchange rates when an account of the payment is not in the currency of the company."""
+    from erpnext.setup.utils import get_exchange_rate
+
+    if not (pe.company and pe.paid_from and pe.paid_to):
+        return
+
+    company_currency = frappe.get_cached_value("Company", pe.company, "default_currency")
+    paid_from_currency = frappe.get_cached_value("Account", pe.paid_from, "account_currency")
+    paid_to_currency = frappe.get_cached_value("Account", pe.paid_to, "account_currency")
+
+    if paid_from_currency == paid_to_currency == company_currency:
+        return
+
+    pe.paid_from_account_currency = paid_from_currency
+    pe.paid_to_account_currency = paid_to_currency
+    pe.source_exchange_rate = (
+        1.0 if paid_from_currency == company_currency
+        else get_exchange_rate(paid_from_currency, company_currency, pe.posting_date)
+    )
+    pe.target_exchange_rate = (
+        1.0 if paid_to_currency == company_currency
+        else get_exchange_rate(paid_to_currency, company_currency, pe.posting_date)
+    )
+
+    if paid_from_currency == paid_to_currency:
+        return
+
+    if pe.payment_type == "Receive" and pe.source_exchange_rate:
+        pe.paid_amount = flt(flt(pe.received_amount) * pe.target_exchange_rate / pe.source_exchange_rate, pe.precision("paid_amount"))
+    elif pe.payment_type == "Pay" and pe.target_exchange_rate:
+        pe.received_amount = flt(flt(pe.paid_amount) * pe.source_exchange_rate / pe.target_exchange_rate, pe.precision("received_amount"))
 
 
 @frappe.whitelist(methods=['GET'])
