@@ -12,6 +12,7 @@ import _ from "@/lib/translate"
 import { expandFrame } from "@/lib/embedded"
 
 function Dialog({
+  //// Neoffice — see the block marker below: props added to track open state (0c2bd0a "fix(bank reconciliation): the frame takes the window of the desk only while a dialog is open")
   open,
   defaultOpen,
   onOpenChange,
@@ -87,6 +88,10 @@ function DialogContent({
   // Radix sets aria-hidden + pointer-events:none on all elements outside the portal
   // We counter this by continuously stripping those attributes from Learn elements
   const noraGuardRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
+  //// Neoffice — removed the standalone `React.useEffect(() => expandFrame(), [])` that used to live here, and its marker
+  //// (0c2bd0a "fix(bank reconciliation): the frame takes the window of the desk only while a dialog is open"): it ran on every
+  //// mount of DialogContent, even for a closed dialog, so the frame expanded at page load; expand/collapse now follows the open
+  //// state of the Dialog root, see the marker in the Dialog function above.
   React.useEffect(() => {
     noraGuardRef.current = setInterval(() => {
       document.querySelectorAll('.nora-lp, #nora-step-popover').forEach(el => {
