@@ -225,7 +225,7 @@ class TestPaymentGap(FrappeTestCase):
 		self.assertEqual(self._outstanding("Purchase Invoice", invoice), 0)
 		self.assertEqual([d.account for d in entry.deductions], [GAP_ACCOUNT])
 
-	def test_what_is_not_automatic_is_not_booked(self):
+	def test_what_is_not_automatic_is_not_booked(self):  # role-check: ok the import runs as the system, and here it books nothing
 		owed = self._outstanding("Sales Invoice", self.sales)
 		with self.assertRaises(frappe.ValidationError):
 			self._book("Sales Invoice", self.sales, owed - 0.03)  # nothing switched on
