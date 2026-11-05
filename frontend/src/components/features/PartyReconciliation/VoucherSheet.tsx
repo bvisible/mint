@@ -1,4 +1,5 @@
-//// Neoffice — added file (no upstream equivalent). What a click on a row shows: the lines, the remark, who made it.
+//// Neoffice — added file (no upstream equivalent). What a click on a row shows: the document as it is printed (the same
+//// PDF as the desk's side preview), the lines, the remark, who made it.
 import { useFrappeGetCall } from "frappe-react-sdk"
 import { Copy, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
@@ -19,7 +20,7 @@ type Props = { voucher: VoucherRef | null, onClose: () => void }
 
 const COLUMNS: Record<string, string> = {
     account: "Account", party: "Party", debit: "Debit", credit: "Credit", remark: "Remarks",
-    reference: "Reference", allocated: "Allocated", outstanding: "Outstanding Amount", item: "Item", qty: "Quantity", amount: "Amount",
+    reference: "Reference", allocated: "Allocated", outstanding: "Outstanding Amount", item: "Item", qty: "Quantity", rate: "Rate", amount: "Amount",
 }
 
 const VoucherSheet = ({ voucher, onClose }: Props) => {
@@ -45,7 +46,7 @@ const VoucherSheet = ({ voucher, onClose }: Props) => {
 
     return (
         <Sheet open={voucher !== null} onOpenChange={(open) => { if (!open) onClose() }}>
-            <SheetContent className="sm:max-w-xl w-full overflow-y-auto">
+            <SheetContent className="sm:max-w-3xl w-full overflow-y-auto">
                 <SheetHeader>
                     <SheetTitle>{voucher ? `${_(voucher.type)} ${voucher.name}` : ""}</SheetTitle>
                     <SheetDescription>{detail ? [detail.posting_date ? formatDate(detail.posting_date) : "", detail.owner].filter(Boolean).join(" · ") : ""}</SheetDescription>
@@ -63,7 +64,18 @@ const VoucherSheet = ({ voucher, onClose }: Props) => {
                             {detail.remark && <p className="text-sm whitespace-pre-line text-muted-foreground">{detail.remark}</p>}
                             <p className="text-xs text-muted-foreground">{_("Created")} {formatDate(detail.creation)}</p>
 
+                            {/* the printed document, as the desk's side preview shows it */}
+                            {detail.pdf_url && (
+                                <iframe
+                                    title={detail.name}
+                                    src={`${detail.pdf_url}#view=FitH`}
+                                    className="h-[68vh] w-full rounded-md border bg-white"
+                                />
+                            )}
+
                             {columns.length > 0 && (
+                                <details open={!detail.pdf_url} className="group">
+                                    <summary className="cursor-pointer text-sm font-medium text-muted-foreground select-none">{_("Lines")}</summary>
                                 <Table>
                                     <TableHeader>
                                         <TableRow>{columns.map((key) => <TableHead key={key}>{_(COLUMNS[key])}</TableHead>)}</TableRow>
@@ -78,6 +90,7 @@ const VoucherSheet = ({ voucher, onClose }: Props) => {
                                         ))}
                                     </TableBody>
                                 </Table>
+                                </details>
                             )}
 
                             <div className="flex flex-wrap gap-2">

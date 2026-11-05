@@ -322,6 +322,30 @@ def reconcile(company: str, party_type: str, party: str, invoices: str | list, p
 VOUCHER_PAGES = {"Payment Entry": "payment-entry", "Journal Entry": "journal-entry", "Sales Invoice": "sales-invoice", "Purchase Invoice": "purchase-invoice"}
 
 
+# //// Neoffice — the document as it is printed, the way the desk's side preview shows it (neoffice_theme `pdf_url()`):
+# //// the theme's own PDF route, the document's default print format, its language and its letterhead. A panel that
+# //// redraws the lines by hand shows « Freeline » and « Position générique » where the printed invoice has the text.
+def _pdf_url(voucher) -> str | None:
+	if not frappe.has_permission(voucher.doctype, "print", doc=voucher):
+		return None
+	from urllib.parse import quote, urlencode
+
+	params = {
+		"doctype": voucher.doctype,
+		"name": voucher.name,
+		"format": frappe.get_meta(voucher.doctype).default_print_format or "Standard",
+	}
+	language = voucher.get("language") or frappe.local.lang
+	if language:
+		params["language"] = language
+	if voucher.get("letter_head"):
+		params["letterhead"] = voucher.letter_head
+	# the saved version: a document corrected since is not served from the browser's cache
+	params["_v"] = "".join(ch for ch in str(voucher.modified) if ch.isdigit())
+	file = "-".join(str(voucher.name).split()).replace("/", "-").replace("\\", "-") + ".pdf"
+	return f"/print-pdf/{quote(file)}?{urlencode(params)}"
+
+
 @frappe.whitelist(methods=["GET"])
 def get_voucher_detail(voucher_type: str, voucher_name: str):
 	if voucher_type not in VOUCHER_PAGES:
@@ -341,7 +365,16 @@ def get_voucher_detail(voucher_type: str, voucher_name: str):
 			for r in voucher.references
 		]
 	else:
-		lines = [{"item": r.item_name or r.item_code, "qty": r.qty, "amount": r.amount} for r in voucher.items[:20]]
+		# the text of the line first (the item of a free line is a generic « Freeline »), then quantity, price, amount
+		lines = [
+			{
+				"item": " ".join(frappe.utils.strip_html_tags(r.description or "").split())[:160] or r.item_name or r.item_code,
+				"qty": r.qty,
+				"rate": r.rate,
+				"amount": r.amount,
+			}
+			for r in voucher.items[:200]
+		]
 
 	return {
 		"voucher_type": voucher_type,
@@ -355,4 +388,6 @@ def get_voucher_detail(voucher_type: str, voucher_name: str):
 		"lines": lines,
 		"attachments": frappe.db.count("File", {"attached_to_doctype": voucher_type, "attached_to_name": voucher_name}),
 		"route": f"/app/{VOUCHER_PAGES[voucher_type]}/{voucher.name}",
+		# the printed document (None without the right to print, and for a draft: the print route serves saved documents)
+		"pdf_url": _pdf_url(voucher) if voucher.docstatus == 1 else None,
 	}

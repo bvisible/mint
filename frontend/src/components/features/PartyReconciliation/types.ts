@@ -84,6 +84,7 @@ export type VoucherDetailData = {
     lines: Record<string, string | number | null>[],
     attachments: number,
     route: string,
+    pdf_url?: string | null,
 }
 
 /** What the user ticked: the row key and the amount, as typed. */

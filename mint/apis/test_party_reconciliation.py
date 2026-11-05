@@ -98,6 +98,10 @@ class TestPartyReconciliation(FrappeTestCase):
 		self.assertEqual(shown["name"], row["reference_name"])
 		self.assertEqual(shown["status"], "Submitted")
 		self.assertTrue(shown["route"].startswith("/app/"))
+		# the printed document, through the theme's PDF route, for the saved document the person may print
+		self.assertTrue(shown["pdf_url"].startswith("/print-pdf/"))
+		self.assertIn("doctype=" + row["reference_type"].replace(" ", "+"), shown["pdf_url"])
+		self.assertIn("name=" + row["reference_name"], shown["pdf_url"])
 		with as_role("accountant", email=HOME), self.assertRaises(frappe.ValidationError):
 			pr.get_voucher_detail("User", "Administrator")
 
