@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai"
 //// Neoffice — bankRecDraftJEModalAtom added to the import (9bfe719): this file is mixed, most
 //// hunks are upstream v1.5.0 hand-carried (89e7929) and the rest is our draft Journal Entry
 //// feature. Each marker below says which.
-import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
+import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecImportFilterAtom, bankRecTabAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
 //// Neoffice — NOT ours: upstream v1.5.0 (89e7929) added useRef for the search field.
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -43,6 +43,8 @@ import { useFrappeGetCall } from "frappe-react-sdk"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 //// Neoffice — the router Link is gone with upstream's importer button (see NoTransactionsFoundBanner); the deposit helper takes its place.
 import { depositStatement } from "@/components/features/StatementImports/depositStatement"
+//// Neoffice — added: the cross of the chip of the file the lines come from (see UnreconciledTransactions).
+import { X } from "lucide-react"
 //// Neoffice — added: the gap decision of a bank line that came from an import (filter, row chip, card).
 import { useLinesToDecide } from "@/components/features/StatementImports/useLinesToDecide"
 import GapDecisionCard from "@/components/features/StatementImports/GapDecisionCard"
@@ -114,6 +116,19 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         if (toDecideOnly && toDecide.length === 0) setToDecideOnly(false)
     }, [toDecideOnly, toDecide.length])
 
+    //// Neoffice — the file the person comes from (« Process the N that wait » of the bank files tab): only its lines that wait, until
+    //// the chip is cleared. Another bank account is another page, so its file is dropped (not on mount: the card sets the filter
+    //// just before this tab opens).
+    const [importFilter, setImportFilter] = useAtom(bankRecImportFilterAtom)
+    const setTab = useSetAtom(bankRecTabAtom)
+    const shownAccount = useRef(bankAccount?.name)
+    useEffect(() => {
+        if (shownAccount.current !== bankAccount?.name) {
+            shownAccount.current = bankAccount?.name
+            setImportFilter(null)
+        }
+    }, [bankAccount?.name, setImportFilter])
+
     const searchIndex = useMemo(() => {
 
         if (!unreconciledTransactions) {
@@ -130,12 +145,23 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
     const results = useMemo(() => {
 
         const found = getSearchResults(searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message)
+        //// Neoffice — only the lines of the file the person comes from, when there is one.
+        const inFile = importFilter ? found.filter((transaction) => importFilter.lines.includes(transaction.name)) : found
         //// Neoffice — only the lines that wait for a gap decision, when that filter is on.
-        return toDecideOnly ? found.filter((transaction) => gapByBankLine.has(transaction.name)) : found
+        return toDecideOnly ? inFile.filter((transaction) => gapByBankLine.has(transaction.name)) : inFile
 
-    }, [searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message, toDecideOnly, gapByBankLine])
+    }, [searchIndex, search, typeFilter, amountFilter.value, unreconciledTransactions?.message, toDecideOnly, gapByBankLine, importFilter])
 
     const setSelectedTransaction = useSetAtom(bankRecSelectedTransactionAtom(bankAccount?.name || ''))
+
+    //// Neoffice — coming from a file, its first line is open on the right: the person has only to deal with it (once per file).
+    const openedFor = useRef<object | null>(null)
+    useEffect(() => {
+        if (importFilter && openedFor.current !== importFilter && results.length > 0) {
+            openedFor.current = importFilter
+            setSelectedTransaction([results[0]])
+        }
+    }, [importFilter, results, setSelectedTransaction])
 
     const onFilterChange = () => {
         setSelectedTransaction([])
@@ -159,13 +185,16 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         }
         setTypeFilter('All')
         setAmountFilter({ value: 0, stringValue: '' })
-        //// Neoffice — the clear button also drops the « To decide » filter.
+        //// Neoffice — the clear button also drops the « To decide » filter, and the file.
         setToDecideOnly(false)
+        setImportFilter(null)
         onFilterChange()
     }
 
     //// Neoffice — the « To decide » filter counts as a filter (empty state, clear button).
-    const hasFilters = search !== '' || typeFilter !== 'All' || amountFilter.value !== 0 || toDecideOnly
+    const hasFilters = search !== '' || typeFilter !== 'All' || amountFilter.value !== 0 || toDecideOnly || importFilter !== null
+    //// Neoffice — the file's lines are all dealt with: the list is empty because of the file alone, and that is good news.
+    const fileDone = importFilter !== null && results.length === 0 && !(search !== '' || typeFilter !== 'All' || amountFilter.value !== 0 || toDecideOnly)
 
     if (isLoading) {
         //// Neoffice — NOT ours: upstream v1.5.0 skeleton loading state (89e7929).
@@ -250,6 +279,21 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
             )}
         </div>
 
+        {/* //// Neoffice — added: the file the lines come from, and the way back to the bank files. */}
+        {importFilter && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm text-amber-950">
+                <span className="inline-flex items-center gap-2">
+                    {_("Lines of the file of {0} that wait", [importFilter.label])}
+                    <button type="button" aria-label={_("Clear Filters")} className="rounded-sm p-0.5 hover:bg-amber-100" onClick={() => { setImportFilter(null); onFilterChange() }}>
+                        <X className="size-3.5" />
+                    </button>
+                </span>
+                <Button size="sm" variant="outline" onClick={() => { setImportFilter(null); setTab("Bank Files") }}>
+                    {_("Back to bank files")}
+                </Button>
+            </div>
+        )}
+
         {error && <ErrorBanner error={error} />}
 
         <OlderUnreconciledTransactionsBanner />
@@ -257,8 +301,8 @@ const UnreconciledTransactions = ({ contentHeight }: { contentHeight: number }) 
         {/* //// Neoffice — NOT ours: upstream v1.5.0 empty state with filter awareness (89e7929). */}
         {results.length === 0 && <NoTransactionsFoundBanner
             onClearFilters={hasFilters ? onClearFilters : undefined}
-            text={hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")}
-            description={hasFilters ? _("Try adjusting your search or filter criteria.") : _("Import your bank statement to get started.")} />}
+            text={fileDone ? _("Everything is dealt with") : hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")}
+            description={fileDone ? undefined : hasFilters ? _("Try adjusting your search or filter criteria.") : _("Import your bank statement to get started.")} />}
 
         <Virtuoso
             data={results}

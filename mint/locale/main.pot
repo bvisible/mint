@@ -4818,3 +4818,8 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/ReportsMenu.tsx:21
 msgid "Reports"
 msgstr ""
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:255
+#, python-brace-format
+msgid "Lines of the file of {0} that wait"
+msgstr ""

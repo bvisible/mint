@@ -4,6 +4,9 @@ import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import type { ImportLine, LineState } from "./types"
 
+/** The states of a line that still waits for someone: a gap to decide, or no invoice recognised. */
+export const WAITING_STATES: LineState[] = ["to_decide", "to_match"]
+
 /** The order a person reads them in: what is done, then what waits, then what needs no one. */
 export const STATE_ORDER: LineState[] = [
     "passed_alone", "handled", "left_open", "to_decide", "to_match", "failed", "cancelled", "duplicate", "not_imported",

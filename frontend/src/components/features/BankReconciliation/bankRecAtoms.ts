@@ -40,6 +40,10 @@ export const bankRecSelectedTransactionAtom = atomFamily((_id: string) => {
 //// Neoffice — added: the tab of the reconciliation page that is shown. It is an atom, not the state of the page, so that a
 //// card of the bank files (« Process the lines that wait ») can take the person to the reconciliation tab.
 export const bankRecTabAtom = atom<string>("Match and Reconcile")
+//// Neoffice — added: the lines of ONE bank file that still wait, when the person comes from « Process the N that wait » of the bank
+//// files tab. The list of unreconciled lines then shows those lines only, under a chip that names the file; the chip's cross (or
+//// « Clear filters ») brings the whole list back. `label` is the file's date as the person reads it, `lines` the bank transactions.
+export const bankRecImportFilterAtom = atom<{ label: string, lines: string[] } | null>(null)
 export const bankRecTransferModalAtom = atom(false)
 export const bankRecRecordPaymentModalAtom = atom(false)
 export const bankRecRecordJournalEntryModalAtom = atom(false)

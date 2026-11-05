@@ -11,9 +11,10 @@ frappe.listview_settings["Mint Bank Statement Import"] = {
     // the list is where a deposited file lands, but the lines of each file are dealt with on the reconciliation page
     // (its bank files tab): a way there from here, so that the person does not stay in the doctype
     onload: function(listview) {
+        // ink, like a primary button: it is what the person does next (Daniel, 05.11)
         listview.page.add_inner_button(__("Back to bank files"), () => {
             frappe.router.push_state("/app/accounting?tab=reconcile&screen=%2Fmint%2Fstatement-imports");
-        });
+        }, null, "primary");
     },
 
     get_indicator: function(doc) {

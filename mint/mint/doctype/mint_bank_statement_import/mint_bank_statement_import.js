@@ -91,9 +91,10 @@ frappe.ui.form.on("Mint Bank Statement Import", {
         //// reconciliation page, on its bank files tab). The import is deposited here, but what becomes of
         //// its lines is decided there: without this button the person stayed in the doctype.
         if (!frm.is_new()) {
+            // the button of what the person does next: ink, like the primary buttons of the desk (Daniel, 05.11)
             frm.add_custom_button(__("Back to bank files"), () => {
                 frappe.router.push_state("/app/accounting?tab=reconcile&screen=%2Fmint%2Fstatement-imports");
-            });
+            }).removeClass("btn-default").addClass("btn-primary");
         }
 
 

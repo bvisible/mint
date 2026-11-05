@@ -1,6 +1,6 @@
 //// Neoffice — bankRecIncludeDraftJE added to the import (88a7d8b), for the draft Journal
 //// Entry support below.
-import { ActionLog, bankRecActionLog, bankRecAmountFilter, bankRecDateAtom, bankRecMatchFilters, bankRecIncludeDraftJE, bankRecSearchText, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from './bankRecAtoms'
+import { ActionLog, bankRecActionLog, bankRecAmountFilter, bankRecDateAtom, bankRecImportFilterAtom, bankRecMatchFilters, bankRecIncludeDraftJE, bankRecSearchText, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from './bankRecAtoms'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
 import { SWRConfiguration, useFrappeGetCall, useFrappeGetDoc, useFrappePostCall, useSWRConfig } from 'frappe-react-sdk'
@@ -173,6 +173,8 @@ export const useRefreshUnreconciledTransactions = () => {
     const searchString = useAtomValue(bankRecSearchText)
     const typeFilter = useAtomValue(bankRecTransactionTypeFilter)
     const amountFilter = useAtomValue(bankRecAmountFilter)
+    //// Neoffice — the file the person comes from: the next line is the next one OF THIS FILE.
+    const importFilter = useAtomValue(bankRecImportFilterAtom)
 
     const { data: unreconciledTransactions } = useGetUnreconciledTransactions()
 
@@ -200,7 +202,9 @@ export const useRefreshUnreconciledTransactions = () => {
             includeScore: true
         }) : null
 
-        const results = getSearchResults(searchIndex, searchString, typeFilter, amountFilter.value, unreconciledTransactions?.message)
+        const found = getSearchResults(searchIndex, searchString, typeFilter, amountFilter.value, unreconciledTransactions?.message)
+        //// Neoffice — only the lines of the file, when the person comes from one.
+        const results = importFilter ? found.filter((t) => importFilter.lines.includes(t.name)) : found
 
         const currentIndex = results.findIndex(t => t.name === transaction.name)
         let nextTransaction = null

@@ -11,9 +11,7 @@ import _ from "@/lib/translate"
 import { cn } from "@/lib/utils"
 import { API } from "./api"
 import type { ImportOverview } from "./types"
-import { describeLine, documentHref, stateLabel, stateTone } from "./utils"
-
-const WAITING = ["to_decide", "to_match"]
+import { describeLine, documentHref, stateLabel, stateTone, WAITING_STATES } from "./utils"
 
 const StatementImportLines = ({ name, currency, version }: { name: string, currency: string, version: number }) => {
     // the view the person chose; until they choose, what waits when something waits, else everything
@@ -28,9 +26,9 @@ const StatementImportLines = ({ name, currency, version }: { name: string, curre
     if (error) return <ErrorBanner error={error} />
     if (isLoading || !data) return <Skeleton className="h-24 w-full" />
 
-    const waitingCount = data.message.lines.filter((line) => WAITING.includes(line.state)).length
+    const waitingCount = data.message.lines.filter((line) => WAITING_STATES.includes(line.state)).length
     const view = chosen ?? (waitingCount > 0 ? "waiting" : "all")
-    const lines = data.message.lines.filter((line) => view === "all" || WAITING.includes(line.state))
+    const lines = data.message.lines.filter((line) => view === "all" || WAITING_STATES.includes(line.state))
 
     return (
         <div className="flex flex-col gap-3">

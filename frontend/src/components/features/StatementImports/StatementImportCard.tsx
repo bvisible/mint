@@ -1,25 +1,55 @@
 //// Neoffice — added file (no upstream equivalent). One import: when, where from, how far along, and its lines.
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { useState } from "react"
-import { useSetAtom } from "jotai"
-import { bankRecTabAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
+import { useAtom, useSetAtom } from "jotai"
+import { useFrappeGetCall } from "frappe-react-sdk"
+import { bankRecDateAtom, bankRecImportFilterAtom, bankRecTabAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { formatDate } from "@/lib/date"
 import _ from "@/lib/translate"
 import { cn } from "@/lib/utils"
+import { API } from "./api"
 import StatementImportLines from "./StatementImportLines"
-import type { StatementImport } from "./types"
-import { STATE_ORDER, sourceLabel, stateLabel, stateTone } from "./utils"
+import type { ImportOverview, StatementImport } from "./types"
+import { STATE_ORDER, WAITING_STATES, sourceLabel, stateLabel, stateTone } from "./utils"
 
 const StatementImportCard = ({ item, currency, version }: { item: StatementImport, currency: string, version: number }) => {
     const setTab = useSetAtom(bankRecTabAtom)
+    const setImportFilter = useSetAtom(bankRecImportFilterAtom)
+    const [dates, setDates] = useAtom(bankRecDateAtom)
     const { progress, counts } = item
+    // the lines of this file: the same call, and the same key, as the table below, so that it is asked once
+    const { data: overview } = useFrappeGetCall<{ message: ImportOverview }>(
+        `${API}.get_import_overview`,
+        { name: item.name },
+        progress.waiting > 0 ? ["statement-imports", "overview", item.name, version] : null,
+        { revalidateOnFocus: false },
+    )
     // open where something waits (the person has to open it to deal with it), closed where nothing does
     const [open, setOpen] = useState(progress.waiting > 0)
     const percent = progress.total ? (progress.done / progress.total) * 100 : 0
     const draft = item.docstatus === 0
+
+    // « Process the N that wait »: the reconciliation, on the lines of THIS file that wait, the first one open. Without the file's
+    // lines the button only changed the tab and the person landed on the whole list, with nothing to say which lines were hers.
+    const processWaiting = () => {
+        const waiting = (overview?.message.lines ?? []).filter((line) => WAITING_STATES.includes(line.state) && line.bank_transaction)
+        if (waiting.length > 0) {
+            const days = waiting.map((line) => line.date).sort()
+            // the period of the page must hold them: a file of last month is not in « this month »
+            setDates({
+                fromDate: days[0] < dates.fromDate ? days[0] : dates.fromDate,
+                toDate: days[days.length - 1] > dates.toDate ? days[days.length - 1] : dates.toDate,
+            })
+            setImportFilter({
+                label: formatDate(item.creation, "Do MMM YYYY"),
+                lines: waiting.map((line) => line.bank_transaction as string),
+            })
+        }
+        setTab("Match and Reconcile")
+    }
 
     return (
         <div className="rounded-lg border bg-card text-card-foreground">
@@ -36,7 +66,7 @@ const StatementImportCard = ({ item, currency, version }: { item: StatementImpor
                         {draft && <Badge variant="outline">{_("Draft")}</Badge>}
                         {!draft && progress.total > 0 && progress.waiting === 0 && <Badge variant="secondary">{_("Everything is dealt with")}</Badge>}
                         {progress.waiting > 0 && (
-                            <Button size="sm" onClick={() => setTab("Match and Reconcile")}>
+                            <Button size="sm" onClick={processWaiting}>
                                 {_("Process the {0} that wait", [String(progress.waiting)])}
                             </Button>
                         )}
