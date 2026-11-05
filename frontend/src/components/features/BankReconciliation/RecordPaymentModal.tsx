@@ -1,5 +1,5 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
-import { bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from "./bankRecAtoms"
+import { bankRecRecordPaymentModalAtom, bankRecRecordPaymentPrefillAtom, bankRecSelectedTransactionAtom, bankRecUnreconcileModalAtom, SelectedBank, selectedBankAccountAtom } from "./bankRecAtoms"
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog"
 import _ from "@/lib/translate"
 import { UnreconciledTransaction, useGetRuleForTransaction, useRefreshUnreconciledTransactions, useUpdateActionLog } from "./utils"
@@ -303,6 +303,12 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
 
     const { data: rule } = useGetRuleForTransaction(selectedTransaction)
 
+    //// Neoffice — the party a card asked the form to open on (« Record another way » of the gap decision), read once; it is cleared
+    //// when the form goes, so that the next opening starts from the line alone.
+    const [prefill, setPrefill] = useAtom(bankRecRecordPaymentPrefillAtom)
+    useEffect(() => () => setPrefill(null), [setPrefill])
+    const { call: getPartyDetails } = useContext(FrappeContext) as FrappeConfig
+
     const isWithdrawal = (selectedTransaction.withdrawal && selectedTransaction.withdrawal > 0) ? true : false
 
     const form = useForm<PaymentEntry>({
@@ -311,8 +317,8 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
             bank_account: selectedTransaction.bank_account,
             company: selectedTransaction?.company,
             // If the money is paid, it's usually to a supplier. If it's received, it's usually from a customer
-            party_type: rule?.party_type ?? (isWithdrawal ? 'Supplier' : 'Customer'),
-            party: rule?.party ?? '',
+            party_type: prefill?.party_type ?? rule?.party_type ?? (isWithdrawal ? 'Supplier' : 'Customer'),
+            party: prefill?.party ?? rule?.party ?? '',
             // If the transaction is a withdrawal, set the paid from to the selected bank account
             paid_from: isWithdrawal ? selectedBankAccount.account : (rule?.account ?? ''),
             // If the transaction is a deposit, set the paid to to the selected bank account
@@ -332,6 +338,20 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
 
     const onReconcile = useRefreshUnreconciledTransactions()
 
+    //// Neoffice — pointed at the party of the card: its name and its account, as when the person picks it in the field.
+    useEffect(() => {
+        if (!prefill) return
+        getPartyDetails.get('mint.apis.bank_reconciliation.get_party_details', {
+            company: selectedTransaction.company,
+            party_type: prefill.party_type,
+            party: prefill.party,
+        }).then((res) => {
+            form.setValue('party_name', res.message.party_name)
+            form.setValue(isWithdrawal ? 'paid_to' : 'paid_from', res.message.party_account)
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     const setUnpaidInvoiceOpen = useSetAtom(isUnpaidInvoicesButtonOpen)
 
     useEffect(() => {
@@ -346,6 +366,8 @@ const PaymentEntryForm = ({ selectedTransaction, selectedBankAccount }: { select
     //// position because the field components take no ref. Upstream focuses nothing.
     // Auto-focus on Party field when modal opens
     useEffect(() => {
+        //// Neoffice — not when the party is already chosen (the card pointed the form at it): the list would open over it.
+        if (prefill) return
         const timer = setTimeout(() => {
             const dialog = document.querySelector('[role="dialog"]')
             if (dialog) {
@@ -1155,13 +1177,14 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
                 ))}
             </TableBody>
         </Table> : null}
-        <div className="flex justify-between items-center">
+        {/* //// Neoffice — the summary and the buttons are the sticky bar of the dialog: with a long list of invoices they fell below the visible part (Daniel, 05.11). */}
+        <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-2 flex items-center justify-between border-t bg-background px-6 pb-6 pt-3">
             <div className="flex gap-2">
                 {/* //// Neoffice — wrapped in _() (1f2847e); upstream ships the bare English labels. */}
                 <span className="text-muted-foreground">{_("Invoices")}: <span className="text-foreground font-mono font-medium">{selectedInvoices.length}</span></span> /
                 <span className="text-muted-foreground">{_("Total")}: <span className="text-foreground font-mono font-medium">{formatCurrency(selectedInvoices.reduce((acc, invoice) => acc + invoice.outstanding_amount, 0))}</span></span>
             </div>
-            <DialogFooter className="pt-2">
+            <DialogFooter className="static m-0 border-0 bg-transparent p-0">
                 <DialogClose asChild>
                     {/* //// Neoffice — wrapped in _() (1f2847e). */}
                     <Button variant='ghost' disabled={allocateAmountToReferencesLoading}>{_("Cancel")}</Button>

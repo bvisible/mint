@@ -7,7 +7,7 @@ import NoraOrb from "@/components/common/NoraOrb"
 import { useSetAtom } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { bankRecRecordPaymentModalAtom, bankRecUnreconcileModalAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
+import { bankRecRecordPaymentModalAtom, bankRecRecordPaymentPrefillAtom, bankRecUnreconcileModalAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import { UnreconciledTransaction, useRefreshUnreconciledTransactions } from "@/components/features/BankReconciliation/utils"
 import AccountsDropdown from "@/components/common/AccountsDropdown"
 import { Button } from "@/components/ui/button"
@@ -49,6 +49,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const { mutate } = useSWRConfig()
     const onReconcile = useRefreshUnreconciledTransactions()
     const setRecordPaymentOpen = useSetAtom(bankRecRecordPaymentModalAtom)
+    const setRecordPaymentPrefill = useSetAtom(bankRecRecordPaymentPrefillAtom)
     const setUnreconcile = useSetAtom(bankRecUnreconcileModalAtom)
 
     // What the person is trying: another account for the gap, and, for a short payment, what becomes of the rest: left
@@ -271,7 +272,11 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                 {decision.decision !== "left_open" && (
                     <Button variant="outline" disabled={loading} onClick={() => onDecide("left_open")}>{_("Leave open")}</Button>
                 )}
-                <Button variant="link" className="px-0" onClick={() => setRecordPaymentOpen(true)}>{_("Record another way")}</Button>
+                <Button variant="link" className="px-0" onClick={() => {
+                    // the form opens on the customer (or supplier) of the invoice, not on whoever the bank wrote
+                    if (decision.party_id) setRecordPaymentPrefill({ party_type: decision.party_doctype, party: decision.party_id })
+                    setRecordPaymentOpen(true)
+                }}>{_("Record another way")}</Button>
                 <a className="text-sm underline underline-offset-2" href={documentHref(decision.invoice_type, decision.invoice)}>{decision.invoice}</a>
             </div>
             <p className="text-xs text-muted-foreground">

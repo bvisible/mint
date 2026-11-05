@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils"
 //// Neoffice — added: the close button's screen-reader label was bare English text in upstream;
 //// we route it through the shared translate helper like the rest of the SPA.
 import _ from "@/lib/translate"
+//// Neoffice — added: a dialog framed in the desk takes the whole window while it is open (lib/embedded.ts).
+import { expandFrame } from "@/lib/embedded"
 
 function Dialog({
   ...props
@@ -65,6 +67,9 @@ function DialogContent({
   // Radix sets aria-hidden + pointer-events:none on all elements outside the portal
   // We counter this by continuously stripping those attributes from Learn elements
   const noraGuardRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
+  //// Neoffice — added: framed in the desk, the dialog was centred in the room under the tabs and its buttons fell below the visible
+  //// part (Daniel, 05.11). While it is open the frame takes the whole window, and gives it back when the dialog goes.
+  React.useEffect(() => expandFrame(), [])
   React.useEffect(() => {
     noraGuardRef.current = setInterval(() => {
       document.querySelectorAll('.nora-lp, #nora-step-popover').forEach(el => {

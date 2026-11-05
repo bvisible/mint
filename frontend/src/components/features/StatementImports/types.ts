@@ -82,6 +82,9 @@ export type GapDecision = {
     invoice_type: "Sales Invoice" | "Purchase Invoice",
     invoice: string,
     party: string | null,
+    /** The party of the invoice by its document name: « Record another way » opens the payment form pointed at it. */
+    party_doctype: "Customer" | "Supplier",
+    party_id: string | null,
     verdict: {
         kind: string,
         gap: number,

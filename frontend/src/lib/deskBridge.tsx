@@ -36,6 +36,27 @@ const DeskBridge = () => {
         return () => window.removeEventListener("message", listen)
     }, [navigate])
 
+    // A link that leaves the application (a document of the desk, a file) opens in a new tab: followed in the frame, it replaced
+    // the reconciliation the person was in the middle of, and everything she had typed. The links of the application itself (the
+    // router's, under its own root) and the ones that already say where they open are left alone, and so is a click with a key held.
+    useEffect(() => {
+        if (!EMBEDDED) return
+        const root = `/${appSegment()}`
+        const leave = (event: MouseEvent) => {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+            const link = (event.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null
+            if (!link || (link.target && link.target !== "_self") || link.hasAttribute("download")) return
+            const raw = link.getAttribute("href") ?? ""
+            if (raw.startsWith("#") || raw.startsWith("javascript:")) return
+            const url = new URL(link.href, window.location.href)
+            if (url.origin === window.location.origin && (url.pathname === root || url.pathname.startsWith(`${root}/`))) return
+            event.preventDefault()
+            window.open(url.href, "_blank", "noopener,noreferrer")
+        }
+        document.addEventListener("click", leave, true)
+        return () => document.removeEventListener("click", leave, true)
+    }, [])
+
     return null
 }
 

@@ -44,6 +44,9 @@ export const bankRecTabAtom = atom<string>("Match and Reconcile")
 //// files tab. The list of unreconciled lines then shows those lines only, under a chip that names the file; the chip's cross (or
 //// « Clear filters ») brings the whole list back. `label` is the file's date as the person reads it, `lines` the bank transactions.
 export const bankRecImportFilterAtom = atom<{ label: string, lines: string[] } | null>(null)
+//// Neoffice — added: the party the payment form opens on when a card that knows it asks for the form (« Record another way » of the gap
+//// decision: the customer or supplier of the invoice). The form reads it once, when it opens, and clears it when it closes.
+export const bankRecRecordPaymentPrefillAtom = atom<{ party_type: string, party: string } | null>(null)
 export const bankRecTransferModalAtom = atom(false)
 export const bankRecRecordPaymentModalAtom = atom(false)
 export const bankRecRecordJournalEntryModalAtom = atom(false)

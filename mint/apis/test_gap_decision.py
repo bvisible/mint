@@ -62,6 +62,23 @@ class TestGapDecision(GapImportCase):
 		self.assertTrue(decision["can_pass"])
 		self.assertEqual(decision["blocker"], "")
 
+	def test_the_decision_names_the_party_of_the_invoice_so_that_another_way_opens_on_it(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		# « Record another way » opens the payment form: it is pointed at the customer (or supplier) of the invoice, by its
+		# document name, not at the name the bank wrote on the line
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(
+			(decision["party_doctype"], decision["party_id"]),
+			("Customer", frappe.db.get_value("Sales Invoice", self.sales, "customer")),
+		)
+		owed = self._owed("Purchase Invoice", self.purchase)
+		statement = self._import(self._line("Purchase Invoice", self.purchase, owed - 0.03))
+		decision = follow_up.get_gap_decision(statement.transactions[0].bank_transaction)
+		self.assertEqual(
+			(decision["party_doctype"], decision["party_id"]),
+			("Supplier", frappe.db.get_value("Purchase Invoice", self.purchase, "supplier")),
+		)
+
 	def test_an_overpayment_can_only_be_left_open(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
 		owed = self._owed("Sales Invoice", self.sales)
 		statement = self._import(self._line("Sales Invoice", self.sales, owed + 5))

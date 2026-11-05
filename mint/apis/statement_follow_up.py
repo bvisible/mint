@@ -530,6 +530,10 @@ def get_gap_decision(
 		"invoice_type": invoice_type,
 		"invoice": invoice,
 		"party": line.party_name or line.party_match,
+		# the party of the invoice by its document name (the line only has the name the bank wrote): « Record another way » opens
+		# the payment form pointed at it
+		"party_doctype": "Customer" if invoice_type == "Sales Invoice" else "Supplier",
+		"party_id": customer if invoice_type == "Sales Invoice" else frappe.db.get_value(invoice_type, invoice, "supplier"),
 		"verdict": {
 			key: verdict[key]
 			for key in ("kind", "gap", "amount", "outstanding", "discount", "currency", "reason")
