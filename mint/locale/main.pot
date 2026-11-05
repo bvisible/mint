@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-05 12:37+0000\n"
-"PO-Revision-Date: 2026-11-05 12:37+0000\n"
+"POT-Creation-Date: 2026-11-05 13:19+0000\n"
+"PO-Revision-Date: 2026-11-05 13:19+0000\n"
 "Last-Translator: support@thecommit.company\n"
 "Language-Team: support@thecommit.company\n"
 "MIME-Version: 1.0\n"
@@ -49,15 +49,20 @@ msgstr ""
 msgid "A credit note goes to an income account, not {0}."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:565
+#: mint/apis/statement_follow_up.py:606
 msgid "A credit note of the balance is for the short payment of a sales invoice."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:114
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:158
+#, python-brace-format
+msgid "A credit note of {0} was prepared as a draft: {1}."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:136
 msgid "A gap to decide"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:626
+#: mint/apis/statement_follow_up.py:713
 msgid "A gap waits for your decision in the bank reconciliation."
 msgstr ""
 
@@ -70,6 +75,14 @@ msgstr ""
 msgid "A payment gap goes to an income or expense account, not {0}."
 msgstr ""
 
+#: mint/apis/statement_follow_up.py:671 mint/apis/statement_follow_up.py:676
+msgid "A rule is for the short payments of a customer."
+msgstr ""
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:45
+msgid "A rule that prepares or makes the credit note by itself needs the usual share of the customer."
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:559
 msgid "Accepted"
 msgstr ""
@@ -80,6 +93,7 @@ msgstr ""
 
 #. Label of a Link field in DocType 'Mint Bank Transaction Rule'
 #. Label of a Link field in DocType 'Mint Transaction Rule Accounts'
+#. Label of a Link field in DocType 'Payment Gap Rule'
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:244
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:465
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:150
@@ -96,6 +110,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:674
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:93
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:21
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:85
 msgid "Account"
 msgstr ""
 
@@ -103,7 +118,7 @@ msgstr ""
 msgid "Account company does not match with the rule company."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:153
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:183
 msgid "Account for the gap"
 msgstr ""
 
@@ -115,7 +130,7 @@ msgstr ""
 msgid "Account is required"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:153
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:183
 msgid "Account of the credit note"
 msgstr ""
 
@@ -144,6 +159,7 @@ msgstr ""
 #: mint/mint/doctype/mint_bank_statement_import_template/mint_bank_statement_import_template.json:117
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:184
 #: mint/mint/doctype/mint_settings/mint_settings.json:107
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:137
 msgid "Accounts Manager"
 msgstr ""
 
@@ -153,6 +169,7 @@ msgstr ""
 #: mint/mint/doctype/mint_bank_statement_import_template/mint_bank_statement_import_template.json:105
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:172
 #: mint/mint/doctype/mint_settings/mint_settings.json:97
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:145
 msgid "Accounts User"
 msgstr ""
 
@@ -319,7 +336,12 @@ msgstr ""
 msgid "Any debit transaction with the keyword 'Bank Fee'."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:140
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:259
+#, python-brace-format, python-format
+msgid "Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
 msgid "Apply the proposal"
 msgstr ""
 
@@ -366,21 +388,23 @@ msgstr ""
 msgid "Back to Form"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:163
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:193
 msgid "Back to the company's account"
 msgstr ""
 
 #. Label of a Currency field in DocType 'Mint Bank Statement Balance'
 #. Option for the 'Maps To' (Select) field in DocType 'Mint Bank Statement
 #. Import Template Columns'
+#. Label of a Select field in DocType 'Payment Gap Rule'
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:378
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:139
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:33
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:56
 msgid "Balance"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:592
+#: mint/apis/gap_rule.py:132 mint/apis/statement_follow_up.py:435
 #, python-brace-format
 msgid "Balance of {0}, paid {1} on {2}"
 msgstr ""
@@ -570,16 +594,16 @@ msgstr ""
 msgid "Below is a list of all entries posted against the bank account {0} which have not been cleared till {1}."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:199
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:229
 msgid "Booked as"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:617
+#: mint/apis/statement_follow_up.py:704
 #, python-brace-format
 msgid "Booked, {0} of them with a small gap ({1} in all)."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:615
+#: mint/apis/statement_follow_up.py:702
 msgid "Booked."
 msgstr ""
 
@@ -650,11 +674,11 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:537
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:546
 msgid "Cannot parse a submitted or cancelled document"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:549
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:558
 msgid "Cannot read file"
 msgstr ""
 
@@ -805,10 +829,12 @@ msgid "Column Name"
 msgstr ""
 
 #. Label of a Link field in DocType 'Mint Bank Transaction Rule'
+#. Label of a Link field in DocType 'Payment Gap Rule'
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1095
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:79
 #: frontend/src/pages/BankStatementImporter.tsx:88
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:121
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:27
 msgid "Company"
 msgstr ""
 
@@ -850,6 +876,11 @@ msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1198
 msgid "Confirm and Submit"
+msgstr ""
+
+#. Label of a Int field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:97
+msgid "Confirmations"
 msgstr ""
 
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:209
@@ -922,7 +953,7 @@ msgstr ""
 msgid "Could not copy"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:549
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:558
 msgid "Could not read file content"
 msgstr ""
 
@@ -960,11 +991,11 @@ msgstr ""
 msgid "Create a new rule to automatically classify transactions."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:103
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:117
 msgid "Create the credit note and reconcile"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:147
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:177
 msgid "Create the credit note of the balance"
 msgstr ""
 
@@ -988,11 +1019,11 @@ msgstr ""
 
 #. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
 #: frontend/src/components/features/PartyReconciliation/utils.ts:31
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:161
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:169
 msgid "Credit Note"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:84
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:98
 msgid "Credit note made, invoice settled and bank line reconciled"
 msgstr ""
 
@@ -1000,7 +1031,7 @@ msgstr ""
 msgid "Credit note of the balance"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:169
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:199
 msgid "Credit note that will be made"
 msgstr ""
 
@@ -1022,6 +1053,11 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:520
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:360
 msgid "Custom Remarks"
+msgstr ""
+
+#. Label of a Link field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:36
+msgid "Customer"
 msgstr ""
 
 #: frontend/src/pages/PartyReconciliation.tsx:41
@@ -1081,18 +1117,18 @@ msgid "Debits"
 msgstr ""
 
 #. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:177
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:185
 msgid "Decided By"
 msgstr ""
 
 #. Label of a Datetime field in DocType 'Mint Bank Statement Import
 #. Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:184
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:192
 msgid "Decided On"
 msgstr ""
 
 #. Label of a Select field in DocType 'Mint Bank Statement Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:169
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:177
 msgid "Decision"
 msgstr ""
 
@@ -1163,7 +1199,9 @@ msgstr ""
 msgid "Difference"
 msgstr ""
 
+#. Label of a Check field in DocType 'Payment Gap Rule'
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:286
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:44
 msgid "Disabled"
 msgstr ""
 
@@ -1207,7 +1245,7 @@ msgstr ""
 msgid "Document Type"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:537
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:546
 msgid "Document cannot be parsed"
 msgstr ""
 
@@ -1449,7 +1487,7 @@ msgstr ""
 msgid "File deposited by hand"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:543
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:552
 msgid "File type must be XML"
 msgstr ""
 
@@ -1498,12 +1536,12 @@ msgstr ""
 
 #. Label of a Currency field in DocType 'Mint Bank Statement Import
 #. Transactions'
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:128
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:198
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:150
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:206
 msgid "Gap Amount"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:72
+#: frontend/src/components/features/StatementImports/utils.ts:73
 #, python-brace-format
 msgid "Gap of {0}: to decide"
 msgstr ""
@@ -1513,7 +1551,7 @@ msgstr ""
 msgid "Gap of {0}: {1}"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:84
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:98
 msgid "Gap passed and bank line reconciled"
 msgstr ""
 
@@ -1579,6 +1617,11 @@ msgstr ""
 msgid "Grand Total"
 msgstr ""
 
+#. Label of a Section Break field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:73
+msgid "Habit of the customer"
+msgstr ""
+
 #. Label of a Int field in DocType 'Mint Bank Statement Import Template'
 #: mint/mint/doctype/mint_bank_statement_import_template/mint_bank_statement_import_template.json:72
 msgid "Header Index"
@@ -1602,7 +1645,12 @@ msgstr ""
 msgid "Hide the lines"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:571
+#. Description of the 'Confirmations' (Int) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:94
+msgid "How many times a person confirmed this handling for this customer. The level automatic is only available from three."
+msgstr ""
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:580
 #, python-brace-format
 msgid "IBAN in XML ({0}) points to {1}, but {2} is selected. Using selected account."
 msgstr ""
@@ -1793,7 +1841,7 @@ msgstr ""
 msgid "It's all good!"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:171
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:201
 msgid "Item"
 msgstr ""
 
@@ -1819,7 +1867,7 @@ msgstr ""
 msgid "Journal Template Accounts"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:146
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:176
 msgid "Keep the rest open"
 msgstr ""
 
@@ -1847,23 +1895,33 @@ msgstr ""
 msgid "Last Year"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:218
+#. Label of a Date field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:103
+msgid "Last confirmed on"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:272
 msgid "Leave open"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:91
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:105
 #: frontend/src/components/features/StatementImports/utils.ts:15
 msgid "Left open"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:70
+#: frontend/src/components/features/StatementImports/utils.ts:71
 #, python-brace-format
 msgid "Left open by {0} on {1}"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:225
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:279
 #, python-brace-format
 msgid "Left open by {0} on {1}."
+msgstr ""
+
+#. Label of a Select field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:66
+msgid "Level"
 msgstr ""
 
 #: frontend/src/components/common/LinkFieldCombobox.tsx:271
@@ -1876,9 +1934,18 @@ msgstr ""
 msgid "Location where the document processor is run."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:192
+#: frontend/src/components/features/StatementImports/utils.ts:63
+#, python-brace-format
+msgid "Made by itself by the rule of the customer, credit note {0}"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:222
 #, python-brace-format
 msgid "Made like the credit notes this customer already has ({0}), without link to the invoice."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:253
+msgid "Make it by itself"
 msgstr ""
 
 #. Label of a Select field in DocType 'Mint Bank Statement Import Template
@@ -1974,7 +2041,7 @@ msgid "Mint Bank Statement Import Template Columns"
 msgstr ""
 
 #. Name of a DocType
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:217
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:225
 msgid "Mint Bank Statement Import Transactions"
 msgstr ""
 
@@ -2002,7 +2069,7 @@ msgstr ""
 msgid "Mint Transaction Rule Accounts"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:580
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:589
 msgid "Missing IBAN"
 msgstr ""
 
@@ -2010,7 +2077,7 @@ msgstr ""
 msgid "Missing document_scan_name"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:540
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:549
 msgid "Missing file"
 msgstr ""
 
@@ -2023,7 +2090,7 @@ msgstr ""
 msgid "More"
 msgstr ""
 
-#: mint/apis/payment_gap.py:145 mint/apis/statement_follow_up.py:470
+#: mint/apis/payment_gap.py:145 mint/apis/statement_follow_up.py:494
 msgid "More came in than is owed: that is never passed by itself."
 msgstr ""
 
@@ -2045,7 +2112,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:176
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:206
 msgid "Net"
 msgstr ""
 
@@ -2083,19 +2150,19 @@ msgstr ""
 msgid "No invoice linked"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:634
+#: mint/apis/statement_follow_up.py:721
 msgid "No invoice recognised: they wait like any bank line not reconciled."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:74
+#: frontend/src/components/features/StatementImports/utils.ts:75
 msgid "No invoice recognised: to match in the bank reconciliation"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:554
+#: mint/apis/statement_follow_up.py:594
 msgid "No invoice was recognised for this line."
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:664
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:673
 msgid "No new transactions to import"
 msgstr ""
 
@@ -2117,6 +2184,11 @@ msgstr ""
 
 #: frontend/src/components/common/LinkFieldCombobox.tsx:271
 msgid "No results found."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:260
+#, python-brace-format
+msgid "No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person."
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:206
@@ -2173,7 +2245,7 @@ msgid "Not handled"
 msgstr ""
 
 #: frontend/src/components/features/StatementImports/utils.ts:21
-#: frontend/src/components/features/StatementImports/utils.ts:82
+#: frontend/src/components/features/StatementImports/utils.ts:83
 msgid "Not imported yet"
 msgstr ""
 
@@ -2197,7 +2269,7 @@ msgstr ""
 msgid "Nothing waits in this import."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:642
+#: mint/apis/statement_follow_up.py:729
 msgid "Nothing was created for them."
 msgstr ""
 
@@ -2273,6 +2345,10 @@ msgstr ""
 msgid "Open invoices"
 msgstr ""
 
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:160
+msgid "Open the draft"
+msgstr ""
+
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:248
 #, python-brace-format
 msgid "Open {0} in a new tab"
@@ -2342,7 +2418,7 @@ msgstr ""
 msgid "Paid to (Party Type)"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:124
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:146
 msgid "Paid to the bank"
 msgstr ""
 
@@ -2428,20 +2504,20 @@ msgstr ""
 msgid "Party type is required to create a payment entry."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:104
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:118
 msgid "Pass the gap and reconcile"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:148
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:178
 msgid "Pass the rest as a gap"
 msgstr ""
 
 #: frontend/src/components/features/StatementImports/utils.ts:13
-#: frontend/src/components/features/StatementImports/utils.ts:63
+#: frontend/src/components/features/StatementImports/utils.ts:64
 msgid "Passed by the import"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:63
+#: frontend/src/components/features/StatementImports/utils.ts:64
 #, python-brace-format
 msgid "Passed by the import, gap of {0}"
 msgstr ""
@@ -2472,7 +2548,7 @@ msgstr ""
 #. Transaction Rule'
 #: frontend/src/components/features/BankReconciliation/MatchFilters.tsx:39
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:268
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:205
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:213
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:87
 msgid "Payment Entry"
 msgstr ""
@@ -2482,8 +2558,15 @@ msgid "Payment Entry Created"
 msgstr ""
 
 #. Label of a Select field in DocType 'Mint Bank Statement Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:190
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:198
 msgid "Payment Gap"
+msgstr ""
+
+#. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
+#. Name of a DocType
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:161
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:113
+msgid "Payment Gap Rule"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:160
@@ -2522,11 +2605,11 @@ msgstr ""
 msgid "Please attach a file"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:540
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:549
 msgid "Please attach an XML file first"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:580
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:589
 #, python-brace-format
 msgid "Please check your IBAN. It is missing: {0}"
 msgstr ""
@@ -2602,6 +2685,10 @@ msgstr ""
 msgid "Posting date matches the transaction date"
 msgstr ""
 
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:253
+msgid "Prepare it as a draft"
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:642
 msgid "Preview"
 msgstr ""
@@ -2644,6 +2731,10 @@ msgstr ""
 
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:476
 msgid "Processing file..."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:253
+msgid "Propose it to me"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchFilters.tsx:43
@@ -2700,16 +2791,16 @@ msgstr ""
 msgid "Reconciled afterwards"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:67
+#: frontend/src/components/features/StatementImports/utils.ts:68
 #, python-brace-format
 msgid "Reconciled by {0} on {1}"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:68
+#: frontend/src/components/features/StatementImports/utils.ts:69
 msgid "Reconciled in the bank reconciliation"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:65
+#: frontend/src/components/features/StatementImports/utils.ts:66
 #, python-brace-format
 msgid "Reconciled, the rest settled by the credit note {0}"
 msgstr ""
@@ -2776,11 +2867,11 @@ msgstr ""
 msgid "Record an internal transfer to another bank/credit card/cash account."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:220
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:274
 msgid "Record another way"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:103
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:117
 msgid "Record the partial payment"
 msgstr ""
 
@@ -2928,6 +3019,10 @@ msgstr ""
 msgid "Rule deleted."
 msgstr ""
 
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:243
+msgid "Rule for this customer"
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:699
 msgid "Rule matched based on transaction description and other criteria."
 msgstr ""
@@ -3033,11 +3128,11 @@ msgstr ""
 msgid "Search transactions"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:647
+#: mint/apis/statement_follow_up.py:734
 msgid "See all the imports"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:646
+#: mint/apis/statement_follow_up.py:733
 msgid "See the error log."
 msgstr ""
 
@@ -3129,12 +3224,12 @@ msgstr ""
 msgid "Settings updated"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:103
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:117
 msgid "Settle the invoice and pass the gap"
 msgstr ""
 
 #: frontend/src/components/features/StatementImports/StatementImportCard.tsx:38
-#: mint/apis/statement_follow_up.py:652
+#: mint/apis/statement_follow_up.py:739
 #, python-brace-format
 msgid "Settle the {0} that wait"
 msgstr ""
@@ -3233,7 +3328,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:128
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:150
 msgid "Stays open"
 msgstr ""
 
@@ -3245,7 +3340,7 @@ msgstr ""
 msgid "Still due on these invoices"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:120
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:142
 msgid "Still owed on the invoice"
 msgstr ""
 
@@ -3315,6 +3410,7 @@ msgstr ""
 #: mint/mint/doctype/mint_bank_statement_import_template/mint_bank_statement_import_template.json:93
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:160
 #: mint/mint/doctype/mint_settings/mint_settings.json:87
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:125
 msgid "System Manager"
 msgstr ""
 
@@ -3328,8 +3424,13 @@ msgstr ""
 msgid "The Google Project ID is used to authenticate with the Google Cloud Platform."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:207
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:237
 msgid "The VAT is cut from the account, as in the payment entry."
+msgstr ""
+
+#. Description of the 'Account' (Link) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:82
+msgid "The account of the credit note or of the gap. Empty: the one of the customer's previous credit notes, else the company's gap account."
 msgstr ""
 
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:177
@@ -3344,11 +3445,11 @@ msgstr ""
 msgid "The bank account is not a company account. Please select a company account"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:76
+#: frontend/src/components/features/StatementImports/utils.ts:77
 msgid "The bank already had this line: nothing was created"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:80
+#: frontend/src/components/features/StatementImports/utils.ts:81
 msgid "The bank line was cancelled"
 msgstr ""
 
@@ -3367,7 +3468,7 @@ msgstr ""
 
 #. Description of the 'Credit Note' (Link) field in DocType 'Mint Bank
 #. Statement Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:164
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:172
 msgid "The credit note a person made for the balance of a partial payment."
 msgstr ""
 
@@ -3405,13 +3506,13 @@ msgstr ""
 msgid "The following documents will be {0}:"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/utils.ts:78
+#: frontend/src/components/features/StatementImports/utils.ts:79
 msgid "The import could not handle this line"
 msgstr ""
 
 #. Description of the 'Gap Amount' (Currency) field in DocType 'Mint Bank
 #. Statement Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:200
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:208
 msgid "The invoice balance minus the payment: positive when less came in than is owed."
 msgstr ""
 
@@ -3441,6 +3542,11 @@ msgstr ""
 msgid "The ledger says {0}, the open documents say {1}: a difference of {2}."
 msgstr ""
 
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:48
+#, python-brace-format
+msgid "The level automatic is available after {0} confirmations by a person: {1} so far."
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1014
 msgid "The opening balance might not match your bank statement. Would you like to reconcile them?"
 msgstr ""
@@ -3453,6 +3559,18 @@ msgstr ""
 msgid "The reference number of the transaction"
 msgstr ""
 
+#. Description of the 'Payment Gap Rule' (Link) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:164
+msgid "The rule of the customer that prepared or made the handling of this line."
+msgstr ""
+
+#. Description of the 'Usual share of the invoice' (Percent) field in DocType
+#. 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:76
+msgid "The share of the invoice this customer usually pays. The rule applies to a payment within two points of it."
+msgstr ""
+
 #. Description of the 'Remittance Reference' (Data) field in DocType 'Mint Bank
 #. Statement Import Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:148
@@ -3462,6 +3580,10 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:513
 #, python-brace-format
 msgid "The system found a mirror transaction ({0}) in another account with the same amount and date."
+msgstr ""
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:42
+msgid "The usual share is a percentage between 0 and 100."
 msgstr ""
 
 #: frontend/src/pages/BankStatementImporter.tsx:183
@@ -3484,6 +3606,11 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1010
 #, python-brace-format
 msgid "There are {0} unreconciled transactions before {1}."
+msgstr ""
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:58
+#, python-brace-format
+msgid "There is already a rule for {0} in {1}: {2}."
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1012
@@ -3528,11 +3655,11 @@ msgstr ""
 msgid "This Year"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:547
+#: mint/apis/statement_follow_up.py:587 mint/apis/statement_follow_up.py:668
 msgid "This bank line did not come from an import."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:544
+#: mint/apis/statement_follow_up.py:584
 msgid "This bank line is already dealt with."
 msgstr ""
 
@@ -3540,11 +3667,11 @@ msgstr ""
 msgid "This can contain \"CR\"/\"DR\" values or positive/negative values. You could also have a separate column for CR/DR."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:193
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:223
 msgid "This customer has no credit note yet: the account of the company is used, without link to the invoice."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:138
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
 #, python-brace-format, python-format
 msgid "This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note."
 msgstr ""
@@ -3648,7 +3775,7 @@ msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:244
 #: frontend/src/components/features/StatementImports/utils.ts:16
-#: frontend/src/components/features/StatementImports/utils.ts:72
+#: frontend/src/components/features/StatementImports/utils.ts:73
 msgid "To decide"
 msgstr ""
 
@@ -3687,7 +3814,7 @@ msgstr ""
 msgid "Total Debit"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:187
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:217
 msgid "Total of the credit note"
 msgstr ""
 
@@ -3832,7 +3959,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:408
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:232
 #: frontend/src/components/features/BankReconciliation/utils.ts:281
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:87
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:101
 msgid "Undo"
 msgstr ""
 
@@ -3850,9 +3977,13 @@ msgstr ""
 msgid "Unique Reference"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:301 mint/apis/statement_follow_up.py:539
+#: mint/apis/statement_follow_up.py:302 mint/apis/statement_follow_up.py:579
 #, python-brace-format
 msgid "Unknown decision {0}."
+msgstr ""
+
+#: mint/apis/gap_rule.py:67 mint/apis/statement_follow_up.py:662
+msgid "Unknown level or handling of the rule."
 msgstr ""
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:429
@@ -3925,10 +4056,19 @@ msgstr ""
 msgid "User Remark"
 msgstr ""
 
+#. Label of a Percent field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:79
+msgid "Usual share of the invoice"
+msgstr ""
+
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1138
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1401
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:212
 msgid "VAT"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:269
+msgid "Validate the draft and reconcile"
 msgstr ""
 
 #. Label of a Small Text field in DocType 'Mint Bank Transaction Description
@@ -4004,7 +4144,7 @@ msgstr ""
 
 #. Description of the 'Decision' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:172
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:180
 msgid "What a person decided for a payment gap left to them."
 msgstr ""
 
@@ -4012,9 +4152,14 @@ msgstr ""
 msgid "What became of it"
 msgstr ""
 
+#. Description of the 'Balance' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:52
+msgid "What becomes of the balance when this customer pays less than the invoice, beyond a small gap."
+msgstr ""
+
 #. Description of the 'Payment Gap' (Select) field in DocType 'Mint Bank
 #. Statement Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:193
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:201
 msgid "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
 msgstr ""
 
@@ -4045,7 +4190,7 @@ msgstr ""
 msgid "Withdrawal"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:543
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:552
 msgid "Wrong file type"
 msgstr ""
 
@@ -4097,7 +4242,7 @@ msgstr ""
 msgid "You have not performed any reconciliations in this session yet."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:226
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
 msgid "Your name and the date are noted on the line of the import."
 msgstr ""
 
@@ -4107,12 +4252,27 @@ msgstr ""
 
 #. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:191
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:199
 msgid "accepted_rebate"
 msgstr ""
 
 #: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:61
 msgid "attachment(s)"
+msgstr ""
+
+#. Option for the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:67
+msgid "automatic"
+msgstr ""
+
+#. Option for the 'Balance' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:57
+msgid "credit_note"
+msgstr ""
+
+#. Option for the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:67
+msgid "draft"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:884
@@ -4131,7 +4291,7 @@ msgstr ""
 
 #. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:191
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:199
 msgid "early_discount"
 msgstr ""
 
@@ -4143,13 +4303,18 @@ msgstr ""
 
 #. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:191
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:199
 msgid "exact"
+msgstr ""
+
+#. Option for the 'Balance' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:57
+msgid "gap"
 msgstr ""
 
 #. Option for the 'Decision' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:170
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:178
 msgid "left_open"
 msgstr ""
 
@@ -4165,7 +4330,7 @@ msgstr ""
 
 #. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:191
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:199
 msgid "overpaid"
 msgstr ""
 
@@ -4175,7 +4340,7 @@ msgstr ""
 
 #. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:191
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:199
 msgid "partial"
 msgstr ""
 
@@ -4185,7 +4350,7 @@ msgstr ""
 
 #. Option for the 'Decision' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:170
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:178
 msgid "passed_gap"
 msgstr ""
 
@@ -4196,8 +4361,18 @@ msgstr ""
 #. Option for the 'Payment Gap' (Select) field in DocType 'Mint Bank Statement
 #. Import Transactions'
 #: frontend/src/components/features/StatementImports/utils.ts:38
-#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:191
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:199
 msgid "rounding"
+msgstr ""
+
+#. Option for the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:67
+msgid "suggest"
+msgstr ""
+
+#. Description of the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:62
+msgid "suggest: the card proposes it. draft: the credit note is prepared as a draft. automatic: it is made by itself, only after repeated confirmations."
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:452
@@ -4214,10 +4389,10 @@ msgstr ""
 msgid "us"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:573
+#: mint/apis/gap_rule.py:127 mint/apis/statement_follow_up.py:627
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:315
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:359
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:464
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:473
 #, python-brace-format
 msgid "{0} - Payment for {1}"
 msgstr ""
@@ -4227,7 +4402,7 @@ msgstr ""
 msgid "{0} / {1} dealt with"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:641
+#: mint/apis/statement_follow_up.py:728
 #, python-brace-format
 msgid "{0} already in the bank"
 msgstr ""
@@ -4267,7 +4442,7 @@ msgstr ""
 msgid "{0} is not an invoice a payment can settle."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:613
+#: mint/apis/statement_follow_up.py:700
 #, python-brace-format
 msgid "{0} lines read in the file."
 msgstr ""
@@ -4277,7 +4452,7 @@ msgstr ""
 msgid "{0} new, {1} already imported"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:646
+#: mint/apis/statement_follow_up.py:733
 #, python-brace-format
 msgid "{0} not handled"
 msgstr ""
@@ -4287,7 +4462,7 @@ msgstr ""
 msgid "{0} open invoice(s)"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:620
+#: mint/apis/statement_follow_up.py:707
 #, python-brace-format
 msgid "{0} passed by themselves"
 msgstr ""
@@ -4302,13 +4477,13 @@ msgstr ""
 msgid "{0} to apply"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:625
+#: mint/apis/statement_follow_up.py:712
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:410
 #, python-brace-format
 msgid "{0} to decide"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:633
+#: mint/apis/statement_follow_up.py:720
 #, python-brace-format
 msgid "{0} to match"
 msgstr ""
@@ -4381,38 +4556,3 @@ msgstr ""
 msgid "{} invoices"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:84
-msgid "Closing Balance as per system"
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:110
-msgid "What the bank should show: the ledger balance, without the payments the bank has not processed yet."
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:181
-msgid "Your Progress"
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:61
-msgid "Bank Transactions between {0} and {1}"
-msgstr ""
-
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:56
-msgid "Invalid file type"
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:117
-msgid "Loading"
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:418
-msgid "Paid to"
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:418
-msgid "Received from"
-msgstr ""
-
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:130
-msgid "There are no transactions in the system for the selected bank account and dates."
-msgstr ""

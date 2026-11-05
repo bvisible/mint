@@ -3493,3 +3493,133 @@ msgstr "Ce client règle {0} % de ses factures : {1} de ses {2} dernières factu
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:187
 msgid "Total of the credit note"
 msgstr "Total de l'avoir"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:158
+#, python-brace-format
+msgid "A credit note of {0} was prepared as a draft: {1}."
+msgstr "Un avoir de {0} a été préparé en brouillon : {1}."
+
+#: mint/apis/statement_follow_up.py:671 mint/apis/statement_follow_up.py:676
+msgid "A rule is for the short payments of a customer."
+msgstr "Une règle concerne les paiements inférieurs à la facture d'un client."
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:45
+msgid "A rule that prepares or makes the credit note by itself needs the usual share of the customer."
+msgstr "Une règle qui prépare l'avoir ou le fait seule a besoin de la part habituelle du client."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:259
+#, python-brace-format, python-format
+msgid "Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}."
+msgstr "S'applique à un paiement d'environ {0} % de la facture. Confirmée {1} fois par une personne : « Le faire seule » dès {2}."
+
+#. Option for the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:67
+msgid "automatic"
+msgstr "Automatique"
+
+#. Label of a Section Break field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:73
+msgid "Habit of the customer"
+msgstr "Habitudes du client"
+
+#. Description of the 'Confirmations' (Int) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:94
+msgid "How many times a person confirmed this handling for this customer. The level automatic is only available from three."
+msgstr "Nombre de fois qu'une personne a confirmé ce traitement pour ce client. Le niveau « automatic » n'est disponible qu'à partir de trois."
+
+#. Label of a Date field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:103
+msgid "Last confirmed on"
+msgstr "Dernière confirmation le"
+
+#: frontend/src/components/features/StatementImports/utils.ts:63
+#, python-brace-format
+msgid "Made by itself by the rule of the customer, credit note {0}"
+msgstr "Avoir {0} fait seul par la règle du client"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:253
+msgid "Make it by itself"
+msgstr "Le faire seule"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:260
+#, python-brace-format
+msgid "No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person."
+msgstr "Aucune règle pour l'instant : choisir un niveau en crée une à partir de ce paiement. « Le faire seule » est disponible après {0} confirmations par une personne."
+
+#. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
+#. Name of a DocType
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:161
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:113
+msgid "Payment Gap Rule"
+msgstr "Règle d'écart de paiement"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:253
+msgid "Prepare it as a draft"
+msgstr "Le préparer en brouillon"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:253
+msgid "Propose it to me"
+msgstr "Me le proposer"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:243
+msgid "Rule for this customer"
+msgstr "Règle pour ce client"
+
+#. Option for the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:67
+msgid "suggest"
+msgstr "Proposer"
+
+#. Description of the 'Level' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:62
+msgid "suggest: the card proposes it. draft: the credit note is prepared as a draft. automatic: it is made by itself, only after repeated confirmations."
+msgstr "« suggest » : la carte le propose. « draft » : l'avoir est préparé en brouillon. « automatic » : il est fait seul, uniquement après des confirmations répétées."
+
+#. Description of the 'Account' (Link) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:82
+msgid "The account of the credit note or of the gap. Empty: the one of the customer's previous credit notes, else the company's gap account."
+msgstr "Le compte de l'avoir ou de l'écart. Vide : celui des avoirs précédents du client, sinon le compte des écarts de paiement de la société."
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:48
+#, python-brace-format
+msgid "The level automatic is available after {0} confirmations by a person: {1} so far."
+msgstr "Le niveau « automatic » est disponible après {0} confirmations par une personne : {1} pour l'instant."
+
+#. Description of the 'Payment Gap Rule' (Link) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:164
+msgid "The rule of the customer that prepared or made the handling of this line."
+msgstr "La règle du client qui a préparé ou fait le traitement de cette ligne."
+
+#. Description of the 'Usual share of the invoice' (Percent) field in DocType
+#. 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:76
+msgid "The share of the invoice this customer usually pays. The rule applies to a payment within two points of it."
+msgstr "La part de la facture que ce client paie habituellement. La règle s'applique à un paiement à deux points près de cette part."
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:42
+msgid "The usual share is a percentage between 0 and 100."
+msgstr "La part habituelle est un pourcentage compris entre 0 et 100."
+
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:58
+#, python-brace-format
+msgid "There is already a rule for {0} in {1}: {2}."
+msgstr "Il existe déjà une règle pour {0} dans {1} : {2}."
+
+#: mint/apis/gap_rule.py:67 mint/apis/statement_follow_up.py:662
+msgid "Unknown level or handling of the rule."
+msgstr "Niveau ou traitement de la règle inconnu."
+
+#. Label of a Percent field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:79
+msgid "Usual share of the invoice"
+msgstr "Part habituelle de la facture"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:269
+msgid "Validate the draft and reconcile"
+msgstr "Valider le brouillon et rapprocher"
+
+#. Description of the 'Balance' (Select) field in DocType 'Payment Gap Rule'
+#: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:52
+msgid "What becomes of the balance when this customer pays less than the invoice, beyond a small gap."
+msgstr "Ce que devient le solde lorsque ce client paie moins que la facture, au-delà d'un petit écart."
