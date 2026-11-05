@@ -205,6 +205,17 @@ FORCE_REBUILD=1 yarn build
 - ⚠️ Path atypique : artefacts dans `mint/public/mint/` (pas `public/frontend/`).
 - **proxyOptions.ts**: `require('../../../sites/common_site_config.json')` enveloppé dans try/catch avec fallback `webserver_port=8000` (dev-only, commit `c0dec9c`).
 
+## Naming for the v16 move: the word Mint disappears (Daniel, 05.11.2026)
+
+This app becomes ERPNext's `banking/` module at v16. Everything NEW built here for the bank and the reconciliation does
+not carry the name Mint: visible texts, settings labels, message names, file names, user documentation say « bank »,
+« reconciliation », « banking », and follow what upstream's `banking/` calls things (`Bank Transaction Rule`,
+`Bank Statement Import Log`, route `/banking/…`, same `src/` tree). A new file is named for what it does
+(`party_reconciliation.py`, `payment_gap.py`), never `mint_*`; its settings live on the company (Neoffice Company
+Settings), not on Mint Settings. The current app name is written in ONE place per layer (the `API` constant of
+`frontend/src/components/features/PartyReconciliation/api.ts`, the Python module path); the desk bridge
+(`frontend/src/lib/deskBridge.tsx`) reads it from the address. Existing doctypes keep their names until the move.
+
 ## Discipline fork-upstream (OBLIGATOIRE en début de session)
 
 Mint est un **fork** de `The-Commit-Company/mint`. On a beaucoup customisé (frontend layout Frappe natif, EBICS XML, PDF, VAT/Swiss). Pour ne pas refaire le travail déjà fait — comme cherry-picker 9 commits dont 8 étaient déjà intégrés manuellement (session du 2026-05-14) — exécuter ce diagnostic AVANT toute action liée à l'upstream :

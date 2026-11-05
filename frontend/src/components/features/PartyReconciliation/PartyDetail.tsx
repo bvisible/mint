@@ -152,60 +152,62 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                 </div>
             )}
 
-            <div className="grid gap-4 @5xl:grid-cols-2">
+            {/* The two tables side by side, each with its own scrollbar: a long list of invoices on the left never
+                pushes what settles them out of sight, and what is ticked on one side is seen beside the other. */}
+            <div className="grid gap-4 @3xl:grid-cols-2">
                 {/* Left: what has to be settled */}
                 <section className="flex flex-col gap-2 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                         <h3 className="font-medium">{_("Open invoices")}</h3>
-                        <div className="relative w-48">
-                            <Search className="absolute left-2 top-2.5 size-4 text-muted-foreground" />
-                            <Input className="pl-7 h-9" value={invoiceSearch} onChange={(event) => setInvoiceSearch(event.target.value)} placeholder={_("Amount or reference")} />
+                        <div className="relative w-44">
+                            <Search className="absolute left-2 top-2 size-4 text-muted-foreground" />
+                            <Input className="pl-7 h-8 text-sm" value={invoiceSearch} onChange={(event) => setInvoiceSearch(event.target.value)} placeholder={_("Amount or reference")} />
                         </div>
                     </div>
-                    <div className="max-h-[45vh] overflow-y-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-8" />
-                                <TableHead>{_("Date")}</TableHead>
-                                <TableHead>{_("Invoice")}</TableHead>
-                                <TableHead className="text-right">{_("Due")}</TableHead>
-                                <TableHead className="text-right">{_("To settle")}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {invoices.map((row) => {
-                                const key = invoiceKey(row)
-                                const ticked = key in invoicePicks
-                                const problem = ticked ? amountProblem(invoicePicks[key], row.outstanding_amount) : null
-                                const toggle = () => tick(setInvoicePicks, key, !ticked, row.outstanding_amount)
-                                return (
-                                    <TableRow key={key} data-state={ticked ? "selected" : undefined} className="cursor-pointer"
-                                        onClick={() => setVoucher({ type: row.invoice_type, name: row.invoice_number })}
-                                        onContextMenu={(event) => menuFor(event, row.invoice_type, row.invoice_number, row.reference, toggle, ticked)}>
-                                        <TableCell onClick={(event) => event.stopPropagation()}>
-                                            <Checkbox checked={ticked} onCheckedChange={(on) => tick(setInvoicePicks, key, on === true, row.outstanding_amount)} aria-label={_("Tick")} />
-                                        </TableCell>
-                                        <TableCell className="whitespace-nowrap">{formatDate(row.invoice_date)}</TableCell>
-                                        <TableCell className="min-w-0">
-                                            <div className="font-medium">{row.invoice_number}</div>
-                                            {row.reference && <div className="text-xs text-muted-foreground truncate max-w-48">{row.reference}</div>}
-                                        </TableCell>
-                                        <TableCell className="text-right whitespace-nowrap">{row.due_date ? formatDate(row.due_date) : ""}</TableCell>
-                                        <TableCell className="text-right" onClick={(event) => event.stopPropagation()}>
-                                            {ticked ? (
-                                                <Input className={cn("h-8 w-28 text-right font-mono tabular-nums ml-auto", problem && "border-destructive")} title={problem ?? ""}
-                                                    value={invoicePicks[key]} onChange={(event) => setInvoicePicks((previous) => ({ ...previous, [key]: event.target.value }))} />
-                                            ) : (
-                                                <span className="font-mono tabular-nums">{formatCurrency(row.outstanding_amount, row.currency)}</span>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })}
-                            {invoices.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-6">{_("No open invoice.")}</TableCell></TableRow>}
-                        </TableBody>
-                    </Table>
+                    <div className="max-h-[45vh] @3xl:max-h-[calc(100vh-24rem)] min-h-40 overflow-y-auto rounded-md border [&_[data-slot=table-container]]:overflow-visible">
+                        <Table className="text-[13px]">
+                            <TableHeader className="sticky top-0 bg-card">
+                                <TableRow>
+                                    <TableHead className="w-7 px-2" />
+                                    <TableHead className="px-2">{_("Date")}</TableHead>
+                                    <TableHead className="px-2">{_("Invoice")}</TableHead>
+                                    <TableHead className="px-2 text-right">{_("To settle")}</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {invoices.map((row) => {
+                                    const key = invoiceKey(row)
+                                    const ticked = key in invoicePicks
+                                    const problem = ticked ? amountProblem(invoicePicks[key], row.outstanding_amount) : null
+                                    const toggle = () => tick(setInvoicePicks, key, !ticked, row.outstanding_amount)
+                                    return (
+                                        <TableRow key={key} data-state={ticked ? "selected" : undefined} className="cursor-pointer"
+                                            onClick={() => setVoucher({ type: row.invoice_type, name: row.invoice_number })}
+                                            onContextMenu={(event) => menuFor(event, row.invoice_type, row.invoice_number, row.reference, toggle, ticked)}>
+                                            <TableCell className="px-2 py-1.5" onClick={(event) => event.stopPropagation()}>
+                                                <Checkbox checked={ticked} onCheckedChange={(on) => tick(setInvoicePicks, key, on === true, row.outstanding_amount)} aria-label={_("Tick")} />
+                                            </TableCell>
+                                            <TableCell className="px-2 py-1.5 whitespace-nowrap">{formatDate(row.invoice_date)}</TableCell>
+                                            <TableCell className="px-2 py-1.5 min-w-0">
+                                                <div className="font-medium">{row.invoice_number}</div>
+                                                <div className="text-xs text-muted-foreground truncate max-w-40">
+                                                    {[row.due_date ? `${_("Due")} ${formatDate(row.due_date)}` : "", row.reference].filter(Boolean).join(" · ")}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="px-2 py-1.5 text-right" onClick={(event) => event.stopPropagation()}>
+                                                {ticked ? (
+                                                    <Input className={cn("h-7 w-24 text-right font-mono tabular-nums ml-auto px-2 text-[13px]", problem && "border-destructive")} title={problem ?? ""}
+                                                        value={invoicePicks[key]} onChange={(event) => setInvoicePicks((previous) => ({ ...previous, [key]: event.target.value }))} />
+                                                ) : (
+                                                    <span className="font-mono tabular-nums">{formatCurrency(row.outstanding_amount, row.currency)}</span>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                                {invoices.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">{_("No open invoice.")}</TableCell></TableRow>}
+                            </TableBody>
+                        </Table>
                     </div>
                 </section>
 
@@ -213,58 +215,58 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                 <section className="flex flex-col gap-2 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                         <h3 className="font-medium">{_("Payments, credit notes and entries")}</h3>
-                        <div className="relative w-48">
-                            <Search className="absolute left-2 top-2.5 size-4 text-muted-foreground" />
-                            <Input className="pl-7 h-9" value={settlementSearch} onChange={(event) => setSettlementSearch(event.target.value)} placeholder={_("Amount or reference")} />
+                        <div className="relative w-44">
+                            <Search className="absolute left-2 top-2 size-4 text-muted-foreground" />
+                            <Input className="pl-7 h-8 text-sm" value={settlementSearch} onChange={(event) => setSettlementSearch(event.target.value)} placeholder={_("Amount or reference")} />
                         </div>
                     </div>
-                    <div className="max-h-[45vh] overflow-y-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-8" />
-                                <TableHead>{_("Date")}</TableHead>
-                                <TableHead>{_("Document")}</TableHead>
-                                <TableHead>{_("Reference")}</TableHead>
-                                <TableHead className="text-right">{_("To use")}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {settlements.map((row) => {
-                                const key = settlementKey(row)
-                                const ticked = key in settlementPicks
-                                const problem = ticked ? amountProblem(settlementPicks[key], row.amount) : null
-                                const toggle = () => tick(setSettlementPicks, key, !ticked, row.amount)
-                                return (
-                                    <TableRow key={key} data-state={ticked ? "selected" : undefined} className="cursor-pointer"
-                                        onClick={() => setVoucher({ type: row.reference_type, name: row.reference_name })}
-                                        onContextMenu={(event) => menuFor(event, row.reference_type, row.reference_name, row.reference, toggle, ticked)}>
-                                        <TableCell onClick={(event) => event.stopPropagation()}>
-                                            <Checkbox checked={ticked} onCheckedChange={(on) => tick(setSettlementPicks, key, on === true, row.amount)} aria-label={_("Tick")} />
-                                        </TableCell>
-                                        <TableCell className="whitespace-nowrap">{formatDate(row.posting_date)}</TableCell>
-                                        <TableCell className="min-w-0">
-                                            <Badge variant="secondary">{settlementKind(partyType, row)}</Badge>
-                                            <div className="text-xs mt-0.5">{row.reference_name}</div>
-                                        </TableCell>
-                                        <TableCell className="min-w-0">
-                                            <div className="truncate max-w-40">{row.reference}</div>
-                                            {row.remark && <div className="text-xs text-muted-foreground truncate max-w-40">{row.remark}</div>}
-                                        </TableCell>
-                                        <TableCell className="text-right" onClick={(event) => event.stopPropagation()}>
-                                            {ticked ? (
-                                                <Input className={cn("h-8 w-28 text-right font-mono tabular-nums ml-auto", problem && "border-destructive")} title={problem ?? ""}
-                                                    value={settlementPicks[key]} onChange={(event) => setSettlementPicks((previous) => ({ ...previous, [key]: event.target.value }))} />
-                                            ) : (
-                                                <span className="font-mono tabular-nums">{formatCurrency(row.amount, row.currency)}</span>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })}
-                            {settlements.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-6">{_("Nothing to apply.")}</TableCell></TableRow>}
-                        </TableBody>
-                    </Table>
+                    <div className="max-h-[45vh] @3xl:max-h-[calc(100vh-24rem)] min-h-40 overflow-y-auto rounded-md border [&_[data-slot=table-container]]:overflow-visible">
+                        <Table className="text-[13px]">
+                            <TableHeader className="sticky top-0 bg-card">
+                                <TableRow>
+                                    <TableHead className="w-7 px-2" />
+                                    <TableHead className="px-2">{_("Date")}</TableHead>
+                                    <TableHead className="px-2">{_("Document")}</TableHead>
+                                    <TableHead className="px-2 text-right">{_("To use")}</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {settlements.map((row) => {
+                                    const key = settlementKey(row)
+                                    const ticked = key in settlementPicks
+                                    const problem = ticked ? amountProblem(settlementPicks[key], row.amount) : null
+                                    const toggle = () => tick(setSettlementPicks, key, !ticked, row.amount)
+                                    return (
+                                        <TableRow key={key} data-state={ticked ? "selected" : undefined} className="cursor-pointer"
+                                            onClick={() => setVoucher({ type: row.reference_type, name: row.reference_name })}
+                                            onContextMenu={(event) => menuFor(event, row.reference_type, row.reference_name, row.reference, toggle, ticked)}>
+                                            <TableCell className="px-2 py-1.5" onClick={(event) => event.stopPropagation()}>
+                                                <Checkbox checked={ticked} onCheckedChange={(on) => tick(setSettlementPicks, key, on === true, row.amount)} aria-label={_("Tick")} />
+                                            </TableCell>
+                                            <TableCell className="px-2 py-1.5 whitespace-nowrap">{formatDate(row.posting_date)}</TableCell>
+                                            <TableCell className="px-2 py-1.5 min-w-0">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Badge variant="secondary" className="shrink-0">{settlementKind(partyType, row)}</Badge>
+                                                    <span className="font-medium truncate">{row.reference_name}</span>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground truncate max-w-48">
+                                                    {[row.reference, row.remark].filter(Boolean).join(" · ")}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="px-2 py-1.5 text-right" onClick={(event) => event.stopPropagation()}>
+                                                {ticked ? (
+                                                    <Input className={cn("h-7 w-24 text-right font-mono tabular-nums ml-auto px-2 text-[13px]", problem && "border-destructive")} title={problem ?? ""}
+                                                        value={settlementPicks[key]} onChange={(event) => setSettlementPicks((previous) => ({ ...previous, [key]: event.target.value }))} />
+                                                ) : (
+                                                    <span className="font-mono tabular-nums">{formatCurrency(row.amount, row.currency)}</span>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                                {settlements.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">{_("Nothing to apply.")}</TableCell></TableRow>}
+                            </TableBody>
+                        </Table>
                     </div>
                 </section>
             </div>
