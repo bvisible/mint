@@ -156,3 +156,42 @@ export type GapHistory = {
     share: number,
     proposal: "credit_note" | null,
 }
+
+//// The invoices a bank line settles (mint.apis.line_invoices): the open invoices of the party, the payments prepared for the line.
+export type LineInvoice = {
+    name: string,
+    posting_date: string,
+    due_date: string | null,
+    outstanding: number,
+    total: number,
+    bill_no?: string | null,
+    same_amount: boolean,
+}
+
+export type LineEntry = {
+    name: string,
+    party: string | null,
+    amount: number,
+    by: string,
+    on: string,
+    references: { invoice: string, amount: number }[],
+}
+
+export type LineCandidates = {
+    bank_transaction: string,
+    show: boolean,
+    direction: "in" | "out",
+    amount: number,
+    currency: string,
+    reason: "none" | "several" | "paid" | "open",
+    reference_hint: string | null,
+    paid_on: string | null,
+    invoice_type: "Sales Invoice" | "Purchase Invoice",
+    party_type: "Customer" | "Supplier",
+    party: string | null,
+    party_source: "chosen" | "transaction" | "import" | "iban" | null,
+    invoices: LineInvoice[],
+    recognised: string[],
+    drafts: LineEntry[],
+    submitted: LineEntry[],
+}

@@ -45,6 +45,8 @@ import { Link } from "react-router"
 //// Neoffice — added: the gap decision of a bank line that came from an import (filter, row chip, card).
 import { useLinesToDecide } from "@/components/features/StatementImports/useLinesToDecide"
 import GapDecisionCard from "@/components/features/StatementImports/GapDecisionCard"
+//// Neoffice — added: the invoices a line settles when the import named none, several, or one already paid.
+import LineInvoicesCard from "@/components/features/StatementImports/LineInvoicesCard"
 import { kindLabel } from "@/components/features/StatementImports/utils"
 
 const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
@@ -595,6 +597,8 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
         </TooltipProvider>
         {/* //// Neoffice — added: a gap left by an import waits here for a person's decision. */}
         <GapDecisionCard key={transaction.name} transaction={transaction} />
+        {/* //// Neoffice — added: one amount for several invoices, a reference that does not match, the payment as a draft. */}
+        <LineInvoicesCard key={`${transaction.name}-invoices`} transaction={transaction} />
         {transaction.matched_rule && <RuleAction transaction={transaction} />}
         <VouchersForTransaction transaction={transaction} contentHeight={contentHeight} />
     </div>
