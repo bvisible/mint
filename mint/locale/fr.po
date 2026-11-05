@@ -3796,3 +3796,37 @@ msgstr "Choisissez le {0} concerné : ses factures ouvertes viennent ensuite."
 #, python-brace-format
 msgid "{0} has no open invoice in this currency."
 msgstr "{0} n'a aucune facture ouverte dans cette devise."
+
+#: frontend/src/pages/BankReconciliation.tsx:95
+msgid "Bank Files"
+msgstr "Fichiers bancaires"
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:41
+msgid "CSV or Excel file"
+msgstr "Fichier CSV ou Excel"
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:26
+msgid "Every bank file that came in, by the bank connection or deposited by hand, and what became of each of its lines: passed by the import, reconciled afterwards, or still waiting for someone."
+msgstr "Chaque fichier bancaire reçu, par la connexion bancaire ou déposé à la main, et le sort de chacune de ses lignes : passée par l'import, rapprochée ensuite, ou encore en attente de quelqu'un."
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:32
+msgid "Import a bank file"
+msgstr "Importer un fichier bancaire"
+
+#: frontend/src/components/features/StatementImports/StatementImportLines.tsx:37
+msgid "Lines shown"
+msgstr "Lignes affichées"
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:40
+#, python-brace-format
+msgid "Process the {0} that wait"
+msgstr "Traiter les {0} en attente"
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:37
+msgid "Statement from the bank (XML or PDF)"
+msgstr "Relevé de la banque (XML ou PDF)"
+
+#: frontend/src/components/features/StatementImports/StatementImportLines.tsx:39
+#, python-brace-format
+msgid "Waiting ({0})"
+msgstr "En attente ({0})"
