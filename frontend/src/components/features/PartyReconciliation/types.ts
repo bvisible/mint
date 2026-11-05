@@ -85,6 +85,7 @@ export type VoucherDetailData = {
     attachments: number,
     route: string,
     pdf_url?: string | null,
+    printable?: boolean,
 }
 
 /** What the user ticked: the row key and the amount, as typed. */

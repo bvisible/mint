@@ -12,6 +12,7 @@ import { bankRecRecordPaymentModalAtom, bankRecUnreconcileModalAtom } from "@/co
 import { UnreconciledTransaction, useRefreshUnreconciledTransactions } from "@/components/features/BankReconciliation/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import LinkFieldCombobox from "@/components/common/LinkFieldCombobox"
 import { Checkbox } from "@/components/ui/checkbox"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Input } from "@/components/ui/input"
@@ -33,11 +34,13 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
     const setUnreconcile = useSetAtom(bankRecUnreconcileModalAtom)
     const setRecordPaymentOpen = useSetAtom(bankRecRecordPaymentModalAtom)
 
+    // the party the person picked when the import found nobody, or not the right one: its open invoices come from it
+    const [chosenParty, setChosenParty] = useState<string | null>(null)
     // revalidated on focus: a draft validated in its own tab shows up as soon as the person comes back
     const { data } = useFrappeGetCall<{ message: LineCandidates | null }>(
         `${LINE_API}.get_candidates`,
-        { bank_transaction: transaction.name },
-        ["line-invoices", transaction.name],
+        { bank_transaction: transaction.name, party: chosenParty ?? undefined },
+        ["line-invoices", transaction.name, chosenParty ?? ""],
         { revalidateOnFocus: true, keepPreviousData: true },
     )
     const { call: settle, loading: settling, error: settleError } = useFrappePostCall<{ message: { payment_entry: string, draft: boolean } }>(`${LINE_API}.settle`)
@@ -151,12 +154,25 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
                     <Info className="size-4 text-muted-foreground" />
                 </span>
             </div>
-            <p className="text-sm leading-relaxed">
-                {lead}
-                {candidates.party && (
-                    <span className="text-muted-foreground"> {_(candidates.party_type)} <span className="font-medium text-foreground">{candidates.party}</span>. {found}</span>
-                )}
-            </p>
+            <p className="text-sm leading-relaxed">{lead}</p>
+
+            {/* WHO is behind the payment comes first: the invoices listed below are the ones of this person and nobody else */}
+            {entries.length === 0 && (
+                <div className="flex flex-wrap items-center gap-3 rounded-md bg-muted/50 px-3 py-2">
+                    <span className="text-sm text-muted-foreground">{_(candidates.party_type)}</span>
+                    <div className="min-w-64 flex-1">
+                        <LinkFieldCombobox
+                            doctype={candidates.party_type}
+                            value={candidates.party ?? ""}
+                            onChange={(value) => { setChosenParty(value || null); setPicked({}) }}
+                        />
+                    </div>
+                    {candidates.party && candidates.party_label && candidates.party_label !== candidates.party && (
+                        <span className="text-sm font-medium">{candidates.party_label}</span>
+                    )}
+                    {found && <span className="text-xs text-muted-foreground">{found}</span>}
+                </div>
+            )}
 
             {entries.map((entry) => {
                 const isDraft = candidates.drafts.some((draft) => draft.name === entry.name)
@@ -184,7 +200,13 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
                 )
             })}
 
-            {entries.length === 0 && (
+            {entries.length === 0 && !candidates.party && (
+                <p className="text-sm text-muted-foreground">{_("Pick the {0} that paid: its open invoices come next.", [_(candidates.party_type)])}</p>
+            )}
+            {entries.length === 0 && candidates.party && candidates.invoices.length === 0 && (
+                <p className="text-sm text-muted-foreground">{_("{0} has no open invoice in this currency.", [candidates.party_label ?? candidates.party])}</p>
+            )}
+            {entries.length === 0 && candidates.party && candidates.invoices.length > 0 && (
                 <>
                     <table className="w-full text-sm">
                         <thead>
@@ -252,7 +274,7 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
 
             {(settleError || submitError || deleteError) && <ErrorBanner error={settleError ?? submitError ?? deleteError} />}
             <div className="flex flex-wrap items-center gap-3">
-                {entries.length === 0 && (
+                {entries.length === 0 && candidates.party && candidates.invoices.length > 0 && (
                     <>
                         <Button disabled={!complete || busy} onClick={onSettle}>{_("Validate and reconcile")}</Button>
                         <Button variant="outline" disabled={!complete || busy} onClick={onPrepare}>{_("Prepare the draft")}</Button>

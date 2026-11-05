@@ -189,6 +189,7 @@ export type LineCandidates = {
     invoice_type: "Sales Invoice" | "Purchase Invoice",
     party_type: "Customer" | "Supplier",
     party: string | null,
+    party_label: string | null,
     party_source: "chosen" | "transaction" | "import" | "iban" | null,
     invoices: LineInvoice[],
     recognised: string[],

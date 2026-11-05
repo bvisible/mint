@@ -187,9 +187,12 @@ def get_candidates(bank_transaction: str, party: str | None = None) -> dict | No
 	invoices = (
 		_open_invoices(doctype, chosen_party, bank_line.company, bank_line.currency, amount) if chosen_party else []
 	)
-	show = bool(drafts or submitted) or (
-		bool(line) and reason in ("none", "paid", "several") and bool(invoices)
+	party_label = (
+		frappe.db.get_value(party_type, chosen_party, "customer_name" if receiving else "supplier_name") if chosen_party else None
 	)
+	# shown whenever the import left the line with no single invoice: with the party found, its open invoices; without, the
+	# search for the party (the person says who it is, then the invoices of that person come)
+	show = bool(drafts or submitted) or (bool(line) and reason in ("none", "paid", "several"))
 	return {
 		"bank_transaction": bank_transaction,
 		"show": show,
@@ -203,6 +206,7 @@ def get_candidates(bank_transaction: str, party: str | None = None) -> dict | No
 		"invoice_type": doctype,
 		"party_type": party_type,
 		"party": chosen_party,
+		"party_label": party_label,
 		"party_source": source,
 		"invoices": invoices,
 		"recognised": recognised,

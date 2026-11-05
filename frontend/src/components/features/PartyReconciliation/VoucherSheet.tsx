@@ -1,5 +1,5 @@
-//// Neoffice — added file (no upstream equivalent). What a click on a row shows: the document as it is printed (the same
-//// PDF as the desk's side preview), the lines, the remark, who made it.
+//// Neoffice — added file (no upstream equivalent). What a click on a row shows: the document drawn on its sheet as the desk's
+//// side preview draws it (its print format, no PDF in between; the PDF and the print one click away), the lines, who made it.
 import { useFrappeGetCall } from "frappe-react-sdk"
 import { Copy, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatDate } from "@/lib/date"
 import _ from "@/lib/translate"
 import type { VoucherDetailData } from "./types"
+import PrintSheet, { type PrintAnswer } from "./PrintSheet"
 import { API } from "./api"
 
 export type VoucherRef = { type: string, name: string }
@@ -32,6 +33,13 @@ const VoucherSheet = ({ voucher, onClose }: Props) => {
         { revalidateOnFocus: false },
     )
     const detail = data?.message
+    // the sheet is asked for once the document is known to be printable by this person
+    const { data: printed, isLoading: printing } = useFrappeGetCall<{ message: PrintAnswer }>(
+        `${API}.get_voucher_print`,
+        { voucher_type: voucher?.type, voucher_name: voucher?.name },
+        voucher && detail?.printable ? ["party-reconciliation", "voucher-print", voucher.type, voucher.name] : null,
+        { revalidateOnFocus: false },
+    )
 
     const copy = async (text: string) => {
         try {
@@ -64,17 +72,13 @@ const VoucherSheet = ({ voucher, onClose }: Props) => {
                             {detail.remark && <p className="text-sm whitespace-pre-line text-muted-foreground">{detail.remark}</p>}
                             <p className="text-xs text-muted-foreground">{_("Created")} {formatDate(detail.creation)}</p>
 
-                            {/* the printed document, as the desk's side preview shows it */}
-                            {detail.pdf_url && (
-                                <iframe
-                                    title={detail.name}
-                                    src={`${detail.pdf_url}#view=FitH`}
-                                    className="h-[68vh] w-full rounded-md border bg-white"
-                                />
+                            {/* the document on its sheet, as the desk's side preview shows it */}
+                            {detail.printable && (
+                                <PrintSheet drawn={printed?.message} loading={printing} pdfUrl={detail.pdf_url} title={detail.name} />
                             )}
 
                             {columns.length > 0 && (
-                                <details open={!detail.pdf_url} className="group">
+                                <details open={!detail.printable} className="group">
                                     <summary className="cursor-pointer text-sm font-medium text-muted-foreground select-none">{_("Lines")}</summary>
                                 <Table>
                                     <TableHeader>

@@ -346,6 +346,41 @@ def _pdf_url(voucher) -> str | None:
 	return f"/print-pdf/{quote(file)}?{urlencode(params)}"
 
 
+# //// Neoffice — the document drawn as the desk's side preview draws it (neoffice_theme `live_print_preview`): the HTML of
+# //// its print format and the style, which the screen puts on a sheet of paper, with no PDF in between. For a draft too.
+@frappe.whitelist(methods=["GET"])
+def get_voucher_print(voucher_type: str, voucher_name: str):
+	if voucher_type not in VOUCHER_PAGES:
+		frappe.throw(_("{0} is not a voucher this screen shows.").format(_(voucher_type)), title=_("Invalid Voucher"))
+	voucher = frappe.get_doc(voucher_type, voucher_name)
+	voucher.check_permission("read")
+	frappe.has_permission(voucher_type, "print", doc=voucher, throw=True)
+	from frappe.translate import print_language
+	from frappe.utils.jinja_globals import bundled_asset
+	from frappe.www.printview import get_html_and_style
+
+	try:
+		with print_language(voucher.get("language") or frappe.local.lang):
+			answer = get_html_and_style(
+				doc=voucher_type,
+				name=voucher_name,
+				print_format=frappe.get_meta(voucher_type).default_print_format or None,
+				no_letterhead=0,
+				letterhead=voucher.get("letter_head"),
+			)
+	except frappe.PermissionError:
+		raise
+	except Exception:
+		# the panel says it could not draw; the person still has the lines and the document itself
+		frappe.clear_messages()
+		frappe.local.response.pop("exc_type", None)
+		frappe.log_error("Voucher print preview failed", frappe.get_traceback())
+		return {"error": "render_failed"}
+	# the page the PDF is printed from also loads frappe's print stylesheet: the screen draws the same page
+	answer["print_css"] = bundled_asset("print.bundle.css")
+	return answer
+
+
 @frappe.whitelist(methods=["GET"])
 def get_voucher_detail(voucher_type: str, voucher_name: str):
 	if voucher_type not in VOUCHER_PAGES:
@@ -388,6 +423,8 @@ def get_voucher_detail(voucher_type: str, voucher_name: str):
 		"lines": lines,
 		"attachments": frappe.db.count("File", {"attached_to_doctype": voucher_type, "attached_to_name": voucher_name}),
 		"route": f"/app/{VOUCHER_PAGES[voucher_type]}/{voucher.name}",
-		# the printed document (None without the right to print, and for a draft: the print route serves saved documents)
+		# the PDF of the document (None without the right to print, and for a draft: the print route serves saved documents)
 		"pdf_url": _pdf_url(voucher) if voucher.docstatus == 1 else None,
+		# whether the document can be drawn on the sheet (get_voucher_print): the right to print it
+		"printable": bool(frappe.has_permission(voucher_type, "print", doc=voucher)),
 	}

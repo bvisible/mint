@@ -96,6 +96,17 @@ class TestLineInvoices(GapImportCase):
 		shown = line_invoices.get_candidates(bank_line)
 		self.assertEqual((shown["party"], shown["party_source"]), (customer, "iban"))
 
+	def test_a_payer_nobody_knows_gets_the_search_for_the_party_and_then_its_invoices(self):
+		owed = self._owed("Sales Invoice", self.sales)
+		bank_line = self._bank_line(owed, invoices=[], party_match="", party_name="NOBODY KNOWS THIS NAME")
+		shown = line_invoices.get_candidates(bank_line)
+		# no party, so no invoice of anybody is listed: the person says who it is
+		self.assertEqual((shown["show"], shown["party"], shown["invoices"]), (True, None, []))
+		chosen = line_invoices.get_candidates(bank_line, party=self._customer())
+		self.assertEqual((chosen["party"], chosen["party_source"]), (self._customer(), "chosen"))
+		self.assertIn(self.sales, [row["name"] for row in chosen["invoices"]])
+		self.assertTrue(chosen["party_label"])
+
 	def test_a_line_with_one_open_invoice_is_the_business_of_the_gap_card_not_of_this_one(self):
 		# a payment that does not settle the invoice (the import passes an exact one by itself): the card of the gap is for it
 		owed = self._owed("Sales Invoice", self.sales)

@@ -102,6 +102,14 @@ class TestPartyReconciliation(FrappeTestCase):
 		self.assertTrue(shown["pdf_url"].startswith("/print-pdf/"))
 		self.assertIn("doctype=" + row["reference_type"].replace(" ", "+"), shown["pdf_url"])
 		self.assertIn("name=" + row["reference_name"], shown["pdf_url"])
+		self.assertTrue(shown["printable"])
+		# the same document drawn on the sheet, as the desk's side preview draws it: no PDF in between
+		with as_role("accountant", email=HOME):
+			drawn = pr.get_voucher_print(row["reference_type"], row["reference_name"])
+		self.assertIn("print-format", drawn["html"])
+		self.assertTrue(drawn["print_css"])
+		with as_role("Guest"), self.assertRaises(frappe.PermissionError):
+			pr.get_voucher_print(row["reference_type"], row["reference_name"])
 		with as_role("accountant", email=HOME), self.assertRaises(frappe.ValidationError):
 			pr.get_voucher_detail("User", "Administrator")
 
