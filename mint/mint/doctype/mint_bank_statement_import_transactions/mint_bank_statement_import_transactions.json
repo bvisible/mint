@@ -148,6 +148,35 @@
    "description": "The structured reference of the payment (QR or creditor reference) as the statement carries it."
   },
   {
+   "fieldname": "bank_transaction",
+   "fieldtype": "Link",
+   "label": "Bank Transaction",
+   "options": "Bank Transaction",
+   "read_only": 1,
+   "description": "The Bank Transaction this line created: what became of the line is read from it."
+  },
+  {
+   "fieldname": "decision",
+   "fieldtype": "Select",
+   "label": "Decision",
+   "options": "\npassed_gap\nleft_open",
+   "read_only": 1,
+   "description": "What a person decided for a payment gap left to them."
+  },
+  {
+   "fieldname": "decided_by",
+   "fieldtype": "Link",
+   "label": "Decided By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "decided_on",
+   "fieldtype": "Datetime",
+   "label": "Decided On",
+   "read_only": 1
+  },
+  {
    "fieldname": "difference_kind",
    "fieldtype": "Select",
    "label": "Payment Gap",
@@ -174,7 +203,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-11-05 10:30:00.000000",
+ "modified": "2026-11-05 11:30:00.000000",
  "modified_by": "Administrator",
  "module": "Mint",
  "name": "Mint Bank Statement Import Transactions",

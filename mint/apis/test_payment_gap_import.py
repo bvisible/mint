@@ -18,7 +18,9 @@ from mint.apis.test_payment_gap import COMPANY, GAP_ACCOUNT, LEDGER, _an_invoice
 # role-check: ok the statement import is a job of the system: nobody is in front of the screen when it runs
 
 
-class TestPaymentGapImport(FrappeTestCase):
+class GapImportCase(FrappeTestCase):
+	"""The site, the invoices, the settings and the import helper that the tests of an import below share."""
+
 	@classmethod
 	def setUpClass(cls):
 		super().setUpClass()
@@ -85,6 +87,9 @@ class TestPaymentGapImport(FrappeTestCase):
 		statement.reload()
 		return statement
 
+
+
+class TestPaymentGapImport(GapImportCase):
 	# -- what the line becomes --------------------------------------------------------------------------------------
 
 	def test_an_exact_line_is_the_old_path_and_carries_no_verdict(self):

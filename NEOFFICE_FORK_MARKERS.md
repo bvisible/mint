@@ -116,6 +116,9 @@ Mixed. **Ours only** (all added for the CAMT.053 flow, `5bb4045` → `957a5b9`):
 Added for the payment gaps (05.11, `mint/apis/payment_gap.py`): `remittance_reference` (the structured
 reference the reader matched the invoice on), `difference_kind` / `difference_amount` (what the decider
 found when the sum did not settle the invoice to the cent) and `payment_entry` (the entry the import made).
+Added for the follow-up of an import (`mint/apis/statement_follow_up.py`): `bank_transaction` (the bank line the import line
+created: what became of the line is read from it, never copied back) and `decision`, `decided_by`, `decided_on` (that a
+person decided to pass or leave open a gap, who and when: the only thing no other document records).
 Pure additions; they leave with the import doctype when the move to `banking/` renames it.
 The `columns` widths and the `in_list_view` flips on `reference`, `imported` and
 `string_amount` are **upstream's** v1.5.0 (`89e7929`). No upstream field removed.

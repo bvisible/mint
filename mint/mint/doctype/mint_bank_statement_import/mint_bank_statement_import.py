@@ -250,6 +250,9 @@ class MintBankStatementImport(Document):
 				bank_tx.insert()
 				bank_tx.submit()
 				stats["created"] += 1
+				# //// Neoffice — the line remembers the Bank Transaction it created: that link is how the import follows the
+				# //// line afterwards (what was decided in the reconciliation, by whom, when) without copying a status that drifts.
+				transaction.db_set("bank_transaction", bank_tx.name)
 
 				# First: check if a Payment Entry already exists
 				# (e.g. created by Payment Proposal before bank confirmation)
