@@ -3,7 +3,7 @@ import { useFrappeGetCall } from "frappe-react-sdk"
 import { useState } from "react"
 import ErrorBanner from "@/components/ui/error-banner"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatDate } from "@/lib/date"
 import { formatCurrency } from "@/lib/numbers"
@@ -16,7 +16,8 @@ import { describeLine, documentHref, stateLabel, stateTone } from "./utils"
 const WAITING = ["to_decide", "to_match"]
 
 const StatementImportLines = ({ name, currency, version }: { name: string, currency: string, version: number }) => {
-    const [onlyWaiting, setOnlyWaiting] = useState(false)
+    // the view the person chose; until they choose, what waits when something waits, else everything
+    const [chosen, setChosen] = useState<"waiting" | "all" | null>(null)
     const { data, error, isLoading } = useFrappeGetCall<{ message: ImportOverview }>(
         `${API}.get_import_overview`,
         { name },
@@ -27,14 +28,20 @@ const StatementImportLines = ({ name, currency, version }: { name: string, curre
     if (error) return <ErrorBanner error={error} />
     if (isLoading || !data) return <Skeleton className="h-24 w-full" />
 
-    const lines = data.message.lines.filter((line) => !onlyWaiting || WAITING.includes(line.state))
+    const waitingCount = data.message.lines.filter((line) => WAITING.includes(line.state)).length
+    const view = chosen ?? (waitingCount > 0 ? "waiting" : "all")
+    const lines = data.message.lines.filter((line) => view === "all" || WAITING.includes(line.state))
 
     return (
         <div className="flex flex-col gap-3">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Switch checked={onlyWaiting} onCheckedChange={setOnlyWaiting} />
-                {_("Only what still waits")}
-            </label>
+            <div className="flex items-center gap-2" role="group" aria-label={_("Lines shown")}>
+                <Button size="sm" variant={view === "waiting" ? "default" : "outline"} onClick={() => setChosen("waiting")}>
+                    {_("Waiting ({0})", [String(waitingCount)])}
+                </Button>
+                <Button size="sm" variant={view === "all" ? "default" : "outline"} onClick={() => setChosen("all")}>
+                    {_("All ({0})", [String(data.message.lines.length)])}
+                </Button>
+            </div>
             <Table>
                 <TableHeader>
                     <TableRow>
