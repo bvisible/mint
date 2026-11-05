@@ -1,7 +1,8 @@
 //// Neoffice — added file (no upstream equivalent). One import: when, where from, how far along, and its lines.
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { useState } from "react"
-import { useNavigate } from "react-router"
+import { useSetAtom } from "jotai"
+import { bankRecTabAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -13,9 +14,10 @@ import type { StatementImport } from "./types"
 import { STATE_ORDER, sourceLabel, stateLabel, stateTone } from "./utils"
 
 const StatementImportCard = ({ item, currency, version }: { item: StatementImport, currency: string, version: number }) => {
-    const [open, setOpen] = useState(false)
-    const navigate = useNavigate()
+    const setTab = useSetAtom(bankRecTabAtom)
     const { progress, counts } = item
+    // open where something waits (the person has to open it to deal with it), closed where nothing does
+    const [open, setOpen] = useState(progress.waiting > 0)
     const percent = progress.total ? (progress.done / progress.total) * 100 : 0
     const draft = item.docstatus === 0
 
@@ -34,8 +36,8 @@ const StatementImportCard = ({ item, currency, version }: { item: StatementImpor
                         {draft && <Badge variant="outline">{_("Draft")}</Badge>}
                         {!draft && progress.total > 0 && progress.waiting === 0 && <Badge variant="secondary">{_("Everything is dealt with")}</Badge>}
                         {progress.waiting > 0 && (
-                            <Button size="sm" onClick={() => navigate("/")}>
-                                {_("Settle the {0} that wait", [String(progress.waiting)])}
+                            <Button size="sm" onClick={() => setTab("Match and Reconcile")}>
+                                {_("Process the {0} that wait", [String(progress.waiting)])}
                             </Button>
                         )}
                     </div>

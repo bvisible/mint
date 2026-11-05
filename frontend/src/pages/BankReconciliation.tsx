@@ -20,13 +20,21 @@ import { H1 } from "@/components/ui/typography"
 import _ from "@/lib/translate"
 //// Neoffice — added: framed in a tab of the desk (lib/embedded.ts).
 import { EMBEDDED } from "@/lib/embedded"
-import { useLayoutEffect, useRef, useState } from "react"
-//// Neoffice — added: the link to the follow-up of the imports.
-import { Link } from "react-router"
-import { Button } from "@/components/ui/button"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
+//// Neoffice — added: the bank files tab (what each file brought in), and the tab shown as an atom.
+import { useAtom } from "jotai"
+import { bankRecTabAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
+import StatementImportsPanel from "@/components/features/StatementImports/StatementImportsPanel"
 
 
-const BankReconciliation = () => {
+//// Neoffice — changed: takes the tab to open on (the old address of the imports opens the bank files tab) and keeps the tab shown
+//// in an atom, so that a card of the bank files can take the person to the reconciliation tab.
+const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
+
+    const [tab, setTab] = useAtom(bankRecTabAtom)
+    useEffect(() => {
+        if (initialTab) setTab(initialTab)
+    }, [initialTab, setTab])
 
     const [headerHeight, setHeaderHeight] = useState(0)
 
@@ -64,10 +72,7 @@ const BankReconciliation = () => {
                     )}
                     <div className="flex flex-wrap items-center gap-2">
                         <TooltipProvider>
-                            {/* //// Neoffice — added: from the reconciliation to the imports and what became of their lines. */}
-                            <Button variant="outline" size="sm" asChild>
-                                <Link to="/statement-imports">{_("Imports")}</Link>
-                            </Button>
+                            {/* //// Neoffice — removed: the « Imports » button (the bank files are a tab now, below). */}
                             <RuleConfigureButton />
                             <Settings />
                             <ActionLog />
@@ -80,11 +85,14 @@ const BankReconciliation = () => {
                 <BankPicker size="row" />
                 <BankBalance />
             </div>
-            <Tabs defaultValue="Match and Reconcile">
+            {/* //// Neoffice — changed: controlled by the atom (upstream: defaultValue="Match and Reconcile"). */}
+            <Tabs value={tab} onValueChange={setTab}>
                 {/* //// Neoffice — framed in a desk tab, five tabs do not fit the page's width: */}
                 {/* //// centred, they overflowed both edges and the first was cut. They wrap instead. */}
                 <TabsList className={EMBEDDED ? "w-full h-auto flex-wrap justify-start" : "w-full"}>
                     <TabsTrigger value="Match and Reconcile">{_("Match and Reconcile")}</TabsTrigger>
+                    {/* //// Neoffice — added: the bank files that came in, and how to bring one in. */}
+                    <TabsTrigger value="Bank Files">{_("Bank Files")}</TabsTrigger>
                     <TabsTrigger value="Bank Reconciliation Statement">{_("Bank Reconciliation Statement")}</TabsTrigger>
                     <TabsTrigger value="Bank Transactions">{_("Bank Transactions")}</TabsTrigger>
                     <TabsTrigger value="Bank Clearance Summary">{_("Bank Clearance Summary")}</TabsTrigger>
@@ -92,6 +100,10 @@ const BankReconciliation = () => {
                 </TabsList>
                 <TabsContent value="Match and Reconcile">
                     <MatchAndReconcile contentHeight={remainingHeightAfterTabs} />
+                </TabsContent>
+                {/* //// Neoffice — added: the content of the bank files tab. */}
+                <TabsContent value="Bank Files">
+                    <StatementImportsPanel />
                 </TabsContent>
                 <TabsContent value="Bank Reconciliation Statement">
                     <BankReconciliationStatement />

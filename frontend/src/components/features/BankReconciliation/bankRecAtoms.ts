@@ -37,6 +37,9 @@ export const bankRecSelectedTransactionAtom = atomFamily((_id: string) => {
 })
 
 /** Action Modals */
+//// Neoffice — added: the tab of the reconciliation page that is shown. It is an atom, not the state of the page, so that a
+//// card of the bank files (« Process the lines that wait ») can take the person to the reconciliation tab.
+export const bankRecTabAtom = atom<string>("Match and Reconcile")
 export const bankRecTransferModalAtom = atom(false)
 export const bankRecRecordPaymentModalAtom = atom(false)
 export const bankRecRecordJournalEntryModalAtom = atom(false)
