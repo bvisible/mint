@@ -3042,3 +3042,201 @@ msgstr "{0} comptabilisées avec un écart (total {1})"
 #, python-brace-format
 msgid "{0} to decide"
 msgstr "{0} à décider"
+
+#: frontend/src/components/features/StatementImports/utils.ts:40
+msgid "accepted rebate"
+msgstr "rabais accepté"
+
+#: frontend/src/components/features/StatementImports/utils.ts:18
+msgid "Already in the bank"
+msgstr "Déjà dans la banque"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:71
+msgid "Calculated the same way, the day before the period starts."
+msgstr "Calculé de la même manière, la veille du début de la période."
+
+#: frontend/src/components/features/StatementImports/utils.ts:39
+msgid "early payment discount"
+msgstr "escompte"
+
+#: frontend/src/pages/StatementImports.tsx:32
+msgid "Every bank statement that came in, and what became of each of its lines: passed by the import, reconciled afterwards, or still waiting for someone."
+msgstr "Chaque relevé bancaire reçu, et le sort de chacune de ses lignes : passée par l'import, rapprochée ensuite, ou encore en attente d'une décision."
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:35
+msgid "Everything is dealt with"
+msgstr "Tout est traité"
+
+#: frontend/src/components/features/StatementImports/utils.ts:46
+msgid "File deposited by hand"
+msgstr "Fichier déposé à la main"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:251
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "From the statement file imported, as of {0}."
+msgstr "D'après le fichier de relevé importé, au {0}."
+
+#: frontend/src/components/features/StatementImports/utils.ts:68
+#, python-brace-format
+msgid "Gap of {0}: to decide"
+msgstr "Écart de {0} : à décider"
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:72
+msgid "Hide the lines"
+msgstr "Masquer les lignes"
+
+#: frontend/src/components/features/StatementImports/utils.ts:66
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "Left open by {0} on {1}"
+msgstr "Laissé ouvert par {0} le {1}"
+
+#. Option for the 'Decision' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:162
+msgid "left_open"
+msgstr "laissé ouvert"
+
+#: frontend/src/components/features/StatementImports/utils.ts:70
+msgid "No invoice recognised: to match in the bank reconciliation"
+msgstr "Aucune facture reconnue : à rapprocher dans le rapprochement bancaire"
+
+#: frontend/src/components/features/StatementImports/utils.ts:19
+msgid "Not handled"
+msgstr "Non traitée"
+
+#: frontend/src/components/features/StatementImports/utils.ts:21
+#: frontend/src/components/features/StatementImports/utils.ts:78
+msgid "Not imported yet"
+msgstr "Pas encore importée"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:254
+msgid "Not known yet: click the figure to enter it."
+msgstr "Pas encore connu : cliquez sur le montant pour le saisir."
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:53
+msgid "Nothing to handle: every line was already in the bank."
+msgstr "Rien à traiter : chaque ligne était déjà dans la banque."
+
+#: frontend/src/components/features/StatementImports/StatementImportLines.tsx:79
+msgid "Nothing waits in this import."
+msgstr "Rien n'est en attente dans cet import."
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:53
+msgid "Nothing was imported yet."
+msgstr "Rien n'a encore été importé."
+
+#: frontend/src/components/features/StatementImports/StatementImportLines.tsx:36
+msgid "Only what still waits"
+msgstr "Seulement ce qui attend encore"
+
+#: frontend/src/components/features/StatementImports/utils.ts:42
+msgid "overpayment"
+msgstr "trop-perçu"
+
+#: frontend/src/components/features/StatementImports/utils.ts:41
+msgid "partial payment"
+msgstr "paiement partiel"
+
+#: frontend/src/components/features/StatementImports/utils.ts:13
+#: frontend/src/components/features/StatementImports/utils.ts:60
+msgid "Passed by the import"
+msgstr "Passée par l'import"
+
+#: frontend/src/components/features/StatementImports/utils.ts:60
+#, python-brace-format
+msgid "Passed by the import, gap of {0}"
+msgstr "Passée par l'import, écart de {0}"
+
+#. Option for the 'Decision' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:162
+msgid "passed_gap"
+msgstr "écart passé"
+
+#: frontend/src/components/features/StatementImports/utils.ts:14
+msgid "Reconciled afterwards"
+msgstr "Rapprochée ensuite"
+
+#: frontend/src/components/features/StatementImports/utils.ts:63
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "Reconciled by {0} on {1}"
+msgstr "Rapprochée par {0} le {1}"
+
+#: frontend/src/components/features/StatementImports/utils.ts:64
+msgid "Reconciled in the bank reconciliation"
+msgstr "Rapprochée dans le rapprochement bancaire"
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:38
+#, python-brace-format
+msgid "Settle the {0} that wait"
+msgstr "Régler les {0} en attente"
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:72
+msgid "Show the lines"
+msgstr "Afficher les lignes"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:135
+msgid "Statement minus system."
+msgstr "Relevé moins système."
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:188
+msgid "Still to deal with"
+msgstr "Reste à traiter"
+
+#: frontend/src/components/features/StatementImports/utils.ts:72
+msgid "The bank already had this line: nothing was created"
+msgstr "La banque avait déjà cette ligne : rien n'a été créé."
+
+#: frontend/src/components/features/StatementImports/utils.ts:76
+msgid "The bank line was cancelled"
+msgstr "La ligne bancaire a été annulée."
+
+#. Description of the 'Bank Transaction' (Link) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:156
+msgid "The Bank Transaction this line created: what became of the line is read from it."
+msgstr "La transaction bancaire créée par cette ligne : le sort de la ligne se lit à partir d'elle."
+
+#: frontend/src/components/features/StatementImports/utils.ts:74
+msgid "The import could not handle this line"
+msgstr "L'import n'a pas pu traiter cette ligne."
+
+#: frontend/src/components/features/StatementImports/utils.ts:16
+#: frontend/src/components/features/StatementImports/utils.ts:68
+msgid "To decide"
+msgstr "À décider"
+
+#: frontend/src/components/features/StatementImports/utils.ts:17
+msgid "To match"
+msgstr "À rapprocher"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:253
+msgid "Typed by hand."
+msgstr "Saisi à la main."
+
+#: mint/apis/statement_follow_up.py:298
+#, python-brace-format
+msgid "Unknown decision {0}."
+msgstr "Décision inconnue : {0}."
+
+#. Description of the 'Decision' (Select) field in DocType 'Mint Bank Statement
+#. Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:164
+msgid "What a person decided for a payment gap left to them."
+msgstr "La décision prise par une personne pour un écart de paiement qui lui revenait."
+
+#: frontend/src/components/features/StatementImports/StatementImportLines.tsx:45
+msgid "What became of it"
+msgstr "Sort de la ligne"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:110
+msgid "What the bank should show: the ledger balance, without the payments the bank has not processed yet."
+msgstr "Ce que la banque devrait afficher : le solde du grand livre, sans les paiements qu'elle n'a pas encore traités."
+
+#: frontend/src/components/features/StatementImports/StatementImportCard.tsx:47
+#, python-brace-format
+msgid "{0} / {1} dealt with"
+msgstr "{0} / {1} traitées"
