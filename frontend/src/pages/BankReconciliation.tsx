@@ -27,15 +27,23 @@ import { bankRecTabAtom } from "@/components/features/BankReconciliation/bankRec
 import StatementImportsPanel from "@/components/features/StatementImports/StatementImportsPanel"
 //// Neoffice — added: the three reports behind one tab.
 import ReportsMenu from "@/components/features/BankReconciliation/ReportsMenu"
+//// Neoffice — added: the icon that goes to the whole page and back, and the tab the full page is asked to open on.
+import FullPageButton, { FULL_PAGE_TAB_PARAM } from "@/components/features/BankReconciliation/FullPageButton"
 
 
 //// Neoffice — changed: takes the tab to open on (the old address of the imports opens the bank files tab) and keeps the tab shown
 //// in an atom, so that a card of the bank files can take the person to the reconciliation tab.
+// The tabs of this page: the values of its TabsTrigger / ReportsMenu entries.
+const TABS = ["Match and Reconcile", "Bank Files", "Bank Transactions", "Bank Reconciliation Statement", "Bank Clearance Summary", "Incorrectly Cleared Entries"]
+
 const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
 
     const [tab, setTab] = useAtom(bankRecTabAtom)
     useEffect(() => {
-        if (initialTab) setTab(initialTab)
+        //// Neoffice — the full page (/mint?tab=…) opens on the tab it was asked from; only a tab of this page counts.
+        const asked = new URLSearchParams(window.location.search).get(FULL_PAGE_TAB_PARAM)
+        const wanted = initialTab ?? (asked && TABS.includes(asked) ? asked : null)
+        if (wanted) setTab(wanted)
     }, [initialTab, setTab])
 
     //// Neoffice — headerHeight state removed, superseded by the measured room below (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
@@ -93,6 +101,8 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                             <RuleConfigureButton />
                             <Settings />
                             <ActionLog />
+                            {/* //// Neoffice — added: the whole page, and back (FullPageButton). */}
+                            <FullPageButton />
                         </TooltipProvider>
                         <CompanySelector />
                         <BankRecDateFilter />

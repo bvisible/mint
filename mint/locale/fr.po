@@ -3847,3 +3847,11 @@ msgstr "Rapports"
 #, python-brace-format
 msgid "Lines of the file of {0} that wait"
 msgstr "Lignes du fichier bancaire du {0} en attente"
+
+#: frontend/src/components/features/BankReconciliation/FullPageButton.tsx:21
+msgid "Work on the whole page"
+msgstr "Travaillez en pleine page"
+
+#: frontend/src/components/features/BankReconciliation/FullPageButton.tsx:21
+msgid "Back to Finance"
+msgstr "Revenez à l'espace Finance"
