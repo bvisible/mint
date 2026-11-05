@@ -11,6 +11,8 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { H1 } from "@/components/ui/typography"
 import { useCurrentCompany } from "@/hooks/useCurrentCompany"
 import { EMBEDDED } from "@/lib/embedded"
+//// Neoffice — added: the icon that takes the page to the whole surface of the screen, and back.
+import FullPageButton from "@/components/features/BankReconciliation/FullPageButton"
 import _ from "@/lib/translate"
 
 const PartyReconciliation = () => {
@@ -42,7 +44,11 @@ const PartyReconciliation = () => {
                             <TabsTrigger value="Supplier">{_("Suppliers")}</TabsTrigger>
                         </TabsList>
                     </Tabs>
-                    <CompanySelector />
+                    <div className="flex items-center gap-2">
+                        {/* //// Neoffice — added: the whole page, and back (FullPageButton). */}
+                        <FullPageButton />
+                        <CompanySelector />
+                    </div>
                 </div>
 
                 <div className="grid gap-4 @3xl:grid-cols-[15rem_minmax(0,1fr)]">
