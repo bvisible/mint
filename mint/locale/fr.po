@@ -2676,3 +2676,248 @@ msgstr "Nous avons trouvé {0} transactions existantes dans le système qui sont
 #: BankStatementImporter/CSV/StatementDetails.tsx
 msgid "{0} transactions will be imported into the system. Please review the details below and click the 'Import' button to proceed."
 msgstr "{0} transactions seront importées dans le système. Vérifiez les détails ci-dessous, puis cliquez sur le bouton « Importer » pour continuer."
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:161
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:215
+msgid "Amount or reference"
+msgstr "Montant ou référence"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:280
+msgid "An amount is not valid."
+msgstr "Le montant n'est pas valide."
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:215
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "As of {0}"
+msgstr "Au {0}"
+
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:60
+msgid "attachment(s)"
+msgstr "pièce(s) jointe(s)"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:322
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "Balances as per bank statement before {0}"
+msgstr "Soldes selon le relevé bancaire avant le {0}"
+
+#: frontend/src/pages/PartyReconciliation.tsx:54
+msgid "Choose a customer to reconcile its payments and credit notes with its invoices."
+msgstr "Choisissez un client pour rapprocher ses paiements et ses avoirs de ses factures."
+
+#: frontend/src/pages/PartyReconciliation.tsx:54
+msgid "Choose a supplier to reconcile its payments and debit notes with its invoices."
+msgstr "Choisissez un fournisseur pour rapprocher ses paiements et ses notes de débit de ses factures."
+
+#: mint/apis/party_reconciliation.py:258
+msgid "Choose at least one invoice and one payment, credit note or entry."
+msgstr "Choisissez au moins une facture et un paiement, un avoir ou une écriture."
+
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:168
+#, python-brace-format
+msgctxt "Do MMMM YYYY"
+msgid "Closing Balance as of {}"
+msgstr "Solde de clôture au {}"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:274
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "Closing balance on bank statement as of {0}"
+msgstr "Solde de clôture du relevé bancaire au {0}"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:121
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:87
+msgid "Copy the reference"
+msgstr "Copier la référence"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:121
+#: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:39
+msgid "Could not copy"
+msgstr "Impossible de copier"
+
+#: frontend/src/components/features/PartyReconciliation/utils.ts:22
+msgid "Enter an amount greater than zero"
+msgstr "Saisissez un montant supérieur à zéro"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:267
+#, python-brace-format
+msgctxt "Do MMM YYYY"
+msgid "Enter the closing balance you see in your bank statement for {0} as of the {1}"
+msgstr "Saisissez le solde de clôture indiqué sur votre relevé bancaire pour {0} au {1}."
+
+#: mint/apis/party_reconciliation.py:30
+msgid "Invalid Party Type"
+msgstr "Type de tiers invalide"
+
+#: mint/apis/bank_clearance.py:25 mint/apis/bank_clearance.py:31
+#: mint/apis/bank_reconciliation.py:25 mint/apis/party_reconciliation.py:328
+msgid "Invalid Voucher"
+msgstr "Pièce invalide"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:270
+msgid "Invoices ticked"
+msgstr "Factures cochées"
+
+#: frontend/src/components/features/PartyReconciliation/utils.ts:23
+msgid "More than what is left"
+msgstr "Plus que ce qui reste"
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:67
+msgid "No open documents."
+msgstr "Aucun document ouvert."
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:204
+msgid "No open invoice."
+msgstr "Aucune facture ouverte."
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:261
+msgid "Nothing to apply."
+msgstr "Rien à appliquer."
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:67
+msgid "Nothing to reconcile."
+msgstr "Rien à rapprocher."
+
+#: mint/apis/party_reconciliation.py:30
+msgid "Only customers and suppliers can be reconciled here."
+msgstr "Seuls les clients et les fournisseurs peuvent être rapprochés ici."
+
+#: mint/apis/bank_clearance.py:31
+msgid "Only submitted vouchers can be cleared."
+msgstr "Seules les pièces validées peuvent être compensées."
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:58
+msgid "Only those with something to reconcile"
+msgstr "Seuls ceux qui ont quelque chose à rapprocher"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:158
+msgid "Open invoices"
+msgstr "Factures ouvertes"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:275
+msgid "Party still due after"
+msgstr "Reste dû du tiers après"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:276
+msgid "Party to apply after"
+msgstr "Reste à appliquer du tiers après"
+
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:76
+msgid "Payment, credit note or entry"
+msgstr "Paiement, avoir ou écriture"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:212
+msgid "Payments, credit notes and entries"
+msgstr "Paiements, avoirs et écritures"
+
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:104
+msgid "Reconciling…"
+msgstr "Rapprochement en cours…"
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:53
+msgid "Search a customer"
+msgstr "Rechercher un client"
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:53
+msgid "Search a supplier"
+msgstr "Rechercher un fournisseur"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:273
+msgid "Still due on the ticked invoices"
+msgstr "Reste dû sur les factures cochées"
+
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:93
+msgid "Still due on these invoices"
+msgstr "Reste dû sur ces factures"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:144
+#, python-brace-format
+msgid "The ledger says {0}, the open documents say {1}: a difference of {2}."
+msgstr "Le grand livre indique {0}, les documents ouverts indiquent {1} : un écart de {2}."
+
+#: mint/apis/party_reconciliation.py:236 mint/apis/party_reconciliation.py:243
+msgid "The party has changed"
+msgstr "Le tiers a changé entre-temps."
+
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:64
+msgid "This is what will be written. Nothing is changed until you confirm."
+msgstr "Voici ce qui sera enregistré. Rien n'est modifié tant que vous ne confirmez pas."
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:150
+msgid "This party also has balances on other accounts, which are reconciled separately:"
+msgstr "Ce tiers a aussi des soldes sur d'autres comptes, rapprochés séparément :"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:280
+msgid "Tick at least one invoice and one payment, credit note or entry."
+msgstr "Cochez au moins une facture et un paiement, un avoir ou une écriture."
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:271
+msgid "Ticked to use"
+msgstr "À utiliser (cochés)"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:137
+msgid "To apply"
+msgstr "À appliquer"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:225
+msgid "To use"
+msgstr "À utiliser"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:122
+msgid "Untick"
+msgstr "Décocher"
+
+#: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:274
+msgid "Unused on the ticked lines"
+msgstr "Non utilisé sur les lignes cochées"
+
+#: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:94
+msgid "Unused on these payments and credits"
+msgstr "Non utilisé sur ces paiements et avoirs"
+
+#: mint/apis/party_reconciliation.py:328
+#, python-brace-format
+msgid "{0} is not a voucher this screen shows."
+msgstr "{0} n'est pas une pièce affichée sur cet écran."
+
+#: mint/apis/bank_clearance.py:25 mint/apis/bank_reconciliation.py:25
+#, python-brace-format
+msgid "{0} is not a voucher this tool can clear"
+msgstr "{0} n'est pas une pièce que cet outil peut compenser"
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:81
+#, python-brace-format
+msgid "{0} open invoice(s)"
+msgstr "{0} facture(s) ouverte(s)"
+
+#: frontend/src/components/features/PartyReconciliation/PartyList.tsx:85
+#, python-brace-format
+msgid "{0} to apply"
+msgstr "{0} à appliquer"
+
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:161
+#, python-brace-format
+msgctxt "Do MMMM YYYY"
+msgid "{0} to {1}"
+msgstr "Du {0} au {1}"
+
+#: mint/apis/party_reconciliation.py:123
+#, python-brace-format
+msgid "{0} {1} has no {2} account in {3}."
+msgstr "{0} {1} n'a pas de compte {2} dans {3}."
+
+#: mint/apis/party_reconciliation.py:230
+#, python-brace-format
+msgid "{0} {1} is chosen twice."
+msgstr "{0} {1} est sélectionné deux fois."
+
+#: mint/apis/party_reconciliation.py:235
+#, python-brace-format
+msgid "{0} {1} is no longer open: someone has reconciled it, or it was cancelled. Reload the party."
+msgstr "{0} {1} n'est plus ouvert(e) : une autre personne l'a rapproché(e), ou annulé(e). Rechargez le tiers."
+
+#: mint/apis/party_reconciliation.py:242
+#, python-brace-format
+msgid "{0} {1}: {2} asked, {3} left. Reload the party."
+msgstr "{0} {1} : {2} demandé, {3} restant. Rechargez le tiers."
