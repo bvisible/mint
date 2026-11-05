@@ -12,9 +12,29 @@ import _ from "@/lib/translate"
 import { expandFrame } from "@/lib/embedded"
 
 function Dialog({
+  open,
+  defaultOpen,
+  onOpenChange,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+  //// Neoffice — added: framed in the desk, a dialog was centred in the room under the tabs and its buttons fell below the visible part
+  //// (Daniel, 05.11). While the dialog is OPEN the frame takes the whole window, and gives it back as soon as it is not. It follows the
+  //// open state of the root, never the mounting of DialogContent: that component is rendered for a closed dialog too, and the first
+  //// version took the window of the desk at the load of the page. The root is always controlled here; its behaviour is unchanged.
+  const [inner, setInner] = React.useState(!!defaultOpen)
+  const shown = open ?? inner
+  React.useEffect(() => (shown ? expandFrame() : undefined), [shown])
+  return (
+    <DialogPrimitive.Root
+      data-slot="dialog"
+      open={shown}
+      onOpenChange={(next) => {
+        setInner(next)
+        onOpenChange?.(next)
+      }}
+      {...props}
+    />
+  )
 }
 
 function DialogTrigger({
@@ -67,9 +87,6 @@ function DialogContent({
   // Radix sets aria-hidden + pointer-events:none on all elements outside the portal
   // We counter this by continuously stripping those attributes from Learn elements
   const noraGuardRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
-  //// Neoffice — added: framed in the desk, the dialog was centred in the room under the tabs and its buttons fell below the visible
-  //// part (Daniel, 05.11). While it is open the frame takes the whole window, and gives it back when the dialog goes.
-  React.useEffect(() => expandFrame(), [])
   React.useEffect(() => {
     noraGuardRef.current = setInterval(() => {
       document.querySelectorAll('.nora-lp, #nora-step-popover').forEach(el => {
