@@ -14,11 +14,16 @@ from erpnext import get_default_cost_center
 # //// Journal Entry is built. Upstream books the amounts as received, VAT never enters here.
 from mint.apis.vat_utils import calculate_journal_entry_with_vat
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes), as ERPNext v16 and v15-hotfix do; the SPA already posts it.
+@frappe.whitelist(methods=["POST"])
 def clear_clearing_date(voucher_type: str, voucher_name: str):
     """
         Clear the clearing date of a voucher
     """
+    # //// Neoffice — the doctype comes from the request: only a voucher that has a clearance date can be named.
+    if not frappe.get_meta(voucher_type).has_field("clearance_date"):
+        frappe.throw(_("{0} is not a voucher this tool can clear").format(_(voucher_type)), title=_("Invalid Voucher"))
+
     # using db_set to trigger notification
     payment_entry = frappe.get_doc(voucher_type, voucher_name)
 
@@ -26,7 +31,8 @@ def clear_clearing_date(voucher_type: str, voucher_name: str):
         payment_entry.db_set("clearance_date", None)
 
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes), as ERPNext v16 and v15-hotfix do; the SPA already posts it.
+@frappe.whitelist(methods=["POST"])
 def reconcile_vouchers(bank_transaction_name: str | int, vouchers: str, is_new_voucher: bool = False):
 	 
     # updated clear date of all the vouchers based on the bank transaction
@@ -56,7 +62,8 @@ def reconcile_vouchers(bank_transaction_name: str | int, vouchers: str, is_new_v
     
     return transaction
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes), as ERPNext v16 and v15-hotfix do; the SPA already posts it.
+@frappe.whitelist(methods=["POST"])
 def unreconcile_transaction(transaction_name: str | int):
     """
         Unreconcile an entire bank transaction - so this does not handle individual entries
@@ -80,7 +87,8 @@ def unreconcile_transaction(transaction_name: str | int):
     for voucher in vouchers_to_cancel:
         frappe.get_doc(voucher["doctype"], voucher["name"]).cancel()
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes), as ERPNext v16 and v15-hotfix do; the SPA already posts it.
+@frappe.whitelist(methods=["POST"])
 def undo_reconciliation_action(bank_transaction_id: str | int, voucher_type: str, voucher_id: str | int):
     """
      API to remove a single reconciliation action - for example only undoing one voucher instead of undoing the entire transaction
@@ -138,7 +146,8 @@ def create_bulk_internal_transfer(bank_transaction_names: list[str|int],
     
     return output
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes), as ERPNext v16 and v15-hotfix do; the SPA already posts it.
+@frappe.whitelist(methods=["POST"])
 def create_internal_transfer(bank_transaction_name: str|int, 
                              posting_date: str | datetime.date, 
                              reference_date: str | datetime.date, 
@@ -720,6 +729,10 @@ def get_account_defaults(account: str):
     if not result:
         return ""
 
+    # //// Neoffice — after the existence test above on purpose (the SPA asks on every keystroke): the account
+    # //// of a company the user may not read does not tell its cost center.
+    frappe.has_permission("Account", ptype="read", doc=account, throw=True)
+
     company, report_type = result
 
     return get_default_cost_center(company) if report_type == "Profit and Loss" else  ""
@@ -873,6 +886,10 @@ def get_draft_journal_entries(
     from frappe.utils import cint
 
     transaction = frappe.get_doc("Bank Transaction", bank_transaction_name)
+    # //// Neoffice — the draft entries are read below with a raw query, which knows nothing of the user's rights:
+    # //// the line they are offered for must be one the user may read (ERPNext v16: "hide linked payments the
+    # //// user cannot read", v15-hotfix backport of #61140, covers only the submitted vouchers).
+    transaction.check_permission("read")
     bank_account_details = frappe.db.get_values(
         "Bank Account", transaction.bank_account, ["account", "company"], as_dict=True
     )[0]
@@ -932,7 +949,12 @@ def get_draft_journal_entries(
         .where(subquery.paid_amount > 0.0)
     )
 
-    draft_jes = query.run(as_dict=True)
+    # //// Neoffice — only the drafts the user may read (the query above ignores User Permissions).
+    draft_jes = [
+        draft
+        for draft in query.run(as_dict=True)
+        if frappe.has_permission("Journal Entry", ptype="read", doc=draft["name"])
+    ]
 
     # Subtract any existing allocations (same logic as ERPNext)
     return subtract_allocations_for_drafts(gl_account, draft_jes)

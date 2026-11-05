@@ -30,6 +30,9 @@ def get_statement_details(file_url: str, bank_account: str):
     4. Opening and Closing dates of the statement and balance
     """
 
+    # //// Neoffice — the statement is for a bank account the user must be able to read (get_data checks the file).
+    frappe.has_permission("Bank Account", ptype="read", doc=bank_account, throw=True)
+
     data = get_data(file_url)
 
     file_name = file_url.split("/")[-1]
@@ -179,6 +182,9 @@ def import_statement(file_url: str, bank_account: str):
 def get_data(file_path: str):
 
     file_doc = frappe.get_doc("File", {"file_url": file_path})
+    # //// Neoffice — the file is named by the request and read from disk: without this, any logged-in account
+    # //// (a portal customer included) could have a private spreadsheet of someone else parsed and returned.
+    file_doc.check_permission("read")
 
     parts = file_doc.get_extension()
     extension = parts[1]

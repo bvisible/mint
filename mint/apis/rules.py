@@ -10,6 +10,9 @@ def scheduler_run_rule_evaluation():
 
 @frappe.whitelist(methods=["POST"])
 def run_rule_evaluation(force_evaluate=False):
+    # //// Neoffice — the job below writes the matched rule on every unreconciled bank transaction with raw
+    # //// queries, and any logged-in account could start it. Whoever starts it may write bank transactions.
+    frappe.has_permission("Bank Transaction", ptype="write", throw=True)
     frappe.enqueue(method=_run_rule_evaluation, force_evaluate=force_evaluate)
 
 def _run_rule_evaluation(force_evaluate=False):

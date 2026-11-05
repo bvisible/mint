@@ -52,6 +52,10 @@ def get_closing_balance_as_per_statement(bank_account: str, date: str):
     """
         Get the closing balance as per statement for a bank account and date
     """
+    # //// Neoffice — the balance document has no company of its own, so get_list below let an accountant limited
+    # //// to one company read the statement balance of another company's bank account. The right is on the account.
+    frappe.has_permission("Bank Account", ptype="read", doc=bank_account, throw=True)
+
     latest_balance = frappe.get_list("Mint Bank Statement Balance", filters={
         "bank_account": bank_account,
         "date": ["<=", date]
@@ -67,12 +71,17 @@ def get_closing_balance_as_per_statement(bank_account: str, date: str):
         "date": None
     }
 
-@frappe.whitelist()
+# //// Neoffice — POST only, as ERPNext v16 and v15-hotfix do for every method that writes; the SPA already
+# //// posts it (useFrappePostCall).
+@frappe.whitelist(methods=["POST"])
 # //// Neoffice — NOT ours: upstream v1.5.0 signature, hand-ported (89e7929). Take upstream's.
 def set_closing_balance_as_per_statement(bank_account: str, date: str | datetime.date, balance: float):
     """
     Set the closing balance as per statement for a bank account and date
     """
+    # //// Neoffice — same as the reader above: the balance document is saved under its own doctype's right,
+    # //// which says nothing about the bank account (ERPNext v16 checks the account when a balance is set).
+    frappe.has_permission("Bank Account", ptype="read", doc=bank_account, throw=True)
 
     existing = frappe.db.exists("Mint Bank Statement Balance", {
         "bank_account": bank_account,

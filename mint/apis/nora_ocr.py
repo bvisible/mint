@@ -680,7 +680,8 @@ def _apply_statement_metadata(mbsi, scan_name: str, meta: dict) -> None:
                 frappe.logger().warning(f"[Mint] Could not rename Document Scan: {e}")
 
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes), as ERPNext v16 and v15-hotfix do; the desk form calls it with frappe.call (POST).
+@frappe.whitelist(methods=["POST"])
 def start_ocr_processing(docname: str, force_create: bool = False) -> dict:
     """
     Start async OCR processing via Document Scan for a Mint Bank Statement Import.
@@ -695,6 +696,8 @@ def start_ocr_processing(docname: str, force_create: bool = False) -> dict:
         If duplicate exists and force_create=False, returns duplicate info
     """
     doc = frappe.get_doc("Mint Bank Statement Import", docname)
+    # //// Neoffice — the code below inserts and saves with ignore_permissions, so the right is tested here.
+    doc.check_permission("write")
 
     if not doc.file:
         frappe.throw(_("Please upload a file"))
@@ -726,7 +729,8 @@ def start_ocr_processing(docname: str, force_create: bool = False) -> dict:
         frappe.throw(result.get("message"))
 
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it writes the transactions once the scan is done); the desk form polls it with frappe.call (POST).
+@frappe.whitelist(methods=["POST"])
 def check_ocr_processing_status(docname: str) -> dict:
     """
     Check OCR processing status and populate transactions if completed.
@@ -739,6 +743,8 @@ def check_ocr_processing_status(docname: str) -> dict:
         dict with status, count (if completed), or error (if failed)
     """
     doc = frappe.get_doc("Mint Bank Statement Import", docname)
+    # //// Neoffice — it saves with ignore_permissions further down, so the right is tested here.
+    doc.check_permission("write")
 
     if not doc.document_scan_name:
         return {"status": "Not Started"}
@@ -890,7 +896,8 @@ def test_bank_statement_extraction(file_url: str = None) -> dict:
         }
 
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it creates an import), as ERPNext v16 and v15-hotfix do for what writes.
+@frappe.whitelist(methods=["POST"])
 def create_import_from_document_scan(document_scan_name: str, bank_account: str = None) -> dict:
     """Create a Mint Bank Statement Import from an EXISTING Document Scan.
 

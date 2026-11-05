@@ -449,7 +449,9 @@ def _fail_with_context(doc, title: str, message: str):
 	frappe.throw(message, title=title)
 
 
-@frappe.whitelist()
+# //// Neoffice — POST only (it fills the transactions table), as ERPNext v16 and v15-hotfix do for what writes.
+# //// The desk form calls it with frappe.call (POST) and erpnextswiss imports it as a plain function.
+@frappe.whitelist(methods=["POST"])
 def parse_xml_content(docname):
 	"""Parse CAMT XML file and populate transactions child table."""
 	from erpnextswiss.erpnextswiss.page.bank_wizard.bank_wizard import (
