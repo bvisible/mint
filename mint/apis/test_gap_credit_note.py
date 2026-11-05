@@ -182,6 +182,26 @@ class TestGapCreditNote(GapImportCase):
 			follow_up.decide_gap(partial_line, "passed_gap", credit_note=1)
 		self.assertEqual(frappe.db.count("Sales Invoice", {"is_return": 1}), before)
 
+	def test_without_an_account_of_the_company_the_credit_note_waits_for_the_one_the_person_chooses(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+		frappe.db.set_value("Neoffice Company Settings", COMPANY, "payment_gap_account", None)
+		frappe.clear_document_cache("Company", COMPANY)
+		_statement, bank_line, owed, part = self._partial(0.6)
+		with _only_for("tabSales Invoice Item", []):
+			waiting = follow_up.get_gap_decision(bank_line, credit_note=1)
+			self.assertTrue(waiting["credit_note_chosen"])
+			self.assertFalse(waiting["can_pass"])
+			self.assertIn("account", waiting["blocker"])
+			with self.assertRaises(frappe.ValidationError):
+				follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+			# the refusal wrote nothing: not even the payment
+			self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Unreconciled")
+			self.assertEqual(self._owed("Sales Invoice", self.sales), owed)
+			chosen = follow_up.get_gap_decision(bank_line, account=GAP_ACCOUNT, credit_note=1)
+			self.assertTrue(chosen["can_pass"])
+			answer = follow_up.decide_gap(bank_line, "passed_gap", account=GAP_ACCOUNT, credit_note=1)
+		self.assertEqual(flt(frappe.db.get_value("Sales Invoice", answer["credit_note"], "grand_total"), 2), -flt(owed - part, 2))
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
 	def test_a_purchase_is_never_offered_a_credit_note_of_the_balance(self):
 		owed = self._owed("Purchase Invoice", self.purchase)
 		statement = self._import(self._line("Purchase Invoice", self.purchase, flt(owed / 2, 2)))

@@ -373,8 +373,9 @@ def _amount_of(bank_line) -> float:
 
 
 @frappe.whitelist()
-def get_lines_to_decide(bank_account: str) -> list[dict]:
-	"""The bank lines of an account that came from an import with a gap nobody has decided yet."""
+def get_lines_to_decide(bank_account: str, from_date: str | None = None, to_date: str | None = None) -> list[dict]:
+	"""The bank lines of an account that came from an import with a gap nobody has decided yet, within the period the
+	reconciliation shows (a count that includes lines outside it leads to a list that looks empty)."""
 	_check_rights()
 	frappe.has_permission("Bank Account", "read", bank_account, throw=True)
 	return frappe.db.sql(
@@ -387,9 +388,10 @@ def get_lines_to_decide(bank_account: str) -> list[dict]:
 			and bt.status not in ('Reconciled', 'Settled', 'Cancelled')
 		where t.parenttype = %(doctype)s and ifnull(t.difference_kind, '') not in ('', 'exact')
 			and ifnull(t.decision, '') != 'left_open'
+			and (%(from_date)s is null or bt.date >= %(from_date)s) and (%(to_date)s is null or bt.date <= %(to_date)s)
 		order by bt.date desc, t.parent desc, t.idx
 		""",
-		{"account": bank_account, "doctype": IMPORT},
+		{"account": bank_account, "doctype": IMPORT, "from_date": from_date or None, "to_date": to_date or None},
 		as_dict=True,
 	)
 
@@ -507,9 +509,9 @@ def get_gap_decision(
 		"credit_note_chosen": credit,
 		"credit_note": credit_preview,
 		"history": history,
-		"can_settle": verdict.kind == "partial"
-		and not _account_blocker(verdict.company, account)
-		and not payment_gap.account_problem(verdict, account, True),
+		# offered for every partial payment: a company with no gap account of its own is not a reason to hide the choice,
+		# the person picks the account in the card and what still blocks is said (`blocker`) once they have chosen
+		"can_settle": verdict.kind == "partial",
 		"deductions": [
 			{"account": row.get("account"), "amount": flt(row.get("amount"), 2), "description": row.get("description")}
 			for row in rows
@@ -563,6 +565,19 @@ def decide_gap(
 	credit = _as_flag(credit_note)
 	if credit and not (verdict.kind == "partial" and invoice_type == "Sales Invoice"):
 		frappe.throw(_("A credit note of the balance is for the short payment of a sales invoice."))
+	if credit:
+		# what can refuse the credit note is checked BEFORE the payment is booked: nothing is written for a refusal
+		from mint.apis import gap_credit_note
+
+		blocker = gap_credit_note.preview(
+			verdict.company,
+			frappe.db.get_value("Sales Invoice", invoice, "customer"),
+			bank_line.date,
+			verdict.gap,
+			account or None,
+		)["blocker"]
+		if blocker:
+			frappe.throw(blocker)
 	entry = payment_gap.book(
 		verdict,
 		invoice_type,

@@ -144,7 +144,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
             {isPartial && decision.can_settle && (
                 <div className="flex flex-wrap gap-2">
                     {modeButton("open", _("Keep the rest open"))}
-                    {note && !note.blocker && modeButton("credit", _("Create the credit note of the balance"))}
+                    {note && modeButton("credit", _("Create the credit note of the balance"))}
                     {modeButton("gap", _("Pass the rest as a gap"))}
                 </div>
             )}

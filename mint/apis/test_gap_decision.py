@@ -7,7 +7,7 @@
 
 import frappe
 from frappe.tests.roles import as_role
-from frappe.utils import flt
+from frappe.utils import add_days, flt
 
 from mint.apis import statement_follow_up as follow_up
 from mint.apis.test_payment_gap_import import COMPANY, GAP_ACCOUNT, GapImportCase
@@ -28,6 +28,31 @@ class TestGapDecision(GapImportCase):
 		statement, bank_line = self._a_line_with_a_gap(0.03)
 		listed = {row.bank_transaction: row for row in follow_up.get_lines_to_decide(self.bank_account)}
 		self.assertEqual((listed[bank_line].kind, flt(listed[bank_line].gap, 2)), ("rounding", 0.03))
+
+	def test_the_count_follows_the_period_the_reconciliation_shows(self):
+		_statement, bank_line = self._a_line_with_a_gap(0.03)
+		today = frappe.utils.nowdate()
+		inside = follow_up.get_lines_to_decide(self.bank_account, add_days(today, -1), add_days(today, 1))
+		self.assertIn(bank_line, [row.bank_transaction for row in inside])
+		before = follow_up.get_lines_to_decide(self.bank_account, add_days(today, -400), add_days(today, -300))
+		self.assertNotIn(bank_line, [row.bank_transaction for row in before])
+		everything = follow_up.get_lines_to_decide(self.bank_account)
+		self.assertIn(bank_line, [row.bank_transaction for row in everything])
+
+	def test_the_choice_for_a_partial_payment_is_offered_even_when_the_company_has_no_gap_account(self):
+		frappe.db.set_value("Neoffice Company Settings", "AlpInnovate SA", "payment_gap_account", None)
+		frappe.db.set_value("Company", "AlpInnovate SA", "default_discount_account", None)
+		frappe.clear_document_cache("Company", "AlpInnovate SA")
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed / 2, 2)))
+		decision = follow_up.get_gap_decision(statement.transactions[0].bank_transaction, settle_in_full=1)
+		self.assertTrue(decision["can_settle"])
+		self.assertFalse(decision["can_pass"])
+		self.assertIn("account", decision["blocker"])
+		chosen = follow_up.get_gap_decision(
+			statement.transactions[0].bank_transaction, account=GAP_ACCOUNT, settle_in_full=1
+		)
+		self.assertTrue(chosen["can_pass"])
 
 	def test_the_verdict_is_worked_out_now_and_says_what_a_person_may_do(self):
 		_statement, bank_line = self._a_line_with_a_gap(0.03)
