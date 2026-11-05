@@ -3237,3 +3237,183 @@ msgstr "Ce que la banque devrait afficher : le solde du grand livre, sans les pa
 #, python-brace-format
 msgid "{0} / {1} dealt with"
 msgstr "{0} / {1} traitées"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:100
+msgid "A gap to decide"
+msgstr "Un écart à décider"
+
+#: mint/apis/statement_follow_up.py:575
+msgid "A gap waits for your decision in the bank reconciliation."
+msgstr "Un écart attend votre décision dans le rapprochement bancaire."
+
+#: mint/apis/payment_gap.py:268
+#, python-brace-format
+msgid "A payment gap goes to an income or expense account, not {0}."
+msgstr "Un écart de paiement va sur un compte de produits ou de charges, et non sur {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:127
+msgid "Account for the gap"
+msgstr "Compte pour l'écart"
+
+#: mint/apis/payment_gap.py:266
+#, python-brace-format
+msgid "Account {0} cannot be posted to."
+msgstr "Le compte {0} ne peut pas recevoir d'écritures."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:137
+msgid "Back to the company's account"
+msgstr "Revenir au compte de la société"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:143
+msgid "Booked as"
+msgstr "Comptabilisé comme"
+
+#: mint/apis/statement_follow_up.py:566
+#, python-brace-format
+msgid "Booked, {0} of them with a small gap ({1} in all)."
+msgstr "Comptabilisées, dont {0} avec un petit écart ({1} au total)."
+
+#: mint/apis/statement_follow_up.py:564
+msgid "Booked."
+msgstr "Comptabilisées."
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:359
+#, python-brace-format
+msgid "Gap of {0}: {1}"
+msgstr "Écart de {0} : {1}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:75
+msgid "Gap passed and bank line reconciled"
+msgstr "Écart passé et ligne bancaire rapprochée"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:37
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: a rebate within what the company accepts."
+msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : un rabais accepté par la société."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:31
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: a rounding."
+msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : un arrondi."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:34
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: the early payment discount of {5} % that its terms grant until {6}."
+msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : l'escompte de {5} % que ses conditions accordent jusqu'au {6}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:35
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: the early payment discount that its terms grant."
+msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : l'escompte que ses conditions accordent."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:41
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed: that is never passed by itself."
+msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de plus que le dû : un trop-perçu ne se passe jamais tout seul."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:39
+#, python-brace-format
+msgid "Invoice {0} of {1} still owes {2}. You paid {3}: a partial payment, what came in is booked and {4} stays open."
+msgstr "La facture {0} de {1} présente encore un reste dû de {2}. Vous avez payé {3} : un paiement partiel, le montant reçu est comptabilisé et {4} reste ouvert."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:121
+msgid "Keep the rest open"
+msgstr "Laisser le reste ouvert"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
+msgid "Leave open"
+msgstr "Laisser ouvert"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:169
+#, python-brace-format
+msgid "Left open by {0} on {1}."
+msgstr "Laissé ouvert par {0} le {1}."
+
+#: mint/apis/statement_follow_up.py:583
+msgid "No invoice recognised: they wait like any bank line not reconciled."
+msgstr "Aucune facture reconnue : elles attendent comme toute ligne bancaire non rapprochée."
+
+#: mint/apis/statement_follow_up.py:520
+msgid "No invoice was recognised for this line."
+msgstr "Aucune facture n'a été reconnue pour cette ligne."
+
+#: mint/apis/statement_follow_up.py:591
+msgid "Nothing was created for them."
+msgstr "Rien n'a été créé pour elles."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:110
+msgid "Paid to the bank"
+msgstr "Payé à la banque"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:93
+msgid "Pass the gap and reconcile"
+msgstr "Passer l'écart et rapprocher"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:122
+msgid "Pass the rest as a gap"
+msgstr "Passer le reste en écart"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:164
+msgid "Record another way"
+msgstr "Enregistrer autrement"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:92
+msgid "Record the partial payment"
+msgstr "Enregistrer le paiement partiel"
+
+#: mint/apis/statement_follow_up.py:596
+msgid "See all the imports"
+msgstr "Voir tous les imports"
+
+#: mint/apis/statement_follow_up.py:595
+msgid "See the error log."
+msgstr "Voir le journal des erreurs."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:92
+msgid "Settle the invoice and pass the gap"
+msgstr "Régler la facture et passer l'écart"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:106
+msgid "Still owed on the invoice"
+msgstr "Reste dû sur la facture"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:151
+msgid "The VAT is cut from the account, as in the payment entry."
+msgstr "La TVA est déduite du compte, comme dans l'écriture de paiement."
+
+#: mint/apis/statement_follow_up.py:513
+msgid "This bank line did not come from an import."
+msgstr "Cette ligne bancaire ne provient pas d'un import."
+
+#: mint/apis/statement_follow_up.py:510
+msgid "This bank line is already dealt with."
+msgstr "Cette ligne bancaire est déjà traitée."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
+msgid "Your name and the date are noted on the line of the import."
+msgstr "Votre nom et la date sont notés sur la ligne de l'import."
+
+#: mint/apis/statement_follow_up.py:590
+#, python-brace-format
+msgid "{0} already in the bank"
+msgstr "{0} déjà dans la banque"
+
+#: mint/apis/statement_follow_up.py:562
+#, python-brace-format
+msgid "{0} lines read in the file."
+msgstr "{0} lignes lues dans le fichier."
+
+#: mint/apis/statement_follow_up.py:595
+#, python-brace-format
+msgid "{0} not handled"
+msgstr "{0} non traitée(s)"
+
+#: mint/apis/statement_follow_up.py:569
+#, python-brace-format
+msgid "{0} passed by themselves"
+msgstr "{0} passées seules"
+
+#: mint/apis/statement_follow_up.py:582
+#, python-brace-format
+msgid "{0} to match"
+msgstr "{0} à rapprocher"
