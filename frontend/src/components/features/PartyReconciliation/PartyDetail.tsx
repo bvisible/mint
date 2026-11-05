@@ -125,7 +125,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
     }
 
     return (
-        <div className="flex flex-col gap-4 min-w-0">
+        <div className="@container flex flex-col gap-4 min-w-0">
             {/* The party, its account, and where the ledger stands */}
             <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <div className="min-w-0">
@@ -151,7 +151,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                 </div>
             )}
 
-            <div className="grid gap-4 xl:grid-cols-2">
+            <div className="grid gap-4 @5xl:grid-cols-2">
                 {/* Left: what has to be settled */}
                 <section className="flex flex-col gap-2 min-w-0">
                     <div className="flex items-center justify-between gap-2">
@@ -266,7 +266,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
 
             {/* The calculator: if I take this much, how much is left */}
             <div className="sticky bottom-0 rounded-lg border bg-card p-4 shadow-sm">
-                <div className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-x-6 gap-y-1 text-sm @lg:grid-cols-2 @4xl:grid-cols-4">
                     <Figure label={_("Invoices ticked")} value={formatCurrency(invoiceTotal, currency)} />
                     <Figure label={_("Ticked to use")} value={formatCurrency(settlementTotal, currency)} />
                     <Figure label={_("Reconciled")} value={formatCurrency(settled, currency)} strong />
@@ -302,7 +302,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
 
 const Figure = ({ label, value, strong }: { label: string, value: string, strong?: boolean }) => (
     <div className="flex items-baseline justify-between gap-2 min-w-0">
-        <span className="text-muted-foreground truncate">{label}</span>
+        <span className="text-muted-foreground">{label}</span>
         <span className={cn("font-mono tabular-nums", strong && "font-semibold")}>{value}</span>
     </div>
 )

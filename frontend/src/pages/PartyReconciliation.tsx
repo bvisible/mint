@@ -33,8 +33,8 @@ const PartyReconciliation = () => {
 
     return (
         <TooltipProvider>
-            <div className="p-4 flex flex-col gap-4">
-                <div className={EMBEDDED ? "flex flex-wrap items-center justify-between gap-2" : "flex flex-wrap items-center justify-between gap-2"}>
+            <div className="@container p-4 flex flex-col gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                     {!EMBEDDED && <H1 className="text-sm font-medium">{_("Reconciliation")}</H1>}
                     <Tabs value={partyType} onValueChange={(value) => setPartyType(value as PartyType)}>
                         <TabsList>
@@ -45,7 +45,7 @@ const PartyReconciliation = () => {
                     <CompanySelector />
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
+                <div className="grid gap-4 @4xl:grid-cols-[18rem_minmax(0,1fr)]">
                     <PartyList company={company} partyType={partyType} selected={party} onSelect={setParty} version={version} currency={currency} />
                     {party ? (
                         <PartyDetail company={company} partyType={partyType} party={party} version={version} onReconciled={() => setVersion((current) => current + 1)} />

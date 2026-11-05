@@ -78,11 +78,11 @@ const PartyList = ({ company, partyType, selected, onSelect, version, currency }
                         )}>
                         <div className="font-medium truncate">{party.label}</div>
                         <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                            <span>{party.open_count} {_("open")}</span>
+                            <span>{_("{0} open invoice(s)", [String(party.open_count)])}</span>
                             <span className="font-mono tabular-nums">{formatCurrency(party.open, currency)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                            <span>{party.credit_count} {_("to apply")}</span>
+                            <span>{_("{0} to apply", [String(party.credit_count)])}</span>
                             <span className="font-mono tabular-nums">{formatCurrency(party.credit, currency)}</span>
                         </div>
                         {party.oldest && (
