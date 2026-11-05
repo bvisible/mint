@@ -1396,7 +1396,6 @@ msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:251
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "From the statement file imported, as of {0}."
 msgstr ""
 
@@ -1716,7 +1715,6 @@ msgstr ""
 
 #: frontend/src/components/features/StatementImports/utils.ts:66
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "Left open by {0} on {1}"
 msgstr ""
 
@@ -2519,7 +2517,6 @@ msgstr ""
 
 #: frontend/src/components/features/StatementImports/utils.ts:63
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "Reconciled by {0} on {1}"
 msgstr ""
 

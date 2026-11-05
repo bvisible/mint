@@ -3073,7 +3073,6 @@ msgstr "Fichier déposé à la main"
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:251
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "From the statement file imported, as of {0}."
 msgstr "D'après le fichier de relevé importé, au {0}."
 
@@ -3088,7 +3087,6 @@ msgstr "Masquer les lignes"
 
 #: frontend/src/components/features/StatementImports/utils.ts:66
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "Left open by {0} on {1}"
 msgstr "Laissé ouvert par {0} le {1}"
 
@@ -3161,7 +3159,6 @@ msgstr "Rapprochée ensuite"
 
 #: frontend/src/components/features/StatementImports/utils.ts:63
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "Reconciled by {0} on {1}"
 msgstr "Rapprochée par {0} le {1}"
 

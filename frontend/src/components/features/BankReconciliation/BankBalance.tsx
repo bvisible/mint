@@ -211,6 +211,9 @@ const ClosingBalanceAsPerStatement = () => {
     })
 
     const isDateSame = data?.message?.date === dates.toDate
+    //// Neoffice — the day is formatted out here: a string literal inside the arguments of _() is read by the extractor
+    //// as the CONTEXT of the message, and a message with a context is never found without it.
+    const statementDay = formatDate(data?.message?.date ?? '', 'Do MMM YYYY')
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -248,7 +251,7 @@ const ClosingBalanceAsPerStatement = () => {
             {/* //// Neoffice — where the figure comes from: the file the bank sent, or what somebody typed. */}
             <StatNote>
                 {data?.message?.source === "file"
-                    ? _("From the statement file imported, as of {0}.", [formatDate(data?.message?.date ?? '', 'Do MMM YYYY')])
+                    ? _("From the statement file imported, as of {0}.", [statementDay])
                     : data?.message?.source === "typed"
                         ? _("Typed by hand.")
                         : _("Not known yet: click the figure to enter it.")}

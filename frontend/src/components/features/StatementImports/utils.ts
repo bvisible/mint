@@ -49,7 +49,10 @@ export const sourceLabel = (source: "ebics" | "manual"): string =>
 export const documentHref = (doctype: string, name: string) =>
     `/app/${doctype.toLowerCase().replace(/ /g, "-")}/${encodeURIComponent(name)}`
 
-/** What became of a line, in a sentence. */
+/** What became of a line, in a sentence. The days are formatted apart: a string literal inside the arguments of _()
+ * is read by the message extractor as the CONTEXT of the message, and a message with a context is never found without it. */
+const day = (value: string | null) => (value ? formatDate(value, "Do MMM YYYY") : "")
+
 export const describeLine = (line: ImportLine, currency: string): string => {
     const gap = line.difference_kind && line.difference_kind !== "exact"
         ? `${formatCurrency(Math.abs(line.difference_amount ?? 0), currency)} (${kindLabel(line.difference_kind)})`
@@ -60,10 +63,10 @@ export const describeLine = (line: ImportLine, currency: string): string => {
             return gap ? _("Passed by the import, gap of {0}", [gap]) : _("Passed by the import")
         case "handled":
             return voucher?.by
-                ? _("Reconciled by {0} on {1}", [voucher.by, voucher.on ? formatDate(voucher.on, "Do MMM YYYY") : ""])
+                ? _("Reconciled by {0} on {1}", [voucher.by, day(voucher.on)])
                 : _("Reconciled in the bank reconciliation")
         case "left_open":
-            return _("Left open by {0} on {1}", [line.decided_by ?? "", line.decided_on ? formatDate(line.decided_on, "Do MMM YYYY") : ""])
+            return _("Left open by {0} on {1}", [line.decided_by ?? "", day(line.decided_on)])
         case "to_decide":
             return gap ? _("Gap of {0}: to decide", [gap]) : _("To decide")
         case "to_match":
