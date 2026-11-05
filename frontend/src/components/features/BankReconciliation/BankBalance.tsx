@@ -42,13 +42,12 @@ const BankBalance = () => {
         //// Neoffice — one band: the four figures and the progress side by side, their explanations behind an info icon
         //// (Daniel, 05.11: « il faut optimiser la place au sommet », what matters is the list below).
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-            <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-8 gap-y-1 pr-4 lg:pr-6 lg:border-r-border lg:border-r">
+            <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-6 gap-y-1 pr-4 lg:pr-6 lg:border-r-border lg:border-r">
                 <OpeningBalance />
                 <ClosingBalance />
                 <ClosingBalanceAsPerStatement />
                 <Difference />
-                {/* //// Neoffice — the amount still to deal with, as one more figure of the single band. */}
-                <ToProcess />
+                {/* //// Neoffice — what is left to deal with is no longer a fifth figure: it is the block on the right. */}
             </div>
 
             <ReconcileProgress />
@@ -147,31 +146,6 @@ const Difference = () => {
     </StatContainer>
 }
 
-//// Neoffice — added: the amount still to deal with is the sum of the lines the tables below show, in and out apart
-//// (Daniel, 05.11: next to the number of entries, the amount to process), as one more figure of the strip.
-const ToProcess = () => {
-    const bankAccount = useAtomValue(selectedBankAccountAtom)
-    const { data: unreconciledTransactions, isLoading } = useGetUnreconciledTransactions()
-    const { deposits, withdrawals } = useMemo(() => {
-        let deposits = 0
-        let withdrawals = 0
-        for (const transaction of unreconciledTransactions?.message ?? []) {
-            const left = flt(transaction.unallocated_amount ?? (transaction.deposit || transaction.withdrawal), 2)
-            if (flt(transaction.deposit) > 0) deposits += left
-            else withdrawals += left
-        }
-        return { deposits, withdrawals }
-    }, [unreconciledTransactions])
-    const currency = bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? '')
-
-    return <StatContainer className="min-w-36">
-        <LabelWithInfo label={_("Still to deal with")} />
-        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <span className="whitespace-nowrap font-mono text-sm font-semibold tabular-nums">
-            +{formatCurrency(deposits, currency)} <span className="text-muted-foreground">·</span> −{formatCurrency(withdrawals, currency)}
-        </span>}
-    </StatContainer>
-}
-
 const ReconcileProgress = () => {
 
     const bankAccount = useAtomValue(selectedBankAccountAtom)
@@ -194,20 +168,35 @@ const ReconcileProgress = () => {
     const reconciledCount = (totalCount ?? 0) - (unreconciledTransactions?.message?.length ?? 0)
 
     const progress = (totalCount ? reconciledCount / totalCount : 0) * 100
+    //// Neoffice — the amount still to deal with is the sum of the lines the tables below show, in and out apart
+    //// (Daniel, 05.11: next to the number of entries, the amount to process).
+    const { deposits, withdrawals } = useMemo(() => {
+        let deposits = 0
+        let withdrawals = 0
+        for (const transaction of unreconciledTransactions?.message ?? []) {
+            const left = flt(transaction.unallocated_amount ?? (transaction.deposit || transaction.withdrawal), 2)
+            if (flt(transaction.deposit) > 0) deposits += left
+            else withdrawals += left
+        }
+        return { deposits, withdrawals }
+    }, [unreconciledTransactions])
+    const currency = bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? '')
     //// Neoffice — fixed 18% width replaced by a min/max clamp (1f2847e): in the embedded shell
     //// the percentage collapsed the progress block to a few pixels on a laptop.
-    return <div className="flex flex-col gap-1 items-end min-w-[150px] w-full lg:w-auto lg:min-w-[170px]">
-        <div className="flex flex-wrap items-baseline justify-end gap-x-3">
-            {/* //// Neoffice — whitespace-nowrap added (1f2847e): the French wording is longer and wrapped */}
-            {/* //// mid-sentence in the narrower column. */}
-            {/* //// Neoffice — the count alone (the amounts left are the figure « Still to deal with » of the strip). */}
-            <span className="text-right font-medium text-sm whitespace-nowrap">{reconciledCount} / {totalCount} {_("reconciled")}</span>
+    //// Neoffice — one block for what is left: the amounts in and out, the count of what is reconciled beside the label and
+    //// the bar as a thin line under them, so that the strip stays on one line (Daniel, 05.11).
+    return <StatContainer className="min-w-[15rem] gap-0.5">
+        <div className="flex items-baseline justify-between gap-3">
+            <StatLabel>{_("Still to deal with")}</StatLabel>
+            <span className="whitespace-nowrap text-xs text-muted-foreground">{reconciledCount} / {totalCount} {_("reconciled")}</span>
         </div>
-        <div className="w-full">
-            <Progress value={progress} max={100} />
-        </div>
-        {/* //// Neoffice — the amounts that stood under the bar moved up to the line of the count. */}
-    </div>
+        {/* //// Neoffice — the amounts in and out of what is left. */}
+        <span className="whitespace-nowrap font-mono text-sm font-semibold tabular-nums">
+            +{formatCurrency(deposits, currency)} <span className="text-muted-foreground">·</span> −{formatCurrency(withdrawals, currency)}
+        </span>
+        {/* //// Neoffice — the bar as a thin line under the amounts. */}
+        <Progress value={progress} max={100} className="mt-0.5 h-[3px]" />
+    </StatContainer>
 }
 
 const ClosingBalanceAsPerStatement = () => {
