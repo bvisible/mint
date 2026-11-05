@@ -42,7 +42,8 @@ const BankReconciliation = () => {
 
     return (
         <div className="p-4 flex flex-col gap-4">
-            <div ref={ref} className="flex flex-col gap-4">
+            {/* //// Neoffice — gap-4 to gap-2: the top of the page is not what the person comes for. */}
+            <div ref={ref} className="flex flex-col gap-2">
                 {/* //// Neoffice — framed in a tab of the desk (lib/embedded.ts), the tab names the */}
                 {/* //// page and the desk shows its logo: no title row, the tools go right and wrap */}
                 {/* //// when the desk's page is narrow (they overflowed it, 01.10). */}
@@ -75,7 +76,8 @@ const BankReconciliation = () => {
                         <BankRecDateFilter />
                     </div>
                 </div>
-                <BankPicker />
+                {/* //// Neoffice — the compact bank cards: the screen keeps its height for the list below. */}
+                <BankPicker size="row" />
                 <BankBalance />
             </div>
             <Tabs defaultValue="Match and Reconcile">

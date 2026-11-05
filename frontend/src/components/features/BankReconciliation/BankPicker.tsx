@@ -11,7 +11,8 @@ import _ from "@/lib/translate"
 
 //// Neoffice — NOT ours: the size prop is upstream v1.5.0, hand-carried (89e7929); the
 //// statement importer renders the same picker in a compact form. Take upstream's.
-const BankPicker = ({ className, size = 'base' }: { className?: string, size?: 'base' | 'sm' }) => {
+//// Neoffice — the size « row » is ours: the logo and the name on one line, the account under it (two lines, not three).
+const BankPicker = ({ className, size = 'base' }: { className?: string, size?: 'base' | 'sm' | 'row' }) => {
 
     const setSelectedBank = useSetAtom(selectedBankAccountAtom)
 
@@ -58,7 +59,7 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
 }
 
 //// Neoffice — NOT ours: upstream v1.5.0 signature, hand-carried (89e7929).
-const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'base' | 'sm' }) => {
+const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'base' | 'sm' | 'row' }) => {
 
     const [selectedBank, setSelectedBank] = useAtom(selectedBankAccountAtom)
 
@@ -69,6 +70,29 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
     const onSelect = () => {
         setSelectedBank(bank)
         mutate()
+    }
+
+    //// Neoffice — the compact card of the bank reconciliation screen (Daniel, 05.11: « le logo puis le nom à côté,
+    //// comme ça on n'a que deux lignes et pas trois »): what matters is the list below, not the top of the page.
+    if (size === 'row') {
+        return <div
+            role="button"
+            title={_("Select {0}", [bank.account_name ?? ''])}
+            onClick={onSelect}
+            className={cn('flex min-w-56 max-w-72 cursor-pointer items-center gap-2 rounded-md border-2 bg-card px-2 py-1',
+                isSelected ? 'border-primary bg-primary-foreground' : 'border-gray-200 hover:bg-gray-50')}
+        >
+            {bank.logo
+                ? <img src={`/assets/mint/mint/${bank.logo}`} alt={bank.bank || bank.name || ''} className="object-contain"
+                    style={{ maxWidth: '72px', maxHeight: '22px', width: 'auto', height: 'auto' }} />
+                : bank.logo_mark
+                    ? <img src={`/assets/mint/mint/${bank.logo_mark}`} alt="" style={{ width: '20px', height: '20px' }} />
+                    : <Landmark size="18px" />}
+            <div className="flex min-w-0 flex-col leading-tight">
+                <span className="truncate text-sm font-medium">{bank.account_name}</span>
+                <span title={_("GL Account")} className="truncate text-xs text-muted-foreground">{bank.account}</span>
+            </div>
+        </div>
     }
 
     return <div

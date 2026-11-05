@@ -39,8 +39,10 @@ const BankBalance = () => {
         //// fixed widths and a hard border; embedded in the desk chrome the available width is much
         //// smaller and the figures overflowed, so the row wraps and the divider only shows from lg.
         //// Every hunk of this file below is the same density/responsive pass plus one _() wrap.
-        <div className="flex flex-wrap justify-between gap-y-4 gap-x-4">
-            <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-6 gap-y-2 pr-4 lg:pr-8 lg:border-r-border lg:border-r">
+        //// Neoffice — one band: the four figures and the progress side by side, their explanations behind an info icon
+        //// (Daniel, 05.11: « il faut optimiser la place au sommet », what matters is the list below).
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+            <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-8 gap-y-1 pr-4 lg:pr-6 lg:border-r-border lg:border-r">
                 <OpeningBalance />
                 <ClosingBalance />
                 <ClosingBalanceAsPerStatement />
@@ -52,10 +54,19 @@ const BankBalance = () => {
     )
 }
 
-//// Neoffice — added: a line under each figure of the strip saying where it comes from. Nobody could tell what the
-//// four figures were (Daniel, 05.11: « je ne comprends pas d'où il prend ces valeurs »).
-const StatNote = ({ children }: { children: React.ReactNode }) => (
-    <span className="max-w-[16rem] text-xs leading-snug text-muted-foreground">{children}</span>
+//// Neoffice — added: the label of a figure with, behind an info icon, where it comes from. Nobody could tell what the
+//// four figures were (Daniel, 05.11: « je ne comprends pas d'où il prend ces valeurs »); the sentence is not shown all
+//// the time, it would cost a line of the screen.
+const LabelWithInfo = ({ label, info }: { label: string, info?: React.ReactNode }) => (
+    <div className="flex items-start gap-1">
+        <StatLabel>{label}</StatLabel>
+        {info && <HoverCard openDelay={100}>
+            <HoverCardTrigger><Info size='14px' className="text-secondary-foreground/80" /></HoverCardTrigger>
+            <HoverCardContent className="w-80" align="start" side="bottom">
+                <Paragraph className="text-sm">{info}</Paragraph>
+            </HoverCardContent>
+        </HoverCard>}
+    </div>
 )
 
 const OpeningBalance = () => {
@@ -64,11 +75,9 @@ const OpeningBalance = () => {
 
     //// Neoffice — min-w-48 to min-w-32 (1f2847e), same density pass.
     return <StatContainer className="min-w-32">
-        <StatLabel>{_("Opening Balance")}</StatLabel>
+        <LabelWithInfo label={_("Opening Balance")} info={_("Calculated the same way, the day before the period starts.")} />
         {/* //// Neoffice — skeleton resized to match the smaller figures (1f2847e). */}
-        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
-        {/* //// Neoffice — caption, see StatNote. */}
-        <StatNote>{_("Calculated the same way, the day before the period starts.")}</StatNote>
+        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
     </StatContainer>
 }
 
@@ -105,9 +114,7 @@ const ClosingBalance = () => {
 
             </div>
             {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
-            {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
-            {/* //// Neoffice — caption, see StatNote. */}
-            <StatNote>{_("What the bank should show: the ledger balance, without the payments the bank has not processed yet.")}</StatNote>
+            {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
         </StatContainer>
     )
 }
@@ -125,14 +132,13 @@ const Difference = () => {
 
     //// Neoffice — sm:min-w-56 to sm:min-w-32 (1f2847e), same density pass.
     return <StatContainer className="w-fit text-right sm:min-w-32">
-        <StatLabel className="text-right">{_("Difference")}</StatLabel>
+        <LabelWithInfo label={_("Difference")} info={_("Statement minus system.")} />
         {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
         {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className={isError ? 'text-destructive font-mono' : 'font-mono'}>
             {formatCurrency(difference,
                 bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))
             }</StatValue>}
-        {/* //// Neoffice — caption, see StatNote. */}
-        <StatNote>{_("Statement minus system.")}</StatNote>
+        {/* //// Neoffice — the caption of the figure moved behind the info icon of its label (LabelWithInfo). */}
     </StatContainer>
 }
 
@@ -174,22 +180,23 @@ const ReconcileProgress = () => {
 
     //// Neoffice — fixed 18% width replaced by a min/max clamp (1f2847e): in the embedded shell
     //// the percentage collapsed the progress block to a few pixels on a laptop.
-    return <div className="flex flex-col gap-1 items-end min-w-[180px] w-full lg:w-auto lg:min-w-[200px] lg:max-w-[260px]">
-        <div>
+    return <div className="flex flex-col gap-1 items-end min-w-[180px] w-full lg:w-auto lg:min-w-[240px]">
+        <div className="flex flex-wrap items-baseline justify-end gap-x-3">
             {/* //// Neoffice — whitespace-nowrap added (1f2847e): the French wording is longer and wrapped */}
             {/* //// mid-sentence in the narrower column. */}
             <span className="text-right font-medium text-sm whitespace-nowrap">{_("Your Progress")}: {reconciledCount} / {totalCount} {_("reconciled")}</span>
+            {/* //// Neoffice — the amount still to deal with, in and out, on the same line as the count. */}
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                {_("Still to deal with")}:{" "}
+                <span className="font-mono tabular-nums text-foreground">+{formatCurrency(toProcess.deposits, currency)}</span>
+                {" · "}
+                <span className="font-mono tabular-nums text-foreground">−{formatCurrency(toProcess.withdrawals, currency)}</span>
+            </span>
         </div>
         <div className="w-full">
             <Progress value={progress} max={100} />
         </div>
-        {/* //// Neoffice — the amount to process, in and out. */}
-        <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
-            {_("Still to deal with")}:{" "}
-            <span className="font-mono tabular-nums text-foreground">+{formatCurrency(toProcess.deposits, currency)}</span>
-            {" · "}
-            <span className="font-mono tabular-nums text-foreground">−{formatCurrency(toProcess.withdrawals, currency)}</span>
-        </div>
+        {/* //// Neoffice — the amounts that stood under the bar moved up to the line of the count. */}
     </div>
 }
 
@@ -220,15 +227,22 @@ const ClosingBalanceAsPerStatement = () => {
 
     //// Neoffice — min-w-48 to min-w-36 (1f2847e), same density pass.
     return <StatContainer className="min-w-36">
-        <StatLabel>{_("Closing Balance as per statement")}</StatLabel>
-        <div className="flex flex-col gap-2 items-start">
+        <LabelWithInfo
+            label={_("Closing Balance as per statement")}
+            info={data?.message?.source === "file"
+                ? _("From the statement file imported, as of {0}.", [statementDay])
+                : data?.message?.source === "typed"
+                    ? _("Typed by hand.")
+                    : _("Not known yet: click the figure to enter it.")}
+        />
+        <div className="flex items-baseline gap-2">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger>
                     <Tooltip>
                         {/* //// Neoffice — gap and skeleton tightened (1f2847e), same density pass. */}
                         <TooltipTrigger asChild>
                             <div className="flex items-center gap-3 underline cursor-pointer underline-offset-6">
-                                {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+                                {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
                                 <Edit className="w-4 h-4" />
                             </div>
                         </TooltipTrigger>
@@ -248,14 +262,7 @@ const ClosingBalanceAsPerStatement = () => {
 
                 </DialogContent>
             </Dialog>
-            {/* //// Neoffice — where the figure comes from: the file the bank sent, or what somebody typed. */}
-            <StatNote>
-                {data?.message?.source === "file"
-                    ? _("From the statement file imported, as of {0}.", [statementDay])
-                    : data?.message?.source === "typed"
-                        ? _("Typed by hand.")
-                        : _("Not known yet: click the figure to enter it.")}
-            </StatNote>
+            {/* //// Neoffice — the source of the figure moved behind the info icon of its label (LabelWithInfo). */}
             {!isDateSame && data?.message.date && <span className="text-xs font-medium text-destructive">{_("As of {0}", [formatDate(data?.message?.date ?? '', 'Do MMM YYYY')])}</span>}
         </div>
     </StatContainer>
