@@ -121,6 +121,8 @@ created: what became of the line is read from it, never copied back) and `decisi
 person decided to pass or leave open a gap, who and when: the only thing no other document records).
 Added for the credit note of a balance (`mint/apis/gap_credit_note.py`): `credit_note` (the credit note a person made for the
 balance of a partial payment: no other document of the import records it).
+Added for the rule of a customer (`mint/apis/gap_rule.py`, ours whole, no upstream equivalent). The doctype file `mint/mint/doctype/payment_gap_rule/payment_gap_rule.json` is added whole (JSON takes no comment); the line field below is added to the import-lines doctype:
+`payment_gap_rule` (the rule that prepared or made the handling of a line: the line is where the import says what it did).
 Pure additions; they leave with the import doctype when the move to `banking/` renames it.
 The `columns` widths and the `in_list_view` flips on `reference`, `imported` and
 `string_amount` are **upstream's** v1.5.0 (`89e7929`). No upstream field removed.

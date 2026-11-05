@@ -70,7 +70,7 @@ class TestGapCreditNote(GapImportCase):
 	# -- what it is made of ---------------------------------------------------------------------------------------------
 
 	def test_a_customer_with_no_credit_note_gets_the_company_account_and_no_item(self):
-		with _only_for("tabSales Invoice Item", []):
+		with _only_for("tabSales Invoice Item` it", []):
 			d = gap_credit_note.defaults(COMPANY, self._customer())
 		self.assertEqual((d.source, d.account, d.item_code, d.times), ("company", GAP_ACCOUNT, None, 0))
 
@@ -79,7 +79,7 @@ class TestGapCreditNote(GapImportCase):
 			item_code=None, item_name="perte-sur-debiteur", income_account=GAP_ACCOUNT, taxes_and_charges=None, times=3,
 			last_day="2026-10-01", item_tax_template=None,
 		)
-		with _only_for("tabSales Invoice Item", [row]):
+		with _only_for("tabSales Invoice Item` it", [row]):
 			d = gap_credit_note.defaults(COMPANY, self._customer())
 		self.assertEqual((d.source, d.item_name, d.account, d.times), ("history", "perte-sur-debiteur", GAP_ACCOUNT, 3))
 
@@ -186,7 +186,7 @@ class TestGapCreditNote(GapImportCase):
 		frappe.db.set_value("Neoffice Company Settings", COMPANY, "payment_gap_account", None)
 		frappe.clear_document_cache("Company", COMPANY)
 		_statement, bank_line, owed, part = self._partial(0.6)
-		with _only_for("tabSales Invoice Item", []):
+		with _only_for("tabSales Invoice Item` it", []):
 			waiting = follow_up.get_gap_decision(bank_line, credit_note=1)
 			self.assertTrue(waiting["credit_note_chosen"])
 			self.assertFalse(waiting["can_pass"])

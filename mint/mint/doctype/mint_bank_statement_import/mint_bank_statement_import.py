@@ -452,6 +452,15 @@ def _pass_the_gap(transaction, bank_tx, invoice_type: str, invoice_name: str, le
 		return False
 
 	transaction.db_set({"difference_kind": verdict.kind, "difference_amount": verdict.gap})
+	# //// Neoffice — the rule of the customer (Payment Gap Rule): a short payment of a sale is prepared as a draft or made by
+	# //// itself when a person gave the customer that level; at any doubt the line stays for a person (mint/apis/gap_rule.py).
+	if verdict.kind == "partial" and invoice_type == "Sales Invoice" and not _payment_entry_exists_for(
+		reference, amount, invoice_type, invoice_name
+	):
+		from mint.apis import gap_rule
+
+		if gap_rule.handle_at_import(verdict, invoice_name, transaction, bank_tx.name, ledger_account, stats):
+			return True
 	if verdict.automatic and not _payment_entry_exists_for(reference, amount, invoice_type, invoice_name):
 		party = transaction.party_name or transaction.party_match
 		entry = payment_gap.book(

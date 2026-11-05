@@ -60,6 +60,7 @@ export const describeLine = (line: ImportLine, currency: string): string => {
     const voucher = line.vouchers[0]
     switch (line.state) {
         case "passed_alone":
+            if (line.rule) return _("Made by itself by the rule of the customer, credit note {0}", [line.credit_note ?? ""])
             return gap ? _("Passed by the import, gap of {0}", [gap]) : _("Passed by the import")
         case "handled":
             if (line.credit_note) return _("Reconciled, the rest settled by the credit note {0}", [line.credit_note])

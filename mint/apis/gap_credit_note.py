@@ -170,8 +170,8 @@ def preview(company: str, customer: str, on, gross: float, account: str | None =
 	return out
 
 
-def create(company: str, customer: str, on, gross: float, account: str | None, remark: str) -> str:
-	"""The credit note of the balance, made and submitted. Its name."""
+def _built(company: str, customer: str, on, gross: float, account: str | None, remark: str):
+	"""The credit note of the balance, measured and not yet saved (what create() and prepare() both start from)."""
 	frappe.has_permission("Sales Invoice", ptype="create", throw=True)
 	d = defaults(company, customer)
 	chosen = account or d.account
@@ -180,6 +180,49 @@ def create(company: str, customer: str, on, gross: float, account: str | None, r
 		frappe.throw(blocker)
 	doc = _measured(company, customer, on, gross, d, chosen)
 	doc.remarks = remark
+	return doc
+
+
+def prepare(company: str, customer: str, on, gross: float, account: str | None, remark: str) -> str:
+	"""The credit note of the balance saved as a DRAFT: nothing is booked, a person opens it, corrects it if needed, and
+	validates it from the card of the gap (create() then submits this very draft)."""
+	doc = _built(company, customer, on, gross, account, remark)
+	doc.insert()
+	return doc.name
+
+
+def _submitted_draft(company: str, customer: str, gross: float, draft: str, remark: str) -> str | None:
+	"""Submit the draft prepared earlier when it is still the credit note of this balance; a draft made for another
+	amount or another customer is out of date: it is removed (it is the draft this flow prepared, never a document of
+	somebody else's work, and nothing was ever booked on it) and None is returned."""
+	row = frappe.db.get_value(
+		"Sales Invoice", draft, ["docstatus", "customer", "company", "is_return", "grand_total"], as_dict=True
+	)
+	if not row or row.docstatus != 0 or not row.is_return:
+		return None
+	if row.customer == customer and row.company == company and abs(abs(flt(row.grand_total, 2)) - flt(gross, 2)) <= 0.005:
+		doc = frappe.get_doc("Sales Invoice", draft)
+		doc.remarks = remark
+		doc.submit()
+		return doc.name
+	# the line of the import that points at it lets go first: a document that is linked cannot be deleted
+	for row in frappe.get_all("Mint Bank Statement Import Transactions", filters={"credit_note": draft}, pluck="name"):
+		frappe.db.set_value("Mint Bank Statement Import Transactions", row, "credit_note", None, update_modified=False)
+	frappe.delete_doc("Sales Invoice", draft, ignore_permissions=True)
+	return None
+
+
+def create(
+	company: str, customer: str, on, gross: float, account: str | None, remark: str, draft: str | None = None
+) -> str:
+	"""The credit note of the balance, made and submitted: the draft prepared earlier when there is one and it is still
+	right, else a new one. Its name."""
+	frappe.has_permission("Sales Invoice", ptype="create", throw=True)
+	if draft:
+		name = _submitted_draft(company, customer, gross, draft, remark)
+		if name:
+			return name
+	doc = _built(company, customer, on, gross, account, remark)
 	doc.insert()
 	doc.submit()
 	return doc.name

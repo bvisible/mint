@@ -5,7 +5,7 @@ import { useFrappeGetCall, useFrappePostCall, useSWRConfig } from "frappe-react-
 import { AlertCircle } from "lucide-react"
 import NoraOrb from "@/components/common/NoraOrb"
 import { useSetAtom } from "jotai"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { bankRecRecordPaymentModalAtom, bankRecUnreconcileModalAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import { UnreconciledTransaction, useRefreshUnreconciledTransactions } from "@/components/features/BankReconciliation/utils"
@@ -16,7 +16,7 @@ import { formatDate } from "@/lib/date"
 import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { API } from "./api"
-import type { GapDecision } from "./types"
+import type { GapDecision, RuleMode } from "./types"
 import { documentHref } from "./utils"
 
 /** The verdict, in a sentence a person can check against the figures under it. */
@@ -71,8 +71,22 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
         { revalidateOnFocus: false, keepPreviousData: true },
     )
     const { call: decide, loading, error } = useFrappePostCall<{ message: { payment_entry: string | null, credit_note: string | null } }>(`${API}.decide_gap`)
+    const { call: setRule, loading: ruleLoading, error: ruleError } = useFrappePostCall(`${API}.set_gap_rule`)
 
     const decision = data?.message
+
+    // What the customer's rule says to do with a payment like this one, or the draft it had prepared, is chosen at the
+    // start; after that the person's own choice is not touched again.
+    const preselected = useRef(false)
+    useEffect(() => {
+        if (!decision || preselected.current) return
+        const wanted = decision.draft ? "credit" : decision.rule_proposal === "credit_note" ? "credit" : decision.rule_proposal === "gap" ? "gap" : null
+        if (wanted) {
+            preselected.current = true
+            setMode(wanted)
+        }
+    }, [decision])
+
     if (!decision) return null
 
     const refresh = () => mutate((key) => Array.isArray(key) && key[0] === "statement-imports")
@@ -103,6 +117,14 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
         ? (credit ? _("Create the credit note and reconcile") : settle ? _("Settle the invoice and pass the gap") : _("Record the partial payment"))
         : _("Pass the gap and reconcile")
     const showAccount = decision.account_editable && (!isPartial || settle || credit)
+    const rule = decision.rule
+    const draft = decision.draft
+    const onRule = (level: RuleMode) => {
+        setRule({ bank_transaction: transaction.name, mode: level, action: settle ? "gap" : "credit_note", account: account ?? undefined })
+            .then(() => refresh())
+    }
+    const levelAvailable = (level: RuleMode) =>
+        level !== "automatic" || (rule?.exists ? !!rule.can_automatic : (habit?.closed_by_credit ?? 0) >= (rule?.auto_after ?? 3))
     const modeButton = (value: "open" | "credit" | "gap", label: string) => (
         <Button key={value} size="sm" variant={mode === value ? "default" : "outline"} onClick={() => choose(value)}>{label}</Button>
     )
@@ -130,7 +152,15 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     </tr>
                 </tbody>
             </table>
-            {isPartial && habit?.proposal === "credit_note" && note && (
+            {draft && (
+                <div className="flex flex-wrap items-center gap-3 rounded-md border border-amber-200 bg-white/60 p-2.5">
+                    <span className="text-sm leading-snug">
+                        {_("A credit note of {0} was prepared as a draft: {1}.", [formatCurrency(draft.total, verdict.currency), draft.name])}
+                    </span>
+                    <a className="text-sm underline underline-offset-2" href={documentHref("Sales Invoice", draft.name)} target="_blank" rel="noopener noreferrer">{_("Open the draft")}</a>
+                </div>
+            )}
+            {isPartial && habit?.proposal === "credit_note" && note && !draft && (
                 <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-white/60 p-2.5">
                     <NoraOrb size={22} className="mt-0.5 shrink-0" />
                     <div className="flex min-w-0 flex-col gap-1.5">
@@ -208,11 +238,35 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     )}
                 </div>
             )}
+            {isPartial && rule && (credit || settle || rule.exists) && (
+                <div className="flex flex-col gap-1.5 rounded-md border border-amber-200 bg-white/60 p-2.5">
+                    <span className="text-sm font-medium">{_("Rule for this customer")}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                        {(["suggest", "draft", "automatic"] as RuleMode[]).map((level) => (
+                            <Button
+                                key={level}
+                                size="sm"
+                                variant={rule.exists && rule.mode === level ? "default" : "outline"}
+                                disabled={ruleLoading || !levelAvailable(level)}
+                                onClick={() => onRule(level)}
+                            >
+                                {level === "suggest" ? _("Propose it to me") : level === "draft" ? _("Prepare it as a draft") : _("Make it by itself")}
+                            </Button>
+                        ))}
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                        {rule.exists
+                            ? _("Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}.", [String(rule.share ?? 0), String(rule.confirmed_times ?? 0), String(rule.auto_after)])
+                            : _("No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person.", [String(rule.auto_after)])}
+                    </span>
+                    {ruleError && <ErrorBanner error={ruleError} />}
+                </div>
+            )}
             {decision.blocker && <p className="text-sm font-medium text-destructive">{decision.blocker}</p>}
             {error && <ErrorBanner error={error} />}
             <div className="flex flex-wrap items-center gap-3">
                 {decision.can_pass && (
-                    <Button disabled={loading} onClick={() => onDecide("passed_gap")}>{passLabel}</Button>
+                    <Button disabled={loading} onClick={() => onDecide("passed_gap")}>{draft && credit ? _("Validate the draft and reconcile") : passLabel}</Button>
                 )}
                 {decision.decision !== "left_open" && (
                     <Button variant="outline" disabled={loading} onClick={() => onDecide("left_open")}>{_("Leave open")}</Button>

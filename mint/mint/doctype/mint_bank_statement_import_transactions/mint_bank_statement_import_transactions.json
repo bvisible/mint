@@ -156,6 +156,14 @@
    "description": "The Bank Transaction this line created: what became of the line is read from it."
   },
   {
+   "fieldname": "payment_gap_rule",
+   "fieldtype": "Link",
+   "label": "Payment Gap Rule",
+   "options": "Payment Gap Rule",
+   "read_only": 1,
+   "description": "The rule of the customer that prepared or made the handling of this line."
+  },
+  {
    "fieldname": "credit_note",
    "fieldtype": "Link",
    "label": "Credit Note",
@@ -211,7 +219,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-11-05 13:00:00.000000",
+ "modified": "2026-11-05 14:40:00.000000",
  "modified_by": "Administrator",
  "module": "Mint",
  "name": "Mint Bank Statement Import Transactions",

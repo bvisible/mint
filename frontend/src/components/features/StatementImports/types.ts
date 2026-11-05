@@ -54,6 +54,8 @@ export type ImportLine = {
     decided_by: string | null,
     decided_on: string | null,
     credit_note: string | null,
+    /** The rule of the customer that prepared or made the handling of this line. */
+    rule: string | null,
 }
 
 export type ImportOverview = Omit<StatementImport, "creation" | "owner" | "import_summary" | "status"> & {
@@ -109,6 +111,27 @@ export type GapDecision = {
     credit_note: CreditNotePreview | null,
     /** What the customer's own invoices say about a payment at this share (null when there is nothing to read). */
     history: GapHistory | null,
+    /** The rule a person made for this customer (exists = false when there is none), and what it says to do here. */
+    rule: GapRule | null,
+    rule_proposal: "credit_note" | "gap" | null,
+    /** The credit note the rule had the import prepare as a draft, waiting to be validated. */
+    draft: { name: string, total: number } | null,
+}
+
+export type RuleMode = "suggest" | "draft" | "automatic"
+
+export type GapRule = {
+    exists: boolean,
+    auto_after: number,
+    name?: string,
+    mode?: RuleMode,
+    action?: "credit_note" | "gap",
+    share?: number,
+    account?: string | null,
+    confirmed_times?: number,
+    can_automatic?: boolean,
+    matches?: boolean,
+    disabled?: boolean,
 }
 
 export type CreditNotePreview = {

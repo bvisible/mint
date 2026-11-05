@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-11-05 14:30:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "customer",
+  "disabled",
+  "column_break_rule",
+  "action",
+  "mode",
+  "section_break_habit",
+  "share",
+  "account",
+  "column_break_habit",
+  "confirmed_times",
+  "last_confirmed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "column_break_rule",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "credit_note",
+   "description": "What becomes of the balance when this customer pays less than the invoice, beyond a small gap.",
+   "fieldname": "action",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Balance",
+   "options": "credit_note\ngap",
+   "reqd": 1
+  },
+  {
+   "default": "suggest",
+   "description": "suggest: the card proposes it. draft: the credit note is prepared as a draft. automatic: it is made by itself, only after repeated confirmations.",
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Level",
+   "options": "suggest\ndraft\nautomatic",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_habit",
+   "fieldtype": "Section Break",
+   "label": "Habit of the customer"
+  },
+  {
+   "description": "The share of the invoice this customer usually pays. The rule applies to a payment within two points of it.",
+   "fieldname": "share",
+   "fieldtype": "Percent",
+   "label": "Usual share of the invoice"
+  },
+  {
+   "description": "The account of the credit note or of the gap. Empty: the one of the customer's previous credit notes, else the company's gap account.",
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "label": "Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_habit",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "How many times a person confirmed this handling for this customer. The level automatic is only available from three.",
+   "fieldname": "confirmed_times",
+   "fieldtype": "Int",
+   "label": "Confirmations",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_confirmed_on",
+   "fieldtype": "Date",
+   "label": "Last confirmed on",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-11-05 14:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mint",
+ "name": "Payment Gap Rule",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "customer"
+}
