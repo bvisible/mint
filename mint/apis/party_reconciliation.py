@@ -227,19 +227,19 @@ def _pick(rows: list[dict], chosen: list, kind_key: str, name_key: str, amount_k
 	for choice in chosen:
 		key = key_of(choice)
 		if key in seen:
-			frappe.throw(_("{0} {1} is chosen twice.").format(_(key[0] or ""), key[1]))
+			frappe.throw(_("{0} {1} is chosen twice.").format((_(key[0]) if key[0] else ""), key[1]))
 		seen.add(key)
 		row = by_key.get(key)
 		if not row:
 			frappe.throw(
-				_("{0} {1} is no longer open: someone has reconciled it, or it was cancelled. Reload the party.").format(_(key[0] or ""), key[1]),
+				_("{0} {1} is no longer open: someone has reconciled it, or it was cancelled. Reload the party.").format((_(key[0]) if key[0] else ""), key[1]),
 				title=_("The party has changed"),
 			)
 		available = flt(row[amount_key])
 		amount = flt(choice.get("amount")) or available
 		if amount <= 0 or amount > available + CENT:
 			frappe.throw(
-				_("{0} {1}: {2} asked, {3} left. Reload the party.").format(_(key[0] or ""), key[1], amount, available),
+				_("{0} {1}: {2} asked, {3} left. Reload the party.").format((_(key[0]) if key[0] else ""), key[1], amount, available),
 				title=_("The party has changed"),
 			)
 		picked.append({**row, amount_key: min(amount, available)})
