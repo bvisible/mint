@@ -21,6 +21,8 @@ import '@neoffice/nora-learn-react/styles'
 import { EMBEDDED, outerWindow } from './lib/embedded'
 //// Neoffice — added: the party reconciliation screen, and the bridge that lets the desk's tabs move this frame.
 import PartyReconciliation from './pages/PartyReconciliation'
+//// Neoffice — added: what each bank statement import brought in and what became of its lines.
+import StatementImports from './pages/StatementImports'
 import DeskBridge from './lib/deskBridge'
 
 // Frappe integration flag — set by mint/www/mint.html before the bundle loads.
@@ -119,6 +121,8 @@ function App() {
 				<Route path="/statement-importer" element={<BankStatementImporter />} />
 				{/* //// Neoffice — added: reconciling a party's payments with its invoices. */}
 				<Route path="/party-reconciliation" element={<PartyReconciliation />} />
+				{/* //// Neoffice — added: the follow-up of the bank statement imports. */}
+				<Route path="/statement-imports" element={<StatementImports />} />
 				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>
 		</BrowserRouter>

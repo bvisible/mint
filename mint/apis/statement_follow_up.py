@@ -153,6 +153,27 @@ def _vouchers(bank_line: str) -> list[dict]:
 	return vouchers
 
 
+def latest_file_balance(bank_account: str, on_or_before) -> frappe._dict | None:
+	"""The closing balance the bank itself wrote in the latest statement file imported for this account, with the day
+	of the last line of that statement (the file gives the balance, not always its day). None when no file says one."""
+	rows = frappe.db.sql(
+		f"""
+		select i.name, i.closing_balance as balance, max(t.date) as date
+		from `tab{IMPORT}` i
+		join `tab{LINE}` t on t.parent = i.name and t.parenttype = %(doctype)s
+		where i.docstatus = 1 and i.file_type = 'XML' and i.bank_account = %(bank_account)s
+			and i.closing_balance != 0 and t.status in ('Paid', 'Imported', 'Existing')
+		group by i.name, i.closing_balance, i.creation
+		having max(t.date) <= %(on_or_before)s
+		order by max(t.date) desc, i.creation desc
+		limit 1
+		""",
+		{"doctype": IMPORT, "bank_account": bank_account, "on_or_before": on_or_before},
+		as_dict=True,
+	)
+	return rows[0] if rows else None
+
+
 @frappe.whitelist()
 def get_import_overview(name: str) -> dict:
 	"""One import told line by line: where it came from, how far along it is, and what became of each line."""

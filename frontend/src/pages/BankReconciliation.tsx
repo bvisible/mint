@@ -21,6 +21,9 @@ import _ from "@/lib/translate"
 //// Neoffice — added: framed in a tab of the desk (lib/embedded.ts).
 import { EMBEDDED } from "@/lib/embedded"
 import { useLayoutEffect, useRef, useState } from "react"
+//// Neoffice — added: the link to the follow-up of the imports.
+import { Link } from "react-router"
+import { Button } from "@/components/ui/button"
 
 
 const BankReconciliation = () => {
@@ -60,6 +63,10 @@ const BankReconciliation = () => {
                     )}
                     <div className="flex flex-wrap items-center gap-2">
                         <TooltipProvider>
+                            {/* //// Neoffice — added: from the reconciliation to the imports and what became of their lines. */}
+                            <Button variant="outline" size="sm" asChild>
+                                <Link to="/statement-imports">{_("Imports")}</Link>
+                            </Button>
                             <RuleConfigureButton />
                             <Settings />
                             <ActionLog />

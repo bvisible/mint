@@ -8,7 +8,7 @@
 
 import frappe
 from frappe.tests.roles import as_role
-from frappe.utils import flt
+from frappe.utils import add_days, flt, nowdate
 
 from mint.apis import payment_gap, statement_follow_up as follow_up
 from mint.apis.test_payment_gap_import import GapImportCase
@@ -134,6 +134,25 @@ class TestStatementFollowUp(GapImportCase):
 		overview = self._overview(draft)
 		self.assertEqual(overview["lines"][0]["state"], "not_imported")
 		self.assertEqual(overview["progress"], {"total": 0, "waiting": 0, "done": 0})
+
+	def test_the_statement_balance_comes_from_the_latest_file_unless_a_person_typed_one_for_that_day(self):  # role-check: ok the balance is typed by the accountant; set as the system here
+		from mint.apis import bank_account as accounts
+
+		statement = self._import(self._line("Sales Invoice", self.sales, 10))
+		frappe.db.set_value("Mint Bank Statement Import", statement.name, {"docstatus": 1, "closing_balance": 1234.5})
+		today = nowdate()
+		answer = accounts.get_closing_balance_as_per_statement(self.bank_account, today)
+		self.assertEqual(
+			(answer["source"], flt(answer["balance"], 2), answer["statement_import"]), ("file", 1234.5, statement.name)
+		)
+		self.assertEqual(str(answer["date"]), today)
+		# a figure a person typed for the same day wins over the file of that day
+		accounts.set_closing_balance_as_per_statement(self.bank_account, today, 99.0)
+		typed = accounts.get_closing_balance_as_per_statement(self.bank_account, today)
+		self.assertEqual((typed["source"], flt(typed["balance"], 2)), ("typed", 99.0))
+		# asked for a day before the last line of that file, the file says nothing
+		before = accounts.get_closing_balance_as_per_statement(self.bank_account, add_days(today, -3650))
+		self.assertNotEqual(before.get("statement_import"), statement.name)
 
 	# -- the list ---------------------------------------------------------------------------------------------------
 

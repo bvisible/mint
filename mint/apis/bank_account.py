@@ -7,6 +7,9 @@ import frappe
 # //// ours, re-apply them on upstream's version.
 import datetime
 
+# //// Neoffice — getdate: the file's balance is compared with the typed one by day (get_closing_balance_as_per_statement).
+from frappe.utils import getdate
+
 @frappe.whitelist(methods=["GET"])
 @frappe.read_only()
 def get_list(company: str, show_disabled: bool = False):
@@ -61,14 +64,33 @@ def get_closing_balance_as_per_statement(bank_account: str, date: str):
         "date": ["<=", date]
     }, fields=["balance", "date"], order_by="date desc", limit=1)
 
-    if latest_balance:
+    # //// Neoffice — the statement file the bank sent carries its closing balance: when it is more recent than the one
+    # //// somebody typed (or nobody typed any), it is the balance as per statement, and the answer says where it
+    # //// comes from. Typing was the only way before, so the figure was empty until somebody did. A tie goes to the
+    # //// typed one: a person's correction wins over the file of the same day.
+    from mint.apis.statement_follow_up import latest_file_balance
+
+    typed = latest_balance[0] if latest_balance else None
+    from_file = latest_file_balance(bank_account, date)
+    if from_file and (not typed or getdate(from_file.date) > getdate(typed.date)):
         return {
-            "balance": latest_balance[0].balance,
-            "date": latest_balance[0].date
+            "balance": from_file.balance,
+            "date": from_file.date,
+            "source": "file",
+            "statement_import": from_file.name,
         }
+    # //// Neoffice — the same answers as before, each now naming where the figure comes from.
+    if typed:
+        return {
+            "balance": typed.balance,
+            "date": typed.date,
+            "source": "typed"
+        }
+    # //// Neoffice — nothing typed, no file: the same empty answer, with its source empty too.
     return {
         "balance": 0,
-        "date": None
+        "date": None,
+        "source": None
     }
 
 # //// Neoffice — POST only, as ERPNext v16 and v15-hotfix do for every method that writes; the SPA already

@@ -75,7 +75,8 @@ export const useGetAccountClosingBalanceAsPerStatement = (swrConfig: SWRConfigur
     const dates = useAtomValue(bankRecDateAtom)
     const bankAccount = useAtomValue(selectedBankAccountAtom)
 
-    return useFrappeGetCall<{ message: { balance: number, date?: string } }>("mint.apis.bank_account.get_closing_balance_as_per_statement", {
+    //// Neoffice — the answer also names its source (a file the bank sent, or typed by hand): see bank_account.py.
+    return useFrappeGetCall<{ message: { balance: number, date?: string, source?: "file" | "typed" | null, statement_import?: string } }>("mint.apis.bank_account.get_closing_balance_as_per_statement", {
         bank_account: bankAccount?.name,
         date: dates.toDate
     }, `bank-reconciliation-account-closing-balance-as-per-statement-${bankAccount?.name}-${dates.toDate}`, {

@@ -19,7 +19,8 @@ import { Form } from "@/components/ui/form"
 import { CurrencyFormField } from "@/components/ui/form-elements"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
-import { useContext, useState } from "react"
+//// Neoffice — useMemo: the amount still to deal with (ReconcileProgress).
+import { useContext, useMemo, useState } from "react"
 import { Separator } from "@/components/ui/separator"
 import { MintBankStatementBalance } from "@/types/Mint/MintBankStatementBalance"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -51,6 +52,12 @@ const BankBalance = () => {
     )
 }
 
+//// Neoffice — added: a line under each figure of the strip saying where it comes from. Nobody could tell what the
+//// four figures were (Daniel, 05.11: « je ne comprends pas d'où il prend ces valeurs »).
+const StatNote = ({ children }: { children: React.ReactNode }) => (
+    <span className="max-w-[16rem] text-xs leading-snug text-muted-foreground">{children}</span>
+)
+
 const OpeningBalance = () => {
     const bankAccount = useAtomValue(selectedBankAccountAtom)
     const { data, isLoading } = useGetAccountOpeningBalance()
@@ -60,6 +67,8 @@ const OpeningBalance = () => {
         <StatLabel>{_("Opening Balance")}</StatLabel>
         {/* //// Neoffice — skeleton resized to match the smaller figures (1f2847e). */}
         {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+        {/* //// Neoffice — caption, see StatNote. */}
+        <StatNote>{_("Calculated the same way, the day before the period starts.")}</StatNote>
     </StatContainer>
 }
 
@@ -97,6 +106,8 @@ const ClosingBalance = () => {
             </div>
             {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
             {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+            {/* //// Neoffice — caption, see StatNote. */}
+            <StatNote>{_("What the bank should show: the ledger balance, without the payments the bank has not processed yet.")}</StatNote>
         </StatContainer>
     )
 }
@@ -120,6 +131,8 @@ const Difference = () => {
             {formatCurrency(difference,
                 bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))
             }</StatValue>}
+        {/* //// Neoffice — caption, see StatNote. */}
+        <StatNote>{_("Statement minus system.")}</StatNote>
     </StatContainer>
 }
 
@@ -145,6 +158,19 @@ const ReconcileProgress = () => {
     const reconciledCount = (totalCount ?? 0) - (unreconciledTransactions?.message?.length ?? 0)
 
     const progress = (totalCount ? reconciledCount / totalCount : 0) * 100
+    //// Neoffice — the amount still to deal with is the sum of the lines the tables below show, in and out apart
+    //// (Daniel, 05.11: next to the number of entries, the amount to process).
+    const toProcess = useMemo(() => {
+        let deposits = 0
+        let withdrawals = 0
+        for (const transaction of unreconciledTransactions?.message ?? []) {
+            const left = flt(transaction.unallocated_amount ?? (transaction.deposit || transaction.withdrawal), 2)
+            if (flt(transaction.deposit) > 0) deposits += left
+            else withdrawals += left
+        }
+        return { deposits, withdrawals }
+    }, [unreconciledTransactions])
+    const currency = bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? '')
 
     //// Neoffice — fixed 18% width replaced by a min/max clamp (1f2847e): in the embedded shell
     //// the percentage collapsed the progress block to a few pixels on a laptop.
@@ -156,6 +182,13 @@ const ReconcileProgress = () => {
         </div>
         <div className="w-full">
             <Progress value={progress} max={100} />
+        </div>
+        {/* //// Neoffice — the amount to process, in and out. */}
+        <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
+            {_("Still to deal with")}:{" "}
+            <span className="font-mono tabular-nums text-foreground">+{formatCurrency(toProcess.deposits, currency)}</span>
+            {" · "}
+            <span className="font-mono tabular-nums text-foreground">−{formatCurrency(toProcess.withdrawals, currency)}</span>
         </div>
     </div>
 }
@@ -212,6 +245,14 @@ const ClosingBalanceAsPerStatement = () => {
 
                 </DialogContent>
             </Dialog>
+            {/* //// Neoffice — where the figure comes from: the file the bank sent, or what somebody typed. */}
+            <StatNote>
+                {data?.message?.source === "file"
+                    ? _("From the statement file imported, as of {0}.", [formatDate(data?.message?.date ?? '', 'Do MMM YYYY')])
+                    : data?.message?.source === "typed"
+                        ? _("Typed by hand.")
+                        : _("Not known yet: click the figure to enter it.")}
+            </StatNote>
             {!isDateSame && data?.message.date && <span className="text-xs font-medium text-destructive">{_("As of {0}", [formatDate(data?.message?.date ?? '', 'Do MMM YYYY')])}</span>}
         </div>
     </StatContainer>
