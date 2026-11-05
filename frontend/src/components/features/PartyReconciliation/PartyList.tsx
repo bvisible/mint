@@ -11,6 +11,7 @@ import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { cn } from "@/lib/utils"
 import type { PartyRow, PartyType } from "./types"
+import { API } from "./api"
 
 type Props = {
     company: string,
@@ -34,7 +35,7 @@ const PartyList = ({ company, partyType, selected, onSelect, version, currency }
     }, [typed])
 
     const { data, error, isLoading } = useFrappeGetCall<{ message: PartyRow[] }>(
-        "mint.apis.party_reconciliation.get_parties",
+        `${API}.get_parties`,
         { company, party_type: partyType, search, only_open: onlyReconcilable ? 1 : 0, limit: 200 },
         ["party-reconciliation", "parties", company, partyType, search, onlyReconcilable, version],
         { revalidateOnFocus: false },

@@ -46,7 +46,10 @@ const PartyReconciliation = () => {
                 </div>
 
                 <div className="grid gap-4 @4xl:grid-cols-[18rem_minmax(0,1fr)]">
-                    <PartyList company={company} partyType={partyType} selected={party} onSelect={setParty} version={version} currency={currency} />
+                    {/* The list keeps its place while the party scrolls, and has its scrollbar when it is long. */}
+                    <div className="min-w-0 @4xl:sticky @4xl:top-2 @4xl:self-start @4xl:max-h-[calc(100vh-1rem)] @4xl:overflow-y-auto">
+                        <PartyList company={company} partyType={partyType} selected={party} onSelect={setParty} version={version} currency={currency} />
+                    </div>
                     {party ? (
                         <PartyDetail company={company} partyType={partyType} party={party} version={version} onReconciled={() => setVersion((current) => current + 1)} />
                     ) : (

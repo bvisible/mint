@@ -20,6 +20,7 @@ import RowMenu, { type MenuState } from "./RowMenu"
 import type { InvoiceRow, PartyDetailData, PartyType, Selection, SettlementRow } from "./types"
 import { amountProblem, byDate, includesText, invoiceKey, parseAmount, round2, settlementKey, settlementKind } from "./utils"
 import VoucherSheet, { type VoucherRef } from "./VoucherSheet"
+import { API } from "./api"
 
 type Props = {
     company: string,
@@ -40,7 +41,7 @@ const sumOf = (picks: Selection) =>
 
 const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props) => {
     const { data, error, isLoading } = useFrappeGetCall<{ message: PartyDetailData }>(
-        "mint.apis.party_reconciliation.get_party_detail",
+        `${API}.get_party_detail`,
         { company, party_type: partyType, party },
         ["party-reconciliation", "detail", company, partyType, party, version],
         { revalidateOnFocus: false },
@@ -161,6 +162,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                             <Input className="pl-7 h-9" value={invoiceSearch} onChange={(event) => setInvoiceSearch(event.target.value)} placeholder={_("Amount or reference")} />
                         </div>
                     </div>
+                    <div className="max-h-[45vh] overflow-y-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -204,6 +206,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                             {invoices.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-6">{_("No open invoice.")}</TableCell></TableRow>}
                         </TableBody>
                     </Table>
+                    </div>
                 </section>
 
                 {/* Right: what could settle them */}
@@ -215,6 +218,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                             <Input className="pl-7 h-9" value={settlementSearch} onChange={(event) => setSettlementSearch(event.target.value)} placeholder={_("Amount or reference")} />
                         </div>
                     </div>
+                    <div className="max-h-[45vh] overflow-y-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -261,6 +265,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                             {settlements.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-6">{_("Nothing to apply.")}</TableCell></TableRow>}
                         </TableBody>
                     </Table>
+                    </div>
                 </section>
             </div>
 

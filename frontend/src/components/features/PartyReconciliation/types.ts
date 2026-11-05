@@ -1,4 +1,4 @@
-//// Neoffice — added file (no upstream equivalent). The shapes of mint/apis/party_reconciliation.py.
+//// Neoffice — added file (no upstream equivalent). The shapes of the server module of the party reconciliation (see api.ts).
 
 export type PartyType = "Customer" | "Supplier"
 

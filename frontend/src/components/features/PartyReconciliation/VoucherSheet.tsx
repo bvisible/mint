@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatDate } from "@/lib/date"
 import _ from "@/lib/translate"
 import type { VoucherDetailData } from "./types"
+import { API } from "./api"
 
 export type VoucherRef = { type: string, name: string }
 
@@ -23,7 +24,7 @@ const COLUMNS: Record<string, string> = {
 
 const VoucherSheet = ({ voucher, onClose }: Props) => {
     const { data, error, isLoading } = useFrappeGetCall<{ message: VoucherDetailData }>(
-        "mint.apis.party_reconciliation.get_voucher_detail",
+        `${API}.get_voucher_detail`,
         { voucher_type: voucher?.type, voucher_name: voucher?.name },
         // null: nothing is asked while no row is open
         voucher ? ["party-reconciliation", "voucher", voucher.type, voucher.name] : null,

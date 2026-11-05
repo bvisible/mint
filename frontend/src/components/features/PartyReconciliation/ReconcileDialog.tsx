@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import type { PartyType, PreviewData } from "./types"
+import { API } from "./api"
 
 export type Chosen = {
     invoices: { invoice_type: string, invoice_number: string, amount: number }[],
@@ -29,8 +30,8 @@ type Props = {
 }
 
 const ReconcileDialog = ({ open, onOpenChange, company, partyType, party, account, chosen, currency, onDone }: Props) => {
-    const { call: previewCall, loading, error, reset } = useFrappePostCall<{ message: PreviewData }>("mint.apis.party_reconciliation.preview")
-    const { call: reconcileCall, loading: reconciling, error: reconcileError } = useFrappePostCall<{ message: unknown }>("mint.apis.party_reconciliation.reconcile")
+    const { call: previewCall, loading, error, reset } = useFrappePostCall<{ message: PreviewData }>(`${API}.preview`)
+    const { call: reconcileCall, loading: reconciling, error: reconcileError } = useFrappePostCall<{ message: unknown }>(`${API}.reconcile`)
     const [preview, setPreview] = useState<PreviewData | null>(null)
 
     const payload = { company, party_type: partyType, party, account, invoices: chosen.invoices, payments: chosen.payments }
