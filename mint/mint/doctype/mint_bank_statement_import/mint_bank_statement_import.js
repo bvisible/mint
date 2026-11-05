@@ -92,6 +92,7 @@ frappe.ui.form.on("Mint Bank Statement Import", {
         //// its lines is decided there: without this button the person stayed in the doctype.
         if (!frm.is_new()) {
             // the button of what the person does next: ink, like the primary buttons of the desk (Daniel, 05.11)
+            //// Neoffice — added .removeClass("btn-default").addClass("btn-primary") (7721387 "fix(bank files): ... the way back from the desk is a primary button"): the "Back to bank files" button is now ink, like the desk's primary buttons.
             frm.add_custom_button(__("Back to bank files"), () => {
                 frappe.router.push_state("/app/accounting?tab=reconcile&screen=%2Fmint%2Fstatement-imports");
             }).removeClass("btn-default").addClass("btn-primary");
