@@ -282,6 +282,7 @@ class TestGapRule(GapImportCase):
 			# the rest of those invoices is still owed: nothing confirms the handling yet, so no level by itself
 			refused = gap_rule.plan(COMPANY, customer, "automatic", "credit_note", account=GAP_ACCOUNT)
 		self.assertEqual((fine["change"], fine["share"], fine["share_from_habit"], fine["problems"]), ("create", 80.0, True, []))
+		self.assertEqual((fine["habit"]["same_share"], fine["habit"]["closed_by_credit"]), (3, 0))
 		self.assertTrue(refused["problems"])
 		self.assertFalse(refused["automatic_available"])
 		with patch.object(gap_credit_note, "_paid_invoices", return_value=self._paid(0.8, 0.8, 0.8, closed=True)):

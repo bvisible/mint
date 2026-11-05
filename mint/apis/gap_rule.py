@@ -259,6 +259,8 @@ def plan(
 		"account": chosen,
 		"confirmed_times": confirmed,
 		"automatic_available": confirmed >= AUTO_AFTER and bool(fraction),
+		# what the customer's own invoices say of this share: the evidence the person is shown before they say yes
+		"habit": gap_credit_note.history(company, customer, "", fraction) if fraction else None,
 		"problems": problems,
 	}
 
