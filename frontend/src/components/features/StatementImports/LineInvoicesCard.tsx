@@ -131,11 +131,13 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
     }
 
     const title = candidates.reason === "several" ? _("One payment, several invoices") : candidates.reason === "paid" ? _("No invoice recognised") : _("Pick the invoices this payment settles")
+    // formatted apart: a string literal inside the arguments of _() is read by the extractor as its CONTEXT
+    const paidOn = candidates.paid_on ? formatDate(candidates.paid_on, "Do MMM YYYY") : ""
     const lead = candidates.reason === "several"
         ? _("The import recognised {0} invoices.", [String(candidates.recognised.length)])
         : candidates.reason === "paid"
             ? (candidates.paid_on
-                ? _("The reference {0} is that of an invoice already paid, on {1}. This payment does not settle it.", [candidates.reference_hint ?? "", formatDate(candidates.paid_on, "Do MMM YYYY")])
+                ? _("The reference {0} is that of an invoice already paid, on {1}. This payment does not settle it.", [candidates.reference_hint ?? "", paidOn])
                 : _("The reference {0} is that of an invoice already paid. This payment does not settle it.", [candidates.reference_hint ?? ""]))
             : _("The import recognised no invoice.")
     const found = candidates.party_source === "iban" ? _("Found by the IBAN of the payer.") : candidates.party_source === "import" ? _("Named by the import.") : ""
@@ -158,6 +160,7 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
 
             {entries.map((entry) => {
                 const isDraft = candidates.drafts.some((draft) => draft.name === entry.name)
+                const preparedOn = formatDate(entry.on, "Do MMM YYYY")
                 return (
                     <div key={entry.name} className="flex flex-col gap-2 rounded-md border border-orange-300 bg-orange-50/60 p-3">
                         <div className="flex flex-wrap items-center gap-2">
@@ -165,7 +168,7 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
                             <a className="font-medium underline underline-offset-2" href={documentHref("Payment Entry", entry.name)} target="_blank" rel="noopener noreferrer">{entry.name}</a>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                            {_("Prepared by {0} on {1}: {2} on {3}.", [entry.by, formatDate(entry.on, "Do MMM YYYY"), formatCurrency(entry.amount, currency), entry.references.map((r) => r.invoice).join(", ")])}
+                            {_("Prepared by {0} on {1}: {2} on {3}.", [entry.by, preparedOn, formatCurrency(entry.amount, currency), entry.references.map((r) => r.invoice).join(", ")])}
                             {isDraft ? " " + _("Correct it in its tab if needed, validate it, then come back here.") : ""}
                         </p>
                         <div className="flex flex-wrap items-center gap-2">
@@ -188,9 +191,9 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
                             <tr className="border-b text-left text-xs text-muted-foreground">
                                 <th className="w-8 py-1" />
                                 <th className="py-1 font-normal">{_("Invoice")}</th>
-                                <th className="py-1 font-normal">{_("Due Date")}</th>
-                                <th className="py-1 text-right font-normal">{_("Still owed")}</th>
-                                <th className="w-32 py-1 text-right font-normal">{_("Settled by this payment")}</th>
+                                <th className="py-1 pr-2 font-normal leading-tight">{_("Due Date")}</th>
+                                <th className="py-1 pl-2 text-right font-normal leading-tight">{_("Still owed")}</th>
+                                <th className="w-32 py-1 pl-3 text-right font-normal leading-tight">{_("Settled by this payment")}</th>
                             </tr>
                         </thead>
                         <tbody>

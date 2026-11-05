@@ -3691,7 +3691,6 @@ msgstr "Préparer le brouillon"
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:168
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "Prepared by {0} on {1}: {2} on {3}."
 msgstr "Préparé par {0} le {1} : {2} sur {3}."
 
@@ -3738,7 +3737,6 @@ msgstr "Le paiement est {0}, la ligne bancaire {1}."
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:138
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "The reference {0} is that of an invoice already paid, on {1}. This payment does not settle it."
 msgstr "La référence {0} est celle d'une facture déjà réglée, le {1}. Ce paiement ne la règle pas."
 

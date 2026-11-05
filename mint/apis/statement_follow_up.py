@@ -481,6 +481,10 @@ def get_gap_decision(
 	from mint.apis import payment_gap
 
 	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
+	# an invoice that is no longer open (the reference of one already paid): nothing to decide about a gap, the card of the
+	# invoices of the line (mint.apis.line_invoices) is the one that helps
+	if not verdict.kind and flt(verdict.outstanding) <= 0.005:
+		return None
 	# the credit note of the balance is for a short payment of a sale; it excludes passing the rest as a gap
 	creditable = verdict.kind == "partial" and invoice_type == "Sales Invoice" and verdict.currency == _company_currency(
 		verdict.company

@@ -2767,7 +2767,6 @@ msgstr ""
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:168
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "Prepared by {0} on {1}: {2} on {3}."
 msgstr ""
 
@@ -3690,7 +3689,6 @@ msgstr ""
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:138
 #, python-brace-format
-msgctxt "Do MMM YYYY"
 msgid "The reference {0} is that of an invoice already paid, on {1}. This payment does not settle it."
 msgstr ""
 

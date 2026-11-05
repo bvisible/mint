@@ -9,7 +9,7 @@ import frappe
 from frappe.tests.roles import as_role
 from frappe.utils import flt
 
-from mint.apis import line_invoices
+from mint.apis import line_invoices, statement_follow_up as follow_up
 from mint.apis.test_payment_gap_import import GapImportCase
 
 IBAN = "CH93 0076 2011 6238 5295 7"
@@ -70,6 +70,9 @@ class TestLineInvoices(GapImportCase):
 		bank_line = self._bank_line(owed_b, invoices=[a])
 		shown = line_invoices.get_candidates(bank_line)
 		self.assertEqual((shown["reason"], shown["reference_hint"]), ("paid", a))
+		# there is no gap to decide on an invoice that is no longer open: this card is the one that helps
+		self.assertIsNone(follow_up.get_gap_decision(bank_line))
+		self.assertTrue(shown["show"])
 		listed = {row["name"]: row for row in shown["invoices"]}
 		self.assertNotIn(a, listed)
 		self.assertTrue(listed[b]["same_amount"])
