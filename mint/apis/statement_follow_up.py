@@ -206,6 +206,7 @@ def get_import_overview(name: str) -> dict:
 				"decision": line.decision,
 				"decided_by": line.decided_by,
 				"decided_on": line.decided_on,
+				"credit_note": line.get("credit_note"),
 			}
 		)
 	return {
@@ -291,7 +292,7 @@ def list_imports(bank_account: str | None = None, start: int = 0, limit: int = 2
 	]
 
 
-def note_decision(bank_transaction: str, decision: str) -> bool:
+def note_decision(bank_transaction: str, decision: str, credit_note: str | None = None) -> bool:
 	"""Record that a person decided for the import line that created this bank line: who and when.
 
 	Called by the reconciliation when somebody passes a gap or leaves it open. False when the bank line did not come
@@ -300,12 +301,10 @@ def note_decision(bank_transaction: str, decision: str) -> bool:
 		frappe.throw(_("Unknown decision {0}.").format(decision))
 	rows = frappe.get_all(LINE, filters={"bank_transaction": bank_transaction, "parenttype": IMPORT}, pluck="name")
 	for row in rows:
-		frappe.db.set_value(
-			LINE,
-			row,
-			{"decision": decision, "decided_by": frappe.session.user, "decided_on": now_datetime()},
-			update_modified=False,
-		)
+		values = {"decision": decision, "decided_by": frappe.session.user, "decided_on": now_datetime()}
+		if credit_note:
+			values["credit_note"] = credit_note
+		frappe.db.set_value(LINE, row, values, update_modified=False)
 	return bool(rows)
 
 
@@ -412,6 +411,10 @@ def _discount_terms_of(invoice_type: str, invoice: str, on) -> dict:
 	return {"discount_percent": None, "discount_date": None}
 
 
+def _company_currency(company: str) -> str:
+	return frappe.get_cached_value("Company", company, "default_currency")
+
+
 def _as_flag(value) -> bool:
 	return str(value).lower() in ("1", "true")
 
@@ -431,12 +434,15 @@ def _account_blocker(company: str, account: str | None) -> str:
 
 
 @frappe.whitelist()
-def get_gap_decision(bank_transaction: str, account: str | None = None, settle_in_full: int | str = 0) -> dict | None:
+def get_gap_decision(
+	bank_transaction: str, account: str | None = None, settle_in_full: int | str = 0, credit_note: int | str = 0
+) -> dict | None:
 	"""What a person is asked to decide for this bank line, with the verdict worked out now (the invoice may have moved
 	since the import). None when the line did not come from an import, has no recognised invoice, or is dealt with.
 
-	`account` and `settle_in_full` are what the person is trying: the rows the gap would be booked as (VAT cut from the
-	account by the same function the payment window uses) come back, nothing is written."""
+	`account`, `settle_in_full` and `credit_note` are what the person is trying: the rows the gap would be booked as (VAT
+	cut from the account by the same function the payment window uses), or the credit note of the balance, come back,
+	nothing is written."""
 	_check_rights()
 	frappe.has_permission("Bank Transaction", "read", bank_transaction, throw=True)
 	bank_line = frappe.db.get_value("Bank Transaction", bank_transaction, BANK_LINE_FIELDS, as_dict=True)
@@ -451,7 +457,12 @@ def get_gap_decision(bank_transaction: str, account: str | None = None, settle_i
 	from mint.apis import payment_gap
 
 	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
-	settle = _as_flag(settle_in_full) and verdict.kind == "partial"
+	# the credit note of the balance is for a short payment of a sale; it excludes passing the rest as a gap
+	creditable = verdict.kind == "partial" and invoice_type == "Sales Invoice" and verdict.currency == _company_currency(
+		verdict.company
+	)
+	credit = _as_flag(credit_note) and creditable
+	settle = _as_flag(settle_in_full) and verdict.kind == "partial" and not credit
 	editable = verdict.kind in ("rounding", "accepted_rebate", "partial")
 	account = (account or None) if editable else None
 	blocker = ""
@@ -461,8 +472,22 @@ def get_gap_decision(bank_transaction: str, account: str | None = None, settle_i
 		blocker = _account_blocker(verdict.company, account) or payment_gap.account_problem(verdict, account, settle)
 	settings = payment_gap.get_settings(verdict.company)
 	rows = []
-	if not blocker and verdict.kind not in ("", "overpaid", "exact"):
+	if not blocker and verdict.kind not in ("", "overpaid", "exact") and not credit:
 		rows = payment_gap.preview(verdict, frappe.get_doc(invoice_type, invoice), account, settle)
+	customer = frappe.db.get_value(invoice_type, invoice, "customer") if invoice_type == "Sales Invoice" else None
+	credit_preview = history = None
+	if creditable and customer:
+		from mint.apis import gap_credit_note
+
+		credit_preview = gap_credit_note.preview(
+			verdict.company, customer, bank_line.date, verdict.gap, account if credit else None
+		)
+		total = frappe.db.get_value("Sales Invoice", invoice, "grand_total")
+		history = gap_credit_note.history(
+			verdict.company, customer, invoice, flt(verdict.amount) / flt(total) if flt(total) else 0
+		)
+		if credit and credit_preview["blocker"]:
+			blocker = credit_preview["blocker"]
 	return {
 		"bank_transaction": bank_transaction,
 		"statement_import": line.parent,
@@ -477,8 +502,11 @@ def get_gap_decision(bank_transaction: str, account: str | None = None, settle_i
 		"blocker": blocker,
 		"account_editable": editable,
 		"default_account": settings.account if editable else None,
-		"account": account or (settings.account if editable else None),
+		"account": (credit_preview["account"] if credit else None) or account or (settings.account if editable else None),
 		"settle_in_full": settle,
+		"credit_note_chosen": credit,
+		"credit_note": credit_preview,
+		"history": history,
 		"can_settle": verdict.kind == "partial"
 		and not _account_blocker(verdict.company, account)
 		and not payment_gap.account_problem(verdict, account, True),
@@ -495,12 +523,18 @@ def get_gap_decision(bank_transaction: str, account: str | None = None, settle_i
 
 @frappe.whitelist(methods=["POST"])
 def decide_gap(
-	bank_transaction: str, decision: str, account: str | None = None, settle_in_full: int | str = 0
+	bank_transaction: str,
+	decision: str,
+	account: str | None = None,
+	settle_in_full: int | str = 0,
+	credit_note: int | str = 0,
 ) -> dict:
 	"""A person passes the gap of a bank line (the entry is made, linked to the line) or leaves it open.
 
 	`account` is the account the person chose for the gap instead of the company's; `settle_in_full` settles a short
-	payment beyond what the company accepts, the gap being passed on that account instead of left open."""
+	payment beyond what the company accepts, the gap being passed on that account instead of left open; `credit_note`
+	closes it the way the offices do: the payment is booked for what came in and a credit note of the balance settles
+	the invoice (its account is `account`, else the customer's habit, else the company's gap account)."""
 	if decision not in DECISIONS:
 		frappe.throw(_("Unknown decision {0}.").format(decision))
 	_check_rights()
@@ -526,6 +560,9 @@ def decide_gap(
 
 	verdict = payment_gap.judge(invoice_type, invoice, _amount_of(bank_line), bank_line.date, line.remittance_reference)
 	editable = verdict.kind in ("rounding", "accepted_rebate", "partial")
+	credit = _as_flag(credit_note)
+	if credit and not (verdict.kind == "partial" and invoice_type == "Sales Invoice"):
+		frappe.throw(_("A credit note of the balance is for the short payment of a sales invoice."))
 	entry = payment_gap.book(
 		verdict,
 		invoice_type,
@@ -535,14 +572,28 @@ def decide_gap(
 		bank_line.reference_number or "",
 		_("{0} - Payment for {1}").format(line.party_name or line.party_match, invoice),
 		by_person=True,
-		account=(account or None) if editable else None,
-		settle_in_full=_as_flag(settle_in_full) and verdict.kind == "partial",
+		account=None if credit else ((account or None) if editable else None),
+		settle_in_full=_as_flag(settle_in_full) and verdict.kind == "partial" and not credit,
 	)
 	_link_payment_entry_to_bt(
 		frappe.get_doc("Bank Transaction", bank_transaction), entry, reconciliation_type="Voucher Created"
 	)
-	note_decision(bank_transaction, "passed_gap")
-	return {"bank_transaction": bank_transaction, "payment_entry": entry}
+	made = None
+	if credit:
+		from mint.apis import gap_credit_note
+
+		customer = frappe.db.get_value("Sales Invoice", invoice, "customer")
+		made = gap_credit_note.create(
+			verdict.company,
+			customer,
+			bank_line.date,
+			verdict.gap,
+			account or None,
+			_("Balance of {0}, paid {1} on {2}").format(invoice, verdict.amount, bank_line.date),
+		)
+		gap_credit_note.settle(verdict.company, customer, invoice, made, verdict.gap)
+	note_decision(bank_transaction, "passed_gap", made)
+	return {"bank_transaction": bank_transaction, "payment_entry": entry, "credit_note": made}
 
 
 # -- what the person who deposited the file reads when the import is done -----------------------------------------------

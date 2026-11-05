@@ -53,6 +53,7 @@ export type ImportLine = {
     decision: string | null,
     decided_by: string | null,
     decided_on: string | null,
+    credit_note: string | null,
 }
 
 export type ImportOverview = Omit<StatementImport, "creation" | "owner" | "import_summary" | "status"> & {
@@ -103,4 +104,32 @@ export type GapDecision = {
     can_settle: boolean,
     /** The rows the gap would be booked as, the VAT cut from the account included (nothing is written yet). */
     deductions: { account: string, amount: number, description: string | null }[],
+    /** A short payment of a sale can be closed by a credit note of the balance (null for anything else). */
+    credit_note_chosen: boolean,
+    credit_note: CreditNotePreview | null,
+    /** What the customer's own invoices say about a payment at this share (null when there is nothing to read). */
+    history: GapHistory | null,
+}
+
+export type CreditNotePreview = {
+    item: string,
+    item_code: string | null,
+    default_account: string | null,
+    account: string | null,
+    tax_template: string | null,
+    /** How many times the customer already had a credit note made like this one (0 = the company's account). */
+    times: number,
+    source: "history" | "company",
+    blocker: string,
+    net: number | null,
+    tax: number | null,
+    total: number,
+}
+
+export type GapHistory = {
+    considered: number,
+    same_share: number,
+    closed_by_credit: number,
+    share: number,
+    proposal: "credit_note" | null,
 }

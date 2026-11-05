@@ -67,6 +67,9 @@ const StatementImportLines = ({ name, currency, version }: { name: string, curre
                                     {line.vouchers.map((voucher) => (
                                         <a key={voucher.name} className="underline underline-offset-2" href={documentHref(voucher.doctype, voucher.name)}>{voucher.name}</a>
                                     ))}
+                                    {line.credit_note && (
+                                        <a className="underline underline-offset-2" href={documentHref("Sales Invoice", line.credit_note)}>{line.credit_note}</a>
+                                    )}
                                     {line.bank_transaction && (
                                         <a className="underline underline-offset-2" href={documentHref("Bank Transaction", line.bank_transaction)}>{line.bank_transaction}</a>
                                     )}

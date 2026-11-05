@@ -3,6 +3,7 @@
 //// decides; the verdict is worked out now by the server, the same function the import uses.
 import { useFrappeGetCall, useFrappePostCall, useSWRConfig } from "frappe-react-sdk"
 import { AlertCircle } from "lucide-react"
+import NoraOrb from "@/components/common/NoraOrb"
 import { useSetAtom } from "jotai"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -50,18 +51,26 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const setRecordPaymentOpen = useSetAtom(bankRecRecordPaymentModalAtom)
     const setUnreconcile = useSetAtom(bankRecUnreconcileModalAtom)
 
-    // What the person is trying: another account for the gap, or a short payment settled in full. The server answers
-    // with the rows the gap would be booked as, so that they see them (VAT included) before confirming.
+    // What the person is trying: another account for the gap, and, for a short payment, what becomes of the rest: left
+    // open, passed as a gap, or closed by a credit note. The server answers with what would be written (VAT included)
+    // so that they see it before confirming.
     const [account, setAccount] = useState<string | null>(null)
-    const [settle, setSettle] = useState(false)
+    const [mode, setMode] = useState<"open" | "credit" | "gap">("open")
+    const settle = mode === "gap"
+    const credit = mode === "credit"
+    // the account of a credit note is not the account of a gap: a new mode starts from the default of its own
+    const choose = (next: "open" | "credit" | "gap") => {
+        setMode(next)
+        setAccount(null)
+    }
 
     const { data } = useFrappeGetCall<{ message: GapDecision | null }>(
         `${API}.get_gap_decision`,
-        { bank_transaction: transaction.name, account: account ?? undefined, settle_in_full: settle ? 1 : 0 },
-        ["statement-imports", "decision", transaction.name, account ?? "", settle],
+        { bank_transaction: transaction.name, account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0 },
+        ["statement-imports", "decision", transaction.name, account ?? "", mode],
         { revalidateOnFocus: false, keepPreviousData: true },
     )
-    const { call: decide, loading, error } = useFrappePostCall<{ message: { payment_entry: string | null } }>(`${API}.decide_gap`)
+    const { call: decide, loading, error } = useFrappePostCall<{ message: { payment_entry: string | null, credit_note: string | null } }>(`${API}.decide_gap`)
 
     const decision = data?.message
     if (!decision) return null
@@ -69,10 +78,10 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const refresh = () => mutate((key) => Array.isArray(key) && key[0] === "statement-imports")
 
     const onDecide = (choice: "passed_gap" | "left_open") => {
-        decide({ bank_transaction: transaction.name, decision: choice, account: account ?? undefined, settle_in_full: settle ? 1 : 0 }).then(() => {
+        decide({ bank_transaction: transaction.name, decision: choice, account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0 }).then(() => {
             refresh()
             if (choice === "passed_gap") {
-                toast.success(_("Gap passed and bank line reconciled"), {
+                toast.success(credit ? _("Credit note made, invoice settled and bank line reconciled") : _("Gap passed and bank line reconciled"), {
                     duration: 4000,
                     closeButton: true,
                     action: { label: _("Undo"), onClick: () => setUnreconcile(transaction.name) },
@@ -88,10 +97,15 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     // formatted apart: a string literal inside the arguments of _() is read by the extractor as its CONTEXT
     const decidedDay = decision.decided_on ? formatDate(decision.decided_on, "Do MMM YYYY") : ""
     const isPartial = verdict.kind === "partial"
+    const note = decision.credit_note
+    const habit = decision.history
     const passLabel = isPartial
-        ? (settle ? _("Settle the invoice and pass the gap") : _("Record the partial payment"))
+        ? (credit ? _("Create the credit note and reconcile") : settle ? _("Settle the invoice and pass the gap") : _("Record the partial payment"))
         : _("Pass the gap and reconcile")
-    const showAccount = decision.account_editable && (!isPartial || settle)
+    const showAccount = decision.account_editable && (!isPartial || settle || credit)
+    const modeButton = (value: "open" | "credit" | "gap", label: string) => (
+        <Button key={value} size="sm" variant={mode === value ? "default" : "outline"} onClick={() => choose(value)}>{label}</Button>
+    )
 
     return (
         <div className="flex flex-col gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950">
@@ -116,18 +130,30 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     </tr>
                 </tbody>
             </table>
+            {isPartial && habit?.proposal === "credit_note" && note && (
+                <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-white/60 p-2.5">
+                    <NoraOrb size={22} className="mt-0.5 shrink-0" />
+                    <div className="flex min-w-0 flex-col gap-1.5">
+                        <span className="text-sm leading-snug">
+                            {_("This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note.", [String(habit.share), String(habit.same_share), String(habit.considered), String(habit.closed_by_credit)])}
+                        </span>
+                        {!credit && <Button size="sm" className="w-fit" onClick={() => choose("credit")}>{_("Apply the proposal")}</Button>}
+                    </div>
+                </div>
+            )}
             {isPartial && decision.can_settle && (
                 <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant={settle ? "outline" : "default"} onClick={() => setSettle(false)}>{_("Keep the rest open")}</Button>
-                    <Button size="sm" variant={settle ? "default" : "outline"} onClick={() => setSettle(true)}>{_("Pass the rest as a gap")}</Button>
+                    {modeButton("open", _("Keep the rest open"))}
+                    {note && !note.blocker && modeButton("credit", _("Create the credit note of the balance"))}
+                    {modeButton("gap", _("Pass the rest as a gap"))}
                 </div>
             )}
             {showAccount && (
                 <div className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium">{_("Account for the gap")}</span>
+                    <span className="text-sm font-medium">{credit ? _("Account of the credit note") : _("Account for the gap")}</span>
                     <div className="max-w-sm">
                         <AccountsDropdown
-                            root_type={["Income", "Expense"]}
+                            root_type={credit ? ["Income"] : ["Income", "Expense"]}
                             company={transaction.company}
                             value={account ?? decision.account ?? undefined}
                             onChange={(value) => setAccount(value || null)}
@@ -136,6 +162,36 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     {account && account !== decision.default_account && (
                         <button type="button" className="w-fit text-xs underline underline-offset-2" onClick={() => setAccount(null)}>{_("Back to the company's account")}</button>
                     )}
+                </div>
+            )}
+            {credit && note && (
+                <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium">{_("Credit note that will be made")}</span>
+                    <div className="flex justify-between gap-4 text-sm">
+                        <span className="text-muted-foreground">{_("Item")}</span>
+                        <span className="min-w-0 truncate">{note.item}</span>
+                    </div>
+                    {note.net !== null && (
+                        <div className="flex justify-between gap-4 text-sm">
+                            <span className="text-muted-foreground">{_("Net")}</span>
+                            <span className="font-mono tabular-nums">{formatCurrency(note.net, verdict.currency)}</span>
+                        </div>
+                    )}
+                    {note.tax !== null && note.tax > 0 && (
+                        <div className="flex justify-between gap-4 text-sm">
+                            <span className="text-muted-foreground">{_("VAT")}</span>
+                            <span className="font-mono tabular-nums">{formatCurrency(note.tax, verdict.currency)}</span>
+                        </div>
+                    )}
+                    <div className="flex justify-between gap-4 border-t border-amber-200 pt-1 text-sm font-medium">
+                        <span>{_("Total of the credit note")}</span>
+                        <span className="font-mono tabular-nums">{formatCurrency(note.total, verdict.currency)}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                        {note.source === "history"
+                            ? _("Made like the credit notes this customer already has ({0}), without link to the invoice.", [String(note.times)])
+                            : _("This customer has no credit note yet: the account of the company is used, without link to the invoice.")}
+                    </span>
                 </div>
             )}
             {decision.deductions.length > 0 && (

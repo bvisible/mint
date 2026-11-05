@@ -62,6 +62,7 @@ export const describeLine = (line: ImportLine, currency: string): string => {
         case "passed_alone":
             return gap ? _("Passed by the import, gap of {0}", [gap]) : _("Passed by the import")
         case "handled":
+            if (line.credit_note) return _("Reconciled, the rest settled by the credit note {0}", [line.credit_note])
             return voucher?.by
                 ? _("Reconciled by {0} on {1}", [voucher.by, day(voucher.on)])
                 : _("Reconciled in the bank reconciliation")

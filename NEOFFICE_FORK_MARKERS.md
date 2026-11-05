@@ -119,6 +119,8 @@ found when the sum did not settle the invoice to the cent) and `payment_entry` (
 Added for the follow-up of an import (`mint/apis/statement_follow_up.py`): `bank_transaction` (the bank line the import line
 created: what became of the line is read from it, never copied back) and `decision`, `decided_by`, `decided_on` (that a
 person decided to pass or leave open a gap, who and when: the only thing no other document records).
+Added for the credit note of a balance (`mint/apis/gap_credit_note.py`): `credit_note` (the credit note a person made for the
+balance of a partial payment: no other document of the import records it).
 Pure additions; they leave with the import doctype when the move to `banking/` renames it.
 The `columns` widths and the `in_list_view` flips on `reference`, `imported` and
 `string_amount` are **upstream's** v1.5.0 (`89e7929`). No upstream field removed.

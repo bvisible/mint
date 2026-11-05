@@ -156,6 +156,14 @@
    "description": "The Bank Transaction this line created: what became of the line is read from it."
   },
   {
+   "fieldname": "credit_note",
+   "fieldtype": "Link",
+   "label": "Credit Note",
+   "options": "Sales Invoice",
+   "read_only": 1,
+   "description": "The credit note a person made for the balance of a partial payment."
+  },
+  {
    "fieldname": "decision",
    "fieldtype": "Select",
    "label": "Decision",
@@ -203,7 +211,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-11-05 11:30:00.000000",
+ "modified": "2026-11-05 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Mint",
  "name": "Mint Bank Statement Import Transactions",
