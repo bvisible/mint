@@ -3417,3 +3417,79 @@ msgstr "{0} passées seules"
 #, python-brace-format
 msgid "{0} to match"
 msgstr "{0} à rapprocher"
+
+#: mint/apis/gap_credit_note.py:87
+#, python-brace-format
+msgid "A credit note goes to an income account, not {0}."
+msgstr "Un avoir va sur un compte de produits, pas sur {0}."
+
+#: mint/apis/statement_follow_up.py:565
+msgid "A credit note of the balance is for the short payment of a sales invoice."
+msgstr "Un avoir du solde sert à clore une facture de vente partiellement payée."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:153
+msgid "Account of the credit note"
+msgstr "Compte de l'avoir"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:140
+msgid "Apply the proposal"
+msgstr "Appliquer la proposition"
+
+#: mint/apis/statement_follow_up.py:592
+#, python-brace-format
+msgid "Balance of {0}, paid {1} on {2}"
+msgstr "Solde de {0}, payé {1} le {2}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:103
+msgid "Create the credit note and reconcile"
+msgstr "Créer l'avoir et rapprocher"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:147
+msgid "Create the credit note of the balance"
+msgstr "Créer l'avoir du solde"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:84
+msgid "Credit note made, invoice settled and bank line reconciled"
+msgstr "Avoir créé, facture soldée et ligne bancaire rapprochée"
+
+#: mint/apis/gap_credit_note.py:68
+msgid "Credit note of the balance"
+msgstr "Avoir du solde"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:169
+msgid "Credit note that will be made"
+msgstr "Avoir qui sera créé"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:192
+#, python-brace-format
+msgid "Made like the credit notes this customer already has ({0}), without link to the invoice."
+msgstr "Créé comme les avoirs que ce client a déjà ({0}), sans lien avec la facture."
+
+#: frontend/src/components/features/StatementImports/utils.ts:65
+#, python-brace-format
+msgid "Reconciled, the rest settled by the credit note {0}"
+msgstr "Rapprochée, le reste soldé par l'avoir {0}"
+
+#. Description of the 'Credit Note' (Link) field in DocType 'Mint Bank
+#. Statement Import Transactions'
+#: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:164
+msgid "The credit note a person made for the balance of a partial payment."
+msgstr "L'avoir qu'une personne a créé pour le solde d'un paiement partiel."
+
+#: mint/apis/gap_credit_note.py:145
+#, python-brace-format
+msgid "The credit note cannot be brought to {0}."
+msgstr "Le montant de l'avoir ne peut pas être ajusté à {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:193
+msgid "This customer has no credit note yet: the account of the company is used, without link to the invoice."
+msgstr "Ce client n'a pas encore d'avoir : le compte de la société est utilisé, sans lien avec la facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:138
+#, python-brace-format, python-format
+msgid "This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note."
+msgstr "Ce client règle {0} % de ses factures : {1} de ses {2} dernières factures payées l'ont été à cette proportion, et {3} d'entre elles se sont soldées par un avoir pour le reste."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:187
+msgid "Total of the credit note"
+msgstr "Total de l'avoir"
