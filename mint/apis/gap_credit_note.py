@@ -246,22 +246,15 @@ def settle(company: str, customer: str, invoice: str, credit_note: str, amount: 
 
 
 def share_paid(invoice: str, amount: float) -> float:
-	"""The share of the invoice the customer will have paid once this payment is booked: the payments already made on
-	it plus this one, over its total. It is the measure history() reads on the invoices the customer already settled, so
-	the payment that completes an advance is not mistaken for a short one."""
-	total = flt(frappe.db.get_value("Sales Invoice", invoice, "grand_total"))
+	"""The share of the invoice the customer will have paid once this payment is booked: what already settled the invoice
+	(a payment, a journal entry: its total less what is still owed) plus this payment, over its total. Called BEFORE the
+	payment is booked. The payment that completes an advance is thus not mistaken for a short one (30 % where the
+	customer has paid 80 % in all), and the rule of a customer compares like with like."""
+	row = frappe.db.get_value("Sales Invoice", invoice, ["grand_total", "outstanding_amount"], as_dict=True)
+	total = flt(row.grand_total) if row else 0
 	if not total:
 		return 0
-	before = frappe.db.sql(
-		"""
-		select ifnull(sum(per.allocated_amount), 0)
-		from `tabPayment Entry Reference` per
-		join `tabPayment Entry` pe on pe.name = per.parent and pe.docstatus = 1 and pe.payment_type = 'Receive'
-		where per.reference_doctype = 'Sales Invoice' and per.reference_name = %s
-		""",
-		invoice,
-	)[0][0]
-	return (flt(before) + flt(amount)) / total
+	return (total - flt(row.outstanding_amount) + flt(amount)) / total
 
 
 def history(company: str, customer: str, invoice: str, share: float) -> dict:
