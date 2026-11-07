@@ -23,6 +23,10 @@ FREE_OF_TERMS = (
 
 
 def _an_invoice(doctype: str, at_least: float, **extra):
+	# A field another app adds (`scor_reference` comes with erpnextswiss) is not a column on the bare site of the
+	# CI: no such invoice there, so the test class skips instead of dying in SQL.
+	if any(not frappe.db.has_column(doctype, field) for field in extra):
+		return None
 	conditions = [
 		"inv.docstatus = 1",
 		f"inv.outstanding_amount >= {at_least}",
