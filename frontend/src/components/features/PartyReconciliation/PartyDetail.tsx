@@ -2,7 +2,7 @@
 //// them on the right, a calculator below. The party is the one chosen and the one reconciled: nothing here mixes two.
 import { useFrappeGetCall } from "frappe-react-sdk"
 import { AlertTriangle, Search } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -55,6 +55,25 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
     const [voucher, setVoucher] = useState<VoucherRef | null>(null)
     const [menu, setMenu] = useState<MenuState>(null)
     const [confirming, setConfirming] = useState(false)
+
+    // One click shows the voucher beside the list, a double click opens it in a new tab (Daniel, 08.11: the right click already
+    // offered it). The sheet waits the length of a double click, so that it does not flash before the tab; a double click slower
+    // than that closes it again. A tick or an amount typed in a row never counts (their cells stop the click).
+    const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const cancelClick = () => {
+        if (clickTimer.current) clearTimeout(clickTimer.current)
+        clickTimer.current = null
+    }
+    useEffect(() => cancelClick, [])
+    const showVoucher = (type: string, name: string) => {
+        cancelClick()
+        clickTimer.current = setTimeout(() => setVoucher({ type, name }), 250)
+    }
+    const openVoucher = (type: string, name: string) => {
+        cancelClick()
+        setVoucher(null)
+        window.open(deskRoute(type, name), "_blank", "noopener")
+    }
 
     // Another party, or the same one after a reconciliation, starts with nothing ticked.
     useEffect(() => {
@@ -182,9 +201,10 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                                     const toggle = () => tick(setInvoicePicks, key, !ticked, row.outstanding_amount)
                                     return (
                                         <TableRow key={key} data-state={ticked ? "selected" : undefined} className="cursor-pointer"
-                                            onClick={() => setVoucher({ type: row.invoice_type, name: row.invoice_number })}
+                                            onClick={() => showVoucher(row.invoice_type, row.invoice_number)}
+                                            onDoubleClick={() => openVoucher(row.invoice_type, row.invoice_number)}
                                             onContextMenu={(event) => menuFor(event, row.invoice_type, row.invoice_number, row.reference, toggle, ticked)}>
-                                            <TableCell className="px-2 py-1.5" onClick={(event) => event.stopPropagation()}>
+                                            <TableCell className="px-2 py-1.5" onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
                                                 <Checkbox checked={ticked} onCheckedChange={(on) => tick(setInvoicePicks, key, on === true, row.outstanding_amount)} aria-label={_("Tick")} />
                                             </TableCell>
                                             <TableCell className="px-2 py-1.5 whitespace-nowrap">{formatDate(row.invoice_date)}</TableCell>
@@ -194,7 +214,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                                                     {[row.due_date ? `${_("Due")} ${formatDate(row.due_date)}` : "", row.reference].filter(Boolean).join(" · ")}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="px-2 py-1.5 text-right" onClick={(event) => event.stopPropagation()}>
+                                            <TableCell className="px-2 py-1.5 text-right" onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
                                                 {ticked ? (
                                                     <Input className={cn("h-7 w-24 text-right font-mono tabular-nums ml-auto px-2 text-[13px]", problem && "border-destructive")} title={problem ?? ""}
                                                         value={invoicePicks[key]} onChange={(event) => setInvoicePicks((previous) => ({ ...previous, [key]: event.target.value }))} />
@@ -238,9 +258,10 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                                     const toggle = () => tick(setSettlementPicks, key, !ticked, row.amount)
                                     return (
                                         <TableRow key={key} data-state={ticked ? "selected" : undefined} className="cursor-pointer"
-                                            onClick={() => setVoucher({ type: row.reference_type, name: row.reference_name })}
+                                            onClick={() => showVoucher(row.reference_type, row.reference_name)}
+                                            onDoubleClick={() => openVoucher(row.reference_type, row.reference_name)}
                                             onContextMenu={(event) => menuFor(event, row.reference_type, row.reference_name, row.reference, toggle, ticked)}>
-                                            <TableCell className="px-2 py-1.5" onClick={(event) => event.stopPropagation()}>
+                                            <TableCell className="px-2 py-1.5" onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
                                                 <Checkbox checked={ticked} onCheckedChange={(on) => tick(setSettlementPicks, key, on === true, row.amount)} aria-label={_("Tick")} />
                                             </TableCell>
                                             <TableCell className="px-2 py-1.5 whitespace-nowrap">{formatDate(row.posting_date)}</TableCell>
@@ -253,7 +274,7 @@ const PartyDetail = ({ company, partyType, party, version, onReconciled }: Props
                                                     {[row.reference, row.remark].filter(Boolean).join(" · ")}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="px-2 py-1.5 text-right" onClick={(event) => event.stopPropagation()}>
+                                            <TableCell className="px-2 py-1.5 text-right" onClick={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
                                                 {ticked ? (
                                                     <Input className={cn("h-7 w-24 text-right font-mono tabular-nums ml-auto px-2 text-[13px]", problem && "border-destructive")} title={problem ?? ""}
                                                         value={settlementPicks[key]} onChange={(event) => setSettlementPicks((previous) => ({ ...previous, [key]: event.target.value }))} />
