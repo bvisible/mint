@@ -4847,3 +4847,24 @@ msgstr ""
 #: mint/apis/statement_import.py:240
 msgid "Empty File"
 msgstr ""
+
+#: frontend/src/components/features/StatementImports/utils.ts:45
+msgid "dunning fee"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:42
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more: the fee of the dunning {5}, booked on its account and settling it."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:121
+msgid "Book the dunning fee and reconcile"
+msgstr ""
+
+#: mint/apis/payment_gap.py:169
+msgid "The invoice is not recognised without doubt: a person validates a payment that includes a dunning fee."
+msgstr ""
+
+#: mint/apis/payment_gap.py:379
+#, python-brace-format
+msgid "The dunning {0} has no Income Account to book its fee on: set it on the Dunning Type {1}."
+msgstr ""

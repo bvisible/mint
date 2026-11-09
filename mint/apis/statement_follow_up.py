@@ -538,6 +538,11 @@ def get_gap_decision(
 			key: verdict[key]
 			for key in ("kind", "gap", "amount", "outstanding", "discount", "currency", "reason")
 		},
+		# the dunnings whose fee the surplus pays (kind dunning_fee), named so that the card says which ones
+		"dunnings": [
+			{"name": charge.name, "amount": charge.amount, "income_account": charge.income_account}
+			for charge in verdict.dunnings
+		],
 		"can_pass": not blocker and verdict.kind not in ("", "exact"),
 		"blocker": blocker,
 		"account_editable": editable,

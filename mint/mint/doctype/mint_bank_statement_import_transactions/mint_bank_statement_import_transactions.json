@@ -196,7 +196,7 @@
    "fieldname": "difference_kind",
    "fieldtype": "Select",
    "label": "Payment Gap",
-   "options": "\nexact\nrounding\nearly_discount\naccepted_rebate\npartial\noverpaid",
+   "options": "\nexact\nrounding\nearly_discount\naccepted_rebate\npartial\ndunning_fee\noverpaid",
    "read_only": 1,
    "description": "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
   },

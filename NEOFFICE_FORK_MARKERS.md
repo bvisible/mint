@@ -115,7 +115,8 @@ Mixed. **Ours only** (all added for the CAMT.053 flow, `5bb4045` → `957a5b9`):
 `existing_bank_transaction`, `invoice_matches`, `party_match`, `matched_amount`.
 Added for the payment gaps (05.11, `mint/apis/payment_gap.py`): `remittance_reference` (the structured
 reference the reader matched the invoice on), `difference_kind` / `difference_amount` (what the decider
-found when the sum did not settle the invoice to the cent) and `payment_entry` (the entry the import made).
+found when the sum did not settle the invoice to the cent; `dunning_fee` is the kind of a surplus that is the fee of a
+validated dunning of the invoice, 09.11) and `payment_entry` (the entry the import made).
 Added for the follow-up of an import (`mint/apis/statement_follow_up.py`): `bank_transaction` (the bank line the import line
 created: what became of the line is read from it, never copied back) and `decision`, `decided_by`, `decided_on` (that a
 person decided to pass or leave open a gap, who and when: the only thing no other document records).

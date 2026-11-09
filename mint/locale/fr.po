@@ -3871,3 +3871,24 @@ msgstr "Le fichier est vide"
 #: mint/apis/statement_import.py:240
 msgid "Empty File"
 msgstr "Fichier vide"
+
+#: frontend/src/components/features/StatementImports/utils.ts:45
+msgid "dunning fee"
+msgstr "frais de relance"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:42
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more: the fee of the dunning {5}, booked on its account and settling it."
+msgstr "La facture {0} de {1} se solde à {2}. Vous avez payé {3}, soit {4} de plus : les frais de la relance {5}, comptabilisés sur son compte et soldant la facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:121
+msgid "Book the dunning fee and reconcile"
+msgstr "Comptabiliser les frais de relance et rapprocher"
+
+#: mint/apis/payment_gap.py:169
+msgid "The invoice is not recognised without doubt: a person validates a payment that includes a dunning fee."
+msgstr "La facture n'est pas identifiée avec certitude : une personne valide un paiement qui inclut des frais de relance."
+
+#: mint/apis/payment_gap.py:379
+#, python-brace-format
+msgid "The dunning {0} has no Income Account to book its fee on: set it on the Dunning Type {1}."
+msgstr "La relance {0} n'a pas de Compte de Produits pour comptabiliser ses frais : renseignez-le sur le Type de relance {1}."

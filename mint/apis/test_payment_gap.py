@@ -40,6 +40,33 @@ def _an_invoice(doctype: str, at_least: float, **extra):
 	return rows[0][0] if rows else None
 
 
+def _a_dunning_on(invoice: str, fee: float = 20.0):
+	"""A validated dunning of the sales invoice that asks `fee`, made in the test's transaction. Its Dunning Type books
+	the fee on the income account of the company, which is not the account of the gaps: an entry that went to the gap
+	account would not be the dunning's."""
+	from erpnext.accounts.doctype.sales_invoice.sales_invoice import create_dunning
+
+	# a dunning is raised on what is overdue
+	overdue = add_days(nowdate(), -20)
+	frappe.db.set_value("Sales Invoice", invoice, "due_date", overdue)
+	frappe.db.sql("update `tabPayment Schedule` set due_date = %s where parent = %s", (overdue, invoice))
+	dunning_type = frappe.new_doc("Dunning Type")
+	dunning_type.dunning_type = "Gap Test Fee Notice"
+	dunning_type.company = COMPANY
+	dunning_type.dunning_fee = fee
+	dunning_type.rate_of_interest = 0
+	dunning_type.income_account = frappe.get_cached_value("Company", COMPANY, "default_income_account")
+	dunning_type.cost_center = frappe.get_cached_value("Company", COMPANY, "cost_center")
+	dunning_type.append("dunning_letter_text", {"language": "en", "body_text": "test", "closing_text": "test"})
+	dunning_type.insert()
+	dunning = create_dunning(invoice)
+	dunning.dunning_type = dunning_type.name
+	dunning.dunning_fee = fee
+	dunning.save()
+	dunning.submit()
+	return dunning
+
+
 class TestPaymentGap(FrappeTestCase):
 	@classmethod
 	def setUpClass(cls):
@@ -236,3 +263,57 @@ class TestPaymentGap(FrappeTestCase):
 		self._settings(payment_gap_automatic=1)
 		with self.assertRaises(frappe.ValidationError):
 			self._book("Sales Invoice", self.sales, owed + 9.25)  # overpaid
+
+	# -- a surplus that is the fee of a dunning ---------------------------------------------------------------------
+
+	def _a_dunning_on_the_sale(self, fee: float = 20.0):
+		return _a_dunning_on(self.sales, fee)
+
+	def test_a_surplus_that_is_the_fee_of_a_dunning_is_that_fee(self):
+		dunning = self._a_dunning_on_the_sale(fee=20)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		verdict = self._judge("Sales Invoice", self.sales, owed + 20)
+		self.assertEqual(verdict.kind, "dunning_fee")
+		self.assertEqual([charge.name for charge in verdict.dunnings], [dunning.name])
+		self.assertAlmostEqual(verdict.gap, -20, places=2)
+
+	def test_a_surplus_that_is_not_what_a_dunning_asks_stays_an_overpayment(self):
+		self._a_dunning_on_the_sale(fee=20)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		for surplus in (7, 19.5, 20.5, 40):
+			self.assertEqual(self._judge("Sales Invoice", self.sales, owed + surplus).kind, "overpaid", surplus)
+
+	def test_the_fee_of_a_dunning_is_booked_on_its_own_account_and_resolves_it(self):  # role-check: ok the import runs as the system
+		self._settings(payment_gap_automatic=1)
+		dunning = self._a_dunning_on_the_sale(fee=20)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		scor = frappe.db.get_value("Sales Invoice", self.sales, "scor_reference")
+		entry, verdict = self._book("Sales Invoice", self.sales, owed + 20, reference=scor)
+		self.assertTrue(verdict.automatic)
+		self.assertEqual(self._outstanding("Sales Invoice", self.sales), 0)
+		income_account = frappe.get_cached_value("Company", COMPANY, "default_income_account")
+		self.assertNotEqual(income_account, GAP_ACCOUNT)
+		# the account and the link of the dunning, a negative deduction, and no VAT line
+		self.assertEqual(
+			[(d.account, flt(d.amount, 2), d.dunning) for d in entry.deductions],
+			[(income_account, -20.0, dunning.name)],
+		)
+		# what makes ERPNext resolve it: a dunning whose fee is paid with its invoice
+		self.assertEqual(frappe.db.get_value("Dunning", dunning.name, "status"), "Resolved")
+
+	def test_a_fee_waits_for_a_person_without_a_certain_invoice_or_an_account_on_the_dunning(self):  # role-check: ok the import runs as the system, and here it books nothing
+		self._settings(payment_gap_automatic=1)
+		dunning = self._a_dunning_on_the_sale(fee=20)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		scor = frappe.db.get_value("Sales Invoice", self.sales, "scor_reference")
+		# the name of the invoice in the text of the line: the sum is the only evidence that the surplus is the fee
+		by_name = self._judge("Sales Invoice", self.sales, owed + 20, reference=f"Payment {self.sales}")
+		self.assertEqual((by_name.kind, by_name.automatic), ("dunning_fee", False))
+		# a dunning raised before its type had an account has none: it is said where to set it, and nobody can book it
+		frappe.db.set_value("Dunning", dunning.name, "income_account", None)
+		verdict = self._judge("Sales Invoice", self.sales, owed + 20, reference=scor)
+		self.assertEqual((verdict.kind, verdict.automatic), ("dunning_fee", False))
+		self.assertIn(dunning.name, verdict.reason)
+		self.assertIn(dunning.name, payment_gap.account_problem(verdict))
+		with self.assertRaises(frappe.ValidationError):
+			payment_gap.book(verdict, "Sales Invoice", self.sales, LEDGER, nowdate(), scor, "gap test", by_person=True)

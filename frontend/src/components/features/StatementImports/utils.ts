@@ -42,6 +42,7 @@ export const kindLabel = (kind: string | null): string => ({
     early_discount: _("early payment discount"),
     accepted_rebate: _("accepted rebate"),
     partial: _("partial payment"),
+    dunning_fee: _("dunning fee"),
     overpaid: _("overpayment"),
 } as Record<string, string>)[kind ?? ""] ?? ""
 

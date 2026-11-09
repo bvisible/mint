@@ -13,7 +13,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import flt, nowdate
 
-from mint.apis.test_payment_gap import COMPANY, GAP_ACCOUNT, LEDGER, _an_invoice
+from mint.apis.test_payment_gap import COMPANY, GAP_ACCOUNT, LEDGER, _a_dunning_on, _an_invoice
 
 # role-check: ok the statement import is a job of the system: nobody is in front of the screen when it runs
 
@@ -132,6 +132,29 @@ class TestPaymentGapImport(GapImportCase):
 		statement = self._import(self._line("Sales Invoice", self.sales, owed + 5))
 		line = statement.transactions[0]
 		self.assertEqual((line.status, line.difference_kind, flt(line.difference_amount, 2)), ("Imported", "overpaid", -5.0))
+		self.assertEqual(self._owed("Sales Invoice", self.sales), owed)
+
+	def test_a_line_that_pays_an_invoice_and_its_dunning_fee_passes_and_resolves_the_dunning(self):
+		self._settings(payment_gap_automatic=1)
+		dunning = _a_dunning_on(self.sales, fee=20)
+		owed = self._owed("Sales Invoice", self.sales)
+		scor = frappe.db.get_value("Sales Invoice", self.sales, "scor_reference")
+		statement = self._import(self._line("Sales Invoice", self.sales, owed + 20, remittance_reference=scor))
+		line = statement.transactions[0]
+		self.assertEqual((line.status, line.difference_kind, flt(line.difference_amount, 2)), ("Paid", "dunning_fee", -20.0))
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+		entry = frappe.get_doc("Payment Entry", line.payment_entry)
+		self.assertEqual([(d.dunning, flt(d.amount, 2)) for d in entry.deductions], [(dunning.name, -20.0)])
+		self.assertEqual(frappe.db.get_value("Dunning", dunning.name, "status"), "Resolved")
+
+	def test_without_the_invoices_own_reference_a_dunning_fee_waits_with_its_verdict(self):
+		self._settings(payment_gap_automatic=1)
+		_a_dunning_on(self.sales, fee=20)
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, owed + 20))
+		line = statement.transactions[0]
+		self.assertEqual((line.status, line.difference_kind, flt(line.difference_amount, 2)), ("Imported", "dunning_fee", -20.0))
+		self.assertFalse(line.payment_entry)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), owed)
 
 	def test_a_partial_payment_is_validated_when_the_reference_is_the_invoices_own(self):

@@ -10,7 +10,9 @@
 # ////   early_discount   the sum is the invoice minus the discount its payment terms grant on that date
 # ////   accepted_rebate  sales only: less than owed, within the company's percentage AND its cap
 # ////   partial          less than owed beyond that: the money has come in, it is recorded, the rest stays open
-# ////   overpaid         more than owed: never passed by itself
+# ////   dunning_fee      sales only: more than owed, by exactly what a validated dunning of that invoice still asks for
+# ////                    (its fee and interest): booked on the account of the dunning, linked to it, which resolves it
+# ////   overpaid         more than owed, and not a dunning's fee: never passed by itself
 # //// A verdict says whether it may be passed AUTOMATICALLY (nobody in front of the screen) and, when it may not,
 # //// why. Nothing is automatic until the company switches it on (Neoffice Company Settings, « Payment Gaps »);
 # //// a partial payment is validated by itself only when the invoice is recognised without doubt.
@@ -106,6 +108,8 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 		sure=_is_sure(invoice, reference),
 		currency=invoice.currency,
 		company=invoice.company,
+		# the dunnings whose fee this payment pays (kind dunning_fee): [{name, amount, dunning_type, income_account, cost_center}]
+		dunnings=[],
 	)
 	if invoice.docstatus != 1 or outstanding <= 0 or amount <= 0:
 		verdict.reason = _("The invoice is not open.")
@@ -120,7 +124,12 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 		elif abs(gap) <= settings.rounding_tolerance:
 			verdict.kind = "rounding"
 		elif gap < 0:
-			verdict.kind = "overpaid"
+			# a customer who got a dunning pays the invoice AND its fee: that surplus is the fee, not a gift
+			charges = _dunning_charges(invoice, -gap) if receiving else []
+			if charges:
+				verdict.kind, verdict.dunnings = "dunning_fee", charges
+			else:
+				verdict.kind = "overpaid"
 		elif (
 			receiving
 			and settings.rebate_percent > 0
@@ -153,6 +162,11 @@ def _decide_automatic(verdict, settings):
 		"Company", verdict.company, "default_discount_account"
 	):
 		verdict.reason = _("The company has no early payment discount account.")
+	elif verdict.kind == "dunning_fee" and (problem := _dunning_account_problem(verdict)):
+		verdict.reason = problem
+	elif verdict.kind == "dunning_fee" and not verdict.sure:
+		# the sum is the only evidence that the surplus is the fee: a structured reference of the invoice is needed besides
+		verdict.reason = _("The invoice is not recognised without doubt: a person validates a payment that includes a dunning fee.")
 	elif verdict.kind == "partial" and not settings.partial_automatic:
 		verdict.reason = _("A partial payment is validated by a person.")
 	elif verdict.kind == "partial" and not verdict.sure:
@@ -238,6 +252,9 @@ def book(
 def account_problem(verdict, account: str | None = None, settle_in_full: bool = False) -> str:
 	"""Why a gap cannot be booked by a person, or an empty string: a gap goes to an account of the company, and the
 	account that is missing is said instead of the entry failing on it."""
+	if verdict.kind == "dunning_fee":
+		# the account is the one of the dunning, nobody chooses it: what is missing is that the dunning has none
+		return _dunning_account_problem(verdict)
 	settings = get_settings(verdict.company)
 	passes_as_deduction = verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind == "partial" and settle_in_full)
 	if passes_as_deduction and not (account or settings.account):
@@ -272,6 +289,8 @@ def preview(verdict, invoice, account: str | None = None, settle_in_full: bool =
 	"""The rows that the gap will be booked as, VAT included, the way the entry will carry them (nothing is written)."""
 	receiving = invoice.doctype == "Sales Invoice"
 	signed = verdict.gap if receiving else -verdict.gap
+	if verdict.kind == "dunning_fee":
+		return _dunning_deductions(verdict)
 	if verdict.kind == "early_discount":
 		return [
 			{
@@ -286,6 +305,8 @@ def preview(verdict, invoice, account: str | None = None, settle_in_full: bool =
 
 
 def _deductions(verdict, invoice, signed, account: str | None = None) -> list[dict]:
+	if verdict.kind == "dunning_fee":
+		return _dunning_deductions(verdict)
 	settings = get_settings(verdict.company)
 	deduction = {
 		"account": account or settings.account,
@@ -301,3 +322,82 @@ def _deductions(verdict, invoice, signed, account: str | None = None) -> list[di
 
 	has_tax = bool(flt(invoice.get("total_taxes_and_charges")))
 	return calculate_deductions_with_vat([deduction], verdict.company, False, not has_tax)["deductions"]
+
+
+def _dunning_charges(invoice, surplus: float) -> list[frappe._dict]:
+	"""The validated dunnings of this invoice whose fee and interest are still owed, when they are what came in above it.
+
+	A customer who was sent a dunning pays the invoice and the fee in one transfer. The surplus is that fee when it is,
+	to the cent, what ONE dunning still asks for (the latest first: the customer pays the last notice) or what ALL of
+	them ask for together; anything else is an overpayment that a person looks at. A sum in a foreign currency is never
+	matched: a dunning is raised in the currency of its invoice but its fee is booked in the company's."""
+	if invoice.currency != frappe.get_cached_value("Company", invoice.company, "default_currency"):
+		return []
+	names = frappe.get_all("Overdue Payment", filters={"sales_invoice": invoice.name, "docstatus": 1}, pluck="parent", distinct=True)
+	if not names:
+		return []
+	owed = []
+	for row in frappe.get_all(
+		"Dunning",
+		filters={
+			"name": ("in", names),
+			"docstatus": 1,
+			"customer": invoice.customer,
+			"company": invoice.company,
+			"status": "Unresolved",
+		},
+		fields=["name"],
+		order_by="posting_date desc, creation desc",
+	):
+		dunning = frappe.get_doc("Dunning", row.name)
+		# ERPNext's own figure: what is left of the fee and interest once the payments that carry them are taken off, and 0
+		# when a later notice that covers this one is settled
+		amount = flt(dunning.get_unpaid_base_dunning_amount(), 2)
+		if amount > 0:
+			owed.append(
+				frappe._dict(
+					name=dunning.name,
+					amount=amount,
+					dunning_type=dunning.dunning_type,
+					income_account=dunning.income_account,
+					cost_center=dunning.cost_center,
+				)
+			)
+	for charge in owed:
+		if abs(charge.amount - surplus) <= CENT:
+			return [charge]
+	if len(owed) > 1 and abs(sum(charge.amount for charge in owed) - surplus) <= CENT:
+		return owed
+	return []
+
+
+def _dunning_account_problem(verdict) -> str:
+	"""A dunning whose fee has no account to be booked on, or an empty string. The account of a dunning is the one of its
+	Dunning Type (the dunnings raised before the type had one have none): it is said where to set it."""
+	for charge in verdict.dunnings:
+		if not charge.income_account:
+			return _("The dunning {0} has no Income Account to book its fee on: set it on the Dunning Type {1}.").format(
+				charge.name, charge.dunning_type
+			)
+	return ""
+
+
+def _dunning_deductions(verdict) -> list[dict]:
+	"""One negative deduction per dunning, the way ERPNext makes the payment of a dunning itself (`get_payment_entry`): on
+	the account of the dunning, linked to it. That link is what tells ERPNext the fee is paid, so that the dunning is
+	resolved with its invoice (`update_dunnings_linked_to_payment`); a surplus passed on a plain account would leave the
+	dunning « Unresolved » for ever. A fee is not subject to VAT, so there is none to cut."""
+	rows = [
+		{
+			"account": charge.income_account,
+			"cost_center": charge.cost_center or frappe.get_cached_value("Company", verdict.company, "cost_center"),
+			"amount": -flt(charge.amount, 2),
+			"description": _("Interest and/or dunning fee"),
+			"dunning": charge.name,
+		}
+		for charge in verdict.dunnings
+	]
+	# the few centimes between what came in and what the dunnings ask (the match allows one cent) go on the last row, so
+	# that the entry has no difference left
+	rows[-1]["amount"] = flt(rows[-1]["amount"] + verdict.gap - sum(row["amount"] for row in rows), 2)
+	return rows

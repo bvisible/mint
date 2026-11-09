@@ -94,6 +94,8 @@ export type GapDecision = {
         currency: string,
         reason: string,
     },
+    /** The validated dunnings whose fee the surplus pays (verdict kind dunning_fee, empty otherwise). */
+    dunnings: { name: string, amount: number, income_account: string | null }[],
     can_pass: boolean,
     blocker: string,
     decision: string | null,

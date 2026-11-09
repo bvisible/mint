@@ -38,6 +38,8 @@ const sentence = (decision: GapDecision): string => {
             return _("Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: a rebate within what the company accepts.", [invoice, who, owed, paid, gap])
         case "partial":
             return _("Invoice {0} of {1} still owes {2}. You paid {3}: a partial payment, what came in is booked and {4} stays open.", [invoice, who, owed, paid, gap])
+        case "dunning_fee":
+            return _("Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more: the fee of the dunning {5}, booked on its account and settling it.", [invoice, who, owed, paid, gap, decision.dunnings.map((dunning) => dunning.name).join(", ")])
         case "overpaid":
             return _("Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed: that is never passed by itself.", [invoice, who, owed, paid, gap])
         default:
@@ -116,7 +118,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const habit = decision.history
     const passLabel = isPartial
         ? (credit ? _("Create the credit note and reconcile") : settle ? _("Settle the invoice and pass the gap") : _("Record the partial payment"))
-        : _("Pass the gap and reconcile")
+        : verdict.kind === "dunning_fee" ? _("Book the dunning fee and reconcile") : _("Pass the gap and reconcile")
     const showAccount = decision.account_editable && (!isPartial || settle || credit)
     const rule = decision.rule
     const draft = decision.draft
