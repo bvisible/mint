@@ -131,7 +131,10 @@ The `columns` widths and the `in_list_view` flips on `reference`, `imported` and
 #### `mint/mint/doctype/mint_bank_statement_import_template/mint_bank_statement_import_template.json`
 #### `mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json`
 **NOT ours.** Upstream v1.5.0 doctypes, hand-carried by `89e7929`. Field for field identical to
-`upstream/develop`. Take upstream's at the merge and drop the header markers in their `.py`.
+`upstream/develop`, with ONE exception that is ours (#1489): `closing_balance` of the import log loses
+`non_negative` (an overdrawn account's statement closes below zero, and the log refused to store it, so
+the whole import failed). Needs `bench migrate`; the file's `modified` was moved for that. Take
+upstream's at the merge, re-apply that one property and drop the header markers in their `.py`.
 
 ---
 
@@ -198,8 +201,12 @@ states the decision above in the form the guard reads.
   `…_template/__init__.py`, `…_template_columns/__init__.py` are **empty** and left unmarked:
   a marker in an empty package file carries no information and the three doctype ones are
   upstream's anyway.
-- `mint/apis/statement_import.py` differs from `upstream/develop` by **trailing whitespace
-  only** (five lines in `get_column_mapping`). Take upstream's file at the merge.
-- `frontend/src/components/features/BankStatementImporter/CSV/CSVRawDataPreview.tsx` and
-  `…/StatementDetails.tsx` differ from `upstream/develop` by **one line each** (an `_()` wrap
-  around a tooltip). Take upstream's file and re-apply that single wrap.
+- `mint/apis/statement_import.py` differs from `upstream/develop` by trailing whitespace
+  (five lines in `get_column_mapping`) and by four fixes of ours, each marked in place (#1501 short
+  rows, #1489: decimal comma in `get_float_amount`, column at index 0 in `get_column_mapping`,
+  `.xls` date serial numbers, closing balance of zero or below in `import_statement`). Take
+  upstream's file at the merge and re-apply those unless upstream has its own.
+- `frontend/src/components/features/BankStatementImporter/CSV/CSVRawDataPreview.tsx` differs from
+  `upstream/develop` by **one line** (an `_()` wrap around a tooltip), and `…/StatementDetails.tsx`
+  by **two** (that wrap, and the Import button disabled while the file holds no transaction,
+  #1489). Take upstream's file and re-apply them.

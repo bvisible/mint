@@ -2,8 +2,11 @@
 # //// then the v1.5.2 fixes in 2bdac9c) because we had not merged upstream's branch. It is
 # //// identical to upstream/develop except for trailing spaces an editor stripped in
 # //// get_column_mapping, and for the short-row padding of get_transaction_rows (#1501, marked
-# //// in place; upstream still reads the missing cell). At the next merge take upstream's
-# //// file, keep that padding unless upstream has its own, and drop this marker.
+# //// in place; upstream still reads the missing cell). Also ours, marked in place (#1489): the
+# //// decimal comma of get_float_amount, the column at index 0 of get_column_mapping, the date
+# //// serial numbers of an .xls in get_transaction_rows, and the closing balance below zero in
+# //// import_statement. At the next merge take upstream's file, keep those unless upstream has
+# //// its own, and drop this marker.
 import frappe
 import re
 from frappe.utils.csvutils import read_csv_content
@@ -14,7 +17,7 @@ from frappe.utils.xlsxutils import (
 from frappe import _
 from frappe.utils import getdate
 
-from datetime import datetime
+from datetime import datetime, timedelta  # //// Neoffice — timedelta: excel_serial_to_datetime (#1489)
 
 from mint.apis.bank_account import set_closing_balance_as_per_statement
 
@@ -166,7 +169,10 @@ def import_statement(file_url: str, bank_account: str):
     log.closing_balance = data.get("closing_balance")
     log.insert(ignore_permissions=True)
 
-    if data.get("closing_balance") and data.get("closing_balance") > 0 and data.get("statement_end_date"):
+    # //// Neoffice — an overdrawn account has a closing balance below zero, and a statement can end on exactly zero: upstream
+    # //// kept only a balance above zero (and the log field refused a negative one), so such a statement could not be
+    # //// imported at all (#1489). Only a statement that names no balance leaves it unset.
+    if data.get("closing_balance") is not None and data.get("statement_end_date"):
         set_closing_balance_as_per_statement(bank_account, frappe.utils.getdate(data.get("statement_end_date")), data.get("closing_balance"))
     
     from mint.apis.rules import run_rule_evaluation
@@ -277,7 +283,9 @@ def get_column_mapping(header_row: list[str]):
         for standard_variable, names in standard_variables.items():
             if any(name in cell.lower().replace(".", "") for name in names):
 
-                if not column_mapping.get(standard_variable, None):
+                # //// Neoffice — "is the variable mapped yet", not "is its column index truthy": the column at index 0
+                # //// (a Date in first position) is falsy, so a second "Value Date" column replaced it (#1489).
+                if standard_variable not in column_mapping:
                     column["maps_to"] = standard_variable
 
                     column_mapping[standard_variable] = idx
@@ -288,6 +296,19 @@ def get_column_mapping(header_row: list[str]):
     
 
     return columns, column_mapping
+
+
+# //// Neoffice — added (#1489, get_transaction_rows): the date of an .xls cell. xlrd gives a date cell as a plain float, the
+# //// number of days since 1899-12-30 (a workbook on the 1900 date system, which is every one an export makes). Only a number
+# //// that falls between 1954 and 2099 is taken for a date: the amounts and the 8-digit dates written as numbers stay what
+# //// they were. Anything else (a string, a datetime from an .xlsx, nothing) is returned as it came.
+def excel_serial_to_datetime(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return value
+    if not 20000 <= value < 73051:
+        return value
+    return datetime(1899, 12, 30) + timedelta(days=value)
+# //// END Neoffice ////
 
 
 def get_transaction_rows(data: list[list[str]], header_index: int, column_mapping: dict[str, int]):
@@ -322,6 +343,10 @@ def get_transaction_rows(data: list[list[str]], header_index: int, column_mappin
         # //// END Neoffice ////
 
         date = row[column_mapping["Date"]] if "Date" in column_map_keys else None
+        # //// Neoffice — an .xls hands a date cell over as an Excel serial number (a float), which the check below took for
+        # //// "not a date": every row was skipped and the file showed 0 transactions (#1489). An .xlsx gives a datetime.
+        date = excel_serial_to_datetime(date)
+        # //// END Neoffice ////
         amount = row[column_mapping["Amount"]] if "Amount" in column_map_keys else None
         withdrawal = row[column_mapping["Withdrawal"]] if "Withdrawal" in column_map_keys else None
         deposit = row[column_mapping["Deposit"]] if "Deposit" in column_map_keys else None
@@ -364,7 +389,8 @@ def get_transaction_rows(data: list[list[str]], header_index: int, column_mappin
         }
 
         if "Date" in column_map_keys:
-            transaction_row["date"] = row[column_mapping["Date"]]
+            # //// Neoffice — the date as converted above (an .xls serial number is a datetime here), see #1489.
+            transaction_row["date"] = excel_serial_to_datetime(row[column_mapping["Date"]])
         if "Amount" in column_map_keys:
             transaction_row["amount"] = row[column_mapping["Amount"]]
         if "Withdrawal" in column_map_keys:
@@ -398,7 +424,16 @@ def get_float_amount(amount):
         return None
 
     if isinstance(amount, str):
-        amount = amount.lower().replace(",", "").replace(" ", "").replace("cr", "").replace("dr", "")
+        # //// Neoffice — the comma is read for what it is (#1489): upstream dropped every comma, so a decimal comma vanished
+        # //// ("12,50" was 1250.0, "1850,50" 185050.0). A comma is the decimal mark when it is the only one and 1 or 2 digits
+        # //// follow it ("12,50", "1.850,50"); anything else is a thousands separator, as before ("1,250", "1,850.50").
+        amount = amount.lower().replace(" ", "").replace("cr", "").replace("dr", "")
+        amount = re.sub(r'[^\d.,-]', '', amount)
+        if re.fullmatch(r"[^,]*,\d{1,2}", amount):
+            amount = amount.replace(".", "").replace(",", ".")
+        else:
+            amount = amount.replace(",", "")
+        # //// END Neoffice ////
         # Remove any other alphabets and currency symbols - do not remove the minus or decimal sign
         amount = re.sub(r'[^\d.-]', '', amount)
         try:
