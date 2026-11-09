@@ -185,28 +185,60 @@ def import_statement(file_url: str, bank_account: str):
         "end_date": data.get("statement_end_date"),
     }
 
+# //// Neoffice — added (#1490, get_data): a statement file that cannot be read says so in one clear sentence. Upstream let
+# //// whatever the reader raised reach the screen: on an empty file the message quoted a folder of the server, with the
+# //// e-mail address of the user that owns it. The original error goes to the Error Log (staff only), with its traceback;
+# //// the person who uploaded the file reads nothing of the server. Drop only if upstream wraps the readers itself.
+def throw_unreadable_file(file_path: str):
+    frappe.log_error("Bank statement file could not be read", f"File: {file_path}\n\n{frappe.get_traceback()}")
+    frappe.throw(_("The file could not be read"), title=_("Unreadable File"))
+# //// END Neoffice ////
+
+
 def get_data(file_path: str):
 
-    file_doc = frappe.get_doc("File", {"file_url": file_path})
+    # //// Neoffice — see throw_unreadable_file (#1490): a File record that does not exist, a file that cannot be opened and a
+    # //// workbook the reader refuses all end in the same clear message. A refusal of permission is not hidden.
+    try:
+        file_doc = frappe.get_doc("File", {"file_url": file_path})
+    except frappe.DoesNotExistError:
+        throw_unreadable_file(file_path)
     # //// Neoffice — the file is named by the request and read from disk: without this, any logged-in account
     # //// (a portal customer included) could have a private spreadsheet of someone else parsed and returned.
     file_doc.check_permission("read")
 
     parts = file_doc.get_extension()
     extension = parts[1]
-    content = file_doc.get_content()
+    # //// Neoffice — see throw_unreadable_file (#1490)
+    try:
+        content = file_doc.get_content()
+    except frappe.PermissionError:
+        raise
+    except Exception:
+        throw_unreadable_file(file_path)
 
     if extension.lower() not in (".csv", ".xlsx", ".xls"):
         # //// Neoffice — the throw title was left untranslated (see import_statement).
         frappe.throw(_("Import template should be of type .csv, .xlsx or .xls"), title=_("Invalid File Type"))
 
-    if extension.lower() == ".csv":
-        data = read_csv_content(content)
-    elif extension.lower() == ".xlsx":
-        data = read_xlsx_file_from_attached_file(fcontent=content)
-    elif extension.lower() == ".xls":
-        data = read_xls_file_from_attached_file(content)
-    
+    # //// Neoffice — see throw_unreadable_file (#1490)
+    try:
+        if extension.lower() == ".csv":
+            data = read_csv_content(content)
+        elif extension.lower() == ".xlsx":
+            data = read_xlsx_file_from_attached_file(fcontent=content)
+        elif extension.lower() == ".xls":
+            data = read_xls_file_from_attached_file(content)
+    except frappe.PermissionError:
+        raise
+    except Exception:
+        throw_unreadable_file(file_path)
+
+    # //// Neoffice — added (#1490): a file with no cell at all used to go on to get_statement_details and fail there on
+    # //// « list index out of range ». It is said plainly, before anything else reads it.
+    if not any(cell not in (None, "") for row in (data or []) for cell in row):
+        frappe.throw(_("The file is empty"), title=_("Empty File"))
+
     return data
 
 def get_header_row_index(data: list[list[str]]):

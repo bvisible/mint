@@ -4831,3 +4831,19 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/FullPageButton.tsx:21
 msgid "Back to Finance"
 msgstr ""
+
+#: mint/apis/statement_import.py:194
+msgid "The file could not be read"
+msgstr ""
+
+#: mint/apis/statement_import.py:194
+msgid "Unreadable File"
+msgstr ""
+
+#: mint/apis/statement_import.py:240
+msgid "The file is empty"
+msgstr ""
+
+#: mint/apis/statement_import.py:240
+msgid "Empty File"
+msgstr ""
