@@ -1155,7 +1155,8 @@ const FetchInvoicesModal = ({ onClose }: { onClose: () => void }) => {
                             />
                         </TableCell>
                         <TableCell>
-                            {ref.voucher_type}
+                            {/* //// Neoffice — the doctype's name in the user's language (« Sales Invoice » read in English, maintenance#2421) */}
+                            {_(ref.voucher_type)}
                         </TableCell>
                         <TableCell>
                             <a

@@ -19,6 +19,16 @@ export interface ResultItem {
     label?: string
 }
 
+//// Neoffice — a search result's description can be HTML: ERPNext adds a customer's or supplier's primary address,
+//// which our address template writes as `<span class="neo-adr-…">` parts and `<br>` lines. The desk renders it; this
+//// list printed the raw tags (« Record a payment », its party list, maintenance#2421). Lines become commas, tags go.
+const descriptionAsText = (description: string) => {
+    if (!description.includes('<')) return description
+    const html = description.replace(/<br\s*\/?>/gi, ', ')
+    const text = new DOMParser().parseFromString(html, 'text/html').body.textContent || ''
+    return text.replace(/\s+/g, ' ').replace(/(\s*,\s*)+/g, ', ').replace(/^[\s,]+|[\s,]+$/g, '')
+}
+
 export interface LinkFieldComboboxProps {
     /** DocType to be fetched */
     doctype: string;
@@ -275,8 +285,9 @@ const LinkFieldCombobox = ({
                                     <span className="font-medium">
                                         {result.label || result.value}
                                     </span>
+                                    {/* //// Neoffice — the description is read as text: see descriptionAsText */}
                                     {result.description && <span className="text-xs text-muted-foreground">
-                                        {result.description}
+                                        {descriptionAsText(result.description)}
                                     </span>}
                                 </CommandItem>
                             ))}

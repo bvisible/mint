@@ -1091,7 +1091,8 @@ const JournalEntryPreview = ({ preview, onEdit, onConfirm, loading, vatDisabled,
             <div className='bg-muted/50 p-4 rounded-md'>
                 <h3 className='font-semibold mb-2'>{_("Journal Entry Details")}</h3>
                 <div className='grid grid-cols-2 gap-2 text-sm'>
-                    <div><span className='font-medium'>{_("Voucher Type")}:</span> {preview.voucher_type}</div>
+                    {/* //// Neoffice — the voucher type in the user's language (« Bank Entry » read in English, maintenance#2421) */}
+                    <div><span className='font-medium'>{_("Voucher Type")}:</span> {_(preview.voucher_type)}</div>
                     <div><span className='font-medium'>{_("Company")}:</span> {preview.company}</div>
                     <div><span className='font-medium'>{_("Posting Date")}:</span> {preview.posting_date}</div>
                     <div><span className='font-medium'>{_("Reference Date")}:</span> {preview.cheque_date}</div>
