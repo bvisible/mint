@@ -160,3 +160,9 @@
   background-color: #3f3f46;
   color: #fafafa;
 }
+
+/* //// Neoffice — removed the `.neocockpit button.text-primary-foreground` / `.text-white` colour-exception rules */
+/* (6d90b8f "fix(cockpit): drop the colour exception for buttons now that the cockpit's reset yields to the app's */
+/* classes"): the cockpit's button reset (frappe-sidebar-react f724b332d, pinned by 9c2edc6) now holds its own */
+/* buttons only and gives the app's buttons their defaults in the `base` layer, which shadcn's utilities beat, so */
+/* the exception is no longer needed. */
