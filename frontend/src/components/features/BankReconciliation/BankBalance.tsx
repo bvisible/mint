@@ -7,9 +7,7 @@ import { useGetAccountClosingBalance, useGetAccountClosingBalanceAsPerStatement,
 import { flt, formatCurrency } from "@/lib/numbers"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatContainer, StatLabel, StatValue } from "@/components/ui/stats"
-import { Edit, Info, Trash2 } from "lucide-react"
-import { H4, Paragraph } from "@/components/ui/typography"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Edit, Trash2 } from "lucide-react"
 import { getCompanyCurrency } from "@/lib/company"
 import _ from "@/lib/translate"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -26,6 +24,8 @@ import { MintBankStatementBalance } from "@/types/Mint/MintBankStatementBalance"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import ErrorBanner from "@/components/ui/error-banner"
+//// Neoffice — added: the lightbulb that replaces the « i » of the figures.
+import InfoHint, { MANUAL } from "@/components/features/StatementImports/InfoHint"
 
 const BankBalance = () => {
 
@@ -62,14 +62,12 @@ const BankBalance = () => {
 const LabelWithInfo = ({ label, title, info }: { label: string, title?: string, info?: React.ReactNode }) => (
     <div className="flex items-start gap-1">
         <StatLabel>{label}</StatLabel>
-        {info && <HoverCard openDelay={100}>
-            <HoverCardTrigger><Info size='14px' className="text-secondary-foreground/80" /></HoverCardTrigger>
-            <HoverCardContent className="w-80" align="start" side="bottom">
-                {/* //// Neoffice — the full wording of the figure is the title of the hover (the label itself is short). */}
-                {title && <H4 className="text-base">{title}</H4>}
-                <Paragraph className="mt-1 text-sm">{info}</Paragraph>
-            </HoverCardContent>
-        </HoverCard>}
+        {/* //// Neoffice — the bare « i » of the figures is the lightbulb of the other screens, with the page of the manual that explains them
+            (Daniel, 11.11: « tous les i »). The full wording of the figure is the title of the hint (the label itself is short). */}
+        {info && <InfoHint small side="bottom" href={MANUAL.figures} width="w-80">
+            {title && <span className="text-base font-medium">{title}</span>}
+            <span>{info}</span>
+        </InfoHint>}
     </div>
 )
 
@@ -97,26 +95,17 @@ const ClosingBalance = () => {
                     {/* //// Neoffice — short label (it was « Closing Balance as per system »): the strip fits one line. */}
                     {_("Closing")} · {_("System")}
                 </StatLabel>
-                <HoverCard openDelay={100}>
-                    <HoverCardTrigger>
-                        <Info size='14px' className="text-secondary-foreground/80" />
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-96" align="start" side="right">
-                        <H4 className="text-base">{_("Closing balance as per system")}</H4>
-                        <Paragraph className="mt-2 text-sm">
-                            {_("This is what the system expects the closing balance to be in your bank statement.")}
-                            <br />
-                            {_("It takes into account all the transactions that have been posted and subtracts the transactions that have not cleared yet.")}
-                            <br />
-                            {_("If your bank statement shows a different closing balance, it is because all transactions have not reconciled yet.")}
-                            <br /><br />
-                            {/* //// Neoffice — sentence rebuilt with a _() placeholder (1f2847e). Upstream hard-codes the */}
-                            {/* //// English text around a <strong> tab name, which cannot be translated as one sentence. */}
-                            {/* //// Neoffice — the three reports are behind the « Reports » menu now, not tabs of their own: the sentence says where (Daniel, 11.11). */}
-                            {_("For more information, open the {0} menu below, then {1}.", [_("Reports"), _("Bank Reconciliation Statement")])}
-                        </Paragraph>
-                    </HoverCardContent>
-                </HoverCard>
+                {/* //// Neoffice — the bare « i » is the lightbulb with the page of the manual (Daniel, 11.11: « tous les i »). */}
+                <InfoHint small side="bottom" href={MANUAL.figures} width="w-96">
+                    <span className="text-base font-medium">{_("Closing balance as per system")}</span>
+                    <span>{_("This is what the system expects the closing balance to be in your bank statement.")}</span>
+                    <span>{_("It takes into account all the transactions that have been posted and subtracts the transactions that have not cleared yet.")}</span>
+                    <span>{_("If your bank statement shows a different closing balance, it is because all transactions have not reconciled yet.")}</span>
+                    {/* //// Neoffice — sentence rebuilt with a _() placeholder (1f2847e). Upstream hard-codes the English text around a <strong> tab name,
+                        which cannot be translated as one sentence. The three reports are behind the « Reports » menu now, not tabs of their own: the
+                        sentence says where (Daniel, 11.11). */}
+                    <span>{_("For more information, open the {0} menu below, then {1}.", [_("Reports"), _("Bank Reconciliation Statement")])}</span>
+                </InfoHint>
 
             </div>
             {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}

@@ -30,21 +30,26 @@ export const MANUAL = {
     bankFiles: `${MANUAL_URL}/fichiers-bancaires`,
     /** bringing a statement in by hand (CAMT or PDF) */
     importStatement: `${MANUAL_URL}/import-releve-camt-pdf`,
+    /** the four figures at the top of the bank reconciliation */
+    figures: `${MANUAL_URL}/rapprochement-bancaire#les-chiffres-du-haut`,
+    /** a line whose invoice was not recognised: choosing the invoices it settles */
+    pickInvoices: `${MANUAL_URL}/rapprochement-bancaire#une-ligne-importée-sans-facture-reconnue-choisir-les-factures`,
 } as const
 
-/** `more`: a second page of the manual, when the hint speaks of two subjects. */
-const InfoHint = ({ children, href = MANUAL.decide, more, side = "top" }: { children: ReactNode, href?: string, more?: { href: string, label: string }, side?: "top" | "left" | "bottom" }) => (
+/** `more`: a second page of the manual, when the hint speaks of two subjects. `small`: the size of the labels of the figures at
+ * the top, where it replaces the bare « i » of ERPNext. `width`: the width of the card that opens. */
+const InfoHint = ({ children, href = MANUAL.decide, more, side = "top", small = false, width = "w-72" }: { children: ReactNode, href?: string, more?: { href: string, label: string }, side?: "top" | "left" | "bottom" | "right", small?: boolean, width?: string }) => (
     <HoverCard openDelay={80} closeDelay={150}>
         <HoverCardTrigger asChild>
             <button
                 type="button"
                 aria-label={_("What does this do?")}
-                className="inline-flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-black/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className={`inline-flex shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-black/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${small ? "size-5" : "size-7"}`}
             >
-                <Lightbulb className="size-4" />
+                <Lightbulb className={small ? "size-3.5" : "size-4"} />
             </button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-72 text-sm" align="end" side={side}>
+        <HoverCardContent className={`${width} text-sm`} align={small ? "start" : "end"} side={side}>
             <div className="flex flex-col gap-2 leading-snug">
                 <div className="flex flex-col gap-1.5">{children}</div>
                 <div className="flex flex-col gap-1">

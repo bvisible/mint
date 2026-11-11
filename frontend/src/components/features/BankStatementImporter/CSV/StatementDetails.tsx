@@ -7,7 +7,7 @@ import { GetStatementDetailsResponse } from '../import_utils'
 import { flt, formatCurrency } from '@/lib/numbers'
 import { formatDate } from '@/lib/date'
 import { bankRecDateAtom, SelectedBank } from '../../BankReconciliation/bankRecAtoms'
-import { ChevronLeftIcon, ExternalLinkIcon, InfoIcon, Landmark, Loader2Icon } from 'lucide-react'
+import { ChevronLeftIcon, ExternalLinkIcon, Landmark, Loader2Icon } from 'lucide-react'
 import { H2, H3, H4, Paragraph } from '@/components/ui/typography'
 import { FileTypeIcon } from '@/components/ui/file-dropzone'
 import { getFileExtension } from '@/lib/file'
@@ -15,6 +15,8 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+//// Neoffice — added: the lightbulb that replaces the « i ».
+import InfoHint, { MANUAL } from '@/components/features/StatementImports/InfoHint'
 import { useFrappeEventListener, useFrappePostCall } from 'frappe-react-sdk'
 import { toast } from 'sonner'
 import ErrorBanner from '@/components/ui/error-banner'
@@ -174,12 +176,11 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                         <TableRow>
                             <TableHead className='bg-muted/70'>
                                 <div className='flex items-center gap-2'>
-                                    {_("Detected Amount Format")} <Tooltip>
-                                        <TooltipTrigger><InfoIcon size={16} /></TooltipTrigger>
-                                        <TooltipContent>
-                                            {_("The amount format detected in the statement file. This is used to parse the deposit and withdrawal values from each row.")}
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    {_("Detected Amount Format")}
+                                    {/* //// Neoffice — the bare « i » is the lightbulb with the page of the manual (Daniel, 11.11: « tous les i »). */}
+                                    <InfoHint small side="bottom" href={MANUAL.importStatement}>
+                                        {_("The amount format detected in the statement file. This is used to parse the deposit and withdrawal values from each row.")}
+                                    </InfoHint>
                                 </div>
                             </TableHead>
                             <TableCell>{AMOUNT_FORMAT_LABEL_MAP[data.amount_format as keyof typeof AMOUNT_FORMAT_LABEL_MAP]}</TableCell>
@@ -188,12 +189,9 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                             <TableHead className='bg-muted/70'>
                                 <div className='flex items-center gap-2'>
                                     {_("Detected Date Format")}
-                                    <Tooltip>
-                                        <TooltipTrigger><InfoIcon size={16} /></TooltipTrigger>
-                                        <TooltipContent>
-                                            {_("The date format detected in the statement file. This is used to parse the date values.")}
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    <InfoHint small side="bottom" href={MANUAL.importStatement}>
+                                        {_("The date format detected in the statement file. This is used to parse the date values.")}
+                                    </InfoHint>
                                 </div>
                             </TableHead>
                             <TableCell>

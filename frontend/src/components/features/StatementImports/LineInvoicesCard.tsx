@@ -4,7 +4,7 @@
 //// ones the payment settles, the amount is split between them (oldest first, editable), and the payment is validated
 //// and reconciled at once, or prepared as a DRAFT that is opened in its own tab, corrected, validated, and reconciled here.
 import { useFrappeGetCall, useFrappePostCall, useSWRConfig } from "frappe-react-sdk"
-import { FileEdit, Info, ListChecks } from "lucide-react"
+import { FileEdit, ListChecks } from "lucide-react"
 import { useSetAtom } from "jotai"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
@@ -20,6 +20,7 @@ import { formatDate } from "@/lib/date"
 import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { LINE_API } from "./api"
+import InfoHint, { MANUAL } from "./InfoHint"
 import MatchingVouchersHint from "./MatchingVouchersHint"
 import type { LineCandidates, LineEntry } from "./types"
 import { documentHref } from "./utils"
@@ -151,9 +152,10 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
             <div className="flex items-center gap-2">
                 <ListChecks className="size-5 text-muted-foreground" />
                 <span className="text-lg font-medium">{title}</span>
-                <span title={_("The open invoices of the party, the oldest first. Tick the ones this payment settles: the amount is split between them and stays editable. A draft is opened in its own tab so that you can correct it by hand before validating.")}>
-                    <Info className="size-4 text-muted-foreground" />
-                </span>
+                {/* the bare « i » with a tooltip is the lightbulb with the page of the manual (Daniel, 11.11: « tous les i ») */}
+                <InfoHint side="bottom" href={MANUAL.pickInvoices}>
+                    {_("The open invoices of the party, the oldest first. Tick the ones this payment settles: the amount is split between them and stays editable. A draft is opened in its own tab so that you can correct it by hand before validating.")}
+                </InfoHint>
             </div>
             <p className="text-sm leading-relaxed">{lead}</p>
             {/* vouchers that already exist for this line are under « or », below the card */}
