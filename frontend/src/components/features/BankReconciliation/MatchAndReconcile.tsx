@@ -82,8 +82,10 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
             </div>
             {/* //// Neoffice — h-full instead of a minHeight style, to follow the column's measured height (f642280, see marker above). */}
             <Separator orientation="vertical" className="h-full" />
-            {/* //// Neoffice — @container: the three buttons at the top of this column fit its width (OptionsForSingleTransaction). */}
-            <div className="@container h-full min-h-0 flex-1 overflow-y-auto px-1">
+            {/* //// Neoffice — @container: the three buttons at the top of this column fit its width (OptionsForSingleTransaction). The column does
+                not scroll as a whole any more (upstream: overflow-y-auto here): like the list on the left, its heading and its buttons stay in
+                place and only what is under them scrolls, so the scrollbar starts under the buttons (Daniel, 11.11). */}
+            <div className="@container flex h-full min-h-0 flex-1 flex-col px-1">
                 <H4 className="text-sm font-medium">{_("Match or Create")}</H4>
                 <VouchersSection contentHeight={contentHeight} />
             </div>
@@ -444,22 +446,27 @@ const VouchersSection = ({ contentHeight }: { contentHeight: number }) => {
 
     if (selectedTransactions.length === 0) {
         //// Neoffice — NOT ours: upstream v1.5.0 empty state (89e7929).
-        return <Empty className="h-64 my-4">
-            <EmptyHeader>
-                <EmptyMedia variant="icon">
-                    <ReceiptIcon />
-                </EmptyMedia>
-                <EmptyTitle>{_("Select a transaction to match and reconcile with vouchers")}</EmptyTitle>
-            </EmptyHeader>
-        </Empty>
+        return <div className="min-h-0 flex-1 overflow-y-auto">
+            <Empty className="h-64 my-4">
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <ReceiptIcon />
+                    </EmptyMedia>
+                    <EmptyTitle>{_("Select a transaction to match and reconcile with vouchers")}</EmptyTitle>
+                </EmptyHeader>
+            </Empty>
+        </div>
     }
 
     if (selectedTransactions.length > 1) {
-        return <OptionsForMultipleTransactions transactions={selectedTransactions} />
+        //// Neoffice — the column scrolls under its heading (see the column above), so this state scrolls itself.
+        return <div className="min-h-0 flex-1 overflow-y-auto">
+            <OptionsForMultipleTransactions transactions={selectedTransactions} />
+        </div>
     }
 
     //// Neoffice — dropped the minHeight: contentHeight style, which no longer applies now that the column's own height is measured by the page (f642280 "fix(bank reconciliation): the two columns of the match tab fit the room under the tabs").
-    return <div className="mt-2">
+    return <div className="mt-2 flex min-h-0 flex-1 flex-col">
         <OptionsForSingleTransaction transaction={selectedTransactions[0]} contentHeight={contentHeight} />
     </div>
 }
@@ -597,15 +604,16 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
 
     const { setTransferModalOpen, setRecordPaymentModalOpen, setRecordJournalEntryModalOpen } = useKeyboardShortcuts()
 
-    return <div className="flex flex-col gap-3">
+    return <div className="flex min-h-0 flex-1 flex-col">
         <TooltipProvider>
-            {/* //// Neoffice — the three buttons and the filters stay on ONE line, whatever the width of the column, and stay in view while the
-                rest of the column scrolls (Daniel, 11.11: « les boutons doivent tenir dans la largeur, enlève les icônes s'il faut, et ils sont
-                toujours dans le scroll » ; « aligne la police sur les boutons de gauche »). The icons go below 40rem; the text is the size of the buttons
+            {/* //// Neoffice — the three buttons and the filters stay on ONE line, whatever the width of the column, and OUTSIDE what scrolls: like
+                the filters of the list on the left, they stay in place while the cards and the vouchers scroll under them (Daniel, 11.11: « les
+                boutons doivent tenir dans la largeur, enlève les icônes s'il faut » ; « à gauche les boutons ne sont pas dans le scroll, à droite
+                oui : corrige » ; « aligne la police sur les boutons de gauche »). The icons go below 40rem; the text is the size of the buttons
                 of the list on the left (14 px) from 29rem, and a size smaller only below that, where it would not fit; below 26rem (a very narrow column)
                 nothing more can be saved and the buttons wrap rather than being cut (container queries on the column).
                 Upstream: gap-4, no wrapping, not sticky: in a narrow column the third button was cut and a sideways scrollbar appeared. */}
-            <div className="sticky top-0 z-20 -mx-1 flex flex-wrap items-center justify-between gap-1.5 bg-background px-1 pt-2 pb-1.5 @[26rem]:flex-nowrap">
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-1.5 pb-2 @[26rem]:flex-nowrap">
                 <div className="flex min-w-0 flex-wrap gap-1.5 @[26rem]:flex-nowrap">
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -672,12 +680,17 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                 <div className="shrink-0"><MatchFilters /></div>
             </div>
         </TooltipProvider>
-        {/* //// Neoffice — added: a gap left by an import waits here for a person's decision. */}
-        <GapDecisionCard key={transaction.name} transaction={transaction} />
-        {/* //// Neoffice — added: one amount for several invoices, a reference that does not match, the payment as a draft. */}
-        <LineInvoicesCard key={`${transaction.name}-invoices`} transaction={transaction} />
-        {transaction.matched_rule && <RuleAction transaction={transaction} />}
-        <VouchersForTransaction transaction={transaction} contentHeight={contentHeight} />
+        {/* //// Neoffice — what scrolls: the cards and the vouchers, under the buttons. The foot of the gap card sticks to the bottom of THIS box. */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="flex flex-col gap-3">
+                {/* //// Neoffice — added: a gap left by an import waits here for a person's decision. */}
+                <GapDecisionCard key={transaction.name} transaction={transaction} />
+                {/* //// Neoffice — added: one amount for several invoices, a reference that does not match, the payment as a draft. */}
+                <LineInvoicesCard key={`${transaction.name}-invoices`} transaction={transaction} />
+                {transaction.matched_rule && <RuleAction transaction={transaction} />}
+                <VouchersForTransaction transaction={transaction} contentHeight={contentHeight} />
+            </div>
+        </div>
     </div>
 }
 
