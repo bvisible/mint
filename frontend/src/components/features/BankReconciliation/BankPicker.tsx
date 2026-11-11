@@ -1,5 +1,6 @@
 import { useAtom, useSetAtom } from "jotai"
 import { SelectedBank, selectedBankAccountAtom } from "./bankRecAtoms"
+//// Neoffice — added: useState drives the open/closed popover of the new size "select" (1e4b754).
 import { useCallback, useState } from "react"
 import { useGetBankAccounts, useGetUnreconciledTransactions } from "./utils"
 import { cn } from "@/lib/utils"
@@ -42,6 +43,8 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
     if (error) {
         return <ErrorBanner error={error} />
     }
+    //// Neoffice — added: size "select" renders the top-left bank selector instead of the row of
+    //// cards, which moves to the body of the page (1e4b754).
     if (size === 'select') {
         return <BankSelect banks={banks ?? []} className={className} />
     }
