@@ -5517,3 +5517,131 @@ msgstr "Écriture créée"
 #: BankStatementImporter/CSV/StatementDetails.tsx
 msgid "Closing Balance as of {}"
 msgstr "Solde de clôture au {}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:142
+#, python-brace-format
+msgid "A gap of {0} on invoice {1}"
+msgstr "Un écart de {0} sur la facture {1}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:160
+#, python-brace-format
+msgid "Books the payment received. The invoice stays due for {0}."
+msgstr "Enregistre le paiement reçu. La facture reste due pour {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:150
+msgid "Confirm the rebate and reconcile"
+msgstr "Confirmer le rabais et rapprocher"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:255
+msgid "Fill in the settings"
+msgstr "Remplir les réglages"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:157
+#, python-brace-format
+msgid "Makes a credit note of {0} and settles the invoice. The payment received is booked as it is."
+msgstr "Établit un avoir de {0} et solde la facture. Le paiement reçu est enregistré tel quel."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:348
+msgid "Opens the full payment form, pointed at the customer (or supplier) of this invoice. Use it when none of the choices fits."
+msgstr "Ouvre le formulaire de paiement complet, pointé sur le client (ou le fournisseur) de cette facture. Utilisez-le si aucun des choix ne convient."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:257
+msgid "Opens the settings of the company in a new tab: this screen stays open. The gap accounts are in the section Payment Gaps."
+msgstr "Ouvre les réglages de la société dans un nouvel onglet : cet écran reste ouvert. Les comptes d'écart se trouvent dans la section Écarts de paiement."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:141
+#, python-brace-format
+msgid "Paid {0} out of {1}"
+msgstr "Payé {0} sur {1}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:347
+msgid "Reconcile manually"
+msgstr "Rapprocher manuellement"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:301
+msgid "Remember this choice for this customer"
+msgstr "Retenir ce choix pour ce client"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:150
+msgid "Settle the invoice and reconcile"
+msgstr "Solder la facture et rapprocher"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:163
+#, python-brace-format
+msgid "Settles the invoice: the payment is booked for what came in and the gap of {0} goes to the account chosen above."
+msgstr "Solde la facture : le paiement est enregistré pour le montant reçu, et l'écart de {0} est porté sur le compte choisi ci-dessus."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:159
+#, python-brace-format
+msgid "Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above."
+msgstr "Solde la facture : le paiement est enregistré pour le montant reçu, et {0} est porté sur le compte choisi ci-dessus."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
+msgid "Show what will be booked"
+msgstr "Voir ce qui sera enregistré"
+
+#: mint/apis/payment_gap.py:86
+msgid "The company has no payment gap account on purchases."
+msgstr "La société n'a pas de compte d'écart de paiement sur les achats."
+
+#: mint/apis/payment_gap.py:222
+msgid "The company has not named an amount up to which a rebate is passed by itself: a person confirms it."
+msgstr "La société n'a pas fixé de montant jusqu'auquel un rabais passe automatiquement : une personne le confirme."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:202
+msgid "The company has not named an amount up to which a rebate is passed by itself: you confirm it."
+msgstr "La société n'a pas fixé de montant jusqu'auquel un rabais passe automatiquement : vous le confirmez."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:249
+msgid "The company has not said yet where to pass the gaps on purchases."
+msgstr "La société n'a pas encore indiqué où comptabiliser les écarts sur les achats."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:249
+msgid "The company has not said yet where to pass the gaps on sales."
+msgstr "La société n'a pas encore indiqué où comptabiliser les écarts sur les ventes."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:232
+#, python-brace-format
+msgid "The customer owes nothing more. Made like the credit notes this customer already has ({0}), without link to the invoice."
+msgstr "Le client ne doit plus rien. Établi comme les avoirs que ce client possède déjà ({0}), sans lien avec la facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:233
+msgid "The customer owes nothing more. This customer has no credit note yet: the account of the company is used, without link to the invoice."
+msgstr "Le client ne doit plus rien. Ce client n'a pas encore d'avoir : le compte de la société est utilisé, sans lien avec la facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
+msgid "The fee of the dunning is booked on its own account and settles it."
+msgstr "Les frais de rappel sont enregistrés sur leur propre compte et le soldent."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:236
+#, python-brace-format
+msgid "The invoice is settled and {0} goes to the account you choose below: it is more than the company accepts by itself, so you decide."
+msgstr "La facture est soldée et {0} est porté sur le compte que vous choisissez ci-dessous : c'est plus que ce que la société accepte d'elle-même, c'est donc à vous de décider."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:227
+#, python-brace-format
+msgid "The invoice stays due for {0}. Only the payment received is booked."
+msgstr "La facture reste due pour {0}. Seul le paiement reçu est enregistré."
+
+#: mint/apis/payment_gap.py:220
+#, python-brace-format
+msgid "This gap is above {0}: a person confirms it."
+msgstr "Cet écart dépasse {0} : une personne le confirme."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:201
+#, python-brace-format
+msgid "This rebate is above {0}: the import does not pass it by itself, you confirm it."
+msgstr "Ce rabais dépasse {0} : l'import ne le passe pas automatiquement, vous le confirmez."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:250
+msgid "Until it does, each gap is decided one by one: choose an account for this line below."
+msgstr "Tant que ce n'est pas le cas, chaque écart se décide un à un : choisissez un compte pour cette ligne ci-dessous."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:226
+#, python-brace-format
+msgid "What becomes of the remaining {0}?"
+msgstr "Que devient le solde restant de {0} ?"
+
+#: frontend/src/components/features/StatementImports/InfoHint.tsx:17
+msgid "What does this do?"
+msgstr "Que fait cela ?"
