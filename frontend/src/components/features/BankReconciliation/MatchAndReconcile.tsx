@@ -610,9 +610,11 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         <TooltipTrigger asChild>
                             <Button
                                 variant='outline'
+                                // //// Neoffice — see block marker above: responsive text size (1759328)
                                 className="text-xs @[29rem]:text-sm"
                                 aria-label={_("Record a payment entry against a customer or supplier")}
                                 onClick={() => setRecordPaymentModalOpen(true)}>
+                                {/* //// Neoffice — see block marker above: icon hidden in narrow column (1759328) */}
                                 <Receipt className="hidden @[40rem]:block" /> {_("Record Payment")}
                             </Button>
                         </TooltipTrigger>
@@ -628,9 +630,11 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         <TooltipTrigger asChild>
                             <Button
                                 variant='outline'
+                                // //// Neoffice — see block marker above: responsive text size (1759328)
                                 className="text-xs @[29rem]:text-sm"
                                 aria-label={_("Record a bank journal entry for expenses, income or split transactions")}
                                 onClick={() => setRecordJournalEntryModalOpen(true)}>
+                                {/* //// Neoffice — see block marker above: icon hidden in narrow column (1759328) */}
                                 <Landmark className="hidden @[40rem]:block" /> {_("Bank Entry")}
                             </Button>
                         </TooltipTrigger>
@@ -646,9 +650,11 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         <TooltipTrigger asChild>
                             <Button
                                 variant='outline'
+                                // //// Neoffice — see block marker above: responsive text size (1759328)
                                 className="text-xs @[29rem]:text-sm"
                                 aria-label={_("Record an internal transfer to another bank/credit card/cash account")}
                                 onClick={() => setTransferModalOpen(true)}>
+                                {/* //// Neoffice — see block marker above: icon hidden in narrow column (1759328) */}
                                 <ArrowRightLeft className="hidden @[40rem]:block" /> {_("Transfer")}
                             </Button>
                         </TooltipTrigger>
@@ -661,6 +667,7 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         </TooltipContent>
                     </Tooltip>
                 </div>
+                {/* //// Neoffice — see block marker above: filters kept on one line, not wrapped under the buttons (1759328) */}
                 <div className="shrink-0"><MatchFilters /></div>
             </div>
         </TooltipProvider>
