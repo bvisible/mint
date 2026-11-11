@@ -94,6 +94,9 @@ const BankSelect = ({ banks, className }: { banks: SelectedBank[], className?: s
 
     const several = banks.length > 1
     const box = cn("h-11 min-w-56 max-w-80 justify-between gap-2 px-2.5", className)
+    //// Neoffice — the selection kept between visits could hold a copy of the bank from before its logo was known, so the
+    //// selector drew the generic icon where the list under it drew the logo; show the bank of the list instead (cf3d74f
+    //// "fix(bank reconciliation): the bank selector shows the logo of the bank of the list, not the older copy held by the selection")
     // the atom may hold an older copy of the bank (without its logo): what is shown is the bank of the list
     const shown = banks.find((bank) => bank.name === selectedBank?.name) ?? selectedBank
     const content = shown
