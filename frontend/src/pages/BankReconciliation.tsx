@@ -94,6 +94,7 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                             <span className="text-gray-400">|</span>
                             {_("Bank Reconciliation")}
                             <FavoriteStar />
+                            {/* //// Neoffice — see the block marker above: h1 tag/size change */}
                         </h1>
                     )}
                     <div className="flex flex-wrap items-center gap-2">
