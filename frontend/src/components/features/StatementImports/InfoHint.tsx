@@ -1,7 +1,7 @@
-//// Neoffice — added file (no upstream equivalent). The small info icon that holds the explanation of a button or of a
+//// Neoffice — added file (no upstream equivalent). The small lightbulb that holds the explanation of a button or of a
 //// choice. The sentence is not written under every button (nobody reads it after the twentieth time, and it costs a line
 //// of a screen that has none to spare): it opens when the icon is hovered, with a way to the manual for whoever wants more.
-import { Info } from "lucide-react"
+import { Lightbulb } from "lucide-react"
 import type { ReactNode } from "react"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import _ from "@/lib/translate"
@@ -17,7 +17,7 @@ const InfoHint = ({ children, side = "top" }: { children: ReactNode, side?: "top
                 aria-label={_("What does this do?")}
                 className="inline-flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-black/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
-                <Info className="size-4" />
+                <Lightbulb className="size-4" />
             </button>
         </HoverCardTrigger>
         <HoverCardContent className="w-72 text-sm" align="end" side={side}>
