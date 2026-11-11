@@ -20,6 +20,7 @@ import { formatDate } from "@/lib/date"
 import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { LINE_API } from "./api"
+import MatchingVouchersHint from "./MatchingVouchersHint"
 import type { LineCandidates, LineEntry } from "./types"
 import { documentHref } from "./utils"
 
@@ -155,6 +156,8 @@ const LineInvoicesCard = ({ transaction }: { transaction: UnreconciledTransactio
                 </span>
             </div>
             <p className="text-sm leading-relaxed">{lead}</p>
+            {/* vouchers that already exist for this line are under « or », below the card */}
+            <MatchingVouchersHint transaction={transaction} />
 
             {/* WHO is behind the payment comes first: the invoices listed below are the ones of this person and nobody else */}
             {entries.length === 0 && (

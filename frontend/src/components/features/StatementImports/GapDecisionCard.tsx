@@ -24,6 +24,7 @@ import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { API } from "./api"
 import InfoHint, { MANUAL } from "./InfoHint"
+import MatchingVouchersHint from "./MatchingVouchersHint"
 import type { GapDecision, RuleMode } from "./types"
 import { documentHref } from "./utils"
 
@@ -205,6 +206,8 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     <span className="text-xl leading-tight font-medium">{headline}</span>
                     <p className="text-sm leading-relaxed text-muted-foreground">{sentence(decision)}</p>
                 </div>
+                {/* vouchers that already exist for this line are under « or », below the card: say so before the person books a second one */}
+                <MatchingVouchersHint transaction={transaction} />
                 {confirming && (
                     <p className="rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm leading-snug text-amber-950">
                         {verdict.confirm_above

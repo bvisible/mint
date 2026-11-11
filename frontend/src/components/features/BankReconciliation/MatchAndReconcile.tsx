@@ -50,6 +50,8 @@ import { useLinesToDecide } from "@/components/features/StatementImports/useLine
 import GapDecisionCard from "@/components/features/StatementImports/GapDecisionCard"
 //// Neoffice — added: the invoices a line settles when the import named none, several, or one already paid.
 import LineInvoicesCard from "@/components/features/StatementImports/LineInvoicesCard"
+//// Neoffice — added: the anchor of the block of vouchers under « or ».
+import { VOUCHERS_ANCHOR } from "@/components/features/StatementImports/MatchingVouchersHint"
 import { kindLabel } from "@/components/features/StatementImports/utils"
 
 const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
@@ -860,7 +862,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
     }
 
     if (isLoading) {
-        return <div className="flex flex-col gap-2">
+        return <div id={VOUCHERS_ANCHOR} className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Separator className="flex-1" />
                 {/* //// Neoffice — wrapped in _() (1f2847e); upstream ships the bare word. The identical */}
@@ -877,7 +879,8 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
         </div>
     }
 
-    return <div className="relative space-y-2">
+    //// Neoffice — the id is where the line « N vouchers could match » of the cards above takes the person (MatchingVouchersHint).
+    return <div id={VOUCHERS_ANCHOR} className="relative space-y-2">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Separator className="flex-1" />
             {/* //// Neoffice — this "or" now goes through _() like the first one above (13577b4 "chore: the residues of the marking pass, in one lot"). */}
