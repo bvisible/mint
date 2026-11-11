@@ -604,6 +604,7 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
 
     const { setTransferModalOpen, setRecordPaymentModalOpen, setRecordJournalEntryModalOpen } = useKeyboardShortcuts()
 
+    //// Neoffice — min-h-0 flex-1 flex-col so this column's own scrolling child (see below) can shrink instead of the whole column scrolling (b5f6ac9 "fix(bank reconciliation): the heading and the three buttons of the match column stay in place, only the cards and vouchers scroll under them").
     return <div className="flex min-h-0 flex-1 flex-col">
         <TooltipProvider>
             {/* //// Neoffice — the three buttons and the filters stay on ONE line, whatever the width of the column, and OUTSIDE what scrolls: like
@@ -613,6 +614,7 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                 of the list on the left (14 px) from 29rem, and a size smaller only below that, where it would not fit; below 26rem (a very narrow column)
                 nothing more can be saved and the buttons wrap rather than being cut (container queries on the column).
                 Upstream: gap-4, no wrapping, not sticky: in a narrow column the third button was cut and a sideways scrollbar appeared. */}
+            {/* //// Neoffice — see the block marker above: shrink-0 (not sticky any more) and flex-wrap below 26rem (b5f6ac9, 613d8b4). */}
             <div className="flex shrink-0 flex-wrap items-center justify-between gap-1.5 pb-2 @[26rem]:flex-nowrap">
                 <div className="flex min-w-0 flex-wrap gap-1.5 @[26rem]:flex-nowrap">
                     <Tooltip>
