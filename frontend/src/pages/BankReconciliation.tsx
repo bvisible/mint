@@ -16,7 +16,6 @@ import ActionLog from "@/components/features/ActionLog/ActionLog"
 import FavoriteStar from "@/components/features/BankReconciliation/FavoriteStar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { H1 } from "@/components/ui/typography"
 import _ from "@/lib/translate"
 //// Neoffice — added: framed in a tab of the desk (lib/embedded.ts).
 import { EMBEDDED } from "@/lib/embedded"
@@ -85,15 +84,17 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                     {/* //// Mint wordmark; embedded in the Neoffice desk the page carries the Neoffice logo linking */}
                     {/* //// back to /app/home, then the page title and the favourite star. Cosmetic but ours: */}
                     {/* //// at the merge keep both sides and re-apply the logo block. */}
+                    {/* //// Neoffice — the title in a plain h1 of 1.75rem: the desk's stylesheet made the H1 component 42 px, the tools wrapped
+                        under it and the head of the whole page took 80 px of a screen that has none to spare (Daniel, 11.11). */}
                     {!EMBEDDED && (
-                        <H1 className="text-sm font-medium flex items-center gap-2 whitespace-nowrap shrink-0">
+                        <h1 className="flex shrink-0 items-center gap-2 font-medium tracking-tight whitespace-nowrap" style={{ fontSize: "1.75rem", lineHeight: 1.2 }}>
                             <a href="/app/home">
                                 <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-7" />
                             </a>
                             <span className="text-gray-400">|</span>
                             {_("Bank Reconciliation")}
                             <FavoriteStar />
-                        </H1>
+                        </h1>
                     )}
                     <div className="flex flex-wrap items-center gap-2">
                         <TooltipProvider>
@@ -101,11 +102,14 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                             <RuleConfigureButton />
                             <Settings />
                             <ActionLog />
-                            {/* //// Neoffice — added: the whole page, and back (FullPageButton). */}
-                            <FullPageButton />
                         </TooltipProvider>
                         <CompanySelector />
                         <BankRecDateFilter />
+                        {/* //// Neoffice — added: the whole page, and back (FullPageButton), in the corner, after the date (Daniel, 11.11:
+                            first among the tools it was lost at the left of the company). */}
+                        <TooltipProvider>
+                            <FullPageButton />
+                        </TooltipProvider>
                     </div>
                 </div>
                 {/* //// Neoffice — the compact bank cards: the screen keeps its height for the list below. */}

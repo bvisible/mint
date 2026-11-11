@@ -45,9 +45,9 @@ const PartyReconciliation = () => {
                         </TabsList>
                     </Tabs>
                     <div className="flex items-center gap-2">
-                        {/* //// Neoffice — added: the whole page, and back (FullPageButton). */}
-                        <FullPageButton />
                         <CompanySelector />
+                        {/* //// Neoffice — added: the whole page, and back (FullPageButton), in the corner (Daniel, 11.11). */}
+                        <FullPageButton />
                     </div>
                 </div>
 

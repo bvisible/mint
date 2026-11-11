@@ -716,7 +716,7 @@ def result_message(stats: dict, currency: str) -> str:
 	if stats["auto_matched"]:
 		text = _("Booked.")
 		if stats["passed_with_gap"]:
-			text = _("Booked, {0} of them with a small gap ({1} in all).").format(
+			text = _("Booked, {0} of them with a small difference ({1} in all).").format(
 				stats["passed_with_gap"], frappe.utils.fmt_money(stats["gap_total"], currency=currency)
 			)
 		rows.append(row("green", _("{0} passed by themselves").format(stats["auto_matched"]), text))
@@ -725,7 +725,7 @@ def result_message(stats: dict, currency: str) -> str:
 			row(
 				"orange",
 				_("{0} to decide").format(stats["to_decide"]),
-				_("A gap waits for your decision in the bank reconciliation."),
+				_("A difference waits for your decision in the bank reconciliation."),
 			)
 		)
 	if to_match:

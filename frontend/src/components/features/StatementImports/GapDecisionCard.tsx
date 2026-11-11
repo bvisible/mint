@@ -2,13 +2,16 @@
 //// recognised but whose sum does not settle it: the verdict in words, and the choice. The import announces, this
 //// decides; the verdict is worked out now by the server, the same function the import uses.
 //// The card is one column in the panel of the line: a headline, a sentence, what to choose, then the buttons (the main
-//// one in ink, then « Reconcile manually »). Nothing is explained under a button: the explanation is behind its info
-//// icon (InfoHint). There is no « leave it open » button: a person who does nothing leaves the line open anyway.
+//// one in ink, then « Reconcile manually »), which stay at the foot of the visible panel while the rest of the card
+//// scrolls (they were below the fold and tied to the list under the card, Daniel, 11.11). Nothing is explained under a
+//// button: the explanation is behind its lightbulb (InfoHint), with the page of the manual that speaks of it. There is no
+//// « leave it open » button: a person who does nothing leaves the line open anyway.
+//// The words are those of the books, not of the code: a difference, a credit note, a loss on customers, a discount.
 import { useFrappeGetCall, useFrappePostCall, useSWRConfig } from "frappe-react-sdk"
 import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react"
 import NoraOrb from "@/components/common/NoraOrb"
 import { useSetAtom } from "jotai"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { bankRecRecordPaymentModalAtom, bankRecRecordPaymentPrefillAtom, bankRecUnreconcileModalAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import { UnreconciledTransaction, useRefreshUnreconciledTransactions } from "@/components/features/BankReconciliation/utils"
@@ -20,7 +23,7 @@ import { formatDate } from "@/lib/date"
 import { formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { API } from "./api"
-import InfoHint from "./InfoHint"
+import InfoHint, { MANUAL } from "./InfoHint"
 import type { GapDecision, RuleMode } from "./types"
 import { documentHref } from "./utils"
 
@@ -105,7 +108,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const onDecide = () => {
         decide({ bank_transaction: transaction.name, decision: "passed_gap", account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0 }).then(() => {
             refresh()
-            toast.success(credit ? _("Credit note made, invoice settled and bank line reconciled") : _("Gap passed and bank line reconciled"), {
+            toast.success(credit ? _("Credit note made, invoice settled and bank line reconciled") : _("Difference booked and bank line reconciled"), {
                 duration: 4000,
                 closeButton: true,
                 action: { label: _("Undo"), onClick: () => setUnreconcile(transaction.name) },
@@ -139,12 +142,12 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
 
     const headline = isPartial
         ? _("Paid {0} out of {1}", [formatCurrency(verdict.amount, verdict.currency), formatCurrency(verdict.outstanding, verdict.currency)])
-        : _("A gap of {0} on invoice {1}", [gapText, decision.invoice])
+        : _("A difference of {0} on invoice {1}", [gapText, decision.invoice])
 
     const passLabel = draft && credit
         ? _("Validate the draft and reconcile")
         : isPartial
-            ? (credit ? _("Create the credit note and reconcile") : settle ? _("Settle the invoice and pass the gap") : _("Record the partial payment"))
+            ? (credit ? _("Create the credit note and reconcile") : settle ? _("Settle the invoice and book the difference") : _("Record the partial payment"))
             : verdict.kind === "dunning_fee"
                 ? _("Book the dunning fee and reconcile")
                 : confirming ? _("Confirm the rebate and reconcile") : _("Settle the invoice and reconcile")
@@ -160,9 +163,12 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     : _("Books the payment received. The invoice stays due for {0}.", [gapText]))
             : verdict.kind === "dunning_fee"
                 ? _("The fee of the dunning is booked on its own account and settles it.")
-                : _("Settles the invoice: the payment is booked for what came in and the gap of {0} goes to the account chosen above.", [gapText])
+                : _("Settles the invoice: the payment is booked for what came in and the difference of {0} goes to the account chosen above.", [gapText])
 
-    const tile = (value: "open" | "credit" | "gap", label: string, hint: string, proposed: boolean) => (
+    // the page of the manual that the main button speaks of: the three choices of a partial payment, or the card in general
+    const passPage = isPartial ? MANUAL.partial : MANUAL.decide
+
+    const tile = (value: "open" | "credit" | "gap", label: string, hint: ReactNode, proposed: boolean) => (
         <div key={value} className="flex items-center gap-2">
             <button
                 type="button"
@@ -178,176 +184,193 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                 <span className="min-w-0 flex-1">{label}</span>
                 {proposed && <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">{_("Proposed")}</span>}
             </button>
-            <InfoHint>{hint}</InfoHint>
+            <InfoHint href={MANUAL.partial}>{hint}</InfoHint>
         </div>
     )
 
     return (
-        <div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
-            <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-                    <span className="size-1.5 rounded-full bg-current" />
-                    {confirming ? _("To confirm") : _("To decide")}
-                </span>
-                <span className="text-xs text-muted-foreground">{lineDay}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-                <span className="text-xl leading-tight font-medium">{headline}</span>
-                <p className="text-sm leading-relaxed text-muted-foreground">{sentence(decision)}</p>
-            </div>
-            {confirming && (
-                <p className="rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm leading-snug text-amber-950">
-                    {verdict.confirm_above
-                        ? _("This rebate is above {0}: the import does not pass it by itself, you confirm it.", [formatCurrency(verdict.confirm_above, verdict.currency)])
-                        : _("The company has not named an amount up to which a rebate is passed by itself: you confirm it.")}
-                </p>
-            )}
-            {draft && (
-                <div className="flex flex-wrap items-center gap-3 rounded-md border border-orange-200 bg-orange-50 p-2.5">
-                    <span className="text-sm leading-snug">
-                        {_("A credit note of {0} was prepared as a draft: {1}.", [formatCurrency(draft.total, verdict.currency), draft.name])}
+        <div className="flex flex-col rounded-lg border bg-card">
+            <div className="flex flex-col gap-2.5 p-3.5">
+                <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                        <span className="size-1.5 rounded-full bg-current" />
+                        {confirming ? _("To confirm") : _("To decide")}
                     </span>
-                    <a className="text-sm underline underline-offset-2" href={documentHref("Sales Invoice", draft.name)} target="_blank" rel="noopener noreferrer">{_("Open the draft")}</a>
-                </div>
-            )}
-            {isPartial && habit?.proposal === "credit_note" && note && !draft && (
-                <div className="flex items-start gap-2 rounded-md border border-orange-200 bg-orange-50 p-2.5">
-                    <NoraOrb size={22} className="mt-0.5 shrink-0" />
-                    <div className="flex min-w-0 flex-col gap-1.5">
-                        <span className="text-sm leading-snug">
-                            {_("This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note.", [String(habit.share), String(habit.same_share), String(habit.considered), String(habit.closed_by_credit)])}
-                        </span>
-                        {!credit && <Button size="sm" className="w-fit" onClick={() => choose("credit")}>{_("Apply the proposal")}</Button>}
-                    </div>
-                </div>
-            )}
-            {isPartial && decision.can_settle && (
-                <div className="flex flex-col gap-2" role="radiogroup">
-                    <span className="text-base font-medium">{_("What becomes of the remaining {0}?", [gapText])}</span>
-                    {tile("open", _("Keep the rest open"), _("The invoice stays due for {0}. Only the payment received is booked.", [gapText]), false)}
-                    {note && tile(
-                        "credit",
-                        _("Create the credit note of the balance"),
-                        note.source === "history"
-                            ? _("The customer owes nothing more. Made like the credit notes this customer already has ({0}), without link to the invoice.", [String(note.times)])
-                            : _("The customer owes nothing more. This customer has no credit note yet: the account of the company is used, without link to the invoice."),
-                        habit?.proposal === "credit_note" || decision.rule_proposal === "credit_note",
-                    )}
-                    {tile("gap", _("Pass the rest as a gap"), _("The invoice is settled and {0} goes to the account you choose below: it is more than the company accepts by itself, so you decide.", [gapText]), decision.rule_proposal === "gap")}
-                </div>
-            )}
-            {credit && note && (
-                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5 text-sm">
-                    {note.net !== null && <span><span className="text-muted-foreground">{_("Net")}</span> <span className="font-mono tabular-nums">{formatCurrency(note.net, verdict.currency)}</span></span>}
-                    {note.tax !== null && note.tax > 0 && <span><span className="text-muted-foreground">{_("VAT")}</span> <span className="font-mono tabular-nums">{formatCurrency(note.tax, verdict.currency)}</span></span>}
-                    <span className="font-medium">{_("Total of the credit note")} <span className="font-mono tabular-nums">{formatCurrency(note.total, verdict.currency)}</span></span>
-                </div>
-            )}
-            {missingSetting && (
-                <div className="flex flex-col gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-amber-950">
-                    <span className="text-sm leading-snug">
-                        <b>{isSale ? _("The company has not said yet where to pass the gaps on sales.") : _("The company has not said yet where to pass the gaps on purchases.")}</b>{" "}
-                        {_("Until it does, each gap is decided one by one: choose an account for this line below.")}
+                    <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <a className="underline underline-offset-2" href={documentHref(decision.invoice_type, decision.invoice)} target="_blank" rel="noopener noreferrer">{decision.invoice}</a>
+                        <span>{lineDay}</span>
                     </span>
-                    {settingsHref && (
-                        <div className="flex items-center gap-2">
-                            <Button asChild variant="outline" className="h-10 flex-1">
-                                <a href={settingsHref} target="_blank" rel="noopener noreferrer">{_("Fill in the settings")} <ExternalLink className="size-4" /></a>
-                            </Button>
-                            <InfoHint>{_("Opens the settings of the company in a new tab: this screen stays open. The gap accounts are in the section Payment Gaps.")}</InfoHint>
-                        </div>
-                    )}
                 </div>
-            )}
-            {showAccount && (
-                <div className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium">{credit ? _("Account of the credit note") : _("Account for the gap")}</span>
-                    <AccountsDropdown
-                        root_type={credit || isSale ? ["Income"] : ["Expense"]}
-                        company={transaction.company}
-                        value={account ?? decision.account ?? undefined}
-                        onChange={(value) => setAccount(value || null)}
-                    />
-                    {account && account !== decision.default_account && decision.default_account && (
-                        <button type="button" className="w-fit text-xs underline underline-offset-2" onClick={() => setAccount(null)}>{_("Back to the company's account")}</button>
-                    )}
-                </div>
-            )}
-            {decision.deductions.length > 0 && (
                 <div className="flex flex-col gap-1">
-                    <button type="button" className="flex w-fit items-center gap-1 text-sm font-medium" onClick={() => setShowBooked(!showBooked)}>
-                        {showBooked ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
-                        {_("Show what will be booked")}
-                    </button>
-                    {showBooked && (
-                        <>
-                            {decision.deductions.map((row, index) => (
-                                <div key={`${row.account}-${index}`} className="flex justify-between gap-4 text-sm">
-                                    <span className="min-w-0 truncate text-muted-foreground">{row.account}</span>
-                                    <span className="font-mono tabular-nums">{formatCurrency(Math.abs(row.amount), verdict.currency)}</span>
-                                </div>
-                            ))}
-                            {decision.deductions.length > 1 && (
-                                <span className="text-xs text-muted-foreground">{_("The VAT is cut from the account, as in the payment entry.")}</span>
-                            )}
-                        </>
-                    )}
+                    <span className="text-xl leading-tight font-medium">{headline}</span>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{sentence(decision)}</p>
                 </div>
-            )}
-            {isPartial && rule && (credit || settle || rule.exists) && (
-                <div className="flex flex-col gap-1.5">
-                    <button type="button" className="flex w-fit items-center gap-1 text-sm font-medium" onClick={() => setShowRule(!showRule)}>
-                        {showRule ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
-                        {_("Remember this choice for this customer")}
-                    </button>
-                    {showRule && (
-                        <div className="flex flex-col gap-1.5 rounded-md border bg-white p-2.5">
-                            <div className="flex flex-wrap gap-1.5">
-                                {(["suggest", "draft", "automatic"] as RuleMode[]).map((level) => (
-                                    <Button
-                                        key={level}
-                                        size="sm"
-                                        variant={rule.exists && rule.mode === level ? "default" : "outline"}
-                                        disabled={ruleLoading || !levelAvailable(level)}
-                                        onClick={() => onRule(level)}
-                                    >
-                                        {level === "suggest" ? _("Propose it to me") : level === "draft" ? _("Prepare it as a draft") : _("Make it by itself")}
-                                    </Button>
-                                ))}
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                                {rule.exists
-                                    ? _("Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}.", [String(rule.share ?? 0), String(rule.confirmed_times ?? 0), String(rule.auto_after)])
-                                    : _("No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person.", [String(rule.auto_after)])}
+                {confirming && (
+                    <p className="rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm leading-snug text-amber-950">
+                        {verdict.confirm_above
+                            ? _("This rebate is above {0}: the import does not pass it by itself, you confirm it.", [formatCurrency(verdict.confirm_above, verdict.currency)])
+                            : _("The company has not named an amount up to which a rebate is passed by itself: you confirm it.")}
+                    </p>
+                )}
+                {draft && (
+                    <div className="flex flex-wrap items-center gap-3 rounded-md border border-orange-200 bg-orange-50 p-2.5">
+                        <span className="text-sm leading-snug">
+                            {_("A credit note of {0} was prepared as a draft: {1}.", [formatCurrency(draft.total, verdict.currency), draft.name])}
+                        </span>
+                        <a className="text-sm underline underline-offset-2" href={documentHref("Sales Invoice", draft.name)} target="_blank" rel="noopener noreferrer">{_("Open the draft")}</a>
+                    </div>
+                )}
+                {isPartial && habit?.proposal === "credit_note" && note && !draft && (
+                    <div className="flex items-start gap-2 rounded-md border border-orange-200 bg-orange-50 p-2.5">
+                        <NoraOrb size={22} className="mt-0.5 shrink-0" />
+                        <div className="flex min-w-0 flex-col gap-1.5">
+                            <span className="text-sm leading-snug">
+                                {_("This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note.", [String(habit.share), String(habit.same_share), String(habit.considered), String(habit.closed_by_credit)])}
                             </span>
-                            {ruleError && <ErrorBanner error={ruleError} />}
+                            {!credit && <Button size="sm" className="w-fit" onClick={() => choose("credit")}>{_("Apply the proposal")}</Button>}
                         </div>
-                    )}
-                </div>
-            )}
-            {/* the note about the missing setting already says it, and the main button is off until an account is chosen */}
-            {decision.blocker && !(missingSetting && !account) && <p className="text-sm font-medium text-destructive">{decision.blocker}</p>}
-            {error && <ErrorBanner error={error} />}
-            {decision.decision === "left_open" && (
-                <p className="text-xs text-muted-foreground">{_("Left open by {0} on {1}.", [decision.decided_by ?? "", decidedDay])}</p>
-            )}
-            <div className="flex flex-col gap-2 pt-1">
+                    </div>
+                )}
+                {isPartial && decision.can_settle && (
+                    <div className="flex flex-col gap-2" role="radiogroup">
+                        <span className="text-base font-medium">{_("What becomes of the remaining {0}?", [gapText])}</span>
+                        {tile("open", _("Leave the balance to pay"), _("Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, for example a deposit or a payment in several parts.", [gapText]), false)}
+                        {note && tile(
+                            "credit",
+                            _("Cancel the balance with a credit note"),
+                            <>
+                                <span>{_("Makes a credit note of {0} for the customer: the invoice is settled and nothing more is owed. The VAT is corrected like on any credit note. Choose this when you grant a rebate afterwards or when the rest is not due.", [gapText])}</span>
+                                <span className="text-xs text-muted-foreground">
+                                    {note.source === "history"
+                                        ? _("Made like the credit notes this customer already has ({0}), without link to the invoice.", [String(note.times)])
+                                        : _("This customer has no credit note yet: the account of the company is used, without link to the invoice.")}
+                                </span>
+                            </>,
+                            habit?.proposal === "credit_note" || decision.rule_proposal === "credit_note",
+                        )}
+                        {tile("gap", _("Write off the balance as a loss or a discount"), _("The invoice is settled and {0} is booked on the account you choose below: a loss on customers when the customer will not pay the rest, or a discount when you grant one. Unlike a credit note, no document is made for the customer.", [gapText]), decision.rule_proposal === "gap")}
+                    </div>
+                )}
+                {credit && note && (
+                    <div className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5 text-sm">
+                        {note.net !== null && <span><span className="text-muted-foreground">{_("Net")}</span> <span className="font-mono tabular-nums">{formatCurrency(note.net, verdict.currency)}</span></span>}
+                        {note.tax !== null && note.tax > 0 && <span><span className="text-muted-foreground">{_("VAT")}</span> <span className="font-mono tabular-nums">{formatCurrency(note.tax, verdict.currency)}</span></span>}
+                        <span className="font-medium">{_("Total of the credit note")} <span className="font-mono tabular-nums">{formatCurrency(note.total, verdict.currency)}</span></span>
+                    </div>
+                )}
+                {missingSetting && (
+                    <div className="flex flex-col gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-amber-950">
+                        <span className="text-sm leading-snug">
+                            <b>{isSale ? _("The company has not said yet where to book the differences on sales.") : _("The company has not said yet where to book the differences on purchases.")}</b>{" "}
+                            {_("Until it does, each difference is decided one by one: choose an account for this line below.")}
+                        </span>
+                        {settingsHref && (
+                            <div className="flex items-center gap-2">
+                                <Button asChild variant="outline" className="h-10 flex-1">
+                                    <a href={settingsHref} target="_blank" rel="noopener noreferrer">{_("Fill in the settings")} <ExternalLink className="size-4" /></a>
+                                </Button>
+                                <InfoHint href={MANUAL.settings}>{_("Opens the settings of the company in a new tab: this screen stays open. The accounts are in the section Payment Gaps.")}</InfoHint>
+                            </div>
+                        )}
+                    </div>
+                )}
+                {showAccount && (
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="text-sm font-medium">{credit ? _("Account of the credit note") : _("Account for the difference")}</span>
+                            <InfoHint href={MANUAL.settings}>
+                                {credit
+                                    ? _("The income account that the credit note is booked on: the one the earlier credit notes of this customer use, or the one you choose.")
+                                    : _("The account where the difference is booked: for a sale, a loss on customers or a discount account; for a purchase, an expense account. Your fiduciary knows which one to use. The company sets it once in its settings.")}
+                            </InfoHint>
+                        </div>
+                        <AccountsDropdown
+                            root_type={credit || isSale ? ["Income"] : ["Expense"]}
+                            company={transaction.company}
+                            value={account ?? decision.account ?? undefined}
+                            onChange={(value) => setAccount(value || null)}
+                        />
+                        {account && account !== decision.default_account && decision.default_account && (
+                            <button type="button" className="w-fit text-xs underline underline-offset-2" onClick={() => setAccount(null)}>{_("Back to the company's account")}</button>
+                        )}
+                    </div>
+                )}
+                {decision.deductions.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                        <button type="button" className="flex w-fit items-center gap-1 text-sm font-medium" onClick={() => setShowBooked(!showBooked)}>
+                            {showBooked ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+                            {_("Show what will be booked")}
+                        </button>
+                        {showBooked && (
+                            <>
+                                {decision.deductions.map((row, index) => (
+                                    <div key={`${row.account}-${index}`} className="flex justify-between gap-4 text-sm">
+                                        <span className="min-w-0 truncate text-muted-foreground">{row.account}</span>
+                                        <span className="font-mono tabular-nums">{formatCurrency(Math.abs(row.amount), verdict.currency)}</span>
+                                    </div>
+                                ))}
+                                {decision.deductions.length > 1 && (
+                                    <span className="text-xs text-muted-foreground">{_("The VAT is cut from the account, as in the payment entry.")}</span>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
+                {isPartial && rule && (credit || settle || rule.exists) && (
+                    <div className="flex flex-col gap-1.5">
+                        <button type="button" className="flex w-fit items-center gap-1 text-sm font-medium" onClick={() => setShowRule(!showRule)}>
+                            {showRule ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+                            {_("Remember this choice for this customer")}
+                        </button>
+                        {showRule && (
+                            <div className="flex flex-col gap-1.5 rounded-md border bg-white p-2.5">
+                                <div className="flex flex-wrap gap-1.5">
+                                    {(["suggest", "draft", "automatic"] as RuleMode[]).map((level) => (
+                                        <Button
+                                            key={level}
+                                            size="sm"
+                                            variant={rule.exists && rule.mode === level ? "default" : "outline"}
+                                            disabled={ruleLoading || !levelAvailable(level)}
+                                            onClick={() => onRule(level)}
+                                        >
+                                            {level === "suggest" ? _("Propose it to me") : level === "draft" ? _("Prepare it as a draft") : _("Make it by itself")}
+                                        </Button>
+                                    ))}
+                                </div>
+                                <span className="text-xs text-muted-foreground">
+                                    {rule.exists
+                                        ? _("Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}.", [String(rule.share ?? 0), String(rule.confirmed_times ?? 0), String(rule.auto_after)])
+                                        : _("No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person.", [String(rule.auto_after)])}
+                                </span>
+                                {ruleError && <ErrorBanner error={ruleError} />}
+                            </div>
+                        )}
+                    </div>
+                )}
+                {/* the note about the missing setting already says it, and the main button is off until an account is chosen */}
+                {decision.blocker && !(missingSetting && !account) && <p className="text-sm font-medium text-destructive">{decision.blocker}</p>}
+                {error && <ErrorBanner error={error} />}
+                {decision.decision === "left_open" && (
+                    <p className="text-xs text-muted-foreground">{_("Left open by {0} on {1}.", [decision.decided_by ?? "", decidedDay])}</p>
+                )}
+            </div>
+            {/* the buttons stay at the foot of the visible panel while the card scrolls under them */}
+            <div className="sticky bottom-0 z-10 flex flex-col gap-1.5 rounded-b-lg border-t bg-card px-3.5 py-2.5 shadow-[0_-8px_10px_-8px_rgba(0,0,0,0.12)]">
                 <div className="flex items-center gap-2">
-                    <Button className="h-10 flex-1" disabled={loading || !decision.can_pass} onClick={onDecide}>{passLabel}</Button>
-                    <InfoHint>
+                    <Button className="h-9 flex-1" disabled={loading || !decision.can_pass} onClick={onDecide}>{passLabel}</Button>
+                    <InfoHint href={passPage}>
                         <span>{passHint}</span>
                         <span className="text-xs text-muted-foreground">{_("Your name and the date are noted on the line of the import.")}</span>
                     </InfoHint>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" className="h-10 flex-1" disabled={loading} onClick={() => {
+                    <Button variant="outline" className="h-9 flex-1" disabled={loading} onClick={() => {
                         // the form opens on the customer (or supplier) of the invoice, not on whoever the bank wrote
                         if (decision.party_id) setRecordPaymentPrefill({ party_type: decision.party_doctype, party: decision.party_id })
                         setRecordPaymentOpen(true)
                     }}>{_("Reconcile manually")}</Button>
-                    <InfoHint>{_("Opens the full payment form, pointed at the customer (or supplier) of this invoice. Use it when none of the choices fits.")}</InfoHint>
+                    <InfoHint href={MANUAL.manualPayment}>{_("Opens the full payment form, pointed at the customer (or supplier) of this invoice. Use it when none of the choices fits.")}</InfoHint>
                 </div>
-                <a className="w-fit text-sm underline underline-offset-2" href={documentHref(decision.invoice_type, decision.invoice)}>{decision.invoice}</a>
             </div>
         </div>
     )

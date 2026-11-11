@@ -217,7 +217,7 @@ def _decide_automatic(verdict, settings):
 		verdict.reason = _("The invoice is not recognised without doubt: a person validates a payment that includes a dunning fee.")
 	elif verdict.kind == "accepted_rebate" and verdict.needs_confirmation:
 		verdict.reason = (
-			_("This gap is above {0}: a person confirms it.").format(fmt_money(settings.rebate_cap, currency=verdict.currency))
+			_("This difference is above {0}: a person confirms it.").format(fmt_money(settings.rebate_cap, currency=verdict.currency))
 			if settings.rebate_cap > 0
 			else _("The company has not named an amount up to which a rebate is passed by itself: a person confirms it.")
 		)
@@ -336,7 +336,7 @@ def check_account(company: str, account: str):
 	if row.is_group or row.disabled:
 		frappe.throw(_("Account {0} cannot be posted to.").format(account))
 	if row.root_type not in ("Income", "Expense") or row.account_type in ("Receivable", "Payable", "Bank", "Cash"):
-		frappe.throw(_("A payment gap goes to an income or expense account, not {0}.").format(account))
+		frappe.throw(_("A difference goes to an income or expense account, not {0}.").format(account))
 
 
 def preview(verdict, invoice, account: str | None = None, settle_in_full: bool = False) -> list[dict]:

@@ -421,7 +421,7 @@ const UnreconciledTransactionItem = ({ transaction }: { transaction: Unreconcile
                     {/* //// Neoffice — the gap chip: amber, like the state « To decide » of the imports page. */}
                     {gap && <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
                         <span className="size-1.5 rounded-full bg-amber-600" />
-                        {_("Gap of {0}: {1}", [formatCurrency(Math.abs(gap.gap), currency), kindLabel(gap.kind)])}
+                        {_("Difference of {0}: {1}", [formatCurrency(Math.abs(gap.gap), currency), kindLabel(gap.kind)])}
                     </span>}
                 </div>
                 <div className="gap-1 flex flex-col items-end min-w-36 h-full text-right">
@@ -598,8 +598,10 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
 
     return <div className="flex flex-col gap-3">
         <TooltipProvider>
-            <div className="flex items-center justify-between pt-2">
-                <div className="flex gap-4 justify-center">
+            {/* //// Neoffice — the three buttons wrap instead of overflowing sideways: in a narrow panel the third was cut and a horizontal
+                scrollbar took the foot of the panel, where the buttons of the gap card are (Daniel, 11.11). Upstream: no flex-wrap, gap-4. */}
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 pt-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
