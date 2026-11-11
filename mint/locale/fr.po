@@ -5741,3 +5741,16 @@ msgstr "Tant que ce n'est pas le cas, chaque différence se décide une à une :
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:251
 msgid "Write off the balance as a loss or a discount"
 msgstr "Passer le solde en perte ou en escompte"
+
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:25
+msgid "One existing voucher could match this line."
+msgstr "Une pièce existante pourrait correspondre à cette ligne."
+
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:29
+msgid "See them"
+msgstr "Les voir"
+
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:26
+#, python-brace-format
+msgid "{0} existing vouchers could match this line."
+msgstr "{0} pièces existantes pourraient correspondre à cette ligne."
