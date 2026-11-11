@@ -83,30 +83,16 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                     button high, and the four figures under it; the row of bank cards is gone. The left group wraps under the tools
                     (right-aligned) when the page is too narrow for both. */}
                 <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                    {/* //// Neoffice — removed: the title row (the Neoffice logo, « | », the title and the star). On the whole page as in the desk's frame the
+                        head is the bank selector and the tools (Daniel, 11.11: « dans la vue agrandie, enlève le titre »); the page is named by the
+                        desk's tab or by the window. The favourite star is kept, among the tools (below). Upstream: its own Mint wordmark. */}
                     <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
-                        {/* //// Neoffice — rewritten header (031d31d, a822171, 1f2847e, e38d1a6). Upstream shows its own */}
-                        {/* //// Mint wordmark; embedded in the Neoffice desk the page carries the Neoffice logo linking */}
-                        {/* //// back to /app/home, then the page title and the favourite star. Cosmetic but ours: */}
-                        {/* //// at the merge keep both sides and re-apply the logo block. */}
-                        {/* //// Neoffice — the title in a plain h1 of 1.75rem: the desk's stylesheet made the H1 component 42 px, the tools wrapped
-                            under it and the head of the whole page took 80 px of a screen that has none to spare (Daniel, 11.11). */}
-                        {!EMBEDDED && (
-                            <h1 className="flex shrink-0 items-center gap-2 font-medium tracking-tight whitespace-nowrap" style={{ fontSize: "1.75rem", lineHeight: 1.2 }}>
-                                <a href="/app/home">
-                                    <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-7" />
-                                </a>
-                                <span className="text-gray-400">|</span>
-                                {_("Bank Reconciliation")}
-                                <FavoriteStar />
-                                {/* //// Neoffice — see the block marker above: h1 tag/size change */}
-                            </h1>
-                        )}
-                        {/* //// Neoffice — in the desk's frame the bank selector is at the top left, level with the tools; on the whole page the title
-                            takes that place and the selector goes under it, level with the figures (below). */}
-                        {EMBEDDED && <BankPicker size="select" />}
+                        <BankPicker size="select" />
                     </div>
                     {/* //// Neoffice — ml-auto: the tools stay against the right edge when they wrap under the title (they were at the left). */}
                     <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                        {/* //// Neoffice — the favourite star moved here from the title (removed), at the left of the tools, on the whole page only. */}
+                        {!EMBEDDED && <FavoriteStar />}
                         <TooltipProvider>
                             {/* //// Neoffice — removed: the « Imports » button (the bank files are a tab now, below). */}
                             <RuleConfigureButton />
@@ -122,15 +108,7 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                         </TooltipProvider>
                     </div>
                 </div>
-                {EMBEDDED ? <BankBalance /> : (
-                    // the whole page: the selector and the figures on one line while they fit, the figures under it when they do not
-                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                        <BankPicker size="select" />
-                        <div className="min-w-0 flex-1 basis-[46rem]">
-                            <BankBalance />
-                        </div>
-                    </div>
-                )}
+                <BankBalance />
             </div>
             {/* //// Neoffice — changed: controlled by the atom (upstream: defaultValue="Match and Reconcile"). */}
             <Tabs value={tab} onValueChange={setTab}>
