@@ -26,9 +26,14 @@ export const MANUAL = {
     rule: `${GAPS_PAGE}#la-règle-pour-un-client-qui-paie-toujours-une-part`,
     /** the payment form that the « Reconcile manually » button opens */
     manualPayment: `${MANUAL_URL}/rapprochement-bancaire-paiements`,
+    /** the bank files tab: what came in and what became of each line */
+    bankFiles: `${MANUAL_URL}/fichiers-bancaires`,
+    /** bringing a statement in by hand (CAMT or PDF) */
+    importStatement: `${MANUAL_URL}/import-releve-camt-pdf`,
 } as const
 
-const InfoHint = ({ children, href = MANUAL.decide, side = "top" }: { children: ReactNode, href?: string, side?: "top" | "left" | "bottom" }) => (
+/** `more`: a second page of the manual, when the hint speaks of two subjects. */
+const InfoHint = ({ children, href = MANUAL.decide, more, side = "top" }: { children: ReactNode, href?: string, more?: { href: string, label: string }, side?: "top" | "left" | "bottom" }) => (
     <HoverCard openDelay={80} closeDelay={150}>
         <HoverCardTrigger asChild>
             <button
@@ -42,9 +47,16 @@ const InfoHint = ({ children, href = MANUAL.decide, side = "top" }: { children: 
         <HoverCardContent className="w-72 text-sm" align="end" side={side}>
             <div className="flex flex-col gap-2 leading-snug">
                 <div className="flex flex-col gap-1.5">{children}</div>
-                <a className="w-fit text-xs underline underline-offset-2" href={href} target="_blank" rel="noopener noreferrer">
-                    {_("Read more in the manual")}
-                </a>
+                <div className="flex flex-col gap-1">
+                    <a className="w-fit text-xs underline underline-offset-2" href={href} target="_blank" rel="noopener noreferrer">
+                        {_("Read more in the manual")}
+                    </a>
+                    {more && (
+                        <a className="w-fit text-xs underline underline-offset-2" href={more.href} target="_blank" rel="noopener noreferrer">
+                            {more.label}
+                        </a>
+                    )}
+                </div>
             </div>
         </HoverCardContent>
     </HoverCard>
