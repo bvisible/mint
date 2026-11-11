@@ -514,9 +514,9 @@
   dependencies:
     "@tybys/wasm-util" "^0.10.1"
 
-"@neoffice/frappe-sidebar-react@git+https://github.com/bvisible/frappe-sidebar-react.git#1f6e9716768f4760971d0d07043f40aeb4f3037e":
+"@neoffice/frappe-sidebar-react@git+https://github.com/bvisible/frappe-sidebar-react.git#f724b332d899a91d81bbd2d8a309ce2cfe1fddbf":
   version "1.0.0"
-  resolved "git+https://github.com/bvisible/frappe-sidebar-react.git#1f6e9716768f4760971d0d07043f40aeb4f3037e"
+  resolved "git+https://github.com/bvisible/frappe-sidebar-react.git#f724b332d899a91d81bbd2d8a309ce2cfe1fddbf"
   dependencies:
     clsx "^2.0.0"
     lucide-react "^0.400.0"

@@ -1214,14 +1214,23 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 .neocockpit *::after {
   box-sizing: border-box;
 }
-.neocockpit button {
+.neocockpit button:where(:not(.nc-panel *)) {
   font-family: inherit;
   cursor: pointer;
   border: 0;
   color: inherit;
 }
-.neocockpit button:where(:not([class*=bg-])) {
+.neocockpit button:where(:not([class*=bg-]):not(.nc-panel *)) {
   background: transparent;
+}
+@layer base {
+  .neocockpit .nc-panel button {
+    font-family: inherit;
+    cursor: pointer;
+    border: 0;
+    color: inherit;
+    background: transparent;
+  }
 }
 [data-theme=dark] .neocockpit {
   --nc-accent: #dda479;
