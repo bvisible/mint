@@ -94,8 +94,10 @@ const BankSelect = ({ banks, className }: { banks: SelectedBank[], className?: s
 
     const several = banks.length > 1
     const box = cn("h-11 min-w-56 max-w-80 justify-between gap-2 px-2.5", className)
-    const content = selectedBank
-        ? <BankLabel bank={selectedBank} />
+    // the atom may hold an older copy of the bank (without its logo): what is shown is the bank of the list
+    const shown = banks.find((bank) => bank.name === selectedBank?.name) ?? selectedBank
+    const content = shown
+        ? <BankLabel bank={shown} />
         : <span className="text-sm font-normal text-muted-foreground">{_("Select a bank account")}</span>
 
     if (!several) {
