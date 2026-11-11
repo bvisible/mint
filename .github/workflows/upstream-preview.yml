@@ -1,11 +1,15 @@
 name: Upstream preview
-# Weekly measurement for the fork upgrade (tracker #138): the SAME tests, but the
+# Measurement for a fork upgrade, on demand (tracker #138): the SAME tests, but the
 # bench is initialised on UPSTREAM frappe/frappe + frappe/erpnext (version-15)
 # instead of our forks. Failures land in a separate [CI amont] issue (key
 # ci-upstream::) and never touch the normal [CI] issue of this repo.
 on:
-  schedule:
-    - cron: "15 6 * * 1"
+  # On demand only since 2026-11-11 (neoffice-maintenance#342). The weekly schedule measured what the pending
+  # frappe/erpnext fork upgrade would cost (#138). That upgrade is done: both forks sit on the latest upstream
+  # version-15, 0 commits behind. A weekly run on pure upstream can then only show the patches our forks keep
+  # on purpose (an only_for that also refuses under test, a softer customer-group rule...): red every Monday by
+  # construction, an issue nobody can close. Run it by hand before the next upstream merge, and read its reds
+  # against the divergences we keep:  gh workflow run upstream-preview.yml -R <this repo>
   workflow_dispatch:
 concurrency:
   group: upstream-preview-${{ github.ref }}
