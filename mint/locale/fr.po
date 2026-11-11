@@ -511,7 +511,7 @@ msgstr "Écritures bancaires créées"
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:267
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:87
 msgid "Bank Entry"
-msgstr "Écriture de journal"
+msgstr "Écriture bancaire"
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:477
 msgid "Bank Entry Created"
@@ -2548,8 +2548,8 @@ msgid ""
 "Transfer or Record a payment above."
 msgstr ""
 "Ce n'est pas une facture ? Une somme reçue ou versée sans facture, des "
-"frais, un retrait : utilisez Écriture bancaire, Virement ou Enregistrer un "
-"paiement ci-dessus."
+"frais, un retrait : utilisez Écriture bancaire, Virement ou Écriture de "
+"journal ci-dessus."
 
 #: frontend/src/components/features/StatementImports/utils.ts:22
 msgid "Not handled"
@@ -3213,7 +3213,7 @@ msgstr "Rapprochement en cours…"
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:609
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:72
 msgid "Record Payment"
-msgstr "Écriture de paiement"
+msgstr "Écriture de journal"
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:533
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:624
