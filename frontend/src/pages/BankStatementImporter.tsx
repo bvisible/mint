@@ -18,6 +18,7 @@ import { formatDate } from "@/lib/date"
 import { flt, formatCurrency } from "@/lib/numbers"
 import _ from "@/lib/translate"
 import { cn } from "@/lib/utils"
+import { EMBEDDED } from "@/lib/embedded" //// Neoffice — the logo block above is drawn outside the desk only
 import { MintBankStatementImportLog } from "@/types/Mint/MintBankStatementImportLog"
 import { useFrappeFileUpload, useFrappeGetDocList } from "frappe-react-sdk"
 import { useAtom, useAtomValue } from "jotai"
@@ -57,7 +58,16 @@ const BankStatementImporter = () => {
     return (
         <div className="flex flex-col">
             <div className="flex gap-1 items-baseline p-4">
-                <H1 className="text-base font-medium"><span className="text-4xl font-extrabold text-emerald-500">mint</span>&nbsp;</H1>
+                {/* //// Neoffice — the Neoffice logo back to the desk, as on the reconciliation page (BankReconciliation.tsx), in place of */}
+                {/* //// upstream's green « mint » wordmark, which is not our brand (#1490). Framed in the desk, the desk shows its own logo. */}
+                {!EMBEDDED && (
+                    <H1 className="text-base font-medium flex items-center gap-2 self-center">
+                        <a href="/app/home">
+                            <img src="/assets/mint/mint/assets/neoffice_logo.svg" alt="Neoffice" className="h-7" />
+                        </a>
+                        <span className="text-gray-400">|</span>
+                    </H1>
+                )}
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>

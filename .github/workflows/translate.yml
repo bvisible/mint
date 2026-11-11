@@ -1,0 +1,20 @@
+# //// Neoffice — added file (no upstream equivalent): the nightly French translation of mint's new strings.
+# //// Upstream ships EN + DE only and mint/locale/fr.po is ours (NEOFFICE_FORK_MARKERS.md). Without this caller
+# //// nothing filled it after a change: some 95 strings of the screens, the statement import among them, stayed in
+# //// English (neoffice-maintenance#1490). Mechanics in bvisible/neoffice-ci (translate-po.yml): only empty msgstr
+# //// are filled (Haiku), human translations are never touched, placeholders verified, PO only, commit [skip ci].
+name: Translate
+on:
+  schedule:
+    - cron: "40 2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  i18n:
+    uses: bvisible/neoffice-ci/.github/workflows/translate-po.yml@main
+    with:
+      app: mint
+      # erpnext's own words stay erpnext's: a bare word it already translates is left empty here (translate-po.yml)
+      install_apps: erpnext
+    secrets: inherit

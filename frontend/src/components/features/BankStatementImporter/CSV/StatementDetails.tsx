@@ -108,7 +108,8 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                     {/* //// Neoffice — nothing to import is not an import: a file whose rows were all skipped enabled the button and saved an empty import (#1489) */}
                     <Button onClick={onImport} disabled={loading || !data.final_transactions?.length} size='sm' type='button'>
                         {loading ? <Loader2Icon className='size-4 animate-spin' /> : null}
-                        {loading ? _("Importing...") : _("Import {0} transactions", [data.final_transactions?.length?.toString() || "0"])}</Button>
+                        {/* //// Neoffice — one transaction is said in the singular: the button read « Import 1 transactions » (#1490) */}
+                        {loading ? _("Importing...") : data.final_transactions?.length === 1 ? _("Import 1 transaction") : _("Import {0} transactions", [data.final_transactions?.length?.toString() || "0"])}</Button>
                 </div>
                 <div className='flex items-start gap-4'>
                     <div className='flex flex-col gap-1'>
