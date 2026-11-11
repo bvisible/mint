@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-11 20:23+0000\n"
-"PO-Revision-Date: 2026-11-11 20:23+0000\n"
+"POT-Creation-Date: 2026-11-11 20:54+0000\n"
+"PO-Revision-Date: 2026-11-11 20:54+0000\n"
 "Last-Translator: support@thecommit.company\n"
 "Language-Team: support@thecommit.company\n"
 "MIME-Version: 1.0\n"
@@ -1444,7 +1444,7 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:18
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:21
 msgid "Every bank file that came in, by the bank connection or deposited by hand, and what became of each of its lines: passed by the import, reconciled afterwards, or still waiting for someone."
 msgstr ""
 
@@ -1757,7 +1757,7 @@ msgstr ""
 msgid "Import Summary"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:22
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:25
 msgid "Import a bank statement (XML or PDF)"
 msgstr ""
 
@@ -1784,6 +1784,10 @@ msgstr ""
 
 #: frontend/src/pages/BankStatementImporter.tsx:243
 msgid "Imported On"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:20
+msgid "Importing a statement, step by step"
 msgstr ""
 
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:128
@@ -2931,7 +2935,7 @@ msgstr ""
 msgid "Q4"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/InfoHint.tsx:46
+#: frontend/src/components/features/StatementImports/InfoHint.tsx:52
 msgid "Read more in the manual"
 msgstr ""
 
@@ -4108,6 +4112,10 @@ msgstr ""
 msgid "To apply"
 msgstr ""
 
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:22
+msgid "To bring a new statement in, use the button on the right: a CAMT file (XML) from your bank, or a PDF."
+msgstr ""
+
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:198
 msgid "To confirm"
 msgstr ""
@@ -4534,7 +4542,7 @@ msgstr ""
 msgid "What becomes of the remaining {0}?"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/InfoHint.tsx:36
+#: frontend/src/components/features/StatementImports/InfoHint.tsx:41
 msgid "What does this do?"
 msgstr ""
 

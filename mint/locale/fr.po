@@ -5754,3 +5754,11 @@ msgstr "Les voir"
 #, python-brace-format
 msgid "{0} existing vouchers could match this line."
 msgstr "{0} pièces existantes pourraient correspondre à cette ligne."
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:20
+msgid "Importing a statement, step by step"
+msgstr "Importer un relevé, pas à pas"
+
+#: frontend/src/components/features/StatementImports/StatementImportsPanel.tsx:22
+msgid "To bring a new statement in, use the button on the right: a CAMT file (XML) from your bank, or a PDF."
+msgstr "Pour importer un nouveau relevé, utilisez le bouton à droite : un fichier CAMT (XML) fourni par votre banque, ou un PDF."
