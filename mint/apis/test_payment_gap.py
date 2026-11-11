@@ -91,6 +91,7 @@ class TestPaymentGap(FrappeTestCase):
 			"payment_gap_automatic": 0,
 			"payment_gap_partial_automatic": 0,
 			"rounding_tolerance": 0.05,
+			"accepted_rebate_floor": 0,
 			"accepted_rebate_percent": 0,
 			"accepted_rebate_cap": 0,
 			"payment_gap_account": GAP_ACCOUNT,
@@ -146,6 +147,51 @@ class TestPaymentGap(FrappeTestCase):
 		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=500)
 		owed_purchase = self._outstanding("Purchase Invoice", self.purchase)
 		self.assertEqual(self._judge("Purchase Invoice", self.purchase, flt(owed_purchase * 0.96, 2)).kind, "partial")
+
+	def test_a_small_sum_is_accepted_whatever_the_invoice_where_the_percentage_alone_refuses_it(self):
+		owed = self._outstanding("Sales Invoice", self.sales)
+		gap = 0.60
+		paid = flt(owed - gap, 2)
+		# half the gap as a percentage of the balance: the percentage door cannot let it in
+		half_the_gap = flt(gap / 2 / owed * 100, 6)
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=half_the_gap, accepted_rebate_cap=100)
+		self.assertEqual(self._judge("Sales Invoice", self.sales, paid).kind, "partial")
+		self._settings(
+			payment_gap_automatic=1, accepted_rebate_floor=1.00, accepted_rebate_percent=half_the_gap, accepted_rebate_cap=100
+		)
+		verdict = self._judge("Sales Invoice", self.sales, paid)
+		self.assertEqual((verdict.kind, verdict.automatic), ("accepted_rebate", True))
+
+	def test_the_small_sum_stops_where_it_says_and_needs_no_percentage_nor_cap(self):
+		owed = self._outstanding("Sales Invoice", self.sales)
+		self._settings(payment_gap_automatic=1, accepted_rebate_floor=1.00)
+		self.assertEqual(self._judge("Sales Invoice", self.sales, flt(owed - 1.00, 2)).kind, "accepted_rebate")
+		self.assertEqual(self._judge("Sales Invoice", self.sales, flt(owed - 1.01, 2)).kind, "partial")
+
+	def test_the_small_sum_is_for_a_customer_who_pays_less_never_a_supplier_or_a_surplus(self):
+		self._settings(payment_gap_automatic=1, payment_gap_partial_automatic=1, accepted_rebate_floor=1.00)
+		owed_purchase = self._outstanding("Purchase Invoice", self.purchase)
+		self.assertEqual(self._judge("Purchase Invoice", self.purchase, flt(owed_purchase - 0.60, 2)).kind, "partial")
+		verdict = self._judge("Sales Invoice", self.sales, self._outstanding("Sales Invoice", self.sales) + 0.60)
+		self.assertEqual((verdict.kind, verdict.automatic), ("overpaid", False))
+
+	def test_beyond_the_small_sum_the_smaller_of_the_percentage_and_the_cap_decides(self):
+		# 3 % of the balance, 100 francs at most, a small sum of 1 franc: the same cases as the mock-up of the rule
+		with_small_sum = frappe._dict(rebate_floor=1.0, rebate_percent=3.0, rebate_cap=100.0)
+		without = frappe._dict(rebate_floor=0.0, rebate_percent=3.0, rebate_cap=100.0)
+		cases = [
+			# balance, gap, accepted with the small sum, accepted without it
+			(12, 0.45, True, False),  # the percentage alone (0.36) refuses a few centimes on a small invoice
+			(100, 3.00, True, True),  # exactly 3 %
+			(1000, 45.00, False, False),  # 4.5 %: over the percentage
+			(10000, 150.00, False, False),  # 1.5 %, but over the cap of 100: on a large invoice the cap decides
+			(10000, 90.00, True, True),
+			(100, 60.00, False, False),
+		]
+		for balance, gap, accepted, accepted_without in cases:
+			with self.subTest(balance=balance, gap=gap):
+				self.assertEqual(payment_gap._within_accepted_rebate(gap, balance, with_small_sum), accepted)
+				self.assertEqual(payment_gap._within_accepted_rebate(gap, balance, without), accepted_without)
 
 	def test_a_partial_payment_is_validated_by_itself_only_when_the_invoice_is_certain(self):
 		self._settings(payment_gap_automatic=1, payment_gap_partial_automatic=1)

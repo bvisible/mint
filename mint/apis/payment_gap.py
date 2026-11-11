@@ -8,7 +8,8 @@
 # ////   exact            to the cent: the payment settles the invoice
 # ////   rounding         within the rounding tolerance of the company, in either direction
 # ////   early_discount   the sum is the invoice minus the discount its payment terms grant on that date
-# ////   accepted_rebate  sales only: less than owed, within the company's percentage AND its cap
+# ////   accepted_rebate  sales only: less than owed by a small sum the company always accepts, or, beyond it, within the
+# ////                    company's percentage AND its cap (the smaller of the two decides: on a large invoice the cap)
 # ////   partial          less than owed beyond that: the money has come in, it is recorded, the rest stays open
 # ////   dunning_fee      sales only: more than owed, by exactly what a validated dunning of that invoice still asks for
 # ////                    (its fee and interest): booked on the account of the dunning, linked to it, which resolves it
@@ -31,28 +32,34 @@ INVOICE_TYPES = ("Sales Invoice", "Purchase Invoice")
 def get_settings(company: str) -> frappe._dict:
 	"""What the company decided for the gaps of a payment. Everything off, tolerance 0.05, when it decided nothing."""
 	settings = frappe._dict(
-		automatic=0, partial_automatic=0, rounding_tolerance=0.05, rebate_percent=0.0, rebate_cap=0.0, account=None
+		automatic=0,
+		partial_automatic=0,
+		rounding_tolerance=0.05,
+		rebate_floor=0.0,
+		rebate_percent=0.0,
+		rebate_cap=0.0,
+		account=None,
 	)
 	if frappe.db.exists("DocType", SETTINGS) and frappe.db.exists(SETTINGS, company):
-		row = frappe.db.get_value(
-			SETTINGS,
-			company,
-			[
-				"payment_gap_automatic",
-				"payment_gap_partial_automatic",
-				"rounding_tolerance",
-				"accepted_rebate_percent",
-				"accepted_rebate_cap",
-				"payment_gap_account",
-			],
-			as_dict=True,
-		)
+		fields = [
+			"payment_gap_automatic",
+			"payment_gap_partial_automatic",
+			"rounding_tolerance",
+			"accepted_rebate_percent",
+			"accepted_rebate_cap",
+			"payment_gap_account",
+		]
+		# the small sum is a newer field: a site whose schema has not caught up with the code reads it as 0 (none)
+		if frappe.db.has_column(SETTINGS, "accepted_rebate_floor"):
+			fields.append("accepted_rebate_floor")
+		row = frappe.db.get_value(SETTINGS, company, fields, as_dict=True)
 		if row:
 			settings.update(
 				automatic=1 if row.payment_gap_automatic else 0,
 				partial_automatic=1 if row.payment_gap_partial_automatic else 0,
 				# an empty tolerance means 0.05, a 0 means none
 				rounding_tolerance=flt(row.rounding_tolerance) if row.rounding_tolerance is not None else 0.05,
+				rebate_floor=flt(row.get("accepted_rebate_floor")),
 				rebate_percent=flt(row.accepted_rebate_percent),
 				rebate_cap=flt(row.accepted_rebate_cap),
 				account=row.payment_gap_account,
@@ -130,19 +137,29 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 				verdict.kind, verdict.dunnings = "dunning_fee", charges
 			else:
 				verdict.kind = "overpaid"
-		elif (
-			receiving
-			and settings.rebate_percent > 0
-			and settings.rebate_cap > 0
-			and gap <= flt(outstanding * settings.rebate_percent / 100, 2) + 1e-9
-			and gap <= settings.rebate_cap + 1e-9
-		):
+		elif receiving and _within_accepted_rebate(gap, outstanding, settings):
 			verdict.kind = "accepted_rebate"
 		else:
 			verdict.kind = "partial"
 
 	_decide_automatic(verdict, settings)
 	return verdict
+
+
+def _within_accepted_rebate(gap: float, outstanding: float, settings) -> bool:
+	"""Whether a customer who paid `gap` less than the invoice balance is within what the company accepts.
+
+	Two doors. A small sum is always accepted, whatever the invoice (a few centimes on a small invoice are not refused
+	for being more than a percent of it). Beyond it, a share of the balance AND a cap in francs must both hold, so that
+	the smaller of the two decides: on a large invoice it is the cap."""
+	if settings.rebate_floor > 0 and gap <= settings.rebate_floor + 1e-9:
+		return True
+	return (
+		settings.rebate_percent > 0
+		and settings.rebate_cap > 0
+		and gap <= flt(outstanding * settings.rebate_percent / 100, 2) + 1e-9
+		and gap <= settings.rebate_cap + 1e-9
+	)
 
 
 def _decide_automatic(verdict, settings):
