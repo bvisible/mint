@@ -7,6 +7,7 @@ import { GetStatementDetailsResponse } from '../import_utils'
 import { flt, formatCurrency } from '@/lib/numbers'
 import { formatDate } from '@/lib/date'
 import { bankRecDateAtom, SelectedBank } from '../../BankReconciliation/bankRecAtoms'
+//// Neoffice — see the InfoHint marker below: InfoIcon dropped from this import, replaced by InfoHint (506721c "every bare « i » becomes the lightbulb of the other screens")
 import { ChevronLeftIcon, ExternalLinkIcon, Landmark, Loader2Icon } from 'lucide-react'
 import { H2, H3, H4, Paragraph } from '@/components/ui/typography'
 import { FileTypeIcon } from '@/components/ui/file-dropzone'
@@ -189,6 +190,7 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                             <TableHead className='bg-muted/70'>
                                 <div className='flex items-center gap-2'>
                                     {_("Detected Date Format")}
+                                    {/* //// Neoffice — the bare « i » is the lightbulb with the page of the manual (506721c "every bare « i » becomes the lightbulb of the other screens"). */}
                                     <InfoHint small side="bottom" href={MANUAL.importStatement}>
                                         {_("The date format detected in the statement file. This is used to parse the date values.")}
                                     </InfoHint>

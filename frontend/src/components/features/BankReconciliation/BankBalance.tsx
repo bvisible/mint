@@ -7,6 +7,7 @@ import { useGetAccountClosingBalance, useGetAccountClosingBalanceAsPerStatement,
 import { flt, formatCurrency } from "@/lib/numbers"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatContainer, StatLabel, StatValue } from "@/components/ui/stats"
+//// Neoffice — see the InfoHint marker below: Info icon dropped from this import, replaced by InfoHint (506721c "every bare « i » becomes the lightbulb of the other screens")
 import { Edit, Trash2 } from "lucide-react"
 import { getCompanyCurrency } from "@/lib/company"
 import _ from "@/lib/translate"
