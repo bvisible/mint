@@ -548,8 +548,10 @@ def get_gap_decision(
 		"can_pass": not blocker and verdict.kind not in ("", "exact"),
 		"blocker": blocker,
 		"account_editable": editable,
-		"default_account": settings.account if editable else None,
-		"account": (credit_preview["account"] if credit else None) or account or (settings.account if editable else None),
+		"default_account": payment_gap.gap_account(settings, invoice_type) if editable else None,
+		"account": (credit_preview["account"] if credit else None)
+		or account
+		or (payment_gap.gap_account(settings, invoice_type) if editable else None),
 		"settle_in_full": settle,
 		"credit_note_chosen": credit,
 		"credit_note": credit_preview,

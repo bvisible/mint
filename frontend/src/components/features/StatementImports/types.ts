@@ -93,6 +93,9 @@ export type GapDecision = {
         discount: number,
         currency: string,
         reason: string,
+        /** An accepted rebate above the amount the company asks to confirm: the import does not pass it, a person does. */
+        needs_confirmation?: boolean,
+        confirm_above?: number,
     },
     /** The validated dunnings whose fee the surplus pays (verdict kind dunning_fee, empty otherwise). */
     dunnings: { name: string, amount: number, income_account: string | null }[],

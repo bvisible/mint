@@ -76,6 +76,12 @@ class TestPaymentGap(FrappeTestCase):
 		cls.purchase = _an_invoice("Purchase Invoice", 100, is_proposed="= 0")
 		if not (cls.sales and cls.purchase):
 			raise unittest.SkipTest("needs an open sales invoice with VAT and a SCOR reference and an open purchase invoice")
+		# a gap on a sale goes to an income account, a gap on a purchase to an expense account of its own
+		cls.expense = frappe.db.get_value(
+			"Account", {"company": COMPANY, "root_type": "Expense", "is_group": 0, "disabled": 0}, "name", order_by="name"
+		)
+		if not (cls.expense and frappe.db.has_column("Neoffice Company Settings", "payment_gap_account_purchases")):
+			raise unittest.SkipTest("needs an expense account and the purchases gap account on the company settings")
 
 	def setUp(self):
 		# Each test has the invoices as the site has them: what one books, the next does not see.
@@ -95,6 +101,7 @@ class TestPaymentGap(FrappeTestCase):
 			"accepted_rebate_percent": 0,
 			"accepted_rebate_cap": 0,
 			"payment_gap_account": GAP_ACCOUNT,
+			"payment_gap_account_purchases": self.expense,
 		}
 		frappe.db.set_value("Neoffice Company Settings", COMPANY, {**defaults, **values})
 
@@ -299,6 +306,24 @@ class TestPaymentGap(FrappeTestCase):
 		self.assertEqual(flt(entry.paid_amount), flt(owed - 0.03, 2))
 		self.assertEqual(self._outstanding("Purchase Invoice", self.purchase), 0)
 		self.assertEqual([flt(d.amount, 2) for d in entry.deductions], [-0.03])
+		# the gap of a purchase goes to the expense account, never to the income account of the sales
+		self.assertEqual([d.account for d in entry.deductions], [self.expense])
+
+	def test_a_purchase_without_a_gap_account_of_its_own_is_not_passed_to_the_account_of_the_sales(self):  # role-check: ok the import runs as the system, and here it books nothing
+		self._settings(payment_gap_automatic=1, payment_gap_account_purchases=None)
+		owed = self._outstanding("Purchase Invoice", self.purchase)
+		verdict = self._judge("Purchase Invoice", self.purchase, owed - 0.03)
+		self.assertEqual((verdict.kind, verdict.automatic), ("rounding", False))
+		self.assertIn("purchases", verdict.reason)
+		# a sale is untouched by that: its own account is there
+		self.assertTrue(self._judge("Sales Invoice", self.sales, self._outstanding("Sales Invoice", self.sales) - 0.03).automatic)
+		# a person who looks at it is told what is missing, and passes it on the account they choose
+		self.assertIn("purchases", payment_gap.account_problem(verdict))
+		self.assertEqual(payment_gap.account_problem(verdict, self.expense), "")
+		name = payment_gap.book(
+			verdict, "Purchase Invoice", self.purchase, LEDGER, nowdate(), "REF-1", "gap test", by_person=True, account=self.expense
+		)
+		self.assertEqual([d.account for d in frappe.get_doc("Payment Entry", name).deductions], [self.expense])
 
 	def test_an_accepted_rebate_settles_the_invoice_and_cuts_the_vat_from_the_account(self):  # role-check: ok the import runs as the system
 		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=500)

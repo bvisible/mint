@@ -30,6 +30,12 @@ class GapImportCase(FrappeTestCase):
 		cls.bank_account = frappe.db.get_value("Bank Account", {"company": COMPANY, "account": LEDGER})
 		if not (cls.sales and cls.purchase and cls.bank_account):
 			raise unittest.SkipTest("needs open invoices of the company and its bank account on the ledger account")
+		# a gap on a purchase goes to an expense account of its own, not to the income account of the sales
+		cls.expense = frappe.db.get_value(
+			"Account", {"company": COMPANY, "root_type": "Expense", "is_group": 0, "disabled": 0}, "name", order_by="name"
+		)
+		if not (cls.expense and frappe.db.has_column("Neoffice Company Settings", "payment_gap_account_purchases")):
+			raise unittest.SkipTest("needs an expense account and the purchases gap account on the company settings")
 
 	def setUp(self):
 		frappe.db.savepoint("payment_gap_import_test")
@@ -47,6 +53,7 @@ class GapImportCase(FrappeTestCase):
 			"accepted_rebate_percent": 0,
 			"accepted_rebate_cap": 0,
 			"payment_gap_account": GAP_ACCOUNT,
+			"payment_gap_account_purchases": self.expense,
 		}
 		frappe.db.set_value("Neoffice Company Settings", COMPANY, {**defaults, **values})
 

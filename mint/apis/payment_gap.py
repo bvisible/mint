@@ -41,6 +41,7 @@ def get_settings(company: str) -> frappe._dict:
 		rebate_percent=0.0,
 		rebate_cap=0.0,
 		account=None,
+		account_purchases=None,
 	)
 	if frappe.db.exists("DocType", SETTINGS) and frappe.db.exists(SETTINGS, company):
 		fields = [
@@ -51,9 +52,11 @@ def get_settings(company: str) -> frappe._dict:
 			"accepted_rebate_cap",
 			"payment_gap_account",
 		]
-		# the small sum is a newer field: a site whose schema has not caught up with the code reads it as 0 (none)
-		if frappe.db.has_column(SETTINGS, "accepted_rebate_floor"):
-			fields.append("accepted_rebate_floor")
+		# the small sum and the account of the purchases are newer fields: a site whose schema has not caught up with the
+		# code reads them as none
+		for newer in ("accepted_rebate_floor", "payment_gap_account_purchases"):
+			if frappe.db.has_column(SETTINGS, newer):
+				fields.append(newer)
 		row = frappe.db.get_value(SETTINGS, company, fields, as_dict=True)
 		if row:
 			settings.update(
@@ -65,10 +68,25 @@ def get_settings(company: str) -> frappe._dict:
 				rebate_percent=flt(row.accepted_rebate_percent),
 				rebate_cap=flt(row.accepted_rebate_cap),
 				account=row.payment_gap_account,
+				account_purchases=row.get("payment_gap_account_purchases"),
 			)
 	if not settings.account:
 		settings.account = frappe.get_cached_value("Company", company, "default_discount_account")
 	return settings
+
+
+def gap_account(settings, invoice_type: str) -> str | None:
+	"""The account a gap goes to by default: a sale and a purchase have one each (an income account for what a customer
+	short-pays, an expense account for what is short-paid to a supplier)."""
+	return settings.account_purchases if invoice_type == "Purchase Invoice" else settings.account
+
+
+def no_account_message(invoice_type: str) -> str:
+	return (
+		_("The company has no payment gap account on purchases.")
+		if invoice_type == "Purchase Invoice"
+		else _("The company has no payment gap account.")
+	)
 
 
 def _reference_key(value) -> str:
@@ -117,6 +135,7 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 		# an accepted rebate above the amount the company asks to confirm: a person confirms it (see _needs_confirmation)
 		needs_confirmation=False,
 		confirm_above=0.0,
+		invoice_type=invoice_type,
 		sure=_is_sure(invoice, reference),
 		currency=invoice.currency,
 		company=invoice.company,
@@ -185,8 +204,8 @@ def _decide_automatic(verdict, settings):
 		verdict.reason = _("The company has not switched on passing payment gaps by itself.")
 	elif verdict.currency != company_currency:
 		verdict.reason = _("The invoice is not in the currency of the company.")
-	elif verdict.kind in ("rounding", "accepted_rebate") and not settings.account:
-		verdict.reason = _("The company has no payment gap account.")
+	elif verdict.kind in ("rounding", "accepted_rebate") and not gap_account(settings, verdict.invoice_type):
+		verdict.reason = no_account_message(verdict.invoice_type)
 	elif verdict.kind == "early_discount" and not frappe.get_cached_value(
 		"Company", verdict.company, "default_discount_account"
 	):
@@ -292,8 +311,8 @@ def account_problem(verdict, account: str | None = None, settle_in_full: bool = 
 		return _dunning_account_problem(verdict)
 	settings = get_settings(verdict.company)
 	passes_as_deduction = verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind == "partial" and settle_in_full)
-	if passes_as_deduction and not (account or settings.account):
-		return _("The company has no payment gap account.")
+	if passes_as_deduction and not (account or gap_account(settings, verdict.invoice_type)):
+		return no_account_message(verdict.invoice_type)
 	if verdict.kind == "early_discount" and not frappe.get_cached_value(
 		"Company", verdict.company, "default_discount_account"
 	):
@@ -344,7 +363,7 @@ def _deductions(verdict, invoice, signed, account: str | None = None) -> list[di
 		return _dunning_deductions(verdict)
 	settings = get_settings(verdict.company)
 	deduction = {
-		"account": account or settings.account,
+		"account": account or gap_account(settings, invoice.doctype),
 		"cost_center": frappe.get_cached_value("Company", verdict.company, "cost_center"),
 		"amount": signed,
 		"description": _("Payment gap of {0}").format(invoice.name),
