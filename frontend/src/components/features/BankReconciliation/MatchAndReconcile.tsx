@@ -82,7 +82,8 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
             </div>
             {/* //// Neoffice — h-full instead of a minHeight style, to follow the column's measured height (f642280, see marker above). */}
             <Separator orientation="vertical" className="h-full" />
-            <div className="h-full min-h-0 flex-1 overflow-y-auto px-1">
+            {/* //// Neoffice — @container: the three buttons at the top of this column fit its width (OptionsForSingleTransaction). */}
+            <div className="@container h-full min-h-0 flex-1 overflow-y-auto px-1">
                 <H4 className="text-sm font-medium">{_("Match or Create")}</H4>
                 <VouchersSection contentHeight={contentHeight} />
             </div>
@@ -598,17 +599,21 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
 
     return <div className="flex flex-col gap-3">
         <TooltipProvider>
-            {/* //// Neoffice — the three buttons wrap instead of overflowing sideways: in a narrow panel the third was cut and a horizontal
-                scrollbar took the foot of the panel, where the buttons of the gap card are (Daniel, 11.11). Upstream: no flex-wrap, gap-4. */}
-            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 pt-2">
-                <div className="flex flex-wrap gap-2 justify-center">
+            {/* //// Neoffice — the three buttons and the filters stay on ONE line, whatever the width of the column, and stay in view while the
+                rest of the column scrolls (Daniel, 11.11: « les boutons doivent tenir dans la largeur, enlève les icônes s'il faut, et ils sont
+                toujours dans le scroll » ; « aligne la police sur les boutons de gauche »). The icons go below 40rem; the text is the size of the buttons
+                of the list on the left (14 px) from 29rem, and a size smaller only below that, where it would not fit (container queries on the column).
+                Upstream: gap-4, no wrapping, not sticky: in a narrow column the third button was cut and a sideways scrollbar appeared. */}
+            <div className="sticky top-0 z-20 -mx-1 flex flex-nowrap items-center justify-between gap-1.5 bg-background px-1 pt-2 pb-1.5">
+                <div className="flex min-w-0 flex-nowrap gap-1.5">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
                                 variant='outline'
+                                className="text-xs @[29rem]:text-sm"
                                 aria-label={_("Record a payment entry against a customer or supplier")}
                                 onClick={() => setRecordPaymentModalOpen(true)}>
-                                <Receipt /> {_("Record Payment")}
+                                <Receipt className="hidden @[40rem]:block" /> {_("Record Payment")}
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -623,9 +628,10 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         <TooltipTrigger asChild>
                             <Button
                                 variant='outline'
+                                className="text-xs @[29rem]:text-sm"
                                 aria-label={_("Record a bank journal entry for expenses, income or split transactions")}
                                 onClick={() => setRecordJournalEntryModalOpen(true)}>
-                                <Landmark /> {_("Bank Entry")}
+                                <Landmark className="hidden @[40rem]:block" /> {_("Bank Entry")}
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -640,9 +646,10 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         <TooltipTrigger asChild>
                             <Button
                                 variant='outline'
+                                className="text-xs @[29rem]:text-sm"
                                 aria-label={_("Record an internal transfer to another bank/credit card/cash account")}
                                 onClick={() => setTransferModalOpen(true)}>
-                                <ArrowRightLeft /> {_("Transfer")}
+                                <ArrowRightLeft className="hidden @[40rem]:block" /> {_("Transfer")}
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -654,7 +661,7 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
                         </TooltipContent>
                     </Tooltip>
                 </div>
-                <MatchFilters />
+                <div className="shrink-0"><MatchFilters /></div>
             </div>
         </TooltipProvider>
         {/* //// Neoffice — added: a gap left by an import waits here for a person's decision. */}
