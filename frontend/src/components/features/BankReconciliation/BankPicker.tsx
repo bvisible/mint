@@ -1,9 +1,12 @@
 import { useAtom, useSetAtom } from "jotai"
 import { SelectedBank, selectedBankAccountAtom } from "./bankRecAtoms"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { useGetBankAccounts, useGetUnreconciledTransactions } from "./utils"
 import { cn } from "@/lib/utils"
-import { Landmark } from "lucide-react"
+import { Check, ChevronDown, Landmark } from "lucide-react"
+//// Neoffice — added: the selector of the size « select » (below).
+import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { H4 } from "@/components/ui/typography"
 import { getTimeago } from "@/lib/date"
 import ErrorBanner from "@/components/ui/error-banner"
@@ -12,7 +15,9 @@ import _ from "@/lib/translate"
 //// Neoffice — NOT ours: the size prop is upstream v1.5.0, hand-carried (89e7929); the
 //// statement importer renders the same picker in a compact form. Take upstream's.
 //// Neoffice — the size « row » is ours: the logo and the name on one line, the account under it (two lines, not three).
-const BankPicker = ({ className, size = 'base' }: { className?: string, size?: 'base' | 'sm' | 'row' }) => {
+//// Neoffice — the size « select » is ours too: one selector instead of a row of cards (Daniel, 11.11: the bank at the top left,
+//// the four figures under it, and the row of cards gone, since what matters is the list below).
+const BankPicker = ({ className, size = 'base' }: { className?: string, size?: 'base' | 'sm' | 'row' | 'select' }) => {
 
     const setSelectedBank = useSetAtom(selectedBankAccountAtom)
 
@@ -37,6 +42,9 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
     if (error) {
         return <ErrorBanner error={error} />
     }
+    if (size === 'select') {
+        return <BankSelect banks={banks ?? []} className={className} />
+    }
     return (
         <div
             className={cn("flex gap-3 items-stretch w-full overflow-x-auto bank-picker-scrollbar pr-4",
@@ -55,6 +63,71 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
                 ))
             }
         </div>
+    )
+}
+
+//// Neoffice — added: the logo (or the symbol of the bank), its name and, under it, the account of the books.
+const BankLabel = ({ bank }: { bank: SelectedBank }) => (
+    <span className="flex min-w-0 items-center gap-2 text-left">
+        {bank.logo
+            ? <img src={`/assets/mint/mint/${bank.logo}`} alt={bank.bank || bank.name || ''} className="shrink-0 object-contain"
+                style={{ maxWidth: '64px', maxHeight: '20px', width: 'auto', height: 'auto' }} />
+            : bank.logo_mark
+                ? <img src={`/assets/mint/mint/${bank.logo_mark}`} alt="" className="shrink-0" style={{ width: '20px', height: '20px' }} />
+                : <Landmark size="18px" className="shrink-0" />}
+        <span className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate text-sm font-medium">{bank.account_name}</span>
+            <span title={_("GL Account")} className="truncate text-xs font-normal text-muted-foreground">{bank.account}</span>
+        </span>
+    </span>
+)
+
+//// Neoffice — added: the bank to reconcile is chosen in a list that opens under the selector, like the company next to it; with a
+//// single account it is only a label. Two lines (the bank, its account) in the height of the buttons beside it.
+const BankSelect = ({ banks, className }: { banks: SelectedBank[], className?: string }) => {
+    const [selectedBank, setSelectedBank] = useAtom(selectedBankAccountAtom)
+    const { mutate } = useGetUnreconciledTransactions()
+    const [open, setOpen] = useState(false)
+
+    const several = banks.length > 1
+    const box = cn("h-11 min-w-56 max-w-80 justify-between gap-2 px-2.5", className)
+    const content = selectedBank
+        ? <BankLabel bank={selectedBank} />
+        : <span className="text-sm font-normal text-muted-foreground">{_("Select a bank account")}</span>
+
+    if (!several) {
+        return <div className={cn("flex items-center rounded-md border bg-card", box)}>{content}</div>
+    }
+
+    const choose = (bank: SelectedBank) => {
+        setSelectedBank(bank)
+        mutate()
+        setOpen(false)
+    }
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button variant="outline" role="combobox" aria-expanded={open} className={box}>
+                    {content}
+                    <ChevronDown className="opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="flex w-80 max-w-[90vw] flex-col gap-0.5 p-1">
+                {banks.map((bank) => (
+                    <button
+                        key={bank.name}
+                        type="button"
+                        title={_("Select {0}", [bank.account_name ?? ''])}
+                        onClick={() => choose(bank)}
+                        className={cn("flex w-full items-center justify-between gap-2 rounded-sm px-2 py-1.5 hover:bg-accent", selectedBank?.name === bank.name && "bg-accent")}
+                    >
+                        <BankLabel bank={bank} />
+                        {selectedBank?.name === bank.name && <Check className="size-4 shrink-0" />}
+                    </button>
+                ))}
+            </PopoverContent>
+        </Popover>
     )
 }
 

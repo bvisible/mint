@@ -41,6 +41,7 @@ const BankBalance = () => {
         //// Every hunk of this file below is the same density/responsive pass plus one _() wrap.
         //// Neoffice — one band: the four figures and the progress side by side, their explanations behind an info icon
         //// (Daniel, 05.11: « il faut optimiser la place au sommet », what matters is the list below).
+        //// Neoffice — the figures a little smaller (text-lg / text-xl to text-base, Daniel, 11.11): the strip now sits under the bank selector.
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
             <div className="flex flex-1 min-w-0 flex-wrap items-start gap-x-6 gap-y-1 pr-4 lg:pr-6 lg:border-r-border lg:border-r">
                 <OpeningBalance />
@@ -80,7 +81,7 @@ const OpeningBalance = () => {
     return <StatContainer className="min-w-32">
         <LabelWithInfo label={_("Opening")} title={_("Opening Balance")} info={_("Calculated the same way, the day before the period starts.")} />
         {/* //// Neoffice — skeleton resized to match the smaller figures (1f2847e). */}
-        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-base">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
     </StatContainer>
 }
 
@@ -118,7 +119,7 @@ const ClosingBalance = () => {
 
             </div>
             {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
-            {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+            {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-base">{formatCurrency(flt(data?.message, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
         </StatContainer>
     )
 }
@@ -138,7 +139,7 @@ const Difference = () => {
     return <StatContainer className="w-fit text-right sm:min-w-32">
         <LabelWithInfo label={_("Difference")} info={_("Statement minus system.")} />
         {/* //// Neoffice — skeleton resized (1f2847e), same density pass. */}
-        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className={isError ? 'text-destructive font-mono' : 'font-mono'}>
+        {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className={isError ? 'text-destructive font-mono text-base' : 'font-mono text-base'}>
             {formatCurrency(difference,
                 bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))
             }</StatValue>}
@@ -242,7 +243,7 @@ const ClosingBalanceAsPerStatement = () => {
                         {/* //// Neoffice — gap and skeleton tightened (1f2847e), same density pass. */}
                         <TooltipTrigger asChild>
                             <div className="flex items-center gap-3 underline cursor-pointer underline-offset-6">
-                                {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-lg">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
+                                {isLoading ? <Skeleton className="w-[120px] h-7" /> : <StatValue className="font-mono text-base">{formatCurrency(flt(data?.message?.balance, 2), bankAccount?.account_currency ?? getCompanyCurrency(bankAccount?.company ?? ''))}</StatValue>}
                                 <Edit className="w-4 h-4" />
                             </div>
                         </TooltipTrigger>
