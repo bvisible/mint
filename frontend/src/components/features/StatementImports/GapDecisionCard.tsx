@@ -325,7 +325,8 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     )}
                 </div>
             )}
-            {decision.blocker && <p className="text-sm font-medium text-destructive">{decision.blocker}</p>}
+            {/* the note about the missing setting already says it, and the main button is off until an account is chosen */}
+            {decision.blocker && !(missingSetting && !account) && <p className="text-sm font-medium text-destructive">{decision.blocker}</p>}
             {error && <ErrorBanner error={error} />}
             {decision.decision === "left_open" && (
                 <p className="text-xs text-muted-foreground">{_("Left open by {0} on {1}.", [decision.decided_by ?? "", decidedDay])}</p>
