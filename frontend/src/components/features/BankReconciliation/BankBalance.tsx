@@ -112,7 +112,8 @@ const ClosingBalance = () => {
                             <br /><br />
                             {/* //// Neoffice — sentence rebuilt with a _() placeholder (1f2847e). Upstream hard-codes the */}
                             {/* //// English text around a <strong> tab name, which cannot be translated as one sentence. */}
-                            {_("For more information, click on the {0} tab below.", [_("Bank Reconciliation Statement")])}
+                            {/* //// Neoffice — the three reports are behind the « Reports » menu now, not tabs of their own: the sentence says where (Daniel, 11.11). */}
+                            {_("For more information, open the {0} menu below, then {1}.", [_("Reports"), _("Bank Reconciliation Statement")])}
                         </Paragraph>
                     </HoverCardContent>
                 </HoverCard>
