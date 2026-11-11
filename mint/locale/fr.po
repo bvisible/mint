@@ -511,7 +511,7 @@ msgstr "Écritures bancaires créées"
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:267
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:87
 msgid "Bank Entry"
-msgstr "Écriture bancaire"
+msgstr "Écriture de journal"
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:477
 msgid "Bank Entry Created"
