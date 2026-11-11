@@ -160,10 +160,3 @@
   background-color: #3f3f46;
   color: #fafafa;
 }
-
-/* //// Neoffice — added. The cockpit resets every button it holds (`.neocockpit button { color: inherit }`, specificity */
-/* 0,1,1), which beats shadcn's `text-primary-foreground` (0,1,0): the primary button (an ink field from the desk theme) */
-/* read dark on dark, and so did the selected level of a segmented choice. Give the colour back to the buttons that */
-/* name it. Remove when the cockpit's reset yields to a text colour class. */
-.neocockpit button.text-primary-foreground { color: var(--primary-foreground); }
-.neocockpit button.text-white { color: #ffffff; }
