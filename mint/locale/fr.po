@@ -52,18 +52,17 @@ msgstr "Un Document Scan portant ce nom existe déjà"
 #: mint/apis/gap_credit_note.py:87
 #, python-brace-format
 msgid "A credit note goes to an income account, not {0}."
-msgstr "Un avoir va sur un compte de produits, pas sur {0}."
+msgstr "Une note de crédit se comptabilise sur un compte de produits, et non sur {0}."
 
 #: mint/apis/statement_follow_up.py:621
 msgid ""
 "A credit note of the balance is for the short payment of a sales invoice."
-msgstr ""
-"Un avoir du solde sert à clore une facture de vente partiellement payée."
+msgstr "Une note de crédit du solde sert quand le client a payé moins que le montant de sa facture de vente."
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:161
 #, python-brace-format
 msgid "A credit note of {0} was prepared as a draft: {1}."
-msgstr "Un avoir de {0} a été préparé en brouillon : {1}."
+msgstr "Une note de crédit de {0} a été préparée en brouillon : {1}."
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:139
 msgid "A gap to decide"
@@ -151,7 +150,7 @@ msgstr "Le compte est requis"
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:186
 msgid "Account of the credit note"
-msgstr "Compte de l'avoir"
+msgstr "Compte de la note de crédit"
 
 #: mint/apis/gap_credit_note.py:85 mint/apis/payment_gap.py:300
 #, python-brace-format
@@ -1112,7 +1111,7 @@ msgstr ""
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:120
 msgid "Create the credit note and reconcile"
-msgstr "Créer l'avoir et rapprocher"
+msgstr "Créer la note de crédit et rapprocher"
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
 msgid "Create the credit note of the balance"
@@ -1144,11 +1143,11 @@ msgstr ""
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:101
 msgid "Credit note made, invoice settled and bank line reconciled"
-msgstr "Avoir créé, facture soldée et ligne bancaire rapprochée"
+msgstr "Note de crédit créée, facture soldée et ligne bancaire rapprochée"
 
 #: mint/apis/gap_credit_note.py:68
 msgid "Credit note of the balance"
-msgstr "Avoir du solde"
+msgstr "Note de crédit du solde"
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:202
 msgid "Credit note that will be made"
@@ -2215,15 +2214,14 @@ msgstr "Emplacement où le processeur de documents est exécuté."
 #: frontend/src/components/features/StatementImports/utils.ts:67
 #, python-brace-format
 msgid "Made by itself by the rule of the customer, credit note {0}"
-msgstr "Avoir {0} fait seul par la règle du client"
+msgstr "Créée automatiquement selon la règle du client, note de crédit {0}"
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:225
 #, python-brace-format
 msgid ""
 "Made like the credit notes this customer already has ({0}), without link to "
 "the invoice."
-msgstr ""
-"Créé comme les avoirs que ce client a déjà ({0}), sans lien avec la facture."
+msgstr "Créée comme les notes de crédit que ce client a déjà ({0}), sans lien avec la facture."
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:256
 msgid "Make it by itself"
@@ -3188,7 +3186,7 @@ msgstr "Rapprochée dans le rapprochement bancaire"
 #: frontend/src/components/features/StatementImports/utils.ts:70
 #, python-brace-format
 msgid "Reconciled, the rest settled by the credit note {0}"
-msgstr "Rapprochée, le reste soldé par l'avoir {0}"
+msgstr "Rapprochée, le reste soldé par la note de crédit {0}"
 
 #: frontend/src/pages/PartyReconciliation.tsx:40
 msgid "Reconciliation"
@@ -3937,7 +3935,7 @@ msgstr "L'avoir qu'une personne a créé pour le solde d'un paiement partiel."
 #: mint/apis/gap_credit_note.py:147
 #, python-brace-format
 msgid "The credit note cannot be brought to {0}."
-msgstr "Le montant de l'avoir ne peut pas être ajusté à {0}."
+msgstr "Le montant de la note de crédit ne peut pas être ajusté à {0}."
 
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:194
 msgid ""
@@ -4280,9 +4278,7 @@ msgstr "Cela peut contenir des valeurs « CR »/« DR » ou des valeurs positive
 msgid ""
 "This customer has no credit note yet: the account of the company is used, "
 "without link to the invoice."
-msgstr ""
-"Ce client n'a pas encore d'avoir : le compte de la société est utilisé, sans"
-" lien avec la facture."
+msgstr "Ce client n'a pas encore de note de crédit : le compte de la société est utilisé, sans lien avec la facture."
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:171
 #, python-brace-format, python-format
@@ -4290,10 +4286,7 @@ msgid ""
 "This customer pays {0} % of its invoices: {1} of its last {2} paid invoices "
 "were paid at that share, and {3} of them ended with the rest as a credit "
 "note."
-msgstr ""
-"Ce client règle {0} % de ses factures : {1} de ses {2} dernières factures "
-"payées l'ont été à cette proportion, et {3} d'entre elles se sont soldées "
-"par un avoir pour le reste."
+msgstr "Ce client paie {0} % de ses factures : {1} de ses {2} dernières factures payées l'ont été à cette hauteur, et {3} d'entre elles se sont terminées par une note de crédit pour le reste."
 
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:463
 msgid "This is a formula based value."
@@ -4466,7 +4459,7 @@ msgstr "Total débit"
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:220
 msgid "Total of the credit note"
-msgstr "Total de l'avoir"
+msgstr "Total de la note de crédit"
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:181
 msgid "Transaction Date"
@@ -5539,7 +5532,7 @@ msgstr "Remplir les réglages"
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:157
 #, python-brace-format
 msgid "Makes a credit note of {0} and settles the invoice. The payment received is booked as it is."
-msgstr "Établit un avoir de {0} et solde la facture. Le paiement reçu est enregistré tel quel."
+msgstr "Crée une note de crédit de {0} et solde la facture. Le paiement reçu est comptabilisé tel quel."
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:348
 msgid "Opens the full payment form, pointed at the customer (or supplier) of this invoice. Use it when none of the choices fits."
@@ -5645,3 +5638,114 @@ msgstr "Que devient le solde restant de {0} ?"
 #: frontend/src/components/features/StatementImports/InfoHint.tsx:17
 msgid "What does this do?"
 msgstr "Que fait cela ?"
+
+#: mint/apis/payment_gap.py:339
+#, python-brace-format
+msgid "A difference goes to an income or expense account, not {0}."
+msgstr "Une différence se comptabilise sur un compte de produits ou de charges, et non sur {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:145
+#, python-brace-format
+msgid "A difference of {0} on invoice {1}"
+msgstr "Une différence de {0} sur la facture {1}"
+
+#: mint/apis/statement_follow_up.py:728
+msgid "A difference waits for your decision in the bank reconciliation."
+msgstr "Une différence attend votre décision dans le rapprochement bancaire."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
+msgid "Account for the difference"
+msgstr "Compte de la différence"
+
+#: mint/apis/statement_follow_up.py:719
+#, python-brace-format
+msgid "Booked, {0} of them with a small difference ({1} in all)."
+msgstr "Comptabilisées, dont {0} avec une petite différence ({1} au total)."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:240
+msgid "Cancel the balance with a credit note"
+msgstr "Annuler le solde par une note de crédit"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:111
+msgid "Difference booked and bank line reconciled"
+msgstr "Différence comptabilisée et ligne bancaire rapprochée"
+
+#: frontend/src/components/features/StatementImports/utils.ts:77
+#, python-brace-format
+msgid "Difference of {0}: to decide"
+msgstr "Différence de {0} : à décider"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:424
+#, python-brace-format
+msgid "Difference of {0}: {1}"
+msgstr "Différence de {0} : {1}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:237
+msgid "Leave the balance to pay"
+msgstr "Laisser le solde à payer"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:242
+#, python-brace-format
+msgid "Makes a credit note of {0} for the customer: the invoice is settled and nothing more is owed. The VAT is corrected like on any credit note. Choose this when you grant a rebate afterwards or when the rest is not due."
+msgstr "Crée une note de crédit de {0} pour le client : la facture est soldée et il ne doit plus rien. La TVA est corrigée comme pour toute note de crédit. Choisissez cette option si vous accordez un rabais après coup ou si le reste n'est pas dû."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:237
+#, python-brace-format
+msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, for example a deposit or a payment in several parts."
+msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour {0} : choisissez cette option si le client doit encore payer le reste, par exemple un acompte ou un paiement en plusieurs fois."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:272
+msgid "Opens the settings of the company in a new tab: this screen stays open. The accounts are in the section Payment Gaps."
+msgstr "Ouvre les paramètres de la société dans un nouvel onglet : cet écran reste ouvert. Les comptes se trouvent dans la section Écarts de paiement."
+
+#: frontend/src/components/features/StatementImports/utils.ts:68
+#, python-brace-format
+msgid "Passed by the import, difference of {0}"
+msgstr "Reprise par l'import, différence de {0}"
+
+#: frontend/src/components/features/StatementImports/InfoHint.tsx:46
+msgid "Read more in the manual"
+msgstr "En savoir plus dans le manuel"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:150
+msgid "Settle the invoice and book the difference"
+msgstr "Solder la facture et comptabiliser la différence"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:166
+#, python-brace-format
+msgid "Settles the invoice: the payment is booked for what came in and the difference of {0} goes to the account chosen above."
+msgstr "Solde la facture : le paiement est comptabilisé pour le montant reçu, et la différence de {0} va sur le compte choisi ci-dessus."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:284
+msgid "The account where the difference is booked: for a sale, a loss on customers or a discount account; for a purchase, an expense account. Your fiduciary knows which one to use. The company sets it once in its settings."
+msgstr "Le compte où la différence est comptabilisée : pour une vente, un compte de perte sur client ou d'escompte ; pour un achat, un compte de charges. Votre fiduciaire sait lequel utiliser. La société le règle une seule fois dans ses paramètres."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:264
+msgid "The company has not said yet where to book the differences on purchases."
+msgstr "La société n'a pas encore indiqué où comptabiliser les différences sur les achats."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:264
+msgid "The company has not said yet where to book the differences on sales."
+msgstr "La société n'a pas encore indiqué où comptabiliser les différences sur les ventes."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:283
+msgid "The income account that the credit note is booked on: the one the earlier credit notes of this customer use, or the one you choose."
+msgstr "Le compte de produits sur lequel la note de crédit est comptabilisée : celui qu'utilisent les notes de crédit précédentes de ce client, ou celui que vous choisissez."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:251
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked on the account you choose below: a loss on customers when the customer will not pay the rest, or a discount when you grant one. Unlike a credit note, no document is made for the customer."
+msgstr "La facture est soldée et {0} est comptabilisé sur le compte que vous choisissez ci-dessous : une perte sur client si le client ne paiera pas le reste, ou un escompte si vous en accordez un. Contrairement à une note de crédit, aucun document n'est établi pour le client."
+
+#: mint/apis/payment_gap.py:220
+#, python-brace-format
+msgid "This difference is above {0}: a person confirms it."
+msgstr "Cette différence dépasse {0} : une personne doit la confirmer."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:265
+msgid "Until it does, each difference is decided one by one: choose an account for this line below."
+msgstr "Tant que ce n'est pas le cas, chaque différence se décide une à une : choisissez un compte pour cette ligne ci-dessous."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:251
+msgid "Write off the balance as a loss or a discount"
+msgstr "Passer le solde en perte ou en escompte"
