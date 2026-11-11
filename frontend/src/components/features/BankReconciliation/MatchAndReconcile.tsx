@@ -862,6 +862,7 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
     }
 
     if (isLoading) {
+        //// Neoffice — anchor id so the "N existing vouchers could match this line" link can scroll here even while the list is still loading (3a74204 "feat(bank reconciliation): the cards say when existing vouchers could match the line, with a way down to them")
         return <div id={VOUCHERS_ANCHOR} className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Separator className="flex-1" />
