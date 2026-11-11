@@ -1724,7 +1724,7 @@ msgstr "Compte du grand livre"
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:153
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:206
 msgid "Gap Amount"
-msgstr "Montant de l'écart"
+msgstr "Montant de la différence"
 
 #: frontend/src/components/features/StatementImports/utils.ts:77
 #, python-brace-format
@@ -2879,14 +2879,14 @@ msgstr "Écriture de paiement créée"
 #. Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:198
 msgid "Payment Gap"
-msgstr "Écart de paiement"
+msgstr "Différence de paiement"
 
 #. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
 #. Name of a DocType
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:161
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:113
 msgid "Payment Gap Rule"
-msgstr "Règle d'écart de paiement"
+msgstr "Règle de différence de paiement"
 
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:161
 msgid "Payment Recorded"
@@ -2895,7 +2895,7 @@ msgstr "Paiement enregistré"
 #: mint/apis/payment_gap.py:316 mint/apis/payment_gap.py:332
 #, python-brace-format
 msgid "Payment gap of {0}"
-msgstr "Écart de paiement de {0}"
+msgstr "Différence de paiement de {0}"
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:111
 msgid "Payment recorded, invoices settled and bank line reconciled"
@@ -3213,7 +3213,7 @@ msgstr "Rapprochement en cours…"
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:609
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:72
 msgid "Record Payment"
-msgstr "Enregistrer un paiement"
+msgstr "Écriture de paiement"
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:533
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:624
@@ -3882,9 +3882,7 @@ msgstr "La TVA est déduite du compte, comme dans l'écriture de paiement."
 msgid ""
 "The account of the credit note or of the gap. Empty: the one of the "
 "customer's previous credit notes, else the company's gap account."
-msgstr ""
-"Le compte de l'avoir ou de l'écart. Vide : celui des avoirs précédents du "
-"client, sinon le compte des écarts de paiement de la société."
+msgstr "Le compte de la note de crédit ou de la différence. Vide : celui des notes de crédit précédentes de ce client, sinon le compte de différence de la société."
 
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:180
 msgid ""
@@ -3918,13 +3916,11 @@ msgstr "La société n'a pas de compte d'escompte."
 #: mint/apis/gap_credit_note.py:80 mint/apis/payment_gap.py:177
 #: mint/apis/payment_gap.py:278
 msgid "The company has no payment gap account."
-msgstr "La société n'a pas de compte pour les écarts de paiement."
+msgstr "La société n'a pas de compte de différence de paiement."
 
 #: mint/apis/payment_gap.py:173
 msgid "The company has not switched on passing payment gaps by itself."
-msgstr ""
-"La société n'a pas activé la comptabilisation automatique des écarts de "
-"paiement."
+msgstr "La société n'a pas activé le passage automatique des différences de paiement."
 
 #. Description of the 'Credit Note' (Link) field in DocType 'Mint Bank
 #. Statement Import Transactions'
@@ -4869,9 +4865,7 @@ msgstr ""
 #. Import Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:180
 msgid "What a person decided for a payment gap left to them."
-msgstr ""
-"La décision prise par une personne pour un écart de paiement qui lui "
-"revenait."
+msgstr "Ce qu'une personne a décidé pour une différence de paiement qui lui a été laissée."
 
 #: frontend/src/components/features/StatementImports/StatementImportLines.tsx:50
 msgid "What became of it"
@@ -4882,9 +4876,7 @@ msgstr "Sort de la ligne"
 msgid ""
 "What becomes of the balance when this customer pays less than the invoice, "
 "beyond a small gap."
-msgstr ""
-"Ce que devient le solde lorsque ce client paie moins que la facture, au-delà"
-" d'un petit écart."
+msgstr "Ce qu'il advient du solde lorsque ce client paie moins que la facture, au-delà d'une petite différence."
 
 #. Description of the 'Payment Gap' (Select) field in DocType 'Mint Bank
 #. Statement Import Transactions'
@@ -5108,7 +5100,7 @@ msgstr "paiement partiel"
 #. Import Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:178
 msgid "passed_gap"
-msgstr "écart passé"
+msgstr "différence passée"
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:191
 msgid "reconciled"
@@ -5252,7 +5244,7 @@ msgstr "{0} passées seules"
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:405
 #, python-brace-format
 msgid "{0} passed with a gap (total {1})"
-msgstr "{0} comptabilisées avec un écart (total {1})"
+msgstr "{0} comptabilisées avec une différence (total {1})"
 
 #: frontend/src/components/features/PartyReconciliation/PartyList.tsx:86
 #, python-brace-format
@@ -5575,7 +5567,7 @@ msgstr "Voir ce qui sera enregistré"
 
 #: mint/apis/payment_gap.py:86
 msgid "The company has no payment gap account on purchases."
-msgstr "La société n'a pas de compte d'écart de paiement sur les achats."
+msgstr "La société n'a pas de compte de différence de paiement sur les achats."
 
 #: mint/apis/payment_gap.py:222
 msgid "The company has not named an amount up to which a rebate is passed by itself: a person confirms it."
@@ -5696,7 +5688,7 @@ msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour 
 
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:272
 msgid "Opens the settings of the company in a new tab: this screen stays open. The accounts are in the section Payment Gaps."
-msgstr "Ouvre les paramètres de la société dans un nouvel onglet : cet écran reste ouvert. Les comptes se trouvent dans la section Écarts de paiement."
+msgstr "Ouvre les réglages de la société dans un nouvel onglet : cet écran reste ouvert. Les comptes se trouvent dans la section Différences de paiement."
 
 #: frontend/src/components/features/StatementImports/utils.ts:68
 #, python-brace-format
