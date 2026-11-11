@@ -8,8 +8,10 @@
 # ////   exact            to the cent: the payment settles the invoice
 # ////   rounding         within the rounding tolerance of the company, in either direction
 # ////   early_discount   the sum is the invoice minus the discount its payment terms grant on that date
-# ////   accepted_rebate  sales only: less than owed by a small sum the company always accepts, or, beyond it, within the
-# ////                    company's percentage AND its cap (the smaller of the two decides: on a large invoice the cap)
+# ////   accepted_rebate  sales only: less than owed by a small sum the company always accepts, or, beyond it, by up to the
+# ////                    company's percentage of the balance (the percentage alone decides what is accepted). Above the
+# ////                    amount the company asks to confirm, it is still accepted but never passed by itself: a person
+# ////                    confirms it, and the screen says why
 # ////   partial          less than owed beyond that: the money has come in, it is recorded, the rest stays open
 # ////   dunning_fee      sales only: more than owed, by exactly what a validated dunning of that invoice still asks for
 # ////                    (its fee and interest): booked on the account of the dunning, linked to it, which resolves it
@@ -22,7 +24,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate
+from frappe.utils import flt, fmt_money, getdate
 
 CENT = 0.01
 SETTINGS = "Neoffice Company Settings"
@@ -112,6 +114,9 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 		discount=0.0,
 		automatic=False,
 		reason="",
+		# an accepted rebate above the amount the company asks to confirm: a person confirms it (see _needs_confirmation)
+		needs_confirmation=False,
+		confirm_above=0.0,
 		sure=_is_sure(invoice, reference),
 		currency=invoice.currency,
 		company=invoice.company,
@@ -139,6 +144,8 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 				verdict.kind = "overpaid"
 		elif receiving and _within_accepted_rebate(gap, outstanding, settings):
 			verdict.kind = "accepted_rebate"
+			verdict.confirm_above = settings.rebate_cap
+			verdict.needs_confirmation = _needs_confirmation(gap, settings)
 		else:
 			verdict.kind = "partial"
 
@@ -149,17 +156,22 @@ def judge(invoice_type: str, invoice_name: str, amount: float, on, reference: st
 def _within_accepted_rebate(gap: float, outstanding: float, settings) -> bool:
 	"""Whether a customer who paid `gap` less than the invoice balance is within what the company accepts.
 
-	Two doors. A small sum is always accepted, whatever the invoice (a few centimes on a small invoice are not refused
-	for being more than a percent of it). Beyond it, a share of the balance AND a cap in francs must both hold, so that
-	the smaller of the two decides: on a large invoice it is the cap."""
+	Two doors, and the percentage alone decides beyond the first. A small sum is always accepted, whatever the invoice
+	(a few centimes on a small invoice are not refused for being more than a percent of it). Beyond it, a share of the
+	balance. The amount the company asks to confirm is not a limit of what is accepted: see _needs_confirmation."""
 	if settings.rebate_floor > 0 and gap <= settings.rebate_floor + 1e-9:
 		return True
-	return (
-		settings.rebate_percent > 0
-		and settings.rebate_cap > 0
-		and gap <= flt(outstanding * settings.rebate_percent / 100, 2) + 1e-9
-		and gap <= settings.rebate_cap + 1e-9
-	)
+	return settings.rebate_percent > 0 and gap <= flt(outstanding * settings.rebate_percent / 100, 2) + 1e-9
+
+
+def _needs_confirmation(gap: float, settings) -> bool:
+	"""An accepted rebate larger than the amount the company names is not passed by itself, even when passing by itself is
+	on: a person looks at it first. The small sum is exempt, it is accepted without a look. No amount named (0) means no
+	rebate above the small sum is passed by itself: a company that fills in a percentage and nothing else is asked to
+	confirm every rebate, never the other way round."""
+	if settings.rebate_floor > 0 and gap <= settings.rebate_floor + 1e-9:
+		return False
+	return settings.rebate_cap <= 0 or gap > settings.rebate_cap + 1e-9
 
 
 def _decide_automatic(verdict, settings):
@@ -184,6 +196,12 @@ def _decide_automatic(verdict, settings):
 	elif verdict.kind == "dunning_fee" and not verdict.sure:
 		# the sum is the only evidence that the surplus is the fee: a structured reference of the invoice is needed besides
 		verdict.reason = _("The invoice is not recognised without doubt: a person validates a payment that includes a dunning fee.")
+	elif verdict.kind == "accepted_rebate" and verdict.needs_confirmation:
+		verdict.reason = (
+			_("This gap is above {0}: a person confirms it.").format(fmt_money(settings.rebate_cap, currency=verdict.currency))
+			if settings.rebate_cap > 0
+			else _("The company has not named an amount up to which a rebate is passed by itself: a person confirms it.")
+		)
 	elif verdict.kind == "partial" and not settings.partial_automatic:
 		verdict.reason = _("A partial payment is validated by a person.")
 	elif verdict.kind == "partial" and not verdict.sure:

@@ -536,7 +536,9 @@ def get_gap_decision(
 		"party_id": customer if invoice_type == "Sales Invoice" else frappe.db.get_value(invoice_type, invoice, "supplier"),
 		"verdict": {
 			key: verdict[key]
-			for key in ("kind", "gap", "amount", "outstanding", "discount", "currency", "reason")
+			for key in (
+				"kind", "gap", "amount", "outstanding", "discount", "currency", "reason", "needs_confirmation", "confirm_above"
+			)
 		},
 		# the dunnings whose fee the surplus pays (kind dunning_fee), named so that the card says which ones
 		"dunnings": [

@@ -131,22 +131,42 @@ class TestPaymentGap(FrappeTestCase):
 		self._settings(payment_gap_automatic=1)
 		self.assertTrue(self._judge("Sales Invoice", self.sales, owed - 0.03).automatic)
 
-	def test_a_rebate_is_accepted_within_the_percentage_and_the_cap_on_sales_only(self):
+	def test_a_rebate_is_accepted_within_the_percentage_on_sales_only(self):
 		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=500)
 		owed = self._outstanding("Sales Invoice", self.sales)
 		four_percent = flt(owed * 0.96, 2)
 		verdict = self._judge("Sales Invoice", self.sales, four_percent)
-		self.assertEqual((verdict.kind, verdict.automatic), ("accepted_rebate", True))
-		# beyond the percentage, beyond the cap, and a setting left at 0: a partial payment
+		self.assertEqual((verdict.kind, verdict.automatic, verdict.needs_confirmation), ("accepted_rebate", True, False))
+		# beyond the percentage, and a percentage left at 0: a partial payment
 		self.assertEqual(self._judge("Sales Invoice", self.sales, flt(owed * 0.90, 2)).kind, "partial")
-		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=1)
-		self.assertEqual(self._judge("Sales Invoice", self.sales, four_percent).kind, "partial")
-		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=0)
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=0, accepted_rebate_cap=500)
 		self.assertEqual(self._judge("Sales Invoice", self.sales, four_percent).kind, "partial")
 		# a supplier is never granted a rebate by us
 		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=500)
 		owed_purchase = self._outstanding("Purchase Invoice", self.purchase)
 		self.assertEqual(self._judge("Purchase Invoice", self.purchase, flt(owed_purchase * 0.96, 2)).kind, "partial")
+
+	def test_the_amount_to_confirm_does_not_refuse_a_rebate_it_asks_a_person_to_look_at_it(self):
+		owed = self._outstanding("Sales Invoice", self.sales)
+		four_percent = flt(owed * 0.96, 2)
+		gap = flt(owed - four_percent, 2)
+		self.assertGreater(gap, 1)
+		# the percentage accepts it; the amount to confirm is below it: accepted, but not passed by itself
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=1)
+		verdict = self._judge("Sales Invoice", self.sales, four_percent)
+		self.assertEqual((verdict.kind, verdict.automatic, verdict.needs_confirmation), ("accepted_rebate", False, True))
+		self.assertEqual(verdict.confirm_above, 1)
+		self.assertIn("confirm", verdict.reason)
+		# a gap of exactly that amount is passed by itself, one cent more is not
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=gap)
+		self.assertTrue(self._judge("Sales Invoice", self.sales, four_percent).automatic)
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=flt(gap - 0.01, 2))
+		self.assertFalse(self._judge("Sales Invoice", self.sales, four_percent).automatic)
+		# no amount named (0): nothing above the small sum is passed by itself, a person confirms every rebate
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=0)
+		verdict = self._judge("Sales Invoice", self.sales, four_percent)
+		self.assertEqual((verdict.kind, verdict.automatic, verdict.needs_confirmation), ("accepted_rebate", False, True))
+		self.assertTrue(verdict.reason)
 
 	def test_a_small_sum_is_accepted_whatever_the_invoice_where_the_percentage_alone_refuses_it(self):
 		owed = self._outstanding("Sales Invoice", self.sales)
@@ -175,23 +195,38 @@ class TestPaymentGap(FrappeTestCase):
 		verdict = self._judge("Sales Invoice", self.sales, self._outstanding("Sales Invoice", self.sales) + 0.60)
 		self.assertEqual((verdict.kind, verdict.automatic), ("overpaid", False))
 
-	def test_beyond_the_small_sum_the_smaller_of_the_percentage_and_the_cap_decides(self):
-		# 3 % of the balance, 100 francs at most, a small sum of 1 franc: the same cases as the mock-up of the rule
+	def test_beyond_the_small_sum_the_percentage_alone_decides_and_the_amount_to_confirm_only_asks_for_a_look(self):
+		# 3 % of the balance, a small sum of 1 franc, 100 francs above which a person confirms
 		with_small_sum = frappe._dict(rebate_floor=1.0, rebate_percent=3.0, rebate_cap=100.0)
 		without = frappe._dict(rebate_floor=0.0, rebate_percent=3.0, rebate_cap=100.0)
 		cases = [
-			# balance, gap, accepted with the small sum, accepted without it
-			(12, 0.45, True, False),  # the percentage alone (0.36) refuses a few centimes on a small invoice
-			(100, 3.00, True, True),  # exactly 3 %
-			(1000, 45.00, False, False),  # 4.5 %: over the percentage
-			(10000, 150.00, False, False),  # 1.5 %, but over the cap of 100: on a large invoice the cap decides
-			(10000, 90.00, True, True),
-			(100, 60.00, False, False),
+			# balance, gap, accepted with the small sum, accepted without it, confirmed by a person (with the small sum)
+			(12, 0.45, True, False, False),  # the percentage alone (0.36) refuses a few centimes on a small invoice
+			(150, 4.50, True, True, False),  # exactly 3 % of a small invoice, under the amount to confirm
+			(100, 3.00, True, True, False),
+			(1000, 45.00, False, False, None),  # 4.5 %: over the percentage
+			(10000, 90.00, True, True, False),
+			(10000, 150.00, True, True, True),  # 1.5 % of a large invoice: accepted, a person confirms it
+			(36112, 150.00, True, True, True),
+			(10000, 300.00, True, True, True),  # exactly 3 %
+			(10000, 300.01, False, False, None),
+			(100, 60.00, False, False, None),
 		]
-		for balance, gap, accepted, accepted_without in cases:
+		for balance, gap, accepted, accepted_without, confirmed in cases:
 			with self.subTest(balance=balance, gap=gap):
 				self.assertEqual(payment_gap._within_accepted_rebate(gap, balance, with_small_sum), accepted)
 				self.assertEqual(payment_gap._within_accepted_rebate(gap, balance, without), accepted_without)
+				if accepted:
+					self.assertEqual(payment_gap._needs_confirmation(gap, with_small_sum), confirmed)
+		# the small sum is accepted without a look even when it is above the amount to confirm
+		odd = frappe._dict(rebate_floor=150.0, rebate_percent=3.0, rebate_cap=100.0)
+		self.assertTrue(payment_gap._within_accepted_rebate(120, 500, odd))
+		self.assertFalse(payment_gap._needs_confirmation(120, odd))
+		# no amount named: accepted by the percentage, confirmed by a person, the small sum excepted
+		no_amount = frappe._dict(rebate_floor=1.0, rebate_percent=3.0, rebate_cap=0.0)
+		self.assertTrue(payment_gap._within_accepted_rebate(300, 10000, no_amount))
+		self.assertTrue(payment_gap._needs_confirmation(300, no_amount))
+		self.assertFalse(payment_gap._needs_confirmation(0.80, no_amount))
 
 	def test_a_partial_payment_is_validated_by_itself_only_when_the_invoice_is_certain(self):
 		self._settings(payment_gap_automatic=1, payment_gap_partial_automatic=1)
@@ -276,6 +311,21 @@ class TestPaymentGap(FrappeTestCase):
 		# the net of the gap and its VAT make the whole gap
 		self.assertAlmostEqual(sum(flt(d.amount) for d in entry.deductions), flt(owed - paid, 2), places=2)
 		self.assertEqual(entry.deductions[0].account, GAP_ACCOUNT)
+
+	def test_a_rebate_above_the_amount_to_confirm_is_not_booked_by_the_import_but_a_person_books_it(self):  # role-check: ok the import runs as the system
+		self._settings(payment_gap_automatic=1, accepted_rebate_percent=5, accepted_rebate_cap=1)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		paid = flt(owed * 0.96, 2)
+		verdict = payment_gap.judge("Sales Invoice", self.sales, paid, nowdate(), "REF-1")
+		self.assertEqual((verdict.kind, verdict.automatic), ("accepted_rebate", False))
+		with self.assertRaises(frappe.ValidationError):
+			payment_gap.book(verdict, "Sales Invoice", self.sales, LEDGER, nowdate(), "REF-1", "gap test")
+		self.assertEqual(self._outstanding("Sales Invoice", self.sales), owed)
+		name = payment_gap.book(verdict, "Sales Invoice", self.sales, LEDGER, nowdate(), "REF-1", "gap test", by_person=True)
+		entry = frappe.get_doc("Payment Entry", name)
+		self.assertEqual(flt(entry.paid_amount), paid)
+		self.assertEqual(self._outstanding("Sales Invoice", self.sales), 0)
+		self.assertAlmostEqual(sum(flt(d.amount) for d in entry.deductions), flt(owed - paid, 2), places=2)
 
 	def test_a_partial_payment_is_recorded_for_what_came_in_and_the_rest_stays_open(self):  # role-check: ok the import runs as the system
 		self._settings(payment_gap_automatic=1, payment_gap_partial_automatic=1)
