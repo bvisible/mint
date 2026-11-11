@@ -101,9 +101,12 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                                 {/* //// Neoffice — see the block marker above: h1 tag/size change */}
                             </h1>
                         )}
-                        <BankPicker size="select" />
+                        {/* //// Neoffice — in the desk's frame the bank selector is at the top left, level with the tools; on the whole page the title
+                            takes that place and the selector goes under it, level with the figures (below). */}
+                        {EMBEDDED && <BankPicker size="select" />}
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-2">
+                    {/* //// Neoffice — ml-auto: the tools stay against the right edge when they wrap under the title (they were at the left). */}
+                    <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                         <TooltipProvider>
                             {/* //// Neoffice — removed: the « Imports » button (the bank files are a tab now, below). */}
                             <RuleConfigureButton />
@@ -119,7 +122,15 @@ const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
                         </TooltipProvider>
                     </div>
                 </div>
-                <BankBalance />
+                {EMBEDDED ? <BankBalance /> : (
+                    // the whole page: the selector and the figures on one line while they fit, the figures under it when they do not
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                        <BankPicker size="select" />
+                        <div className="min-w-0 flex-1 basis-[46rem]">
+                            <BankBalance />
+                        </div>
+                    </div>
+                )}
             </div>
             {/* //// Neoffice — changed: controlled by the atom (upstream: defaultValue="Match and Reconcile"). */}
             <Tabs value={tab} onValueChange={setTab}>
