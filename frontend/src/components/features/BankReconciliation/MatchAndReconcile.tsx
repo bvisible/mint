@@ -602,10 +602,11 @@ const OptionsForSingleTransaction = ({ transaction, contentHeight }: { transacti
             {/* //// Neoffice — the three buttons and the filters stay on ONE line, whatever the width of the column, and stay in view while the
                 rest of the column scrolls (Daniel, 11.11: « les boutons doivent tenir dans la largeur, enlève les icônes s'il faut, et ils sont
                 toujours dans le scroll » ; « aligne la police sur les boutons de gauche »). The icons go below 40rem; the text is the size of the buttons
-                of the list on the left (14 px) from 29rem, and a size smaller only below that, where it would not fit (container queries on the column).
+                of the list on the left (14 px) from 29rem, and a size smaller only below that, where it would not fit; below 26rem (a very narrow column)
+                nothing more can be saved and the buttons wrap rather than being cut (container queries on the column).
                 Upstream: gap-4, no wrapping, not sticky: in a narrow column the third button was cut and a sideways scrollbar appeared. */}
-            <div className="sticky top-0 z-20 -mx-1 flex flex-nowrap items-center justify-between gap-1.5 bg-background px-1 pt-2 pb-1.5">
-                <div className="flex min-w-0 flex-nowrap gap-1.5">
+            <div className="sticky top-0 z-20 -mx-1 flex flex-wrap items-center justify-between gap-1.5 bg-background px-1 pt-2 pb-1.5 @[26rem]:flex-nowrap">
+                <div className="flex min-w-0 flex-wrap gap-1.5 @[26rem]:flex-nowrap">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
