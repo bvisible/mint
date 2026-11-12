@@ -244,6 +244,7 @@ def book(
 	account: str | None = None,
 	settle_in_full: bool = False,
 	deduct_from_sales: bool = False,
+	leave_open: bool = False,
 ) -> str:
 	"""The Payment Entry of a verdict, made by ERPNext's get_payment_entry and submitted. Its name.
 
@@ -260,18 +261,22 @@ def book(
 
 	`deduct_from_sales` is a person's other way to settle a short payment of a SALE: the balance is taken off the turnover,
 	a debit on each sales account of the invoice and on each of its VAT accounts, in the share of the invoice that the
-	balance is (see sales_deduction_rows). The accounts are the invoice's own, nobody chooses one."""
+	balance is (see sales_deduction_rows). The accounts are the invoice's own, nobody chooses one.
+
+	`leave_open` books the payment as it came in whatever the verdict, the balance staying due on the invoice: a person's
+	choice for a rebate above what the company passes by itself (the credit note of the balance, or a payment still to come,
+	settles it later), as it is for a short payment."""
 	from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
 
 	if verdict.kind == "" or not (verdict.automatic or by_person):
 		frappe.throw(_("This payment is not to be passed by itself: {0}").format(verdict.reason or verdict.kind))
 	if verdict.kind == "overpaid" and (problem := surplus_problem(verdict)):
 		frappe.throw(problem)
-	if deduct_from_sales and verdict.kind != "partial":
+	if deduct_from_sales and verdict.kind not in ("partial", "accepted_rebate"):
 		frappe.throw(_("The balance of a sale is taken off the turnover only for a short payment."))
 	if account:
 		check_account(verdict.company, account)
-	if by_person and not deduct_from_sales:
+	if by_person and not (deduct_from_sales or leave_open):
 		_check_the_gap_has_an_account(verdict, account, settle_in_full)
 	invoice = frappe.get_doc(invoice_type, invoice_name)
 	if deduct_from_sales and (problem := deduct_problem(verdict, invoice)):
@@ -280,7 +285,7 @@ def book(
 	on = getdate(on)
 
 	if verdict.kind in ("early_discount", "exact") or (
-		verdict.kind == "partial" and not (settle_in_full or deduct_from_sales)
+		(verdict.kind == "partial" or leave_open) and not (settle_in_full or deduct_from_sales)
 	):
 		# ERPNext deducts the discount by itself inside the window of the payment terms: the plan says what to hand it
 		# so that the entry pays exactly the sum the bank moved, with or without the discount (see payment_terms).

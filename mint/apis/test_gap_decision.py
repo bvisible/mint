@@ -257,6 +257,78 @@ class TestGapDecision(GapImportCase):
 		self.assertEqual(decision["verdict"]["kind"], "partial")
 		self.assertFalse(decision["can_deduct"])
 
+	# -- a rebate above what the company passes by itself: the same choices as a short payment ----------------------------
+
+	def _a_rebate_to_confirm(self, share=0.03):
+		# accepted by the percentage, no amount named: the rebate is accepted but a person confirms it
+		self._settings(accepted_rebate_percent=5, accepted_rebate_cap=0)
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed * (1 - share), 2)))
+		return statement, statement.transactions[0].bank_transaction, owed
+
+	def test_a_rebate_to_confirm_is_offered_the_choices_of_a_short_payment(self):
+		_statement, bank_line, _owed = self._a_rebate_to_confirm()
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "accepted_rebate")
+		self.assertTrue(decision["verdict"]["needs_confirmation"])
+		self.assertTrue(decision["can_settle"])
+		self.assertTrue(decision["can_deduct"])
+		self.assertIsNotNone(decision["credit_note"])
+		# leaving it open needs no account of the company, and nothing is booked as a rebate in the preview
+		self.assertTrue(decision["can_pass"])
+		self.assertEqual((decision["blocker"], decision["deductions"]), ("", []))
+		self.assertTrue(follow_up.get_gap_decision(bank_line, settle_in_full=1)["deductions"])
+
+	def test_a_rebate_to_confirm_left_open_books_only_the_payment(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line, owed = self._a_rebate_to_confirm()
+		answer = follow_up.decide_gap(bank_line, "passed_gap")
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual(len(entry.deductions), 0)
+		self.assertAlmostEqual(self._owed("Sales Invoice", self.sales), flt(owed - entry.paid_amount, 2), places=2)
+		self.assertGreater(self._owed("Sales Invoice", self.sales), 0)
+		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Reconciled")
+
+	def test_a_rebate_to_confirm_can_still_be_booked_as_a_rebate_on_the_account(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line, _owed = self._a_rebate_to_confirm()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", settle_in_full=1)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertIn(GAP_ACCOUNT, [row.account for row in entry.deductions])
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
+	def test_a_rebate_to_confirm_can_be_taken_off_the_turnover(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line, _owed = self._a_rebate_to_confirm()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", deduct_from_sales=1)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		incomes = {item.income_account for item in frappe.get_doc("Sales Invoice", self.sales).items}
+		self.assertTrue(incomes & {row.account for row in entry.deductions})
+		self.assertNotIn(GAP_ACCOUNT, [row.account for row in entry.deductions])
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
+	def test_a_rebate_to_confirm_can_be_made_a_credit_note_linked_to_the_invoice(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line, owed = self._a_rebate_to_confirm()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		note = frappe.get_doc("Sales Invoice", answer["credit_note"])
+		# the payment is booked as it came in, the credit note settles what is left
+		self.assertEqual(len(entry.deductions), 0)
+		self.assertEqual((note.is_return, note.return_against), (1, self.sales))
+		self.assertAlmostEqual(abs(flt(note.grand_total)), flt(owed - entry.paid_amount, 2), places=2)
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
+	def test_a_rebate_the_company_passes_by_itself_has_no_choices(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		self._settings(accepted_rebate_percent=5, accepted_rebate_cap=100000)
+		owed = self._owed("Sales Invoice", self.sales)
+		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed * 0.97, 2)))
+		bank_line = statement.transactions[0].bank_transaction
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "accepted_rebate")
+		self.assertFalse(decision["verdict"]["needs_confirmation"])
+		self.assertEqual((decision["can_settle"], decision["can_deduct"], decision["credit_note"]), (False, False, None))
+		# the one way a small rebate is passed: on the account of the company
+		entry = frappe.get_doc("Payment Entry", follow_up.decide_gap(bank_line, "passed_gap")["payment_entry"])
+		self.assertIn(GAP_ACCOUNT, [row.account for row in entry.deductions])
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
 	def test_leaving_it_open_creates_nothing_and_leaves_the_list_of_what_waits(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
 		statement, bank_line = self._a_line_with_a_gap(0.03)
 		owed = self._owed("Sales Invoice", self.sales)

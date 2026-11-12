@@ -492,19 +492,19 @@ def get_gap_decision(
 	if not verdict.kind and flt(verdict.outstanding) <= 0.005:
 		return None
 	# the credit note of the balance is for a short payment of a sale; it excludes passing the rest as a gap
-	creditable = verdict.kind == "partial" and invoice_type == "Sales Invoice" and verdict.currency == _company_currency(
-		verdict.company
-	)
+	# a rebate the company accepts but does not pass by itself (above the amount it asked to confirm) is decided like a short
+	# payment: the same choices, with the rebate on the account as one of them
+	rebate_to_confirm = verdict.kind == "accepted_rebate" and bool(verdict.needs_confirmation)
+	beyond = verdict.kind == "partial" or rebate_to_confirm
+	creditable = beyond and invoice_type == "Sales Invoice" and verdict.currency == _company_currency(verdict.company)
 	credit = _as_flag(credit_note) and creditable
 	# the balance of a sale taken off the turnover: a short payment of a sale, on the sales accounts of the invoice
 	invoice_doc = frappe.get_doc(invoice_type, invoice)
-	can_deduct = (
-		verdict.kind == "partial" and invoice_type == "Sales Invoice" and not payment_gap.deduct_problem(verdict, invoice_doc)
-	)
+	can_deduct = beyond and invoice_type == "Sales Invoice" and not payment_gap.deduct_problem(verdict, invoice_doc)
 	deduct = _as_flag(deduct_from_sales) and can_deduct and not credit
 	# for a partial payment the choice is what becomes of the rest, for an overpayment what becomes of the surplus: in both,
 	# « settle » passes the difference on an account and its opposite leaves it open (a person keeps the surplus for a next invoice)
-	settle = _as_flag(settle_in_full) and verdict.kind in ("partial", "overpaid") and not credit and not deduct
+	settle = _as_flag(settle_in_full) and (beyond or verdict.kind == "overpaid") and not credit and not deduct
 	editable = verdict.kind in ("rounding", "accepted_rebate", "partial", "overpaid")
 	account = (account or None) if editable else None
 	blocker = ""
@@ -516,14 +516,15 @@ def get_gap_decision(
 			or _account_blocker(verdict.company, account)
 			or payment_gap.account_problem(verdict, account, settle)
 		)
-	elif deduct:
-		# the accounts are the invoice's own: nothing to choose, nothing that the company has to have set
+	elif deduct or credit or (rebate_to_confirm and not settle):
+		# the accounts are the invoice's own (a deduction, a credit note) or none is touched (the balance left open): nothing
+		# to choose, nothing that the company has to have set. A credit note says what can refuse it further down.
 		blocker = ""
 	else:
 		blocker = _account_blocker(verdict.company, account) or payment_gap.account_problem(verdict, account, settle)
 	settings = payment_gap.get_settings(verdict.company)
 	rows = []
-	if not blocker and verdict.kind not in ("", "exact") and not credit:
+	if not blocker and verdict.kind not in ("", "exact") and not credit and not (rebate_to_confirm and not (settle or deduct)):
 		rows = payment_gap.preview(verdict, invoice_doc, account, settle, deduct)
 	customer = frappe.db.get_value(invoice_type, invoice, "customer") if invoice_type == "Sales Invoice" else None
 	credit_preview = history = rule_info = proposal = draft = None
@@ -590,7 +591,7 @@ def get_gap_decision(
 		"draft": draft,
 		# offered for every partial payment: a company with no gap account of its own is not a reason to hide the choice,
 		# the person picks the account in the card and what still blocks is said (`blocker`) once they have chosen
-		"can_settle": verdict.kind == "partial",
+		"can_settle": beyond,
 		# an overpayment: keep the surplus for a next invoice, or pass it as a difference on an account (the card asks which)
 		"can_decide_surplus": verdict.kind == "overpaid" and not payment_gap.surplus_problem(verdict),
 		# a short payment of a sale: the balance can be taken off the turnover (an entry on the sales accounts of the invoice)
@@ -658,11 +659,13 @@ def decide_gap(
 		from mint.apis import gap_credit_note
 
 		share = gap_credit_note.share_paid(invoice, verdict.amount)
+	rebate_to_confirm = verdict.kind == "accepted_rebate" and bool(verdict.needs_confirmation)
+	beyond = verdict.kind == "partial" or rebate_to_confirm
 	credit = _as_flag(credit_note)
 	# the credit note wins when both are asked; what cannot be taken off the turnover is refused by the booking itself
 	deduct = _as_flag(deduct_from_sales) and not credit
 	settle_flag = _as_flag(settle_in_full) and verdict.kind == "partial" and not credit and not deduct
-	if credit and not (verdict.kind == "partial" and invoice_type == "Sales Invoice"):
+	if credit and not (beyond and invoice_type == "Sales Invoice"):
 		frappe.throw(_("A credit note of the balance is for the short payment of a sales invoice."))
 	if credit:
 		# what can refuse the credit note is checked BEFORE the payment is booked: nothing is written for a refusal
@@ -686,8 +689,11 @@ def decide_gap(
 		_("{0} - Payment for {1}").format(line.party_name or line.party_match, invoice),
 		by_person=True,
 		account=None if (credit or deduct) else ((account or None) if editable else None),
-		settle_in_full=_as_flag(settle_in_full) and verdict.kind in ("partial", "overpaid") and not credit and not deduct,
+		settle_in_full=_as_flag(settle_in_full) and (beyond or verdict.kind == "overpaid") and not credit and not deduct,
 		deduct_from_sales=deduct,
+		# the payment as it came in, the balance left due: the credit note settles it, or a rebate to confirm that nobody
+		# chose to pass leaves it open, as a short payment does
+		leave_open=credit or (rebate_to_confirm and not (_as_flag(settle_in_full) or deduct)),
 	)
 	_link_payment_entry_to_bt(
 		frappe.get_doc("Bank Transaction", bank_transaction), entry, reconciliation_type="Voucher Created"

@@ -135,6 +135,8 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const lineDay = transaction.date ? formatDate(transaction.date, "Do MMM YYYY") : ""
     const isPartial = verdict.kind === "partial"
     const isOverpaid = verdict.kind === "overpaid"
+    // a rebate the company accepts but asks to confirm is decided like a short payment: the same choices (12.11, Jérémy)
+    const isConfirmRebate = verdict.kind === "accepted_rebate" && !!verdict.needs_confirmation
     const isSale = decision.invoice_type === "Sales Invoice"
     const confirming = !!verdict.needs_confirmation
     const note = decision.credit_note
@@ -143,7 +145,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const owed = formatCurrency(verdict.outstanding, verdict.currency)
     // who the surplus waits for: the customer or the supplier of the invoice, by the name the card already uses
     const who = decision.party ?? (decision.invoice_type === "Sales Invoice" ? _("the customer") : _("the supplier"))
-    const showAccount = decision.account_editable && ((!isPartial && !isOverpaid) || settle)
+    const showAccount = decision.account_editable && ((!isPartial && !isOverpaid && !isConfirmRebate) || settle)
     // the company has not said where a gap of this kind of invoice goes: the card says so, and where to say it
     const missingSetting = showAccount && !credit && !decision.default_account
     const settingsHref = transaction.company ? `/app/neoffice-company-settings/${encodeURIComponent(transaction.company)}` : ""
@@ -166,6 +168,8 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
         ? _("Validate the draft and reconcile")
         : isPartial
             ? (credit ? _("Create the credit note and reconcile") : deduct ? _("Take it off the turnover and reconcile") : settle ? (isSale ? _("Settle the invoice and book the loss") : _("Settle the invoice and book the difference")) : _("Record the partial payment"))
+            : isConfirmRebate
+                ? (credit ? _("Create the credit note and reconcile") : deduct ? _("Take it off the turnover and reconcile") : settle ? _("Confirm the rebate and reconcile") : _("Record the partial payment"))
             : isOverpaid
                 ? (settle ? _("Settle the invoice and book the difference") : _("Settle the invoice and keep the surplus"))
             : verdict.kind === "dunning_fee"
@@ -183,6 +187,14 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                 : settle
                     ? _("Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above.", [gapText])
                     : _("Books the payment received. The invoice stays due for {0}.", [gapText]))
+            : isConfirmRebate
+                ? (credit
+                    ? _("Makes a credit note of {0}, linked to the invoice, and settles the invoice. The payment received is booked as it is.", [gapText])
+                    : deduct
+                        ? _("Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT.", [gapText])
+                        : settle
+                            ? _("Settles the invoice: the payment is booked for what came in and the difference of {0} goes to the account chosen above.", [gapText])
+                            : _("Books the payment received. The invoice stays due for {0}.", [gapText]))
             : isOverpaid
                 ? (settle
                     ? _("Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above.", [gapText])
@@ -269,7 +281,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                         </div>
                     </div>
                 )}
-                {isPartial && decision.can_settle && (
+                {(isPartial || isConfirmRebate) && decision.can_settle && (
                     <div className="flex flex-col gap-2" role="radiogroup">
                         <span className="text-base font-medium">{_("What becomes of the remaining {0}?", [gapText])}</span>
                         <div className="grid grid-cols-1 gap-2 @[36rem]:grid-cols-2">
@@ -288,8 +300,10 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                             )}
                             {tile(
                                 "gap",
-                                isSale ? _("Book it as a loss on the customer") : _("Write off the balance as a loss or a discount"),
-                                isSale
+                                isConfirmRebate ? _("Book it as a rebate") : isSale ? _("Book it as a loss on the customer") : _("Write off the balance as a loss or a discount"),
+                                isConfirmRebate
+                                    ? _("The invoice is settled and {0} is booked as a rebate on the account you choose below (the one the company set, by default). Choose this to accept the rebate as it is.", [gapText])
+                                    : isSale
                                     ? _("The invoice is settled and {0} is booked as a loss on the account you choose below (the one the company set, by default). Choose this when the customer will not pay the rest.", [gapText])
                                     : _("The invoice is settled and {0} is booked on the account you choose below: a loss on customers when the customer will not pay the rest, or a discount when you grant one. Unlike a credit note, no document is made for the customer.", [gapText]),
                                 decision.rule_proposal === "gap",
@@ -325,7 +339,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                         )}
                     </div>
                 )}
-                {isPartial && (deduct || (credit && note)) && (
+                {(isPartial || isConfirmRebate) && (deduct || (credit && note)) && (
                     <div className="grid grid-cols-1 gap-3 @[36rem]:grid-cols-2 @[36rem]:gap-x-6">
                         <div className="flex flex-col gap-2.5">
                             <p className="text-sm leading-snug text-muted-foreground">
