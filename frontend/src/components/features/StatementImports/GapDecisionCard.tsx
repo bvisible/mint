@@ -419,8 +419,10 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                                         </div>
                                     )}
                                     {note.net !== null && bookedRow(`${_("Net")} · ${note.account ?? ""}`, note.net)}
-                                    {note.tax !== null && note.tax > 0 && bookedRow(_("VAT"), note.tax)}
-                                    {note.fees > 0 && bookedRow(note.fees_label ?? _("Charges"), note.fees)}
+                                    {note.tax_lines.map((line, index) => (
+                                        <div key={`${line.account}-${index}`}>{bookedRow(`${_("VAT")} · ${line.account}`, line.amount)}</div>
+                                    ))}
+                                    {note.fees > 0 && bookedRow(`${note.fees_label ?? _("Charges")}${note.fees_account ? ` · ${note.fees_account}` : ""}`, note.fees)}
                                     {bookedRow(_("Total of the credit note"), note.total, true)}
                                 </>
                             )}

@@ -101,6 +101,21 @@ class TestGapCreditNote(GapImportCase):
 		# net + VAT + the charges that the article brings (the RPLP, when it has one) = the balance, to the cent
 		self.assertAlmostEqual(shown["net"] + shown["tax"] + shown["fees"], gross, places=2)
 
+	def test_the_preview_names_the_account_of_each_vat_line_that_the_note_will_book(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+		article = self._the_article()
+		invoice = frappe.get_doc("Sales Invoice", self.sales)
+		if not any(item.item_tax_template for item in invoice.items):
+			self.skipTest("the invoice has no item tax template")
+		gross = flt(invoice.outstanding_amount * 0.2, 2)
+		shown = gap_credit_note.preview(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, invoice=self.sales, item_code=article)
+		self.assertTrue(shown["tax_lines"])
+		self.assertAlmostEqual(sum(line["amount"] for line in shown["tax_lines"]), shown["tax"], places=2)
+		# what the person reads is what is booked: the same accounts, the same amounts
+		name = gap_credit_note.create(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, "test", invoice=self.sales, item_code=article)
+		note = frappe.get_doc("Sales Invoice", name)
+		booked = sorted((row.account_head, abs(flt(row.tax_amount, 2))) for row in note.taxes if flt(row.tax_amount, 2) and row.charge_type != "Actual")
+		self.assertEqual(sorted((line["account"], line["amount"]) for line in shown["tax_lines"]), booked)
+
 	def test_the_credit_note_of_the_card_settles_its_balance(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
 		article = self._the_article()
 		invoice = frappe.get_doc("Sales Invoice", self.sales)
@@ -176,6 +191,7 @@ class TestGapCreditNote(GapImportCase):
 		with patch.object(gap_credit_note, "_invoice_charged_a_surcharge", return_value=True):
 			shown = gap_credit_note.preview(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, invoice=self.sales, item_code=article)
 		self.assertGreater(shown["fees"], 0)
+		self.assertTrue(shown["fees_account"])
 		self.assertAlmostEqual(shown["net"] + shown["tax"] + shown["fees"], gross, places=2)
 
 	def test_the_import_that_has_no_invoice_in_hand_adds_no_charge_either(self):

@@ -320,6 +320,9 @@ def preview(
 		"tax": None,
 		"fees": 0.0,
 		"fees_label": None,
+		"fees_account": None,
+		# each VAT line that will be booked, with its account: a person reads there which VAT account the note goes to
+		"tax_lines": [],
 		"total": flt(gross, 2),
 	}
 	if not blocker:
@@ -336,7 +339,13 @@ def preview(
 		out["net"] = abs(flt(doc.net_total, 2))
 		out["fees"] = abs(flt(sum(flt(row.tax_amount) for row in charges), 2))
 		out["fees_label"] = charges[0].description if charges else None
+		out["fees_account"] = charges[0].account_head if charges else None
 		out["tax"] = flt(abs(flt(doc.total_taxes_and_charges, 2)) - out["fees"], 2)
+		out["tax_lines"] = [
+			{"account": row.account_head, "amount": abs(flt(row.tax_amount, 2))}
+			for row in doc.taxes
+			if row.charge_type != "Actual" and flt(row.tax_amount, 2)
+		]
 	return out
 
 

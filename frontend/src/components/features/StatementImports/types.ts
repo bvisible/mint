@@ -165,6 +165,9 @@ export type CreditNotePreview = {
     /** A fixed charge the article brings (the RPLP), apart from the VAT: net + VAT + charges = the total. */
     fees: number,
     fees_label: string | null,
+    fees_account: string | null,
+    /** Each VAT line the note will book, with its account (a person reads there which VAT account it goes to). */
+    tax_lines: { account: string, amount: number }[],
     total: number,
 }
 
