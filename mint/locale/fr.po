@@ -5396,3 +5396,70 @@ msgstr "Le passer en rabais"
 #, python-brace-format
 msgid "The invoice is settled and {0} is booked as a rebate on the account you choose below (the one the company set, by default). Choose this to accept the rebate as it is."
 msgstr "La facture est soldée et {0} est comptabilisé comme rabais sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option pour accepter le rabais tel quel."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:358
+#, python-brace-format
+msgid "A credit note of {0} is made on the article below, with the VAT of the invoice. It settles the invoice."
+msgstr "Une note de crédit de {0} est établie sur l'article ci-dessous, avec la TVA de la facture. Elle solde la facture."
+
+#: mint/apis/gap_credit_note.py:178
+#, python-brace-format
+msgid "Article {0} cannot be sold."
+msgstr "L'article {0} ne peut pas être vendu."
+
+#: mint/apis/gap_credit_note.py:176
+#, python-brace-format
+msgid "Article {0} does not exist."
+msgstr "L'article {0} n'existe pas."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:423
+msgid "Charges"
+msgstr "Frais"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:369
+msgid "Choose an article"
+msgstr "Choisissez un article"
+
+#: mint/apis/gap_credit_note.py:259
+msgid "Choose the article of the credit note."
+msgstr "Choisissez l'article de la note de crédit."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:378
+msgid "Choose the article that tells why: a discount, a loss on a customer."
+msgstr "Choisissez l'article qui indique le motif : un rabais, une perte sur client."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:377
+msgid "Filled in: the article most used for the credit notes of the company."
+msgstr "Rempli automatiquement : l'article le plus utilisé pour les notes de crédit de la société."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:375
+msgid "Filled in: the article of the credit notes of this customer."
+msgstr "Rempli automatiquement : l'article des notes de crédit de ce client."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:400
+msgid "Make the credit note yourself from the invoice, then choose Leave the balance to pay: you match it afterwards."
+msgstr "Établissez vous-même la note de crédit à partir de la facture, puis choisissez « Laisser le solde à payer » : vous la rapprocherez ensuite."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:194
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:202
+#, python-brace-format
+msgid "Makes a credit note of {0} on the article chosen above and settles the invoice. The payment received is booked as it is."
+msgstr "Établit une note de crédit de {0} sur l'article choisi ci-dessus et solde la facture. Le paiement reçu est enregistré tel quel."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:308
+#, python-brace-format
+msgid "Makes a credit note of {0} on the article you choose, with the VAT of the invoice, and settles the invoice. It is one line and moves no stock. When goods come back, make the credit note yourself from the invoice, then choose Leave the balance to pay."
+msgstr "Établit une note de crédit de {0} sur l'article que vous choisissez, avec la TVA de la facture, et solde la facture. C'est une seule ligne, sans toucher au stock. Si des marchandises vous sont retournées, établissez vous-même la note de crédit à partir de la facture, puis choisissez « Laisser le solde à payer »."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:392
+msgid "The account the article is sold on."
+msgstr "Le compte sur lequel l'article est vendu."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:391
+#, python-brace-format
+msgid "The account the article is sold on. For a loss on a customer, choose {0}."
+msgstr "Le compte sur lequel l'article est vendu. Pour une perte sur client, choisissez {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:373
+msgid "The article you chose."
+msgstr "L'article que vous avez choisi."
