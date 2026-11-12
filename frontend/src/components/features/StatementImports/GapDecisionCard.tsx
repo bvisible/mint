@@ -9,7 +9,7 @@
 //// The words are those of the books, not of the code: a difference, a credit note, a loss on customers, a discount.
 //// A short payment of a sale has four choices (12.11, Jérémy and Daniel): leave the balance to pay (a credit note will be made and matched
 //// later, goods back in stock), take it off the turnover (one entry on the sales accounts of the invoice, with its VAT), make a credit
-//// note (a document linked to the invoice, on its own accounts) or book it as a loss on the customer (the write-off account). The
+//// note (one line on the article the person chooses, filled in from the habit) or book it as a loss on the customer (the write-off account). The
 //// choices sit in two columns and so does what will be booked, when the panel is wide (a container query), one column otherwise.
 //// More came in than is owed (an overpayment): two choices as for a short payment, the first proposed. Keep the surplus for a
 //// next invoice (the payment is booked in full, the invoice settled, the surplus stays on the payment to be matched later), or
@@ -23,6 +23,7 @@ import { toast } from "sonner"
 import { bankRecRecordPaymentModalAtom, bankRecRecordPaymentPrefillAtom, bankRecUnreconcileModalAtom } from "@/components/features/BankReconciliation/bankRecAtoms"
 import { UnreconciledTransaction, useRefreshUnreconciledTransactions } from "@/components/features/BankReconciliation/utils"
 import AccountsDropdown from "@/components/common/AccountsDropdown"
+import LinkFieldCombobox from "@/components/common/LinkFieldCombobox"
 import { Button } from "@/components/ui/button"
 import ErrorBanner from "@/components/ui/error-banner"
 import { cn } from "@/lib/utils"
@@ -77,6 +78,8 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     // open, passed as a gap, or closed by a credit note. The server answers with what would be written (VAT included)
     // so that they see it before confirming.
     const [account, setAccount] = useState<string | null>(null)
+    // the article of the credit note: filled in by the server (the habit of the customer, else the one the company uses most) until the person picks another
+    const [creditItem, setCreditItem] = useState<string | null>(null)
     const [mode, setMode] = useState<Mode>("open")
     // what is folded away until asked for: the rows that will be booked, the rule for this customer
     const [showBooked, setShowBooked] = useState(false)
@@ -88,12 +91,18 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const choose = (next: Mode) => {
         setMode(next)
         setAccount(null)
+        setCreditItem(null)
+    }
+    // another article is sold on its own account: the account starts again from the one of the article
+    const chooseArticle = (value: string) => {
+        setCreditItem(value || null)
+        setAccount(null)
     }
 
     const { data } = useFrappeGetCall<{ message: GapDecision | null }>(
         `${API}.get_gap_decision`,
-        { bank_transaction: transaction.name, account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0, deduct_from_sales: deduct ? 1 : 0 },
-        ["statement-imports", "decision", transaction.name, account ?? "", mode],
+        { bank_transaction: transaction.name, account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0, deduct_from_sales: deduct ? 1 : 0, credit_item: credit ? (creditItem ?? undefined) : undefined },
+        ["statement-imports", "decision", transaction.name, account ?? "", mode, creditItem ?? ""],
         { revalidateOnFocus: false, keepPreviousData: true },
     )
     const { call: decide, loading, error } = useFrappePostCall<{ message: { payment_entry: string | null, credit_note: string | null } }>(`${API}.decide_gap`)
@@ -118,7 +127,8 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const refresh = () => mutate((key) => Array.isArray(key) && key[0] === "statement-imports")
 
     const onDecide = () => {
-        decide({ bank_transaction: transaction.name, decision: "passed_gap", account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0, deduct_from_sales: deduct ? 1 : 0 }).then(() => {
+        // the article the person sees (filled in or chosen) is the one the credit note is made on
+        decide({ bank_transaction: transaction.name, decision: "passed_gap", account: account ?? decision.credit_note?.account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0, deduct_from_sales: deduct ? 1 : 0, credit_item: credit ? (creditItem ?? decision.credit_note?.item_code ?? undefined) : undefined }).then(() => {
             refresh()
             toast.success(credit ? _("Credit note made, invoice settled and bank line reconciled") : deduct ? _("Balance taken off the turnover, invoice settled and bank line reconciled") : isOverpaid && !settle ? _("Invoice settled and bank line reconciled, the surplus stays available") : _("Difference booked and bank line reconciled"), {
                 duration: 4000,
@@ -181,7 +191,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
         ? decision.blocker
         : isPartial
             ? (credit
-                ? _("Makes a credit note of {0}, linked to the invoice, and settles the invoice. The payment received is booked as it is.", [gapText])
+                ? _("Makes a credit note of {0} on the article chosen above and settles the invoice. The payment received is booked as it is.", [gapText])
                 : deduct
                 ? _("Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT.", [gapText])
                 : settle
@@ -189,7 +199,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                     : _("Books the payment received. The invoice stays due for {0}.", [gapText]))
             : isConfirmRebate
                 ? (credit
-                    ? _("Makes a credit note of {0}, linked to the invoice, and settles the invoice. The payment received is booked as it is.", [gapText])
+                    ? _("Makes a credit note of {0} on the article chosen above and settles the invoice. The payment received is booked as it is.", [gapText])
                     : deduct
                         ? _("Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT.", [gapText])
                         : settle
@@ -295,7 +305,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                             {note && tile(
                                 "credit",
                                 _("Make a credit note"),
-                                _("Makes a credit note of {0}, linked to the invoice, on its sales accounts and with its VAT, and settles the invoice. No stock moves: when goods come back, make the credit note yourself first and choose Leave the balance to pay.", [gapText]),
+                                _("Makes a credit note of {0} on the article you choose, with the VAT of the invoice, and settles the invoice. It is one line and moves no stock. When goods come back, make the credit note yourself from the invoice, then choose Leave the balance to pay.", [gapText]),
                                 habit?.proposal === "credit_note" || decision.rule_proposal === "credit_note",
                             )}
                             {tile(
@@ -345,12 +355,49 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                             <p className="text-sm leading-snug text-muted-foreground">
                                 {deduct
                                     ? _("{0} are taken off the turnover, on the sales account of the invoice and with its VAT: one entry, and the invoice is settled. For an arrangement with the customer, a commercial gesture or a rebate.", [gapText])
-                                    : _("A credit note of {0} is made, linked to invoice {1}, on its sales accounts and with its VAT. It settles the invoice.", [gapText, decision.invoice])}
+                                    : _("A credit note of {0} is made on the article below, with the VAT of the invoice. It settles the invoice.", [gapText])}
                             </p>
+                            {credit && note && !draft && (
+                                <>
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-sm font-medium">{_("Article")}</span>
+                                        <LinkFieldCombobox
+                                            doctype="Item"
+                                            filters={[["is_sales_item", "=", 1], ["disabled", "=", 0]]}
+                                            value={creditItem ?? note.item_code ?? ""}
+                                            onChange={chooseArticle}
+                                            placeholder={_("Choose an article")}
+                                        />
+                                        <span className="text-xs leading-snug text-muted-foreground">
+                                            {creditItem
+                                                ? _("The article you chose.")
+                                                : note.source === "history"
+                                                    ? _("Filled in: the article of the credit notes of this customer.")
+                                                    : note.source === "article"
+                                                        ? _("Filled in: the article most used for the credit notes of the company.")
+                                                        : _("Choose the article that tells why: a discount, a loss on a customer.")}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-sm font-medium">{_("Account")}</span>
+                                        <AccountsDropdown
+                                            root_type={["Income"]}
+                                            company={transaction.company}
+                                            value={account ?? note.account ?? undefined}
+                                            onChange={(value) => setAccount(value || null)}
+                                        />
+                                        <span className="text-xs leading-snug text-muted-foreground">
+                                            {decision.default_account && decision.default_account !== (account ?? note.account)
+                                                ? _("The account the article is sold on. For a loss on a customer, choose {0}.", [decision.default_account])
+                                                : _("The account the article is sold on.")}
+                                        </span>
+                                    </div>
+                                </>
+                            )}
                             {credit && (
                                 <p className="rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm leading-snug text-amber-950">
                                     <b>{_("Goods are coming back and must go into stock?")}</b>{" "}
-                                    {_("Make the credit note yourself first, then choose Leave the balance to pay: you match it afterwards.")}
+                                    {_("Make the credit note yourself from the invoice, then choose Leave the balance to pay: you match it afterwards.")}
                                 </p>
                             )}
                         </div>
@@ -365,16 +412,15 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                                 </>
                             ) : note && (
                                 <>
-                                    {note.linked_to && (
+                                    {note.item && (
                                         <div className="flex justify-between gap-4 text-sm">
-                                            <span className="text-muted-foreground">{_("Linked to")}</span>
-                                            <span className="font-mono">{note.linked_to}</span>
+                                            <span className="text-muted-foreground">{_("Article")}</span>
+                                            <span className="min-w-0 truncate">{note.item}</span>
                                         </div>
                                     )}
-                                    {(note.accounts ?? []).map((row) => (
-                                        <div key={row.account}>{bookedRow(`${_("Net")} · ${row.account}`, row.net)}</div>
-                                    ))}
+                                    {note.net !== null && bookedRow(`${_("Net")} · ${note.account ?? ""}`, note.net)}
                                     {note.tax !== null && note.tax > 0 && bookedRow(_("VAT"), note.tax)}
+                                    {note.fees > 0 && bookedRow(note.fees_label ?? _("Charges"), note.fees)}
                                     {bookedRow(_("Total of the credit note"), note.total, true)}
                                 </>
                             )}

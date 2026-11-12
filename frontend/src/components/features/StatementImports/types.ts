@@ -157,13 +157,14 @@ export type CreditNotePreview = {
     tax_template: string | null,
     /** How many times the customer already had a credit note made like this one (0 = the company's account). */
     times: number,
-    source: "history" | "company" | "invoice",
-    /** The invoice the credit note is drawn from and linked to, and the sales accounts it is made on (net on each). */
-    linked_to?: string,
-    accounts?: { account: string, net: number }[],
+    /** Where the line comes from: the habit of the customer, the company's account, or an article (chosen by the person, or the one the company uses most). */
+    source: "history" | "company" | "article",
     blocker: string,
     net: number | null,
     tax: number | null,
+    /** A fixed charge the article brings (the RPLP), apart from the VAT: net + VAT + charges = the total. */
+    fees: number,
+    fees_label: string | null,
     total: number,
 }
 

@@ -27,6 +27,10 @@ class GapImportCase(FrappeTestCase):
 		frappe.set_user("Administrator")
 		cls.sales = _an_invoice("Sales Invoice", 200, total_taxes_and_charges="> 0", scor_reference="is not null")
 		cls.purchase = _an_invoice("Purchase Invoice", 100, is_proposed="= 0")
+		# an article that is sold, for the credit note a person makes on the card (it is the line of the credit note)
+		cls.article = frappe.db.get_value("Item", {"disabled": 0, "is_sales_item": 1, "is_stock_item": 0}, "name") or frappe.db.get_value(
+			"Item", {"disabled": 0, "is_sales_item": 1}, "name"
+		)
 		cls.bank_account = frappe.db.get_value("Bank Account", {"company": COMPANY, "account": LEDGER})
 		if not (cls.sales and cls.purchase and cls.bank_account):
 			raise unittest.SkipTest("needs open invoices of the company and its bank account on the ledger account")

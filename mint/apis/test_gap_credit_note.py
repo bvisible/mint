@@ -67,39 +67,74 @@ class TestGapCreditNote(GapImportCase):
 	def _customer(self):
 		return frappe.db.get_value("Sales Invoice", self.sales, "customer")
 
-	# -- the credit note drawn from the invoice ---------------------------------------------------------------------------
+	# -- the credit note on the article the person chose -----------------------------------------------------------------
 
-	def test_the_credit_note_is_drawn_from_the_invoice_it_is_linked_to_and_on_its_sales_accounts(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+	def _the_article(self):
+		if not self.article:
+			self.skipTest("needs an article that is sold")
+		return self.article
+
+	def test_the_credit_note_is_one_line_on_the_chosen_article_and_the_account_it_is_sold_on(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+		article = self._the_article()
 		invoice = frappe.get_doc("Sales Invoice", self.sales)
 		gross = flt(invoice.outstanding_amount * 0.2, 2)
-		name = gap_credit_note.create(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, "test", invoice=self.sales)
+		name = gap_credit_note.create(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, "test", invoice=self.sales, item_code=article)
 		note = frappe.get_doc("Sales Invoice", name)
-		self.assertEqual((note.docstatus, note.is_return, note.return_against), (1, 1, self.sales))
-		self.assertEqual(note.update_stock, 0)
-		# the accounts are those of the invoice, never the gap account of the company
-		self.assertEqual({item.income_account for item in note.items}, {item.income_account for item in invoice.items})
+		self.assertEqual((note.docstatus, note.is_return, note.update_stock), (1, 1, 0))
+		# one line, on the article, on the account the article is sold on: no copy of the lines of the invoice, no link to it
+		self.assertEqual([item.item_code for item in note.items], [article])
+		self.assertEqual(note.items[0].income_account, gap_credit_note._sold_on(frappe.get_cached_doc("Item", article), COMPANY))
+		self.assertFalse(note.return_against)
 		self.assertAlmostEqual(abs(flt(note.grand_total)), gross, places=2)
-		# and the VAT is the invoice's own, in its share
-		charged = sum(flt(tax.tax_amount) for tax in invoice.taxes)
-		taken = abs(sum(flt(tax.tax_amount) for tax in note.taxes))
-		self.assertAlmostEqual(taken, charged * gross / flt(invoice.grand_total), delta=0.02)
 
-	def test_the_preview_of_a_credit_note_from_the_invoice_says_its_accounts_and_its_link(self):
+	def test_the_preview_says_the_article_its_account_and_takes_back_the_vat_of_the_sale(self):
+		article = self._the_article()
 		invoice = frappe.get_doc("Sales Invoice", self.sales)
+		if not any(item.item_tax_template for item in invoice.items):
+			self.skipTest("the invoice has no item tax template")
 		gross = flt(invoice.outstanding_amount * 0.2, 2)
-		shown = gap_credit_note.preview(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, invoice=self.sales)
+		shown = gap_credit_note.preview(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, invoice=self.sales, item_code=article)
 		self.assertEqual(shown["blocker"], "")
-		self.assertEqual(shown["linked_to"], self.sales)
-		self.assertEqual({row["account"] for row in shown["accounts"]}, {item.income_account for item in invoice.items})
-		self.assertAlmostEqual(shown["net"] + shown["tax"], gross, places=2)
+		self.assertEqual((shown["item_code"], shown["source"]), (article, "article"))
+		self.assertEqual(shown["account"], shown["default_account"])
+		self.assertGreater(shown["tax"], 0)
+		# net + VAT + the charges that the article brings (the RPLP, when it has one) = the balance, to the cent
+		self.assertAlmostEqual(shown["net"] + shown["tax"] + shown["fees"], gross, places=2)
 
-	def test_the_credit_note_from_the_invoice_settles_its_balance(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+	def test_the_credit_note_of_the_card_settles_its_balance(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+		article = self._the_article()
 		invoice = frappe.get_doc("Sales Invoice", self.sales)
 		owed = flt(invoice.outstanding_amount, 2)
 		gross = flt(owed * 0.2, 2)
-		name = gap_credit_note.create(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, "test", invoice=self.sales)
+		name = gap_credit_note.create(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, "test", invoice=self.sales, item_code=article)
 		gap_credit_note.settle(COMPANY, invoice.customer, self.sales, name, gross)
 		self.assertAlmostEqual(self._owed("Sales Invoice", self.sales), flt(owed - gross, 2), places=2)
+
+	def test_an_article_that_does_not_exist_is_refused_and_said(self):
+		shown = gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0, item_code="NO-SUCH-ARTICLE-1234")
+		self.assertIn("does not exist", shown["blocker"])
+		self.assertIsNone(shown["net"])
+
+	def test_an_article_that_is_not_sold_is_refused_and_said(self):
+		other = frappe.db.get_value("Item", {"disabled": 0, "is_sales_item": 0}, "name")
+		if not other:
+			self.skipTest("every article of this site is sold")
+		self.assertIn("cannot be sold", gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0, item_code=other)["blocker"])
+
+	def test_a_person_is_asked_for_the_article_when_the_customer_and_the_company_have_no_habit(self):
+		with _only_for("tabSales Invoice Item` it", []), _only_for("tabSales Invoice Item` line", []):
+			shown = gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0, article_required=True)
+		self.assertIn("Choose the article", shown["blocker"])
+		# the import acts on the habit alone: it is not asked
+		with _only_for("tabSales Invoice Item` it", []):
+			self.assertEqual(gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0)["blocker"], "")
+
+	def test_the_article_most_used_on_the_credit_notes_of_the_company_is_proposed_to_a_customer_with_no_habit(self):
+		rows = [frappe._dict(item_code=self.article, times=7)]
+		article = self._the_article()
+		with _only_for("tabSales Invoice Item` it", []), _only_for("tabSales Invoice Item` line", rows):
+			shown = gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0, article_required=True)
+		self.assertEqual((shown["blocker"], shown["item_code"], shown["source"]), ("", article, "article"))
 
 	# -- what it is made of ---------------------------------------------------------------------------------------------
 
@@ -183,10 +218,10 @@ class TestGapCreditNote(GapImportCase):
 
 	def test_the_credit_note_closes_the_invoice_with_the_payment_and_is_kept_on_the_line(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
 		statement, bank_line, owed, part = self._partial(0.6)
-		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1, credit_item=self._the_article())
 		note = frappe.get_doc("Sales Invoice", answer["credit_note"])
 		self.assertEqual((note.docstatus, note.is_return, flt(note.grand_total, 2)), (1, 1, -flt(owed - part, 2)))
-		self.assertEqual(note.return_against, self.sales)
+		self.assertFalse(note.return_against)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 		self.assertEqual(flt(frappe.db.get_value("Payment Entry", answer["payment_entry"], "paid_amount"), 2), part)
 		line = follow_up.get_import_overview(statement.name)["lines"][0]
@@ -200,7 +235,7 @@ class TestGapCreditNote(GapImportCase):
 		owed = self._owed("Sales Invoice", self.sales)
 		gap = flt(int(owed * 0.4 * 20) / 20 + 0.01, 2)
 		statement = self._import(self._line("Sales Invoice", self.sales, flt(owed - gap, 2)))
-		answer = follow_up.decide_gap(statement.transactions[0].bank_transaction, "passed_gap", credit_note=1)
+		answer = follow_up.decide_gap(statement.transactions[0].bank_transaction, "passed_gap", credit_note=1, credit_item=self._the_article())
 		note = frappe.db.get_value("Sales Invoice", answer["credit_note"], ["grand_total", "rounded_total", "outstanding_amount"], as_dict=True)
 		self.assertEqual((flt(note.grand_total, 2), flt(note.rounded_total, 2), flt(note.outstanding_amount, 2)), (-gap, 0, 0))
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
@@ -212,36 +247,39 @@ class TestGapCreditNote(GapImportCase):
 		)
 		if not other:
 			self.skipTest("no other income account on this site")
-		answer = follow_up.decide_gap(bank_line, "passed_gap", account=other, credit_note=1)
+		answer = follow_up.decide_gap(bank_line, "passed_gap", account=other, credit_note=1, credit_item=self._the_article())
 		accounts = frappe.get_all("Sales Invoice Item", filters={"parent": answer["credit_note"]}, pluck="income_account")
 		self.assertEqual(set(accounts), {other})
 
 	def test_nothing_is_made_when_the_credit_note_cannot_be(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
 		_statement, bank_line = self._a_line_with_a_gap(0.03)
 		with self.assertRaises(frappe.ValidationError):
-			follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+			follow_up.decide_gap(bank_line, "passed_gap", credit_note=1, credit_item=self._the_article())
 		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Unreconciled")
 		before = frappe.db.count("Sales Invoice", {"is_return": 1})
 		_s2, partial_line, _o, _p = self._partial(0.5)
-		# the invoice cannot be returned (nothing can be brought to the balance): the refusal is said and nothing is written
-		with patch.object(gap_credit_note, "_from_invoice", side_effect=frappe.ValidationError("cannot be brought")):
-			self.assertIn("cannot be brought", follow_up.get_gap_decision(partial_line, credit_note=1)["blocker"])
+		# the credit note cannot be brought to the balance: the refusal is said and nothing is written
+		article = self._the_article()
+		with patch.object(gap_credit_note, "_measured", side_effect=frappe.ValidationError("cannot be brought")):
+			self.assertIn("cannot be brought", follow_up.get_gap_decision(partial_line, credit_note=1, credit_item=article)["blocker"])
 			with self.assertRaises(frappe.ValidationError):
-				follow_up.decide_gap(partial_line, "passed_gap", credit_note=1)
+				follow_up.decide_gap(partial_line, "passed_gap", credit_note=1, credit_item=article)
 		self.assertEqual(frappe.db.get_value("Bank Transaction", partial_line, "status"), "Unreconciled")
 		self.assertEqual(frappe.db.count("Sales Invoice", {"is_return": 1}), before)
 
 	def test_the_credit_note_needs_no_gap_account_of_the_company(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
-		# the accounts of the credit note are the invoice's own: the account of the gaps, which a loss on customers uses, is not
-		# in it, so a company that has none can still make one
+		# the account of the credit note is the one its article is sold on: the account of the gaps, which a loss on customers
+		# uses, is not in it, so a company that has none can still make one
 		frappe.db.set_value("Neoffice Company Settings", COMPANY, "payment_gap_account", None)
 		frappe.clear_document_cache("Company", COMPANY)
 		_statement, bank_line, owed, part = self._partial(0.6)
-		chosen = follow_up.get_gap_decision(bank_line, credit_note=1)
+		article = self._the_article()
+		chosen = follow_up.get_gap_decision(bank_line, credit_note=1, credit_item=article)
 		self.assertTrue(chosen["credit_note_chosen"])
 		self.assertTrue(chosen["can_pass"])
 		self.assertEqual(chosen["blocker"], "")
-		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+		self.assertEqual(chosen["credit_note"]["item_code"], article)
+		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1, credit_item=article)
 		self.assertEqual(flt(frappe.db.get_value("Sales Invoice", answer["credit_note"], "grand_total"), 2), -flt(owed - part, 2))
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 
@@ -291,6 +329,6 @@ class TestGapCreditNote(GapImportCase):
 		_statement, bank_line, _owed, _part = self._partial(0.6)
 		with as_role("Guest"):
 			with self.assertRaises(frappe.PermissionError):
-				follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+				follow_up.decide_gap(bank_line, "passed_gap", credit_note=1, credit_item=self.article)
 			with self.assertRaises(frappe.PermissionError):
 				gap_credit_note.create(COMPANY, self._customer(), frappe.utils.nowdate(), 10.0, None, "x")

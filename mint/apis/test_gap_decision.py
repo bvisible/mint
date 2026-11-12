@@ -241,14 +241,17 @@ class TestGapDecision(GapImportCase):
 		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Reconciled")
 		self.assertEqual(follow_up.get_import_overview(statement.name)["lines"][0]["decision"], "passed_gap")
 
-	def test_the_credit_note_of_the_balance_is_linked_to_the_invoice_and_settles_it(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+	def test_the_credit_note_of_the_balance_is_one_line_on_the_article_and_settles_the_invoice(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
 		_statement, bank_line, _owed = self._a_short_payment()
-		preview = follow_up.get_gap_decision(bank_line, credit_note=1)
-		self.assertEqual(preview["credit_note"]["linked_to"], self.sales)
+		if not self.article:
+			self.skipTest("needs an article that is sold")
+		preview = follow_up.get_gap_decision(bank_line, credit_note=1, credit_item=self.article)
+		self.assertEqual(preview["credit_note"]["item_code"], self.article)
 		self.assertTrue(preview["can_pass"])
-		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1, credit_item=self.article)
 		note = frappe.get_doc("Sales Invoice", answer["credit_note"])
-		self.assertEqual((note.is_return, note.return_against, note.docstatus), (1, self.sales, 1))
+		self.assertEqual((note.is_return, note.docstatus, [item.item_code for item in note.items]), (1, 1, [self.article]))
+		self.assertFalse(note.return_against)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 
 	def test_a_short_payment_of_a_purchase_cannot_be_taken_off_the_turnover(self):
@@ -304,14 +307,16 @@ class TestGapDecision(GapImportCase):
 		self.assertNotIn(GAP_ACCOUNT, [row.account for row in entry.deductions])
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 
-	def test_a_rebate_to_confirm_can_be_made_a_credit_note_linked_to_the_invoice(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+	def test_a_rebate_to_confirm_can_be_made_a_credit_note_on_an_article(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
 		_statement, bank_line, owed = self._a_rebate_to_confirm()
-		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+		if not self.article:
+			self.skipTest("needs an article that is sold")
+		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1, credit_item=self.article)
 		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
 		note = frappe.get_doc("Sales Invoice", answer["credit_note"])
 		# the payment is booked as it came in, the credit note settles what is left
 		self.assertEqual(len(entry.deductions), 0)
-		self.assertEqual((note.is_return, note.return_against), (1, self.sales))
+		self.assertEqual((note.is_return, [item.item_code for item in note.items]), (1, [self.article]))
 		self.assertAlmostEqual(abs(flt(note.grand_total)), flt(owed - entry.paid_amount, 2), places=2)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 

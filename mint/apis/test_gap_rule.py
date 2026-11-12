@@ -138,14 +138,14 @@ class TestGapRule(GapImportCase):
 	def test_a_persons_decision_at_the_usual_share_is_one_more_confirmation(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_rule
 		_statement, line, _owed, part = self._partial()
 		rule = self._rule(part)
-		follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1)
+		follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1, credit_item=self.article)
 		rule.reload()
 		self.assertEqual((rule.confirmed_times, str(rule.last_confirmed_on)), (1, nowdate()))
 
 	def test_a_decision_at_another_share_confirms_nothing(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_rule
 		_statement, line, _owed, part = self._partial(0.6)
 		rule = self._rule(part, share=80.0)
-		follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1)
+		follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1, credit_item=self.article)
 		rule.reload()
 		self.assertEqual(rule.confirmed_times, 0)
 
@@ -214,7 +214,7 @@ class TestGapRule(GapImportCase):
 		decision = follow_up.get_gap_decision(line.bank_transaction)
 		self.assertEqual(decision["draft"], {"name": draft, "total": flt(owed - part, 2)})
 		with _only_for("tabSales Invoice Item` it", []):
-			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1)
+			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1, credit_item=self.article)
 		self.assertEqual(answer["credit_note"], draft)
 		self.assertEqual(frappe.db.get_value("Sales Invoice", draft, "docstatus"), 1)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
@@ -226,7 +226,7 @@ class TestGapRule(GapImportCase):
 			_statement, line, _o, _p = self._partial()
 			stale = line.credit_note
 			frappe.db.set_value("Sales Invoice", stale, "grand_total", -1.0)
-			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1)
+			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1, credit_item=self.article)
 		# Frappe hands the name of a deleted numbered document to the next one: what proves the stale draft is gone is that
 		# the credit note which settled the invoice is submitted and carries the right amount, not the stale one
 		made = frappe.db.get_value("Sales Invoice", answer["credit_note"], ["docstatus", "grand_total"], as_dict=True)
@@ -242,9 +242,9 @@ class TestGapRule(GapImportCase):
 		self._rule(part, mode="suggest", account=income)
 		with _only_for("tabSales Invoice Item` it", []):
 			_statement, line, _o, _p = self._partial()
-			decision = follow_up.get_gap_decision(line.bank_transaction, credit_note=1)
+			decision = follow_up.get_gap_decision(line.bank_transaction, credit_note=1, credit_item=self.article)
 			self.assertEqual((decision["blocker"], decision["account"], decision["can_pass"]), ("", income, True))
-			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1)
+			answer = follow_up.decide_gap(line.bank_transaction, "passed_gap", credit_note=1, credit_item=self.article)
 		self.assertEqual(frappe.db.get_value("Sales Invoice Item", {"parent": answer["credit_note"]}, "income_account"), income)
 		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
 
