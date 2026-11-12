@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-12 10:01+0000\n"
-"PO-Revision-Date: 2026-11-12 10:01+0000\n"
+"POT-Creation-Date: 2026-11-12 10:15+0000\n"
+"PO-Revision-Date: 2026-11-12 10:15+0000\n"
 "Last-Translator: support@thecommit.company\n"
 "Language-Team: support@thecommit.company\n"
 "MIME-Version: 1.0\n"
@@ -49,31 +49,31 @@ msgstr ""
 msgid "A credit note goes to an income account, not {0}."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:666
+#: mint/apis/statement_follow_up.py:669
 msgid "A credit note of the balance is for the short payment of a sales invoice."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:334
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:348
 #, python-brace-format
 msgid "A credit note of {0} is made, linked to invoice {1}, on its sales accounts and with its VAT. It settles the invoice."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:256
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:268
 #, python-brace-format
 msgid "A credit note of {0} was prepared as a draft: {1}."
 msgstr ""
 
-#: mint/apis/payment_gap.py:423
+#: mint/apis/payment_gap.py:428
 #, python-brace-format
 msgid "A difference goes to an income or expense account, not {0}."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:163
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:165
 #, python-brace-format
 msgid "A difference of {0} on invoice {1}"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:772
+#: mint/apis/statement_follow_up.py:778
 msgid "A difference waits for your decision in the bank reconciliation."
 msgstr ""
 
@@ -85,7 +85,7 @@ msgstr ""
 msgid "A payment in a foreign currency is recorded in the payment window."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:730 mint/apis/statement_follow_up.py:735
+#: mint/apis/statement_follow_up.py:736 mint/apis/statement_follow_up.py:741
 msgid "A rule is for the short payments of a customer."
 msgstr ""
 
@@ -129,7 +129,7 @@ msgstr ""
 msgid "Account company does not match with the rule company."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:394
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:408
 msgid "Account for the difference"
 msgstr ""
 
@@ -141,12 +141,12 @@ msgstr ""
 msgid "Account is required"
 msgstr ""
 
-#: mint/apis/gap_credit_note.py:88 mint/apis/payment_gap.py:421
+#: mint/apis/gap_credit_note.py:88 mint/apis/payment_gap.py:426
 #, python-brace-format
 msgid "Account {0} cannot be posted to."
 msgstr ""
 
-#: mint/apis/gap_credit_note.py:86 mint/apis/payment_gap.py:419
+#: mint/apis/gap_credit_note.py:86 mint/apis/payment_gap.py:424
 #, python-brace-format
 msgid "Account {0} does not belong to company {1}"
 msgstr ""
@@ -327,7 +327,7 @@ msgstr ""
 msgid "An invoice appears twice in the split."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:164
 #, python-brace-format
 msgid "An overpayment of {0} on invoice {1}"
 msgstr ""
@@ -357,12 +357,12 @@ msgstr ""
 msgid "Any debit transaction with the keyword 'Bank Fee'."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:454
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:468
 #, python-brace-format, python-format
 msgid "Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:268
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
 msgid "Apply the proposal"
 msgstr ""
 
@@ -419,7 +419,7 @@ msgstr ""
 msgid "Back to bank files"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:406
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:420
 msgid "Back to the company's account"
 msgstr ""
 
@@ -439,7 +439,7 @@ msgstr ""
 msgid "Balance"
 msgstr ""
 
-#: mint/apis/payment_gap.py:372
+#: mint/apis/payment_gap.py:377
 #, python-brace-format
 msgid "Balance of {0} taken off the sales"
 msgstr ""
@@ -641,38 +641,43 @@ msgstr ""
 msgid "Below is a list of all entries posted against the bank account {0} which have not been cleared till {1}."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:314
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:328
 msgid "Book it as a difference"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:291
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:303
 msgid "Book it as a loss on the customer"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:172
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:303
+msgid "Book it as a rebate"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:176
 msgid "Book the dunning fee and reconcile"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:763
+#: mint/apis/statement_follow_up.py:769
 #, python-brace-format
 msgid "Booked, {0} of them with a small difference ({1} in all)."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:761
+#: mint/apis/statement_follow_up.py:767
 msgid "Booked."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:185
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:189
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:197
 #, python-brace-format
 msgid "Books the payment received. The invoice stays due for {0}."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:190
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:202
 #, python-brace-format
 msgid "Books the whole payment: the invoice is settled and {0} stays available for the customer, to match with a next invoice."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:191
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:203
 #, python-brace-format
 msgid "Books the whole payment: the invoice is settled and {0} stays open with the supplier, to match with a next invoice."
 msgstr ""
@@ -949,7 +954,8 @@ msgstr ""
 msgid "Confirm and Submit"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:173
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:172
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:177
 msgid "Confirm the rebate and reconcile"
 msgstr ""
 
@@ -1070,7 +1076,8 @@ msgstr ""
 msgid "Create a new rule to automatically classify transactions."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:172
 msgid "Create the credit note and reconcile"
 msgstr ""
 
@@ -1088,7 +1095,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:401
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:611
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:728
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:350
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:364
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:49
 msgid "Credit"
 msgstr ""
@@ -1175,7 +1182,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:400
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:610
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:713
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:348
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:362
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:43
 msgid "Debit"
 msgstr ""
@@ -1601,7 +1608,7 @@ msgstr ""
 msgid "File type must be XML"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:384
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:398
 msgid "Fill in the settings"
 msgstr ""
 
@@ -1668,7 +1675,7 @@ msgstr ""
 msgid "Get Unpaid Invoices"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:338
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:352
 msgid "Goods are coming back and must go into stock?"
 msgstr ""
 
@@ -1858,7 +1865,7 @@ msgstr ""
 msgid "Index count starts from 0"
 msgstr ""
 
-#: mint/apis/payment_gap.py:538
+#: mint/apis/payment_gap.py:543
 msgid "Interest and/or dunning fee"
 msgstr ""
 
@@ -1954,7 +1961,7 @@ msgstr ""
 msgid "Invoice {0} of {1} still owes {2}. You paid {3}: a partial payment, what came in is booked and {4} stays open."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:369
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:383
 #, python-brace-format
 msgid "Invoice {0}: amount due"
 msgstr ""
@@ -1998,7 +2005,7 @@ msgstr ""
 msgid "Journal Template Accounts"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:305
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:319
 msgid "Keep it for a next invoice"
 msgstr ""
 
@@ -2031,7 +2038,7 @@ msgstr ""
 msgid "Last confirmed on"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:276
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:288
 msgid "Leave the balance to pay"
 msgstr ""
 
@@ -2044,7 +2051,7 @@ msgstr ""
 msgid "Left open by {0} on {1}"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:466
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:480
 #, python-brace-format
 msgid "Left open by {0} on {1}."
 msgstr ""
@@ -2071,7 +2078,7 @@ msgstr ""
 msgid "Lines shown"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:356
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:370
 msgid "Linked to"
 msgstr ""
 
@@ -2090,24 +2097,25 @@ msgstr ""
 msgid "Made by itself by the rule of the customer, credit note {0}"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:285
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:297
 msgid "Make a credit note"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:448
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:462
 msgid "Make it by itself"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:353
 msgid "Make the credit note yourself first, then choose Leave the balance to pay: you match it afterwards."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:184
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:192
 #, python-brace-format
 msgid "Makes a credit note of {0}, linked to the invoice, and settles the invoice. The payment received is booked as it is."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:286
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:298
 #, python-brace-format
 msgid "Makes a credit note of {0}, linked to the invoice, on its sales accounts and with its VAT, and settles the invoice. No stock moves: when goods come back, make the credit note yourself first and choose Leave the balance to pay."
 msgstr ""
@@ -2280,7 +2288,7 @@ msgstr ""
 msgid "Named by the import."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:361
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:375
 msgid "Net"
 msgstr ""
 
@@ -2322,7 +2330,7 @@ msgstr ""
 msgid "No invoice recognised"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:780
+#: mint/apis/statement_follow_up.py:786
 msgid "No invoice recognised: they wait like any bank line not reconciled."
 msgstr ""
 
@@ -2330,7 +2338,7 @@ msgstr ""
 msgid "No invoice recognised: to match in the bank reconciliation"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:646
+#: mint/apis/statement_follow_up.py:647
 msgid "No invoice was recognised for this line."
 msgstr ""
 
@@ -2358,7 +2366,7 @@ msgstr ""
 msgid "No results found."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:455
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:469
 #, python-brace-format
 msgid "No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person."
 msgstr ""
@@ -2445,7 +2453,7 @@ msgstr ""
 msgid "Nothing waits in this import."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:788
+#: mint/apis/statement_follow_up.py:794
 msgid "Nothing was created for them."
 msgstr ""
 
@@ -2504,11 +2512,11 @@ msgstr ""
 msgid "Only submitted vouchers can be cleared."
 msgstr ""
 
-#: mint/apis/payment_gap.py:354
+#: mint/apis/payment_gap.py:359
 msgid "Only the balance of a sale is taken off the turnover."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:276
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:288
 #, python-brace-format
 msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, or when a credit note will be made afterwards (goods brought back into stock, for example) and matched later."
 msgstr ""
@@ -2534,7 +2542,7 @@ msgstr ""
 msgid "Open invoices"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:258
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:270
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:197
 msgid "Open the draft"
 msgstr ""
@@ -2554,11 +2562,11 @@ msgstr ""
 msgid "Opening Balance"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:484
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:498
 msgid "Opens the full payment form, pointed at the customer (or supplier) of this invoice. Use it when none of the choices fits."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:386
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:400
 msgid "Opens the settings of the company in a new tab: this screen stays open. The accounts are in the section Payment Gaps."
 msgstr ""
 
@@ -2616,7 +2624,7 @@ msgstr ""
 msgid "Paid to (Party Type)"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:160
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
 #, python-brace-format
 msgid "Paid {0} out of {1}"
 msgstr ""
@@ -2764,7 +2772,7 @@ msgstr ""
 msgid "Payment Recorded"
 msgstr ""
 
-#: mint/apis/payment_gap.py:441 mint/apis/payment_gap.py:457
+#: mint/apis/payment_gap.py:446 mint/apis/payment_gap.py:462
 #, python-brace-format
 msgid "Payment gap of {0}"
 msgstr ""
@@ -2897,7 +2905,7 @@ msgstr ""
 msgid "Posting date matches the transaction date"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:448
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:462
 msgid "Prepare it as a draft"
 msgstr ""
 
@@ -2967,11 +2975,11 @@ msgstr ""
 msgid "Processing file..."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:448
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:462
 msgid "Propose it to me"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:221
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:233
 msgid "Proposed"
 msgstr ""
 
@@ -3021,7 +3029,7 @@ msgstr ""
 msgid "Reconcile"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:483
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:497
 msgid "Reconcile manually"
 msgstr ""
 
@@ -3123,7 +3131,8 @@ msgstr ""
 msgid "Record another way"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:172
 msgid "Record the partial payment"
 msgstr ""
 
@@ -3219,7 +3228,7 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:435
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:449
 msgid "Remember this choice for this customer"
 msgstr ""
 
@@ -3388,11 +3397,11 @@ msgstr ""
 msgid "Search transactions"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:793
+#: mint/apis/statement_follow_up.py:799
 msgid "See all the imports"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:792
+#: mint/apis/statement_follow_up.py:798
 msgid "See the error log."
 msgstr ""
 
@@ -3490,24 +3499,24 @@ msgstr ""
 msgid "Settings updated"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:174
 msgid "Settle the invoice and book the difference"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
 msgid "Settle the invoice and book the loss"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:174
 msgid "Settle the invoice and keep the surplus"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:173
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:177
 msgid "Settle the invoice and reconcile"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:798
+#: mint/apis/statement_follow_up.py:804
 #, python-brace-format
 msgid "Settle the {0} that wait"
 msgstr ""
@@ -3516,18 +3525,20 @@ msgstr ""
 msgid "Settled by this payment"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:194
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:196
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:206
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and the difference of {0} goes to the account chosen above."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:184
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:188
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:200
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:186
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:194
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT."
 msgstr ""
@@ -3548,7 +3559,7 @@ msgstr ""
 msgid "Show the lines"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:414
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:428
 msgid "Show what will be booked"
 msgstr ""
 
@@ -3721,11 +3732,12 @@ msgstr ""
 msgid "System Manager"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:279
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:291
 msgid "Take it off the turnover"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:170
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:172
 msgid "Take it off the turnover and reconcile"
 msgstr ""
 
@@ -3739,7 +3751,7 @@ msgstr ""
 msgid "The Google Project ID is used to authenticate with the Google Cloud Platform."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:425
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:439
 msgid "The VAT is cut from the account, as in the payment entry."
 msgstr ""
 
@@ -3748,7 +3760,7 @@ msgstr ""
 msgid "The account of the credit note or of the gap. Empty: the one of the customer's previous credit notes, else the company's gap account."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:396
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:410
 msgid "The account where the difference is booked: for a sale, a loss on customers or a discount account; for a purchase, an expense account. Your fiduciary knows which one to use. The company sets it once in its settings."
 msgstr ""
 
@@ -3756,7 +3768,7 @@ msgstr ""
 msgid "The amount format detected in the statement file. This is used to parse the deposit and withdrawal values from each row."
 msgstr ""
 
-#: mint/apis/payment_gap.py:271
+#: mint/apis/payment_gap.py:276
 msgid "The balance of a sale is taken off the turnover only for a short payment."
 msgstr ""
 
@@ -3776,7 +3788,7 @@ msgstr ""
 msgid "The bank line was cancelled"
 msgstr ""
 
-#: mint/apis/payment_gap.py:215 mint/apis/payment_gap.py:346
+#: mint/apis/payment_gap.py:215 mint/apis/payment_gap.py:351
 msgid "The company has no early payment discount account."
 msgstr ""
 
@@ -3792,15 +3804,15 @@ msgstr ""
 msgid "The company has not named an amount up to which a rebate is passed by itself: a person confirms it."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:250
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:262
 msgid "The company has not named an amount up to which a rebate is passed by itself: you confirm it."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:378
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:392
 msgid "The company has not said yet where to book the differences on purchases."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:378
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:392
 msgid "The company has not said yet where to book the differences on sales."
 msgstr ""
 
@@ -3808,7 +3820,7 @@ msgstr ""
 msgid "The company has not switched on passing payment gaps by itself."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:344
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:358
 msgid "The credit note"
 msgstr ""
 
@@ -3847,12 +3859,12 @@ msgstr ""
 msgid "The document has been created and reconciled. Uploading attachments..."
 msgstr ""
 
-#: mint/apis/payment_gap.py:522
+#: mint/apis/payment_gap.py:527
 #, python-brace-format
 msgid "The dunning {0} has no Income Account to book its fee on: set it on the Dunning Type {1}."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:193
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:205
 msgid "The fee of the dunning is booked on its own account and settles it."
 msgstr ""
 
@@ -3892,7 +3904,7 @@ msgstr ""
 msgid "The invoice balance minus the payment: positive when less came in than is owed."
 msgstr ""
 
-#: mint/apis/payment_gap.py:358
+#: mint/apis/payment_gap.py:363
 msgid "The invoice has no sales account to take the balance off."
 msgstr ""
 
@@ -3905,7 +3917,7 @@ msgstr ""
 msgid "The invoice is not in the currency of the company."
 msgstr ""
 
-#: mint/apis/payment_gap.py:356 mint/apis/payment_gap.py:403
+#: mint/apis/payment_gap.py:361 mint/apis/payment_gap.py:408
 msgid "The invoice is not in the currency of the company: use Reconcile manually."
 msgstr ""
 
@@ -3921,22 +3933,27 @@ msgstr ""
 msgid "The invoice is not recognised without doubt: a person validates the partial payment."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:293
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:307
 #, python-brace-format
 msgid "The invoice is settled and {0} is booked as a loss on the account you choose below (the one the company set, by default). Choose this when the customer will not pay the rest."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:315
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:305
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked as a rebate on the account you choose below (the one the company set, by default). Choose this to accept the rebate as it is."
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:329
 #, python-brace-format
 msgid "The invoice is settled and {0} is booked on the account you choose below, like the fee of a dunning. Nothing stays available for later."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:294
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:308
 #, python-brace-format
 msgid "The invoice is settled and {0} is booked on the account you choose below: a loss on customers when the customer will not pay the rest, or a discount when you grant one. Unlike a credit note, no document is made for the customer."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:292
 #, python-brace-format
 msgid "The invoice is settled and {0} is taken off the turnover, on the sales account of the invoice and with its VAT: one entry, no document for the customer. Choose this for an arrangement with the customer, a commercial gesture or a rebate."
 msgstr ""
@@ -3973,22 +3990,22 @@ msgstr ""
 msgid "The party has changed"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:307
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:321
 #, python-brace-format
 msgid "The payment is booked in full. The invoice is settled and {0} stays available for the customer on this payment: you match it to another invoice later, in a reconciliation."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:308
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:322
 #, python-brace-format
 msgid "The payment is booked in full. The invoice is settled and {0} stays open with the supplier on this payment: you match it to another invoice later, in a reconciliation."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:322
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:336
 #, python-brace-format
 msgid "The payment is booked in full: {0} settle the invoice and {1} stay available for {2}, to match with a next invoice."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:323
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:337
 #, python-brace-format
 msgid "The payment is booked in full: {0} settle the invoice and {1} stay open with {2}, to match with a next invoice."
 msgstr ""
@@ -4117,12 +4134,12 @@ msgstr ""
 msgid "This Year"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:639 mint/apis/statement_follow_up.py:727
+#: mint/apis/statement_follow_up.py:640 mint/apis/statement_follow_up.py:733
 msgid "This bank line did not come from an import."
 msgstr ""
 
 #: mint/apis/line_invoices.py:323 mint/apis/line_invoices.py:342
-#: mint/apis/statement_follow_up.py:636
+#: mint/apis/statement_follow_up.py:637
 msgid "This bank line is already dealt with."
 msgstr ""
 
@@ -4130,7 +4147,7 @@ msgstr ""
 msgid "This can contain \"CR\"/\"DR\" values or positive/negative values. You could also have a separate column for CR/DR."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:266
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:278
 #, python-brace-format, python-format
 msgid "This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note."
 msgstr ""
@@ -4187,12 +4204,12 @@ msgstr ""
 msgid "This party also has balances on other accounts, which are reconciled separately:"
 msgstr ""
 
-#: mint/apis/payment_gap.py:267
+#: mint/apis/payment_gap.py:272
 #, python-brace-format
 msgid "This payment is not to be passed by itself: {0}"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:249
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:261
 #, python-brace-format
 msgid "This rebate is above {0}: the import does not pass it by itself, you confirm it."
 msgstr ""
@@ -4246,12 +4263,12 @@ msgstr ""
 msgid "To bring a new statement in, use the button on the right: a CAMT file (XML) from your bank, or a PDF."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:233
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:245
 msgid "To confirm"
 msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:290
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:233
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:245
 #: frontend/src/components/features/StatementImports/utils.ts:19
 #: frontend/src/components/features/StatementImports/utils.ts:77
 msgid "To decide"
@@ -4292,7 +4309,7 @@ msgstr ""
 msgid "Total Debit"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:364
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:378
 msgid "Total of the credit note"
 msgstr ""
 
@@ -4456,13 +4473,13 @@ msgstr ""
 msgid "Unique Reference"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:302 mint/apis/statement_follow_up.py:631
+#: mint/apis/statement_follow_up.py:302 mint/apis/statement_follow_up.py:632
 #, python-brace-format
 msgid "Unknown decision {0}."
 msgstr ""
 
 #: mint/apis/gap_rule.py:84 mint/apis/gap_rule.py:227
-#: mint/apis/statement_follow_up.py:721
+#: mint/apis/statement_follow_up.py:727
 msgid "Unknown level or handling of the rule."
 msgstr ""
 
@@ -4499,7 +4516,7 @@ msgstr ""
 msgid "Untick"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:379
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:393
 msgid "Until it does, each difference is decided one by one: choose an account for this line below."
 msgstr ""
 
@@ -4559,7 +4576,7 @@ msgstr ""
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1139
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1428
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:363
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:377
 msgid "VAT"
 msgstr ""
 
@@ -4568,7 +4585,7 @@ msgstr ""
 msgid "Validate and reconcile"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:166
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
 msgid "Validate the draft and reconcile"
 msgstr ""
 
@@ -4667,12 +4684,12 @@ msgstr ""
 msgid "What becomes of the balance when this customer pays less than the invoice, beyond a small gap."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:274
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:286
 #, python-brace-format
 msgid "What becomes of the remaining {0}?"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:302
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:316
 #, python-brace-format
 msgid "What becomes of the surplus of {0}?"
 msgstr ""
@@ -4687,7 +4704,7 @@ msgstr ""
 msgid "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:344
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:358
 msgid "What will be booked"
 msgstr ""
 
@@ -4722,7 +4739,7 @@ msgstr ""
 msgid "Work on the whole page"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:291
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:303
 msgid "Write off the balance as a loss or a discount"
 msgstr ""
 
@@ -4778,7 +4795,7 @@ msgstr ""
 msgid "You have not performed any reconciliations in this session yet."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:475
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:489
 msgid "Your name and the date are noted on the line of the import."
 msgstr ""
 
@@ -4921,11 +4938,11 @@ msgstr ""
 msgid "suggest: the card proposes it. draft: the credit note is prepared as a draft. automatic: it is made by itself, only after repeated confirmations."
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:145
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:147
 msgid "the customer"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:145
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:147
 msgid "the supplier"
 msgstr ""
 
@@ -4944,7 +4961,7 @@ msgid "us"
 msgstr ""
 
 #: mint/apis/gap_rule.py:145 mint/apis/line_invoices.py:267
-#: mint/apis/statement_follow_up.py:686
+#: mint/apis/statement_follow_up.py:689
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:315
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:359
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:473
@@ -4957,12 +4974,12 @@ msgstr ""
 msgid "{0} / {1} dealt with"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:787
+#: mint/apis/statement_follow_up.py:793
 #, python-brace-format
 msgid "{0} already in the bank"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:333
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:347
 #, python-brace-format
 msgid "{0} are taken off the turnover, on the sales account of the invoice and with its VAT: one entry, and the invoice is settled. For an arrangement with the customer, a commercial gesture or a rebate."
 msgstr ""
@@ -5027,7 +5044,7 @@ msgstr ""
 msgid "{0} is not in the currency of the payment."
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:759
+#: mint/apis/statement_follow_up.py:765
 #, python-brace-format
 msgid "{0} lines read in the file."
 msgstr ""
@@ -5037,7 +5054,7 @@ msgstr ""
 msgid "{0} new, {1} already imported"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:792
+#: mint/apis/statement_follow_up.py:798
 #, python-brace-format
 msgid "{0} not handled"
 msgstr ""
@@ -5047,12 +5064,12 @@ msgstr ""
 msgid "{0} open invoice(s)"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:164
 #, python-brace-format
 msgid "{0} paid too much on invoice {1}"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:766
+#: mint/apis/statement_follow_up.py:772
 #, python-brace-format
 msgid "{0} passed by themselves"
 msgstr ""
@@ -5067,13 +5084,13 @@ msgstr ""
 msgid "{0} to apply"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:771
+#: mint/apis/statement_follow_up.py:777
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:410
 #, python-brace-format
 msgid "{0} to decide"
 msgstr ""
 
-#: mint/apis/statement_follow_up.py:779
+#: mint/apis/statement_follow_up.py:785
 #, python-brace-format
 msgid "{0} to match"
 msgstr ""

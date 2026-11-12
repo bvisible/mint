@@ -5387,3 +5387,12 @@ msgstr "La facture est soldée et {0} est déduit du chiffre d'affaires, sur le 
 #, python-brace-format
 msgid "{0} are taken off the turnover, on the sales account of the invoice and with its VAT: one entry, and the invoice is settled. For an arrangement with the customer, a commercial gesture or a rebate."
 msgstr "{0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, et la facture est soldée. Pour un arrangement avec le client, un geste commercial ou un rabais."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:303
+msgid "Book it as a rebate"
+msgstr "Le passer en rabais"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:305
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked as a rebate on the account you choose below (the one the company set, by default). Choose this to accept the rebate as it is."
+msgstr "La facture est soldée et {0} est comptabilisé comme rabais sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option pour accepter le rabais tel quel."
