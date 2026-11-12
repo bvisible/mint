@@ -125,10 +125,35 @@ def _document(company: str, customer: str, on, rate: float, d: frappe._dict, acc
 			"item_tax_template": d.get("item_tax_template"),
 		},
 	)
+	if d.get("no_surcharge"):
+		_without_surcharges(doc)
 	if d.tax_template:
 		doc.set_taxes()
 	doc.calculate_taxes_and_totals()
 	return doc
+
+
+def _invoice_charged_a_surcharge(invoice: str | None) -> bool:
+	"""Did the sale the balance is of carry a fixed charge that the theme adds to the net total of a sales document (the RPLP)?
+	A site without the theme has no such rows, and a balance with no invoice in hand has none to take back."""
+	if not invoice or not frappe.db.has_column("Sales Taxes and Charges", "neo_surcharge_type"):
+		return False
+	return bool(
+		frappe.db.exists(
+			"Sales Taxes and Charges",
+			{"parent": invoice, "parenttype": "Sales Invoice", "neo_surcharge_type": ["is", "set"]},
+		)
+	)
+
+
+def _without_surcharges(doc) -> None:
+	"""Switch off, on this document, the fixed charges the theme adds to the net total of a sales document. A credit note of the
+	balance gives back what the sale charged and not more: an article that carries the RPLP would otherwise add one to a note
+	that settles an invoice which had none. The switches are the theme's own (one per charge); a site without them is untouched."""
+	for slot in (1, 2, 3):
+		field = f"neo_surcharge_{slot}_apply"
+		if doc.meta.has_field(field):
+			doc.set(field, 0)
 
 
 def _default_uom() -> str:
@@ -261,6 +286,8 @@ def _plan(company: str, customer: str, account: str | None, invoice: str | None,
 		blocker = article_problem(item_code)
 		if not blocker:
 			d = with_article(company, d, item_code, invoice)
+	# the fixed charges of the theme come back only when the sale made them
+	d["no_surcharge"] = not _invoice_charged_a_surcharge(invoice)
 	chosen = account or d.account
 	return d, chosen, blocker or problem(company, chosen)
 

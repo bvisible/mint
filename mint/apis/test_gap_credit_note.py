@@ -110,6 +110,79 @@ class TestGapCreditNote(GapImportCase):
 		gap_credit_note.settle(COMPANY, invoice.customer, self.sales, name, gross)
 		self.assertAlmostEqual(self._owed("Sales Invoice", self.sales), flt(owed - gross, 2), places=2)
 
+	# -- the fixed charge of an article (the RPLP) is the sale's to charge, not the credit note's ------------------------------
+
+	def _article_with_a_surcharge(self):
+		"""An article of the site on which the theme adds its fixed charge to a credit note, found by measuring (nothing is
+		assumed about the site's articles); the test is skipped on a site that has none."""
+		customer = self._customer()
+		base = gap_credit_note.defaults(COMPANY, customer)
+		candidates = [self.article] if self.article else []
+		candidates += frappe.get_all("Item", filters={"disabled": 0, "is_sales_item": 1}, pluck="name", order_by="modified desc", limit_page_length=80)
+		for code in dict.fromkeys(candidates):
+			d = gap_credit_note.with_article(COMPANY, base, code, self.sales)
+			try:
+				probe = gap_credit_note._document(COMPANY, customer, frappe.utils.nowdate(), 100.0, d, d.account)
+				gap_credit_note._as_saving_will(probe)
+			except frappe.ValidationError:
+				frappe.clear_last_message()
+				continue
+			if any(row.get("neo_surcharge_type") for row in probe.taxes):
+				return code
+		self.skipTest("no article of this site carries a surcharge")
+
+	def _invoice_without_a_charge(self):
+		"""A sale of the site that made no fixed charge (the test invoice may have made one: the site decides)."""
+		rows = frappe.db.sql(
+			"""
+			select si.name, si.customer from `tabSales Invoice` si
+			where si.company = %s and si.docstatus = 1 and si.is_return = 0 and ifnull(si.taxes_and_charges, '') != ''
+				and not exists (
+					select 1 from `tabSales Taxes and Charges` t
+					where t.parent = si.name and t.parenttype = 'Sales Invoice' and ifnull(t.neo_surcharge_type, '') != ''
+				)
+			order by si.modified desc limit 1
+			""",
+			COMPANY,
+		)
+		if not rows:
+			self.skipTest("every sale of this site made the charge")
+		return rows[0]
+
+	def test_the_credit_note_does_not_add_a_charge_the_sale_did_not_make(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_without_the_right_cannot_make_a_credit_note
+		article = self._article_with_a_surcharge()
+		sale, customer = self._invoice_without_a_charge()
+		# the premise: left to itself, the theme WOULD add the charge to a credit note on this article
+		d = gap_credit_note.with_article(COMPANY, gap_credit_note.defaults(COMPANY, customer), article, sale)
+		natural = gap_credit_note._document(COMPANY, customer, frappe.utils.nowdate(), 100.0, d, d.account)
+		gap_credit_note._as_saving_will(natural)
+		if not any(row.get("neo_surcharge_type") for row in natural.taxes):
+			self.skipTest("the theme adds no charge to a note on this sale")
+		gross = 100.0
+		shown = gap_credit_note.preview(COMPANY, customer, frappe.utils.nowdate(), gross, None, invoice=sale, item_code=article)
+		self.assertEqual(shown["blocker"], "")
+		self.assertEqual((shown["fees"], shown["fees_label"]), (0, None))
+		self.assertAlmostEqual(shown["net"] + shown["tax"], gross, places=2)
+		# what is saved is what is shown: no charge row on the credit note, and its total is the balance
+		name = gap_credit_note.create(COMPANY, customer, frappe.utils.nowdate(), gross, None, "test", invoice=sale, item_code=article)
+		note = frappe.get_doc("Sales Invoice", name)
+		self.assertFalse([row.description for row in note.taxes if row.get("neo_surcharge_type")])
+		self.assertAlmostEqual(abs(flt(note.grand_total)), gross, places=2)
+
+	def test_the_credit_note_of_a_sale_that_made_the_charge_takes_it_back(self):
+		article = self._article_with_a_surcharge()
+		invoice = frappe.get_doc("Sales Invoice", self.sales)
+		gross = flt(invoice.outstanding_amount * 0.2, 2)
+		with patch.object(gap_credit_note, "_invoice_charged_a_surcharge", return_value=True):
+			shown = gap_credit_note.preview(COMPANY, invoice.customer, frappe.utils.nowdate(), gross, None, invoice=self.sales, item_code=article)
+		self.assertGreater(shown["fees"], 0)
+		self.assertAlmostEqual(shown["net"] + shown["tax"] + shown["fees"], gross, places=2)
+
+	def test_the_import_that_has_no_invoice_in_hand_adds_no_charge_either(self):
+		article = self._article_with_a_surcharge()
+		shown = gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0, None, invoice=None, item_code=article)
+		self.assertEqual(shown["fees"], 0)
+
 	def test_an_article_that_does_not_exist_is_refused_and_said(self):
 		shown = gap_credit_note.preview(COMPANY, self._customer(), frappe.utils.nowdate(), 100.0, item_code="NO-SUCH-ARTICLE-1234")
 		self.assertIn("does not exist", shown["blocker"])
