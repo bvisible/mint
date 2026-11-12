@@ -209,6 +209,54 @@ class TestGapDecision(GapImportCase):
 		self.assertEqual(self._owed("Sales Invoice", self.sales), flt(owed - part, 2))
 		self.assertEqual(self._states(statement), ["handled"])
 
+	def _a_short_payment(self, share=0.8, invoice_type="Sales Invoice"):
+		invoice = self.sales if invoice_type == "Sales Invoice" else self.purchase
+		owed = self._owed(invoice_type, invoice)
+		statement = self._import(self._line(invoice_type, invoice, flt(owed * share, 2)))
+		return statement, statement.transactions[0].bank_transaction, owed
+
+	def test_a_short_payment_of_a_sale_is_offered_to_be_taken_off_the_turnover(self):
+		_statement, bank_line, _owed = self._a_short_payment()
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "partial")
+		self.assertTrue(decision["can_deduct"])
+		chosen = follow_up.get_gap_decision(bank_line, deduct_from_sales=1)
+		self.assertTrue(chosen["can_pass"])
+		self.assertEqual(chosen["blocker"], "")
+		invoice = frappe.get_doc("Sales Invoice", self.sales)
+		accounts = {row["account"] for row in chosen["deductions"]}
+		self.assertTrue({item.income_account for item in invoice.items} & accounts)
+		self.assertAlmostEqual(sum(row["amount"] for row in chosen["deductions"]), chosen["verdict"]["gap"], places=2)
+		# the receivable account of the invoice is where the credit goes: the card says it
+		self.assertEqual(chosen["booked_credit_account"], invoice.debit_to)
+
+	def test_taking_the_balance_off_the_turnover_books_one_entry_and_settles_the_invoice(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		statement, bank_line, owed = self._a_short_payment()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", deduct_from_sales=1)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+		self.assertAlmostEqual(sum(flt(row.amount) for row in entry.deductions), flt(owed - entry.paid_amount, 2), places=2)
+		self.assertNotIn(GAP_ACCOUNT, [row.account for row in entry.deductions])
+		self.assertIsNone(answer["credit_note"])
+		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Reconciled")
+		self.assertEqual(follow_up.get_import_overview(statement.name)["lines"][0]["decision"], "passed_gap")
+
+	def test_the_credit_note_of_the_balance_is_linked_to_the_invoice_and_settles_it(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line, _owed = self._a_short_payment()
+		preview = follow_up.get_gap_decision(bank_line, credit_note=1)
+		self.assertEqual(preview["credit_note"]["linked_to"], self.sales)
+		self.assertTrue(preview["can_pass"])
+		answer = follow_up.decide_gap(bank_line, "passed_gap", credit_note=1)
+		note = frappe.get_doc("Sales Invoice", answer["credit_note"])
+		self.assertEqual((note.is_return, note.return_against, note.docstatus), (1, self.sales, 1))
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+
+	def test_a_short_payment_of_a_purchase_cannot_be_taken_off_the_turnover(self):
+		_statement, bank_line, _owed = self._a_short_payment(invoice_type="Purchase Invoice")
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "partial")
+		self.assertFalse(decision["can_deduct"])
+
 	def test_leaving_it_open_creates_nothing_and_leaves_the_list_of_what_waits(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
 		statement, bank_line = self._a_line_with_a_gap(0.03)
 		owed = self._owed("Sales Invoice", self.sales)

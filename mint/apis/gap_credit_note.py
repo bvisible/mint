@@ -10,9 +10,12 @@
 # //// company's gap account when it has none, and the proposal "this customer's payments are at this share and the
 # //// rest ended as a credit note" is read from the customer's own invoices.
 # ////
-# //// The credit note has NO link to the invoice (return_against stays empty): that is how the offices here make them,
-# //// and the engine settles it by the party's ledger, not by that link. It is for sales only: a supplier's credit
-# //// note is the supplier's to issue.
+# //// The credit note is DRAWN FROM THE INVOICE (12.11, Jérémy: « une note de crédit est une déduction du chiffre
+# //// d'affaires, sur le 3200 ou le 3400, liée à sa facture »): it is the return of the invoice (return_against), on the
+# //// sales accounts and with the VAT of the invoice itself, each line at the share of the invoice that the balance is.
+# //// It used to be one line on the customer's habit or on the gap account of the company, without link (the 3295 « loss
+# //// on customers »: a write-off, which the other choice of the card still is). The engine settles it against the
+# //// invoice by the party's ledger, as before. It is for sales only: a supplier's credit note is the supplier's to issue.
 
 import frappe
 from frappe import _
@@ -147,8 +150,119 @@ def _measured(company: str, customer: str, on, gross: float, d: frappe._dict, ac
 	frappe.throw(_("The credit note cannot be brought to {0}.").format(gross))
 
 
-def preview(company: str, customer: str, on, gross: float, account: str | None = None) -> dict:
-	"""What the credit note of the balance would be, measured, nothing written."""
+def _returned(invoice: str, on, factor: float, account: str | None, nudge: float = 0.0):
+	"""ERPNext's own return of the invoice (linked to it, with its items, its sales accounts and its taxes), every line
+	brought to `factor` of the invoice, and nothing else done to it: not validated, so that saving it validates it once.
+	`nudge` is a few cents added to the rate of the largest line, to bring the total to the cent."""
+	from erpnext.accounts.doctype.sales_invoice.sales_invoice import make_sales_return
+
+	doc = make_sales_return(invoice)
+	doc.update(
+		{
+			"posting_date": getdate(on),
+			"set_posting_time": 1,
+			"update_stock": 0,
+			# the credit note settles exactly the balance: a total rounded to five centimes would leave a few cents open on it
+			"disable_rounded_total": 1,
+			"ignore_pricing_rule": 1,
+		}
+	)
+	for item in doc.items:
+		if account:
+			item.income_account = account
+		# the rate is the one to bring: nothing may recompute it from a price list or a discount of the invoice
+		rate = flt(item.rate)
+		item.price_list_rate = 0
+		item.discount_percentage = 0
+		item.discount_amount = 0
+		item.rate = flt(rate * factor, 6)
+	if nudge and doc.items:
+		largest = max(doc.items, key=lambda item: abs(flt(item.rate) * flt(item.qty)))
+		largest.rate = flt(flt(largest.rate) + nudge / (abs(flt(largest.qty)) or 1), 6)
+	return doc
+
+
+def _as_saving_will(doc):
+	"""What saving does to the figures of the document, once: `before_validate` (where ERPNext shares a fixed charge of the
+	invoice out in the proportion of the return) and `validate`. Only on a copy that is thrown away."""
+	doc.run_method("before_validate")
+	doc.run_method("validate")
+
+
+def _from_invoice(invoice: str, on, gross: float, account: str | None = None):
+	"""The credit note of the balance drawn from its invoice and not yet saved: the return of the invoice, every line at the
+	share of the invoice that the balance is, the share brought (by validating a fresh copy, as saving will) until the grand
+	total is the balance to the cent. `account`, when given (the rule of a customer, a person), replaces the sales accounts
+	of the lines. No stock moves: goods that come back are the person's own credit note.
+
+	A copy is validated once and thrown away: validating twice would take a fixed charge of the invoice (an `Actual` tax
+	row, which ERPNext shares out in the proportion of the return) off twice. What is returned is a fresh copy at the
+	share that was found, for saving to validate."""
+	gross = flt(gross, 2)
+	source = frappe.db.get_value("Sales Invoice", invoice, ["docstatus", "is_return", "grand_total"], as_dict=True)
+	if not source or source.docstatus != 1 or source.is_return or not flt(source.grand_total):
+		frappe.throw(_("The credit note of the balance is drawn from an invoice that is submitted and not a return."))
+	factor = gross / flt(source.grand_total)
+	nudge = 0.0
+	for _pass in range(8):
+		probe = _returned(invoice, on, factor, account, nudge)
+		_as_saving_will(probe)
+		total = abs(flt(probe.grand_total, 2))
+		difference = flt(gross - total, 2)
+		if abs(difference) <= 0.005:
+			return _returned(invoice, on, factor, account, nudge)
+		if not total:
+			break
+		if abs(difference) > 0.5:
+			# far: bring every line along
+			factor = factor * gross / total
+		else:
+			# near: the cents that are missing go on the largest line
+			nudge += difference
+	frappe.throw(_("The credit note cannot be brought to {0}.").format(gross))
+
+
+def _preview_from_invoice(company: str, invoice: str, on, gross: float, account: str | None) -> dict:
+	blocker = problem(company, account) if account else ""
+	out = {
+		"item": None,
+		"item_code": None,
+		"default_account": None,
+		"account": account,
+		"tax_template": None,
+		"times": 0,
+		"source": "invoice",
+		"linked_to": invoice,
+		"accounts": [],
+		"blocker": blocker,
+		"net": None,
+		"tax": None,
+		"total": flt(gross, 2),
+	}
+	if blocker:
+		return out
+	try:
+		doc = _from_invoice(invoice, on, gross, account)
+		# measured as saving will: validated once, and this copy is only for the figures
+		_as_saving_will(doc)
+	except frappe.ValidationError as error:
+		frappe.clear_last_message()
+		out["blocker"] = str(error)
+		return out
+	out["net"] = abs(flt(doc.net_total, 2))
+	out["tax"] = abs(flt(doc.total_taxes_and_charges, 2))
+	nets: dict[str, float] = {}
+	for item in doc.items:
+		nets[item.income_account] = nets.get(item.income_account, 0.0) + abs(flt(item.net_amount))
+	out["accounts"] = [{"account": name, "net": flt(net, 2)} for name, net in nets.items()]
+	return out
+
+
+def preview(company: str, customer: str, on, gross: float, account: str | None = None, invoice: str | None = None) -> dict:
+	"""What the credit note of the balance would be, measured, nothing written. Drawn from `invoice` when it is given (the
+	way the card and the import make it); else from the customer's habit, as it was made before."""
+	if invoice:
+		return _preview_from_invoice(company, invoice, on, gross, account)
 	d = defaults(company, customer)
 	chosen = account or d.account
 	blocker = problem(company, chosen)
@@ -172,9 +286,16 @@ def preview(company: str, customer: str, on, gross: float, account: str | None =
 	return out
 
 
-def _built(company: str, customer: str, on, gross: float, account: str | None, remark: str):
+def _built(company: str, customer: str, on, gross: float, account: str | None, remark: str, invoice: str | None = None):
 	"""The credit note of the balance, measured and not yet saved (what create() and prepare() both start from)."""
 	frappe.has_permission("Sales Invoice", ptype="create", throw=True)
+	if invoice:
+		blocker = problem(company, account) if account else ""
+		if blocker:
+			frappe.throw(blocker)
+		doc = _from_invoice(invoice, on, gross, account)
+		doc.remarks = remark
+		return doc
 	d = defaults(company, customer)
 	chosen = account or d.account
 	blocker = problem(company, chosen)
@@ -185,10 +306,10 @@ def _built(company: str, customer: str, on, gross: float, account: str | None, r
 	return doc
 
 
-def prepare(company: str, customer: str, on, gross: float, account: str | None, remark: str) -> str:
+def prepare(company: str, customer: str, on, gross: float, account: str | None, remark: str, invoice: str | None = None) -> str:
 	"""The credit note of the balance saved as a DRAFT: nothing is booked, a person opens it, corrects it if needed, and
 	validates it from the card of the gap (create() then submits this very draft)."""
-	doc = _built(company, customer, on, gross, account, remark)
+	doc = _built(company, customer, on, gross, account, remark, invoice)
 	doc.insert()
 	return doc.name
 
@@ -215,7 +336,14 @@ def _submitted_draft(company: str, customer: str, gross: float, draft: str, rema
 
 
 def create(
-	company: str, customer: str, on, gross: float, account: str | None, remark: str, draft: str | None = None
+	company: str,
+	customer: str,
+	on,
+	gross: float,
+	account: str | None,
+	remark: str,
+	draft: str | None = None,
+	invoice: str | None = None,
 ) -> str:
 	"""The credit note of the balance, made and submitted: the draft prepared earlier when there is one and it is still
 	right, else a new one. Its name."""
@@ -224,7 +352,7 @@ def create(
 		name = _submitted_draft(company, customer, gross, draft, remark)
 		if name:
 			return name
-	doc = _built(company, customer, on, gross, account, remark)
+	doc = _built(company, customer, on, gross, account, remark, invoice)
 	doc.insert()
 	doc.submit()
 	return doc.name

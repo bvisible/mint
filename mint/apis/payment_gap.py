@@ -243,6 +243,7 @@ def book(
 	by_person: bool = False,
 	account: str | None = None,
 	settle_in_full: bool = False,
+	deduct_from_sales: bool = False,
 ) -> str:
 	"""The Payment Entry of a verdict, made by ERPNext's get_payment_entry and submitted. Its name.
 
@@ -255,22 +256,32 @@ def book(
 	cut from the account, is passed on that account, instead of being left open on the invoice. For a payment that came
 	in OVER the invoice it is the same choice the other way round: left off, the whole payment is booked and the surplus
 	stays on it as an unallocated amount (the customer's, or the supplier's, to match with a next invoice); on, the surplus
-	is passed on the account, with no VAT."""
+	is passed on the account, with no VAT.
+
+	`deduct_from_sales` is a person's other way to settle a short payment of a SALE: the balance is taken off the turnover,
+	a debit on each sales account of the invoice and on each of its VAT accounts, in the share of the invoice that the
+	balance is (see sales_deduction_rows). The accounts are the invoice's own, nobody chooses one."""
 	from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
 
 	if verdict.kind == "" or not (verdict.automatic or by_person):
 		frappe.throw(_("This payment is not to be passed by itself: {0}").format(verdict.reason or verdict.kind))
 	if verdict.kind == "overpaid" and (problem := surplus_problem(verdict)):
 		frappe.throw(problem)
+	if deduct_from_sales and verdict.kind != "partial":
+		frappe.throw(_("The balance of a sale is taken off the turnover only for a short payment."))
 	if account:
 		check_account(verdict.company, account)
-	if by_person:
+	if by_person and not deduct_from_sales:
 		_check_the_gap_has_an_account(verdict, account, settle_in_full)
 	invoice = frappe.get_doc(invoice_type, invoice_name)
+	if deduct_from_sales and (problem := deduct_problem(verdict, invoice)):
+		frappe.throw(problem)
 	receiving = invoice_type == "Sales Invoice"
 	on = getdate(on)
 
-	if verdict.kind in ("early_discount", "exact") or (verdict.kind == "partial" and not settle_in_full):
+	if verdict.kind in ("early_discount", "exact") or (
+		verdict.kind == "partial" and not (settle_in_full or deduct_from_sales)
+	):
 		# ERPNext deducts the discount by itself inside the window of the payment terms: the plan says what to hand it
 		# so that the entry pays exactly the sum the bank moved, with or without the discount (see payment_terms).
 		from erpnextswiss.erpnextswiss.payment_terms import assert_pays_the_row, entry_plan
@@ -301,7 +312,11 @@ def book(
 		signed = verdict.gap if receiving else -verdict.gap
 		# a surplus that a person keeps has no deduction: what came in above the invoice stays on the entry, unallocated
 		keeps_the_surplus = verdict.kind == "overpaid" and not settle_in_full
-		for deduction in [] if keeps_the_surplus else _deductions(verdict, invoice, signed, account):
+		if deduct_from_sales:
+			rows = sales_deduction_rows(invoice, verdict.gap)
+		else:
+			rows = [] if keeps_the_surplus else _deductions(verdict, invoice, signed, account)
+		for deduction in rows:
 			pe.append("deductions", deduction)
 
 	pe.posting_date = on
@@ -332,6 +347,54 @@ def account_problem(verdict, account: str | None = None, settle_in_full: bool = 
 	return ""
 
 
+def deduct_problem(verdict, invoice) -> str:
+	"""Why the balance of this invoice cannot be taken off the turnover, or an empty string. Only a sale, in the currency of
+	the company (the rows are worked out in it), and one that has a sales account to take the balance off."""
+	if invoice.doctype != "Sales Invoice":
+		return _("Only the balance of a sale is taken off the turnover.")
+	if verdict.currency != frappe.get_cached_value("Company", verdict.company, "default_currency"):
+		return _("The invoice is not in the currency of the company: use Reconcile manually.")
+	if not any(item.income_account for item in invoice.items):
+		return _("The invoice has no sales account to take the balance off.")
+	return ""
+
+
+def sales_deduction_rows(invoice, gap: float) -> list[dict]:
+	"""The balance of a sale taken off its turnover: one debit per sales account of the invoice and one per VAT account of
+	it, each in the share of the invoice that the balance is (the net lines on the accounts they were sold on, the VAT as
+	the invoice charged it). The cents of rounding go on the largest row, so that the rows add up to `gap` exactly and the
+	invoice is settled to the cent. What is taken off the turnover also takes its VAT off, as a credit note would."""
+	total = flt(invoice.grand_total, 2)
+	if not total or not flt(gap):
+		return []
+	share = flt(gap) / total
+	cost_center = frappe.get_cached_value("Company", invoice.company, "cost_center")
+	description = _("Balance of {0} taken off the sales").format(invoice.name)
+	nets: dict[str, float] = {}
+	for item in invoice.items:
+		if item.income_account:
+			nets[item.income_account] = nets.get(item.income_account, 0.0) + flt(item.net_amount)
+	rows = [
+		{"account": account, "cost_center": cost_center, "amount": flt(net * share, 2), "description": description}
+		for account, net in nets.items()
+	]
+	for tax in invoice.taxes:
+		if flt(tax.tax_amount) and tax.account_head:
+			rows.append(
+				{
+					"account": tax.account_head,
+					"cost_center": tax.cost_center or cost_center,
+					"amount": flt(flt(tax.tax_amount) * share, 2),
+					"description": description,
+				}
+			)
+	if not rows:
+		return []
+	largest = max(rows, key=lambda row: abs(row["amount"]))
+	largest["amount"] = flt(largest["amount"] + flt(gap) - sum(row["amount"] for row in rows), 2)
+	return [row for row in rows if row["amount"]]
+
+
 def surplus_problem(verdict) -> str:
 	"""Why a person cannot decide the surplus of an overpaid line here, or an empty string. The entry that keeps a surplus
 	open, or passes it, is made in the currency of the company only (the figures of a foreign currency are the payment
@@ -360,8 +423,12 @@ def check_account(company: str, account: str):
 		frappe.throw(_("A difference goes to an income or expense account, not {0}.").format(account))
 
 
-def preview(verdict, invoice, account: str | None = None, settle_in_full: bool = False) -> list[dict]:
+def preview(
+	verdict, invoice, account: str | None = None, settle_in_full: bool = False, deduct_from_sales: bool = False
+) -> list[dict]:
 	"""The rows that the gap will be booked as, VAT included, the way the entry will carry them (nothing is written)."""
+	if deduct_from_sales:
+		return sales_deduction_rows(invoice, verdict.gap)
 	receiving = invoice.doctype == "Sales Invoice"
 	signed = verdict.gap if receiving else -verdict.gap
 	if verdict.kind == "dunning_fee":

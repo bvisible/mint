@@ -114,6 +114,11 @@ export type GapDecision = {
     can_settle: boolean,
     /** More came in than is owed: the person chooses between keeping the surplus for a next invoice and booking it as a difference. */
     can_decide_surplus: boolean,
+    /** A short payment of a sale can be taken off the turnover: one entry on the sales accounts of the invoice, with its VAT. */
+    can_deduct: boolean,
+    deduct_chosen: boolean,
+    /** The receivable account of the invoice, where the credit of that entry goes. */
+    booked_credit_account: string | null,
     /** The rows the gap would be booked as, the VAT cut from the account included (nothing is written yet). */
     deductions: { account: string, amount: number, description: string | null }[],
     /** A short payment of a sale can be closed by a credit note of the balance (null for anything else). */
@@ -145,14 +150,17 @@ export type GapRule = {
 }
 
 export type CreditNotePreview = {
-    item: string,
+    item: string | null,
     item_code: string | null,
     default_account: string | null,
     account: string | null,
     tax_template: string | null,
     /** How many times the customer already had a credit note made like this one (0 = the company's account). */
     times: number,
-    source: "history" | "company",
+    source: "history" | "company" | "invoice",
+    /** The invoice the credit note is drawn from and linked to, and the sales accounts it is made on (net on each). */
+    linked_to?: string,
+    accounts?: { account: string, net: number }[],
     blocker: string,
     net: number | null,
     tax: number | null,

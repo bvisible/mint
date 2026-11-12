@@ -435,6 +435,65 @@ class TestPaymentGap(FrappeTestCase):
 		self.assertEqual((flt(entry.unallocated_amount, 2), entry.docstatus), (0, 1))
 		self.assertEqual(self._outstanding("Purchase Invoice", self.purchase), 0)
 
+	# -- the balance of a sale taken off the turnover ---------------------------------------------------------------
+
+	def _taken_off(self, share=0.2, **options):
+		"""What the card does once a person chose « deduct it from the turnover » for a short payment of the sale."""
+		owed = self._outstanding("Sales Invoice", self.sales)
+		part = flt(owed * (1 - share), 2)
+		verdict = payment_gap.judge("Sales Invoice", self.sales, part, nowdate(), "REF-1")
+		entry = payment_gap.book(
+			verdict, "Sales Invoice", self.sales, LEDGER, nowdate(), "REF-1", "gap test", by_person=True, deduct_from_sales=True, **options
+		)
+		return frappe.get_doc("Payment Entry", entry), verdict, frappe.get_doc("Sales Invoice", self.sales)
+
+	def test_the_balance_of_a_sale_can_be_taken_off_the_turnover_on_the_accounts_of_the_invoice(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		entry, verdict, invoice = self._taken_off()
+		self.assertEqual(verdict.kind, "partial")
+		incomes = {item.income_account for item in invoice.items}
+		taxes = {tax.account_head for tax in invoice.taxes if flt(tax.tax_amount)}
+		accounts = {row.account for row in entry.deductions}
+		# a debit on the sales account of the invoice and on its VAT account, nothing on the gap account
+		self.assertTrue(incomes & accounts)
+		self.assertTrue(accounts <= incomes | taxes)
+		self.assertNotIn(GAP_ACCOUNT, accounts - incomes)
+		# the rows add up to the balance to the cent, the invoice is settled, the payment is booked as it came in
+		self.assertAlmostEqual(sum(flt(row.amount) for row in entry.deductions), verdict.gap, places=2)
+		self.assertEqual(self._outstanding("Sales Invoice", self.sales), 0)
+		self.assertEqual(flt(entry.paid_amount, 2), flt(verdict.amount, 2))
+		self.assertEqual((entry.docstatus, flt(entry.unallocated_amount, 2)), (1, 0))
+
+	def test_the_vat_taken_off_is_the_share_of_the_vat_the_invoice_charged(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		entry, verdict, invoice = self._taken_off(share=0.25)
+		charged = sum(flt(tax.tax_amount) for tax in invoice.taxes)
+		taxes = {tax.account_head for tax in invoice.taxes}
+		taken = sum(flt(row.amount) for row in entry.deductions if row.account in taxes)
+		self.assertAlmostEqual(taken, charged * verdict.gap / flt(invoice.grand_total), delta=0.02)
+
+	def test_the_rows_of_a_deduction_from_the_sales_add_up_to_the_balance_to_the_cent(self):
+		invoice = frappe.get_doc("Sales Invoice", self.sales)
+		for gap in (0.07, 33.33, flt(invoice.grand_total / 3, 2), flt(invoice.grand_total, 2)):
+			rows = payment_gap.sales_deduction_rows(invoice, gap)
+			self.assertAlmostEqual(sum(flt(row["amount"]) for row in rows), gap, places=2, msg=gap)
+
+	def test_a_purchase_cannot_be_taken_off_the_turnover(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		owed = self._outstanding("Purchase Invoice", self.purchase)
+		verdict = payment_gap.judge("Purchase Invoice", self.purchase, flt(owed / 2, 2), nowdate(), "REF-1")
+		with self.assertRaises(frappe.ValidationError):
+			payment_gap.book(
+				verdict, "Purchase Invoice", self.purchase, LEDGER, nowdate(), "REF-1", "gap test", by_person=True, deduct_from_sales=True
+			)
+
+	def test_a_sale_in_another_currency_cannot_be_taken_off_the_turnover(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		frappe.db.set_value("Company", COMPANY, "default_currency", "EUR")
+		frappe.clear_document_cache("Company", COMPANY)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		verdict = payment_gap.judge("Sales Invoice", self.sales, flt(owed / 2, 2), nowdate(), "REF-1")
+		with self.assertRaises(frappe.ValidationError):
+			payment_gap.book(
+				verdict, "Sales Invoice", self.sales, LEDGER, nowdate(), "REF-1", "gap test", by_person=True, deduct_from_sales=True
+			)
+
 	# -- a surplus that is the fee of a dunning ---------------------------------------------------------------------
 
 	def _a_dunning_on_the_sale(self, fee: float = 20.0):

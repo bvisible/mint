@@ -434,6 +434,7 @@ def make_credit_note(verdict, invoice: str, on, account: str | None, draft: str 
 		account or None,
 		_("Balance of {0}, paid {1} on {2}").format(invoice, verdict.amount, on),
 		draft=draft,
+		invoice=invoice,
 	)
 	gap_credit_note.settle(verdict.company, customer, invoice, made, verdict.gap)
 	return made
@@ -459,14 +460,19 @@ def _account_blocker(company: str, account: str | None) -> str:
 
 @frappe.whitelist()
 def get_gap_decision(
-	bank_transaction: str, account: str | None = None, settle_in_full: int | str = 0, credit_note: int | str = 0
+	bank_transaction: str,
+	account: str | None = None,
+	settle_in_full: int | str = 0,
+	credit_note: int | str = 0,
+	deduct_from_sales: int | str = 0,
 ) -> dict | None:
 	"""What a person is asked to decide for this bank line, with the verdict worked out now (the invoice may have moved
 	since the import). None when the line did not come from an import, has no recognised invoice, or is dealt with.
 
-	`account`, `settle_in_full` and `credit_note` are what the person is trying: the rows the gap would be booked as (VAT
-	cut from the account by the same function the payment window uses), or the credit note of the balance, come back,
-	nothing is written."""
+	`account`, `settle_in_full`, `credit_note` and `deduct_from_sales` are what the person is trying: the rows the gap would
+	be booked as (VAT cut from the account by the same function the payment window uses; or, for `deduct_from_sales`, taken
+	off the sales accounts of the invoice with the VAT it charged), or the credit note of the balance drawn from the
+	invoice, come back, nothing is written."""
 	_check_rights()
 	frappe.has_permission("Bank Transaction", "read", bank_transaction, throw=True)
 	bank_line = frappe.db.get_value("Bank Transaction", bank_transaction, BANK_LINE_FIELDS, as_dict=True)
@@ -490,9 +496,15 @@ def get_gap_decision(
 		verdict.company
 	)
 	credit = _as_flag(credit_note) and creditable
+	# the balance of a sale taken off the turnover: a short payment of a sale, on the sales accounts of the invoice
+	invoice_doc = frappe.get_doc(invoice_type, invoice)
+	can_deduct = (
+		verdict.kind == "partial" and invoice_type == "Sales Invoice" and not payment_gap.deduct_problem(verdict, invoice_doc)
+	)
+	deduct = _as_flag(deduct_from_sales) and can_deduct and not credit
 	# for a partial payment the choice is what becomes of the rest, for an overpayment what becomes of the surplus: in both,
 	# « settle » passes the difference on an account and its opposite leaves it open (a person keeps the surplus for a next invoice)
-	settle = _as_flag(settle_in_full) and verdict.kind in ("partial", "overpaid") and not credit
+	settle = _as_flag(settle_in_full) and verdict.kind in ("partial", "overpaid") and not credit and not deduct
 	editable = verdict.kind in ("rounding", "accepted_rebate", "partial", "overpaid")
 	account = (account or None) if editable else None
 	blocker = ""
@@ -504,12 +516,15 @@ def get_gap_decision(
 			or _account_blocker(verdict.company, account)
 			or payment_gap.account_problem(verdict, account, settle)
 		)
+	elif deduct:
+		# the accounts are the invoice's own: nothing to choose, nothing that the company has to have set
+		blocker = ""
 	else:
 		blocker = _account_blocker(verdict.company, account) or payment_gap.account_problem(verdict, account, settle)
 	settings = payment_gap.get_settings(verdict.company)
 	rows = []
 	if not blocker and verdict.kind not in ("", "exact") and not credit:
-		rows = payment_gap.preview(verdict, frappe.get_doc(invoice_type, invoice), account, settle)
+		rows = payment_gap.preview(verdict, invoice_doc, account, settle, deduct)
 	customer = frappe.db.get_value(invoice_type, invoice, "customer") if invoice_type == "Sales Invoice" else None
 	credit_preview = history = rule_info = proposal = draft = None
 	if creditable and customer:
@@ -519,7 +534,12 @@ def get_gap_decision(
 		share = gap_credit_note.share_paid(invoice, verdict.amount)
 		rule = gap_rule.get(verdict.company, customer)
 		credit_preview = gap_credit_note.preview(
-			verdict.company, customer, bank_line.date, verdict.gap, (account or gap_rule.account_for(rule, share)) if credit else None
+			verdict.company,
+			customer,
+			bank_line.date,
+			verdict.gap,
+			(account or gap_rule.account_for(rule, share)) if credit else None,
+			invoice=invoice,
 		)
 		history = gap_credit_note.history(verdict.company, customer, invoice, share)
 		if credit and credit_preview["blocker"]:
@@ -573,6 +593,11 @@ def get_gap_decision(
 		"can_settle": verdict.kind == "partial",
 		# an overpayment: keep the surplus for a next invoice, or pass it as a difference on an account (the card asks which)
 		"can_decide_surplus": verdict.kind == "overpaid" and not payment_gap.surplus_problem(verdict),
+		# a short payment of a sale: the balance can be taken off the turnover (an entry on the sales accounts of the invoice)
+		"can_deduct": can_deduct,
+		"deduct_chosen": deduct,
+		# where the credit of that entry goes: the receivable account of the invoice, for the customer
+		"booked_credit_account": invoice_doc.debit_to if invoice_type == "Sales Invoice" else None,
 		"deductions": [
 			{"account": row.get("account"), "amount": flt(row.get("amount"), 2), "description": row.get("description")}
 			for row in rows
@@ -591,12 +616,15 @@ def decide_gap(
 	account: str | None = None,
 	settle_in_full: int | str = 0,
 	credit_note: int | str = 0,
+	deduct_from_sales: int | str = 0,
 ) -> dict:
 	"""A person passes the gap of a bank line (the entry is made, linked to the line) or leaves it open.
 
 	`account` is the account the person chose for the gap instead of the company's; `settle_in_full` settles a short
 	payment beyond what the company accepts, the gap being passed on that account instead of left open (for an
-	overpayment, it passes the surplus on that account instead of keeping it open on the payment); `credit_note`
+	overpayment, it passes the surplus on that account instead of keeping it open on the payment); `deduct_from_sales`
+	settles a short payment of a sale by taking the balance off its turnover, on the sales accounts of the invoice with
+	its VAT; `credit_note`
 	closes it the way the offices do: the payment is booked for what came in and a credit note of the balance settles
 	the invoice (its account is `account`, else the customer's habit, else the company's gap account)."""
 	if decision not in DECISIONS:
@@ -631,7 +659,9 @@ def decide_gap(
 
 		share = gap_credit_note.share_paid(invoice, verdict.amount)
 	credit = _as_flag(credit_note)
-	settle_flag = _as_flag(settle_in_full) and verdict.kind == "partial" and not credit
+	# the credit note wins when both are asked; what cannot be taken off the turnover is refused by the booking itself
+	deduct = _as_flag(deduct_from_sales) and not credit
+	settle_flag = _as_flag(settle_in_full) and verdict.kind == "partial" and not credit and not deduct
 	if credit and not (verdict.kind == "partial" and invoice_type == "Sales Invoice"):
 		frappe.throw(_("A credit note of the balance is for the short payment of a sales invoice."))
 	if credit:
@@ -641,7 +671,9 @@ def decide_gap(
 		customer = frappe.db.get_value("Sales Invoice", invoice, "customer")
 		# nobody picked an account: the one the customer's rule names (the account of the draft it prepared)
 		account = account or gap_rule.account_for(gap_rule.get(verdict.company, customer), share)
-		blocker = gap_credit_note.preview(verdict.company, customer, bank_line.date, verdict.gap, account or None)["blocker"]
+		blocker = gap_credit_note.preview(
+			verdict.company, customer, bank_line.date, verdict.gap, account or None, invoice=invoice
+		)["blocker"]
 		if blocker:
 			frappe.throw(blocker)
 	entry = payment_gap.book(
@@ -653,8 +685,9 @@ def decide_gap(
 		bank_line.reference_number or "",
 		_("{0} - Payment for {1}").format(line.party_name or line.party_match, invoice),
 		by_person=True,
-		account=None if credit else ((account or None) if editable else None),
-		settle_in_full=_as_flag(settle_in_full) and verdict.kind in ("partial", "overpaid") and not credit,
+		account=None if (credit or deduct) else ((account or None) if editable else None),
+		settle_in_full=_as_flag(settle_in_full) and verdict.kind in ("partial", "overpaid") and not credit and not deduct,
+		deduct_from_sales=deduct,
 	)
 	_link_payment_entry_to_bt(
 		frappe.get_doc("Bank Transaction", bank_transaction), entry, reconciliation_type="Voucher Created"

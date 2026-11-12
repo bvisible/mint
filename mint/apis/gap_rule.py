@@ -136,7 +136,7 @@ def handle_at_import(verdict, invoice: str, transaction, bank_transaction: str, 
 		return False
 	credit = rule.action == "credit_note"
 	blocker = (
-		gap_credit_note.preview(verdict.company, customer, transaction.date, verdict.gap, rule.account or None)["blocker"]
+		gap_credit_note.preview(verdict.company, customer, transaction.date, verdict.gap, rule.account or None, invoice=invoice)["blocker"]
 		if credit
 		else payment_gap.account_problem(verdict, rule.account, True)
 	)
@@ -148,7 +148,9 @@ def handle_at_import(verdict, invoice: str, transaction, bank_transaction: str, 
 		if not credit:
 			return False
 		remark = _("Balance of {0}, paid {1} on {2}").format(invoice, verdict.amount, transaction.date)
-		draft = gap_credit_note.prepare(verdict.company, customer, transaction.date, verdict.gap, rule.account or None, remark)
+		draft = gap_credit_note.prepare(
+			verdict.company, customer, transaction.date, verdict.gap, rule.account or None, remark, invoice=invoice
+		)
 		transaction.db_set({"credit_note": draft, "payment_gap_rule": rule.name})
 		return False
 
