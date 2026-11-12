@@ -15,7 +15,10 @@
 # ////   partial          less than owed beyond that: the money has come in, it is recorded, the rest stays open
 # ////   dunning_fee      sales only: more than owed, by exactly what a validated dunning of that invoice still asks for
 # ////                    (its fee and interest): booked on the account of the dunning, linked to it, which resolves it
-# ////   overpaid         more than owed, and not a dunning's fee: never passed by itself
+# ////   overpaid         more than owed, and not a dunning's fee: never passed by itself. A PERSON decides what the surplus
+# ////                    becomes, as for a partial payment: kept on the payment as an amount left open for a next invoice
+# ////                    (the entry carries it as its unallocated amount, which a later reconciliation allocates), or
+# ////                    passed as a difference on an account, the way the fee of a dunning is (a negative deduction, no VAT)
 # //// A verdict says whether it may be passed AUTOMATICALLY (nobody in front of the screen) and, when it may not,
 # //// why. Nothing is automatic until the company switches it on (Neoffice Company Settings, « Payment Gaps »);
 # //// a partial payment is validated by itself only when the invoice is recognised without doubt.
@@ -249,11 +252,16 @@ def book(
 
 	`account` is the account a person chose for the gap instead of the company's. `settle_in_full` is a person's choice
 	for a payment that came in short beyond what the company accepts: the invoice is settled and the gap, with its VAT
-	cut from the account, is passed on that account, instead of being left open on the invoice."""
+	cut from the account, is passed on that account, instead of being left open on the invoice. For a payment that came
+	in OVER the invoice it is the same choice the other way round: left off, the whole payment is booked and the surplus
+	stays on it as an unallocated amount (the customer's, or the supplier's, to match with a next invoice); on, the surplus
+	is passed on the account, with no VAT."""
 	from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
 
-	if verdict.kind in ("", "overpaid") or not (verdict.automatic or by_person):
+	if verdict.kind == "" or not (verdict.automatic or by_person):
 		frappe.throw(_("This payment is not to be passed by itself: {0}").format(verdict.reason or verdict.kind))
+	if verdict.kind == "overpaid" and (problem := surplus_problem(verdict)):
+		frappe.throw(problem)
 	if account:
 		check_account(verdict.company, account)
 	if by_person:
@@ -291,7 +299,9 @@ def book(
 		# What Payment Entry wants: for a Receive, difference = allocated - received, so a shortfall is a positive
 		# deduction; for a Pay, difference = paid - allocated, so the same shortfall is a negative one.
 		signed = verdict.gap if receiving else -verdict.gap
-		for deduction in _deductions(verdict, invoice, signed, account):
+		# a surplus that a person keeps has no deduction: what came in above the invoice stays on the entry, unallocated
+		keeps_the_surplus = verdict.kind == "overpaid" and not settle_in_full
+		for deduction in [] if keeps_the_surplus else _deductions(verdict, invoice, signed, account):
 			pe.append("deductions", deduction)
 
 	pe.posting_date = on
@@ -310,13 +320,24 @@ def account_problem(verdict, account: str | None = None, settle_in_full: bool = 
 		# the account is the one of the dunning, nobody chooses it: what is missing is that the dunning has none
 		return _dunning_account_problem(verdict)
 	settings = get_settings(verdict.company)
-	passes_as_deduction = verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind == "partial" and settle_in_full)
+	passes_as_deduction = verdict.kind in ("rounding", "accepted_rebate") or (
+		verdict.kind in ("partial", "overpaid") and settle_in_full
+	)
 	if passes_as_deduction and not (account or gap_account(settings, verdict.invoice_type)):
 		return no_account_message(verdict.invoice_type)
 	if verdict.kind == "early_discount" and not frappe.get_cached_value(
 		"Company", verdict.company, "default_discount_account"
 	):
 		return _("The company has no early payment discount account.")
+	return ""
+
+
+def surplus_problem(verdict) -> str:
+	"""Why a person cannot decide the surplus of an overpaid line here, or an empty string. The entry that keeps a surplus
+	open, or passes it, is made in the currency of the company only (the figures of a foreign currency are the payment
+	window's): the line is left to it."""
+	if verdict.currency != frappe.get_cached_value("Company", verdict.company, "default_currency"):
+		return _("The invoice is not in the currency of the company: use Reconcile manually.")
 	return ""
 
 
@@ -353,7 +374,7 @@ def preview(verdict, invoice, account: str | None = None, settle_in_full: bool =
 				"description": _("Payment gap of {0}").format(invoice.name),
 			}
 		]
-	if verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind == "partial" and settle_in_full):
+	if verdict.kind in ("rounding", "accepted_rebate") or (verdict.kind in ("partial", "overpaid") and settle_in_full):
 		return _deductions(verdict, invoice, signed, account)
 	return []
 
@@ -368,8 +389,9 @@ def _deductions(verdict, invoice, signed, account: str | None = None) -> list[di
 		"amount": signed,
 		"description": _("Payment gap of {0}").format(invoice.name),
 	}
-	if verdict.kind == "rounding":
-		# a rounding of a few centimes carries no VAT line
+	if verdict.kind in ("rounding", "overpaid"):
+		# a rounding of a few centimes carries no VAT line; nor does a surplus passed as a difference, which pays for no supply
+		# (the fee of a dunning is the same)
 		return [deduction]
 	# The VAT is cut from the account, as the reconciliation screen does, but an invoice that carries no VAT gets none.
 	from mint.apis.bank_reconciliation import calculate_deductions_with_vat

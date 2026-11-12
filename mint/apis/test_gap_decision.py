@@ -79,12 +79,94 @@ class TestGapDecision(GapImportCase):
 			("Supplier", frappe.db.get_value("Purchase Invoice", self.purchase, "supplier")),
 		)
 
-	def test_an_overpayment_can_only_be_left_open(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
-		owed = self._owed("Sales Invoice", self.sales)
-		statement = self._import(self._line("Sales Invoice", self.sales, owed + 5))
-		bank_line = statement.transactions[0].bank_transaction
+	def _an_overpayment(self, extra=5.0, invoice_type="Sales Invoice"):
+		invoice = self.sales if invoice_type == "Sales Invoice" else self.purchase
+		owed = self._owed(invoice_type, invoice)
+		statement = self._import(self._line(invoice_type, invoice, flt(owed + extra, 2)))
+		return statement, statement.transactions[0].bank_transaction
+
+	def test_an_overpayment_is_offered_to_keep_the_surplus_or_to_pass_it_as_a_difference(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._an_overpayment()
 		decision = follow_up.get_gap_decision(bank_line)
 		self.assertEqual(decision["verdict"]["kind"], "overpaid")
+		self.assertTrue(decision["can_decide_surplus"])
+		self.assertTrue(decision["can_pass"])
+		self.assertEqual(decision["blocker"], "")
+		# the account of the difference is the company's until a person picks another; keeping the surplus books nothing on it
+		self.assertTrue(decision["account_editable"])
+		self.assertEqual(decision["default_account"], GAP_ACCOUNT)
+		self.assertEqual(decision["deductions"], [])
+		passed = follow_up.get_gap_decision(bank_line, settle_in_full=1)
+		self.assertTrue(passed["can_pass"])
+		self.assertEqual([(row["account"], row["amount"]) for row in passed["deductions"]], [(GAP_ACCOUNT, -5.0)])
+
+	def test_keeping_the_surplus_books_the_whole_payment_and_leaves_the_rest_open_for_a_next_invoice(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		statement, bank_line = self._an_overpayment()
+		owed = self._owed("Sales Invoice", self.sales)
+		answer = follow_up.decide_gap(bank_line, "passed_gap")
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual((flt(entry.paid_amount, 2), flt(entry.unallocated_amount, 2)), (flt(owed + 5, 2), 5.0))
+		self.assertEqual(len(entry.deductions), 0)
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Reconciled")
+		line = follow_up.get_import_overview(statement.name)["lines"][0]
+		self.assertEqual((line["state"], line["decision"], line["decided_by"]), ("handled", "passed_gap", "Administrator"))
+		self.assertNotIn(bank_line, [row.bank_transaction for row in follow_up.get_lines_to_decide(self.bank_account)])
+
+	def test_passing_the_surplus_as_a_difference_books_it_on_the_account_and_leaves_nothing_open(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._an_overpayment()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", settle_in_full=1)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual([(d.account, flt(d.amount, 2)) for d in entry.deductions], [(GAP_ACCOUNT, -5.0)])
+		self.assertEqual(flt(entry.unallocated_amount, 2), 0)
+		self.assertEqual(self._owed("Sales Invoice", self.sales), 0)
+		self.assertEqual(frappe.db.get_value("Bank Transaction", bank_line, "status"), "Reconciled")
+
+	def test_the_surplus_goes_to_the_account_a_person_picked(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		other = frappe.db.get_value(
+			"Account",
+			{"company": COMPANY, "root_type": "Income", "is_group": 0, "disabled": 0, "name": ("!=", GAP_ACCOUNT)},
+			"name",
+			order_by="name",
+		)
+		if not other:
+			self.skipTest("needs a second income account")
+		_statement, bank_line = self._an_overpayment()
+		answer = follow_up.decide_gap(bank_line, "passed_gap", account=other, settle_in_full=1)
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual([d.account for d in entry.deductions], [other])
+
+	def test_passing_the_surplus_with_no_account_says_so_but_keeping_it_needs_none(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		frappe.db.set_value("Neoffice Company Settings", "AlpInnovate SA", "payment_gap_account", None)
+		frappe.clear_document_cache("Company", "AlpInnovate SA")
+		_statement, bank_line = self._an_overpayment()
+		kept = follow_up.get_gap_decision(bank_line)
+		self.assertTrue(kept["can_pass"])
+		passed = follow_up.get_gap_decision(bank_line, settle_in_full=1)
+		self.assertFalse(passed["can_pass"])
+		self.assertIn("account", passed["blocker"])
+		with self.assertRaises(frappe.ValidationError):
+			follow_up.decide_gap(bank_line, "passed_gap", settle_in_full=1)
+		self.assertTrue(follow_up.decide_gap(bank_line, "passed_gap")["payment_entry"])
+
+	def test_a_surplus_paid_to_a_supplier_is_offered_the_same_two_ways(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._an_overpayment(invoice_type="Purchase Invoice")
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "overpaid")
+		self.assertTrue(decision["can_decide_surplus"])
+		self.assertEqual(decision["default_account"], self.expense)
+		answer = follow_up.decide_gap(bank_line, "passed_gap")
+		entry = frappe.get_doc("Payment Entry", answer["payment_entry"])
+		self.assertEqual((flt(entry.unallocated_amount, 2), len(entry.deductions)), (5.0, 0))
+		self.assertEqual(self._owed("Purchase Invoice", self.purchase), 0)
+
+	def test_a_surplus_on_an_invoice_in_another_currency_is_left_to_the_payment_window(self):  # role-check: ok the accountant's act, played as the system here; the rights are tested in test_somebody_who_cannot_write_the_bank_line_cannot_decide_it
+		_statement, bank_line = self._an_overpayment()
+		frappe.db.set_value("Company", COMPANY, "default_currency", "EUR")
+		frappe.clear_document_cache("Company", COMPANY)
+		decision = follow_up.get_gap_decision(bank_line)
+		self.assertEqual(decision["verdict"]["kind"], "overpaid")
+		self.assertFalse(decision["can_decide_surplus"])
 		self.assertFalse(decision["can_pass"])
 		self.assertTrue(decision["blocker"])
 		with self.assertRaises(frappe.ValidationError):

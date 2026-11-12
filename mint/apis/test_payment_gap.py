@@ -385,6 +385,56 @@ class TestPaymentGap(FrappeTestCase):
 		with self.assertRaises(frappe.ValidationError):
 			self._book("Sales Invoice", self.sales, owed + 9.25)  # overpaid
 
+	# -- a surplus that a person decides ----------------------------------------------------------------------------
+
+	def _decided(self, doctype, name, amount, **options):
+		"""What the card does once a person chose: the entry of an overpaid line, booked with by_person."""
+		verdict = payment_gap.judge(doctype, name, amount, nowdate(), "REF-1")
+		entry = payment_gap.book(verdict, doctype, name, LEDGER, nowdate(), "REF-1", "gap test", by_person=True, **options)
+		return frappe.get_doc("Payment Entry", entry), verdict
+
+	def test_a_person_can_keep_a_surplus_as_an_amount_left_open_on_the_payment(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		owed = self._outstanding("Sales Invoice", self.sales)
+		entry, verdict = self._decided("Sales Invoice", self.sales, owed + 9.25)
+		self.assertEqual(verdict.kind, "overpaid")
+		# the whole payment is booked, the invoice is settled, and the surplus stays on the payment for a next invoice
+		self.assertEqual(flt(entry.paid_amount, 2), flt(owed + 9.25, 2))
+		self.assertEqual(flt(entry.unallocated_amount, 2), 9.25)
+		self.assertEqual(len(entry.deductions), 0)
+		self.assertEqual(self._outstanding("Sales Invoice", self.sales), 0)
+		self.assertEqual(entry.docstatus, 1)
+
+	def test_a_person_can_pass_a_surplus_as_a_difference_on_an_account(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		owed = self._outstanding("Sales Invoice", self.sales)
+		entry, _verdict = self._decided("Sales Invoice", self.sales, owed + 9.25, settle_in_full=True)
+		# like the fee of a dunning: a negative deduction, with no VAT cut from it
+		self.assertEqual([(d.account, flt(d.amount, 2)) for d in entry.deductions], [(GAP_ACCOUNT, -9.25)])
+		self.assertEqual(flt(entry.unallocated_amount, 2), 0)
+		self.assertEqual(flt(entry.paid_amount, 2), flt(owed + 9.25, 2))
+		self.assertEqual(self._outstanding("Sales Invoice", self.sales), 0)
+
+	def test_a_surplus_passed_as_a_difference_needs_an_account(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		self._settings(payment_gap_account=None)
+		owed = self._outstanding("Sales Invoice", self.sales)
+		with self.assertRaises(frappe.ValidationError):
+			self._decided("Sales Invoice", self.sales, owed + 9.25, settle_in_full=True)
+		# keeping it needs none
+		entry, _verdict = self._decided("Sales Invoice", self.sales, owed + 9.25)
+		self.assertEqual(flt(entry.unallocated_amount, 2), 9.25)
+
+	def test_a_surplus_paid_to_a_supplier_is_kept_or_passed_the_same_way(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		owed = self._outstanding("Purchase Invoice", self.purchase)
+		kept, _verdict = self._decided("Purchase Invoice", self.purchase, owed + 9.25)
+		self.assertEqual((flt(kept.unallocated_amount, 2), len(kept.deductions)), (9.25, 0))
+		self.assertEqual(self._outstanding("Purchase Invoice", self.purchase), 0)
+
+	def test_a_surplus_paid_to_a_supplier_can_be_passed_on_the_expense_account(self):  # role-check: ok the book function is the system's, the rights of the person are tested in test_gap_decision
+		owed = self._outstanding("Purchase Invoice", self.purchase)
+		entry, _verdict = self._decided("Purchase Invoice", self.purchase, owed + 9.25, settle_in_full=True)
+		self.assertEqual([(d.account, abs(flt(d.amount, 2))) for d in entry.deductions], [(self.expense, 9.25)])
+		self.assertEqual((flt(entry.unallocated_amount, 2), entry.docstatus), (0, 1))
+		self.assertEqual(self._outstanding("Purchase Invoice", self.purchase), 0)
+
 	# -- a surplus that is the fee of a dunning ---------------------------------------------------------------------
 
 	def _a_dunning_on_the_sale(self, fee: float = 20.0):

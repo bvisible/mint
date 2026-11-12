@@ -7,6 +7,9 @@
 //// button: the explanation is behind its lightbulb (InfoHint), with the page of the manual that speaks of it. There is no
 //// « leave it open » button: a person who does nothing leaves the line open anyway.
 //// The words are those of the books, not of the code: a difference, a credit note, a loss on customers, a discount.
+//// More came in than is owed (an overpayment): two choices as for a short payment, the first proposed. Keep the surplus for a
+//// next invoice (the payment is booked in full, the invoice settled, the surplus stays on the payment to be matched later), or
+//// book it as a difference on an account, the way the fee of a dunning is (Jérémy, Daniel, 12.11: the card offered nothing).
 import { useFrappeGetCall, useFrappePostCall, useSWRConfig } from "frappe-react-sdk"
 import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react"
 import NoraOrb from "@/components/common/NoraOrb"
@@ -50,7 +53,7 @@ const sentence = (decision: GapDecision): string => {
         case "dunning_fee":
             return _("Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more: the fee of the dunning {5}, booked on its account and settling it.", [invoice, who, owed, paid, gap, decision.dunnings.map((dunning) => dunning.name).join(", ")])
         case "overpaid":
-            return _("Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed: that is never passed by itself.", [invoice, who, owed, paid, gap])
+            return _("Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed.", [invoice, who, owed, paid, gap])
         default:
             return decision.blocker
     }
@@ -109,7 +112,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const onDecide = () => {
         decide({ bank_transaction: transaction.name, decision: "passed_gap", account: account ?? undefined, settle_in_full: settle ? 1 : 0, credit_note: credit ? 1 : 0 }).then(() => {
             refresh()
-            toast.success(credit ? _("Credit note made, invoice settled and bank line reconciled") : _("Difference booked and bank line reconciled"), {
+            toast.success(credit ? _("Credit note made, invoice settled and bank line reconciled") : isOverpaid && !settle ? _("Invoice settled and bank line reconciled, the surplus stays available") : _("Difference booked and bank line reconciled"), {
                 duration: 4000,
                 closeButton: true,
                 action: { label: _("Undo"), onClick: () => setUnreconcile(transaction.name) },
@@ -123,12 +126,16 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     const decidedDay = decision.decided_on ? formatDate(decision.decided_on, "Do MMM YYYY") : ""
     const lineDay = transaction.date ? formatDate(transaction.date, "Do MMM YYYY") : ""
     const isPartial = verdict.kind === "partial"
+    const isOverpaid = verdict.kind === "overpaid"
     const isSale = decision.invoice_type === "Sales Invoice"
     const confirming = !!verdict.needs_confirmation
     const note = decision.credit_note
     const habit = decision.history
     const gapText = formatCurrency(Math.abs(verdict.gap), verdict.currency)
-    const showAccount = decision.account_editable && (!isPartial || settle || credit)
+    const owed = formatCurrency(verdict.outstanding, verdict.currency)
+    // who the surplus waits for: the customer or the supplier of the invoice, by the name the card already uses
+    const who = decision.party ?? (decision.invoice_type === "Sales Invoice" ? _("the customer") : _("the supplier"))
+    const showAccount = decision.account_editable && ((!isPartial && !isOverpaid) || settle || credit)
     // the company has not said where a gap of this kind of invoice goes: the card says so, and where to say it
     const missingSetting = showAccount && !credit && !decision.default_account
     const settingsHref = transaction.company ? `/app/neoffice-company-settings/${encodeURIComponent(transaction.company)}` : ""
@@ -143,12 +150,16 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
 
     const headline = isPartial
         ? _("Paid {0} out of {1}", [formatCurrency(verdict.amount, verdict.currency), formatCurrency(verdict.outstanding, verdict.currency)])
-        : _("A difference of {0} on invoice {1}", [gapText, decision.invoice])
+        : isOverpaid
+            ? (isSale ? _("An overpayment of {0} on invoice {1}", [gapText, decision.invoice]) : _("{0} paid too much on invoice {1}", [gapText, decision.invoice]))
+            : _("A difference of {0} on invoice {1}", [gapText, decision.invoice])
 
     const passLabel = draft && credit
         ? _("Validate the draft and reconcile")
         : isPartial
             ? (credit ? _("Create the credit note and reconcile") : settle ? _("Settle the invoice and book the difference") : _("Record the partial payment"))
+            : isOverpaid
+                ? (settle ? _("Settle the invoice and book the difference") : _("Settle the invoice and keep the surplus"))
             : verdict.kind === "dunning_fee"
                 ? _("Book the dunning fee and reconcile")
                 : confirming ? _("Confirm the rebate and reconcile") : _("Settle the invoice and reconcile")
@@ -162,6 +173,12 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                 : settle
                     ? _("Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above.", [gapText])
                     : _("Books the payment received. The invoice stays due for {0}.", [gapText]))
+            : isOverpaid
+                ? (settle
+                    ? _("Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above.", [gapText])
+                    : isSale
+                        ? _("Books the whole payment: the invoice is settled and {0} stays available for the customer, to match with a next invoice.", [gapText])
+                        : _("Books the whole payment: the invoice is settled and {0} stays open with the supplier, to match with a next invoice.", [gapText]))
             : verdict.kind === "dunning_fee"
                 ? _("The fee of the dunning is booked on its own account and settles it.")
                 : _("Settles the invoice: the payment is booked for what came in and the difference of {0} goes to the account chosen above.", [gapText])
@@ -169,7 +186,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
     // the page of the manual that the main button speaks of: the three choices of a partial payment, or the card in general
     const passPage = isPartial ? MANUAL.partial : MANUAL.decide
 
-    const tile = (value: "open" | "credit" | "gap", label: string, hint: ReactNode, proposed: boolean) => (
+    const tile = (value: "open" | "credit" | "gap", label: string, hint: ReactNode, proposed: boolean, href: string = MANUAL.partial) => (
         <div key={value} className="flex items-center gap-2">
             <button
                 type="button"
@@ -185,7 +202,7 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                 <span className="min-w-0 flex-1">{label}</span>
                 {proposed && <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">{_("Proposed")}</span>}
             </button>
-            <InfoHint href={MANUAL.partial}>{hint}</InfoHint>
+            <InfoHint href={href}>{hint}</InfoHint>
         </div>
     )
 
@@ -252,6 +269,34 @@ const GapDecisionCard = ({ transaction }: { transaction: UnreconciledTransaction
                             habit?.proposal === "credit_note" || decision.rule_proposal === "credit_note",
                         )}
                         {tile("gap", _("Write off the balance as a loss or a discount"), _("The invoice is settled and {0} is booked on the account you choose below: a loss on customers when the customer will not pay the rest, or a discount when you grant one. Unlike a credit note, no document is made for the customer.", [gapText]), decision.rule_proposal === "gap")}
+                    </div>
+                )}
+                {isOverpaid && decision.can_decide_surplus && (
+                    <div className="flex flex-col gap-2" role="radiogroup">
+                        <span className="text-base font-medium">{_("What becomes of the surplus of {0}?", [gapText])}</span>
+                        {tile(
+                            "open",
+                            _("Keep it for a next invoice"),
+                            isSale
+                                ? _("The payment is booked in full. The invoice is settled and {0} stays available for the customer on this payment: you match it to another invoice later, in a reconciliation.", [gapText])
+                                : _("The payment is booked in full. The invoice is settled and {0} stays open with the supplier on this payment: you match it to another invoice later, in a reconciliation.", [gapText]),
+                            true,
+                            MANUAL.decide,
+                        )}
+                        {tile(
+                            "gap",
+                            _("Book it as a difference"),
+                            _("The invoice is settled and {0} is booked on the account you choose below, like the fee of a dunning. Nothing stays available for later.", [gapText]),
+                            false,
+                            MANUAL.decide,
+                        )}
+                        {!settle && (
+                            <p className="text-sm leading-snug text-muted-foreground">
+                                {isSale
+                                    ? _("The payment is booked in full: {0} settle the invoice and {1} stay available for {2}, to match with a next invoice.", [owed, gapText, who])
+                                    : _("The payment is booked in full: {0} settle the invoice and {1} stay open with {2}, to match with a next invoice.", [owed, gapText, who])}
+                            </p>
+                        )}
                     </div>
                 )}
                 {credit && note && (

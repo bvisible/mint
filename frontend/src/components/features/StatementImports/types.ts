@@ -112,6 +112,8 @@ export type GapDecision = {
     account: string | null,
     settle_in_full: boolean,
     can_settle: boolean,
+    /** More came in than is owed: the person chooses between keeping the surplus for a next invoice and booking it as a difference. */
+    can_decide_surplus: boolean,
     /** The rows the gap would be booked as, the VAT cut from the account included (nothing is written yet). */
     deductions: { account: string, amount: number, description: string | null }[],
     /** A short payment of a sale can be closed by a credit note of the balance (null for anything else). */
