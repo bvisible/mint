@@ -5285,3 +5285,105 @@ msgstr "Que devient le surplus de {0} ?"
 #, python-brace-format
 msgid "{0} paid too much on invoice {1}"
 msgstr "{0} payés en trop sur la facture {1}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:334
+#, python-brace-format
+msgid "A credit note of {0} is made, linked to invoice {1}, on its sales accounts and with its VAT. It settles the invoice."
+msgstr "Une note de crédit de {0} est établie, liée à la facture {1}, sur ses comptes de vente et avec sa TVA. Elle solde la facture."
+
+#: mint/apis/payment_gap.py:372
+#, python-brace-format
+msgid "Balance of {0} taken off the sales"
+msgstr "Solde de {0} déduit du chiffre d'affaires"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:123
+msgid "Balance taken off the turnover, invoice settled and bank line reconciled"
+msgstr "Solde déduit du chiffre d'affaires, facture soldée et ligne bancaire rapprochée"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:291
+msgid "Book it as a loss on the customer"
+msgstr "Le passer en perte sur client"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:338
+msgid "Goods are coming back and must go into stock?"
+msgstr "De la marchandise revient et doit rentrer en stock ?"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:369
+#, python-brace-format
+msgid "Invoice {0}: amount due"
+msgstr "Facture {0} : montant dû"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:285
+msgid "Make a credit note"
+msgstr "Faire une note de crédit"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
+msgid "Make the credit note yourself first, then choose Leave the balance to pay: you match it afterwards."
+msgstr "Faites d'abord vous-même la note de crédit, puis choisissez « Laisser le solde à payer » : vous la rapprocherez ensuite."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#, python-brace-format
+msgid "Makes a credit note of {0}, linked to the invoice, and settles the invoice. The payment received is booked as it is."
+msgstr "Établit une note de crédit de {0}, liée à la facture, et solde la facture. Le paiement reçu est comptabilisé tel quel."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:286
+#, python-brace-format
+msgid "Makes a credit note of {0}, linked to the invoice, on its sales accounts and with its VAT, and settles the invoice. No stock moves: when goods come back, make the credit note yourself first and choose Leave the balance to pay."
+msgstr "Établit une note de crédit de {0}, liée à la facture, sur ses comptes de vente et avec sa TVA, et solde la facture. Aucun mouvement de stock : si la marchandise revient, faites d'abord vous-même la note de crédit, puis choisissez « Laisser le solde à payer »."
+
+#: mint/apis/payment_gap.py:354
+msgid "Only the balance of a sale is taken off the turnover."
+msgstr "Seul le solde d'une vente est déduit du chiffre d'affaires."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:276
+#, python-brace-format
+msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, or when a credit note will be made afterwards (goods brought back into stock, for example) and matched later."
+msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour {0} : choisissez cette option lorsque le client doit encore régler le reste, ou lorsqu'une note de crédit sera établie plus tard (marchandise reprise en stock, par exemple) et rapprochée ensuite."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
+msgid "Settle the invoice and book the loss"
+msgstr "Solder la facture et comptabiliser la perte"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
+#, python-brace-format
+msgid "Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT."
+msgstr "Solde la facture : le paiement est comptabilisé pour le montant reçu, et {0} est déduit du chiffre d'affaires, sur le compte de vente de la facture, avec sa TVA."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:279
+msgid "Take it off the turnover"
+msgstr "Le déduire du chiffre d'affaires"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
+msgid "Take it off the turnover and reconcile"
+msgstr "Déduire du chiffre d'affaires et rapprocher"
+
+#: mint/apis/payment_gap.py:271
+msgid "The balance of a sale is taken off the turnover only for a short payment."
+msgstr "Le solde d'une vente n'est déduit du chiffre d'affaires que pour un paiement incomplet."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:344
+msgid "The credit note"
+msgstr "La note de crédit"
+
+#: mint/apis/gap_credit_note.py:204
+msgid "The credit note of the balance is drawn from an invoice that is submitted and not a return."
+msgstr "La note de crédit du solde est établie à partir d'une facture validée, et non d'un retour."
+
+#: mint/apis/payment_gap.py:358
+msgid "The invoice has no sales account to take the balance off."
+msgstr "La facture n'a pas de compte de vente où déduire le solde."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:293
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked as a loss on the account you choose below (the one the company set, by default). Choose this when the customer will not pay the rest."
+msgstr "La facture est soldée et {0} est comptabilisé en perte sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option lorsque le client ne réglera pas le reste."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
+#, python-brace-format
+msgid "The invoice is settled and {0} is taken off the turnover, on the sales account of the invoice and with its VAT: one entry, no document for the customer. Choose this for an arrangement with the customer, a commercial gesture or a rebate."
+msgstr "La facture est soldée et {0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, pas de document pour le client. Choisissez cette option pour un arrangement avec le client, un geste commercial ou un rabais."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:333
+#, python-brace-format
+msgid "{0} are taken off the turnover, on the sales account of the invoice and with its VAT: one entry, and the invoice is settled. For an arrangement with the customer, a commercial gesture or a rebate."
+msgstr "{0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, et la facture est soldée. Pour un arrangement avec le client, un geste commercial ou un rabais."
