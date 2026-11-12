@@ -5197,3 +5197,12 @@ msgstr "Ouvre les réglages de la société dans un nouvel onglet : cet écran r
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and the gap of {0} goes to the account chosen above."
 msgstr "Solde la facture : le paiement est enregistré pour le montant reçu, et l'écart de {0} est porté sur le compte choisi ci-dessus."
+
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:43
+msgid "One existing voucher has the amount or the reference of this line."
+msgstr "Une pièce existante a le montant ou la référence de cette ligne."
+
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:44
+#, python-brace-format
+msgid "{0} existing vouchers have the amount or the reference of this line."
+msgstr "{0} pièces existantes ont le montant ou la référence de cette ligne."
