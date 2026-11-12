@@ -5206,3 +5206,82 @@ msgstr "Une pièce existante a le montant ou la référence de cette ligne."
 #, python-brace-format
 msgid "{0} existing vouchers have the amount or the reference of this line."
 msgstr "{0} pièces existantes ont le montant ou la référence de cette ligne."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:154
+#, python-brace-format
+msgid "An overpayment of {0} on invoice {1}"
+msgstr "Un trop-perçu de {0} sur la facture {1}"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:288
+msgid "Book it as a difference"
+msgstr "Le comptabiliser comme différence"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#, python-brace-format
+msgid "Books the whole payment: the invoice is settled and {0} stays available for the customer, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : la facture est soldée et {0} reste à disposition du client, à rapprocher d'une prochaine facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:181
+#, python-brace-format
+msgid "Books the whole payment: the invoice is settled and {0} stays open with the supplier, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : la facture est soldée et {0} reste ouvert chez le fournisseur, à rapprocher d'une prochaine facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:115
+msgid "Invoice settled and bank line reconciled, the surplus stays available"
+msgstr "Facture soldée et ligne bancaire rapprochée, le surplus reste à disposition"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:56
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed."
+msgstr "La facture {0} de {1} se solde à {2}. Vous avez payé {3}, soit {4} de plus que le montant dû."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:279
+msgid "Keep it for a next invoice"
+msgstr "Le garder pour une prochaine facture"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
+msgid "Settle the invoice and keep the surplus"
+msgstr "Solder la facture et garder le surplus"
+
+#: mint/apis/payment_gap.py:340
+msgid "The invoice is not in the currency of the company: use Reconcile manually."
+msgstr "La facture n'est pas dans la devise de la société : utilisez « Rapprocher manuellement »."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:289
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked on the account you choose below, like the fee of a dunning. Nothing stays available for later."
+msgstr "La facture est soldée et {0} est comptabilisé sur le compte que vous choisissez ci-dessous, comme les frais d'un rappel. Rien ne reste à disposition pour plus tard."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:281
+#, python-brace-format
+msgid "The payment is booked in full. The invoice is settled and {0} stays available for the customer on this payment: you match it to another invoice later, in a reconciliation."
+msgstr "Le paiement est enregistré en entier. La facture est soldée et {0} reste à disposition du client sur ce paiement : vous le rapprocherez plus tard d'une autre facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:282
+#, python-brace-format
+msgid "The payment is booked in full. The invoice is settled and {0} stays open with the supplier on this payment: you match it to another invoice later, in a reconciliation."
+msgstr "Le paiement est enregistré en entier. La facture est soldée et {0} reste ouvert chez le fournisseur sur ce paiement : vous le rapprocherez plus tard d'une autre facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:296
+#, python-brace-format
+msgid "The payment is booked in full: {0} settle the invoice and {1} stay available for {2}, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : {0} solde la facture et {1} reste à disposition de {2}, à rapprocher d'une prochaine facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:297
+#, python-brace-format
+msgid "The payment is booked in full: {0} settle the invoice and {1} stay open with {2}, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : {0} solde la facture et {1} reste ouvert chez {2}, à rapprocher d'une prochaine facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:137
+msgid "the supplier"
+msgstr "le fournisseur"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:276
+#, python-brace-format
+msgid "What becomes of the surplus of {0}?"
+msgstr "Que devient le surplus de {0} ?"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:154
+#, python-brace-format
+msgid "{0} paid too much on invoice {1}"
+msgstr "{0} payés en trop sur la facture {1}"
