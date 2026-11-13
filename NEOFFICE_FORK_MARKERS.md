@@ -14,7 +14,21 @@ picture of what is ours and why.
 
 Fork of **The-Commit-Company/mint**, branch `version-15` of `bvisible/mint`.
 
-### Base and attribution (established 2026-09-04)
+### Upstream merge of v1.5.4 (13.11.2026)
+
+`origin/version-15` merged the upstream tag **`v1.5.4`** (`93f6235`) on 13.11.2026: a real merge commit
+(second parent `v1.5.4`), so from now on `merge-base origin/version-15 upstream/main` is `v1.5.4` and the
+marker check of an upstream merge measures from it. The content was merged on **`v1.5.2` as its base**
+(`git merge-tree --merge-base=v1.5.2`), not on `feb81798`: v1.5.0 and v1.5.2 had been carried by hand, so the
+real upstream delta was v1.5.2..v1.5.4 (8 commits: user permissions on the bank account list, type filter of
+the transaction list, `chq` reference column, company list fetched explicitly, no duplicate custom fields on
+ERPNext v16, `required_apps = ["frappe/erpnext"]`). Three upstream changes of feb81798..v1.5.2 the hand-carry
+had missed came in with it (the `bankAccount ? … : null` SWR key of `useGetBankTransactions`, and the `ar`/`de`
+catalogues). The three hand-made backports below (`4969a76`, `768ef4c`, `64c3ad6`) are upstream's own code
+now: their markers were dropped. Every file the sections below called *"NOT ours … take upstream's at the
+merge"* was taken from `v1.5.4` byte for byte, except where a line of ours stays marked in place.
+
+### Base and attribution (established 2026-09-04, before the v1.5.4 merge)
 
 | Fact | Value |
 |---|---|
@@ -47,6 +61,9 @@ Fork of **The-Commit-Company/mint**, branch `version-15` of `bvisible/mint`.
   They are marked in place as `backport of upstream <sha> (cherry-pick), drop at the merge`.
 - `git diff --stat feb81798…HEAD` → **194 files changed, 36 103 insertions, 1 083 deletions**.
 
+> ✅ **Settled by the v1.5.4 merge (13.11.2026)**: the files below are upstream's again, byte for byte (or with
+> our marked lines only). Kept for the record:
+>
 > ⚠️ **A large part of that diff is NOT ours.** Upstream released **v1.5.0 / v1.5.2 after
 > `feb81798`** and, instead of merging their branch, we carried the release in by hand
 > (`89e7929` Daniel, then `2bdac9c`). Files that are **byte-identical to `upstream/develop`
@@ -80,8 +97,7 @@ Ours, four changes:
   transitive copy.
 
 #### `frontend/.env.production`
-**NOT ours.** `VITE_BASE_NAME='mint'`, identical to `upstream/develop`. Hand-carried with the
-v1.5.0 port (`89e7929`). Take upstream's at the merge.
+Upstream's (`VITE_BASE_NAME='mint'`), taken from `v1.5.4` at the merge of 13.11.2026: no divergence left.
 
 #### `mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json`
 Mixed. Compared with `upstream/develop`, **these fields are ours only**:
@@ -134,8 +150,9 @@ The `columns` widths and the `in_list_view` flips on `reference`, `imported` and
 **NOT ours.** Upstream v1.5.0 doctypes, hand-carried by `89e7929`. Field for field identical to
 `upstream/develop`, with ONE exception that is ours (#1489): `closing_balance` of the import log loses
 `non_negative` (an overdrawn account's statement closes below zero, and the log refused to store it, so
-the whole import failed). Needs `bench migrate`; the file's `modified` was moved for that. Take
-upstream's at the merge, re-apply that one property and drop the header markers in their `.py`.
+the whole import failed). Needs `bench migrate`; the file's `modified` was moved for that. At the
+v1.5.4 merge (13.11.2026) the `.py` controllers and stubs were taken from upstream (markers dropped) and the JSON
+kept that one property.
 
 ---
 
@@ -202,12 +219,14 @@ states the decision above in the form the guard reads.
   `…_template/__init__.py`, `…_template_columns/__init__.py` are **empty** and left unmarked:
   a marker in an empty package file carries no information and the three doctype ones are
   upstream's anyway.
-- `mint/apis/statement_import.py` differs from `upstream/develop` by trailing whitespace
-  (five lines in `get_column_mapping`) and by four fixes of ours, each marked in place (#1501 short
-  rows, #1489: decimal comma in `get_float_amount`, column at index 0 in `get_column_mapping`,
-  `.xls` date serial numbers, closing balance of zero or below in `import_statement`). Take
-  upstream's file at the merge and re-apply those unless upstream has its own.
+- `mint/apis/statement_import.py` is upstream's since the v1.5.4 merge (trailing whitespace of
+  `get_column_mapping` restored) plus our fixes, each marked in place (#1501 short rows, #1489: decimal
+  comma in `get_float_amount`, column at index 0 in `get_column_mapping`, `.xls` date serial numbers,
+  closing balance of zero or below in `import_statement`). At the next merge keep those unless upstream
+  has its own.
 - `frontend/src/components/features/BankStatementImporter/CSV/CSVRawDataPreview.tsx` differs from
-  `upstream/develop` by **one line** (an `_()` wrap around a tooltip), and `…/StatementDetails.tsx`
-  by **two** (that wrap, and the Import button disabled while the file holds no transaction,
-  #1489). Take upstream's file and re-apply them.
+  upstream by **one line** (an `_()` wrap around a tooltip), and `…/StatementDetails.tsx` by **two**
+  (that wrap, and the Import button disabled while the file holds no transaction, #1489), each marked
+  in place since the v1.5.4 merge.
+- `mint/hooks.py`: upstream v1.5.4 declares `required_apps = ["frappe/erpnext"]`; ours keeps that entry and
+  adds `bvisible/neoffice_theme` after it (marked in place).

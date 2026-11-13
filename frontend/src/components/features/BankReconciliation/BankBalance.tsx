@@ -149,8 +149,6 @@ const ReconcileProgress = () => {
         ['docstatus', '=', 1],
         ['date', '<=', dates?.toDate],
         ['date', '>=', dates?.fromDate]
-    //// Neoffice — NOT ours: one argument dropped from useFrappeGetDocCount when upstream v1.5.0
-    //// moved to a newer frappe-react-sdk, hand-carried (89e7929). Take upstream's at the merge.
     ], false, undefined, {
         revalidateOnFocus: false
     })

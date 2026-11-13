@@ -1,12 +1,7 @@
-# //// Neoffice — NOT ours: this whole file is upstream v1.5.0, carried by hand (89e7929,
-# //// then the v1.5.2 fixes in 2bdac9c) because we had not merged upstream's branch. It is
-# //// identical to upstream/develop except for trailing spaces an editor stripped in
-# //// get_column_mapping, and for the short-row padding of get_transaction_rows (#1501, marked
-# //// in place; upstream still reads the missing cell). Also ours, marked in place (#1489): the
-# //// decimal comma of get_float_amount, the column at index 0 of get_column_mapping, the date
-# //// serial numbers of an .xls in get_transaction_rows, and the closing balance below zero in
-# //// import_statement. At the next merge take upstream's file, keep those unless upstream has
-# //// its own, and drop this marker.
+# //// Neoffice — upstream's file (merged with v1.5.4). Ours, each marked in place: the short-row padding of
+# //// get_transaction_rows (#1501; upstream still reads the missing cell), and (#1489) the decimal comma of
+# //// get_float_amount, the column at index 0 of get_column_mapping, the date serial numbers of an .xls in
+# //// get_transaction_rows, and the closing balance below zero in import_statement.
 import frappe
 import re
 from frappe.utils.csvutils import read_csv_content
@@ -275,13 +270,13 @@ def get_column_mapping(header_row: list[str]):
     Given the header row, try to map each column index to a standard variable, or set it to "Do not import"
     """
     standard_variables = {
-        "Date": ["date", "transaction date"],
+        "Date": ["date", "transaction date"], 
         "Withdrawal": ["withdrawal", "debit"],
         "Deposit": ["deposit", "credit"],
-        "Amount": ["amount"],
-        "Description": ["description", "particulars", "remarks", "narration", "detail", "reference"],
-        "Reference": ["reference", "ref", "tran id", "transaction id", "cheque", "check", "id", "chq"],
-        "Transaction Type": ["transaction type", "cr/dr", "dr/cr", "debit/credit", "credit/debit"],
+        "Amount": ["amount"], 
+        "Description": ["description", "particulars", "remarks", "narration", "detail", "reference"], 
+        "Reference": ["reference", "ref", "tran id", "transaction id", "cheque", "check", "id", "chq"], 
+        "Transaction Type": ["transaction type", "cr/dr", "dr/cr", "debit/credit", "credit/debit"], 
         "Balance": ["balance"],
     }
 

@@ -1,4 +1,3 @@
-# //// Neoffice — frappe is imported for the per-field check of the standard fields below.
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
@@ -24,7 +23,8 @@ def _without_standard_fields(custom_fields):
 
 def after_install():
 
-    # //// Neoffice — the dict is built first so each field can be checked against ERPNext's own.
+    # //// Neoffice — upstream's early return when reconciliation_type exists (561c65c) is replaced by the
+    # //// per-field check of _without_standard_fields: the dict is built first so each field can be checked.
     custom_fields = {
         "Bank Transaction Payments": [
 			{

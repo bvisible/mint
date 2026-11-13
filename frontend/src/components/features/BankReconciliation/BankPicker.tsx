@@ -13,8 +13,6 @@ import { getTimeago } from "@/lib/date"
 import ErrorBanner from "@/components/ui/error-banner"
 import _ from "@/lib/translate"
 
-//// Neoffice — NOT ours: the size prop is upstream v1.5.0, hand-carried (89e7929); the
-//// statement importer renders the same picker in a compact form. Take upstream's.
 //// Neoffice — the size « row » is ours: the logo and the name on one line, the account under it (two lines, not three).
 //// Neoffice — the size « select » is ours too: one selector instead of a row of cards (Daniel, 11.11: the bank at the top left,
 //// the four figures under it, and the row of cards gone, since what matters is the list below).
@@ -51,7 +49,6 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
     return (
         <div
             className={cn("flex gap-3 items-stretch w-full overflow-x-auto bank-picker-scrollbar pr-4",
-                //// Neoffice — NOT ours: upstream v1.5.0 scroll padding, hand-carried (89e7929).
                 banks?.length > 4 ? 'pb-2' : '', className,
             )}
             style={{
@@ -61,7 +58,6 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
         >
             {
                 banks?.map((bank) => (
-                    //// Neoffice — NOT ours: size forwarded to the item, upstream v1.5.0 (89e7929).
                     <BankPickerItem key={bank.name} bank={bank} size={size} />
                 ))
             }
@@ -139,7 +135,6 @@ const BankSelect = ({ banks, className }: { banks: SelectedBank[], className?: s
     )
 }
 
-//// Neoffice — NOT ours: upstream v1.5.0 signature, hand-carried (89e7929).
 const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'base' | 'sm' | 'row' }) => {
 
     const [selectedBank, setSelectedBank] = useAtom(selectedBankAccountAtom)
@@ -183,7 +178,6 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
         title={_("Select {0}", [bank.account_name ?? ''])}
         onClick={onSelect}
         className={cn('rounded-md border-2 border-gray-200 min-w-80 relative p-2 bg-card overflow-hidden cursor-pointer',
-            //// Neoffice — NOT ours: upstream v1.5.0 compact-size classes, hand-carried (89e7929).
             isSelected ? 'border-primary bg-primary-foreground' : 'hover:bg-gray-50',
             {
                 "max-w-60 min-w-60": size === 'sm',
@@ -199,6 +193,7 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
             className={cn("object-left object-contain mb-1", {
                 'mb-2': size === 'sm',
             })}
+            //// Neoffice — the bounding style is ours (e582a55), see the marker above className.
             style={size === 'sm'
                 ? { maxWidth: '64px', maxHeight: '20px', width: 'auto', height: 'auto' }
                 : { maxWidth: '112px', maxHeight: '32px', width: 'auto', height: 'auto' }}
@@ -218,8 +213,7 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
         </div>}
 
         <div className="flex flex-col gap-0.5">
-            {/* //// Neoffice — NOT ours below, except the _("GL Account") wrap on the next line, which is */}
-            {/* //// ours (1f2847e): the rest is upstream v1.5.0's compact size (89e7929). */}
+            {/* //// Neoffice — the _("GL Account") wrap on the next line is ours (1f2847e). */}
             <span className={cn("tracking-tight font-medium", {
                 'text-xs': size === 'sm',
             })}>{bank.account_name}</span>
@@ -227,7 +221,6 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
             {bank.last_integration_date && size !== 'sm' && <span className="text-xs text-muted-foreground">{_("Last Synced Transaction")}: {getTimeago(bank.last_integration_date)}</span>}
         </div>
 
-        {/* //// Neoffice — NOT ours: upstream v1.5.0 compact-size offsets, hand-carried (89e7929). */}
         <div className={cn("absolute -top-1 right-0", {
             "-top-1.5": size === 'sm',
         })}>
@@ -238,12 +231,9 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
                 }
             )}>
                 {bank.account_type?.slice(0, 24)}
-            {/* //// Neoffice — NOT ours: upstream v1.5.0 guards the badge on account_type being set, so the */}
-            {/* //// closing brace moved. Hand-carried (89e7929). */}
             </span>}
         </div>
 
-    {/* //// Neoffice — NOT ours: a stray space in the closing tag, from upstream v1.5.0 (89e7929). */}
     </div >
 }
 

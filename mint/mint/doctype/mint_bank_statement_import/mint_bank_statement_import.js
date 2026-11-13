@@ -42,6 +42,7 @@ frappe.ui.form.on("Mint Bank Statement Import", {
         if (frm._poll_interval) { clearInterval(frm._poll_interval); frm._poll_interval = null; }
         if (typeof neoffice !== 'undefined' && neoffice.processing_overlay) { neoffice.processing_overlay.hide(); }
 
+        //// Neoffice — ours to the end of refresh() (see the marker above): file info, then the XML/PDF branch.
         render_file_info(frm);
 
         if (frm.doc.file && frm.doc.docstatus === 0 && !frm.is_new()) {
@@ -71,6 +72,7 @@ frappe.ui.form.on("Mint Bank Statement Import", {
                 if (frm.doc.document_scan_name) {
                     frm.add_custom_button(__("View Document Scan"), () => frappe.set_route("Form", "Document Scan", frm.doc.document_scan_name));
                 }
+                //// Neoffice — NORA's analysis in place of upstream's Google AI button.
                 if (!frm.doc.ocr_status && (!frm.doc.transactions || frm.doc.transactions.length === 0)) {
                     frm.add_custom_button(__("Analyze with Nora AI"), () => start_ocr_processing(frm)).addClass("btn-primary");
                 }

@@ -1,7 +1,6 @@
-//// Neoffice — upstream v1.5.0 component, hand-carried (89e7929, then the v1.5.2 date-format
-//// fixes in 2bdac9c). Ours differs from upstream/develop by TWO lines: the "GL Account"
-//// tooltip is wrapped in _(), and the Import button stays off while the file holds no
-//// transaction (#1489, marked in place). At the merge take upstream's file and re-apply both.
+//// Neoffice — upstream's component (merged with v1.5.4). Ours: TWO lines, the "GL Account"
+//// tooltip wrapped in _(), and the Import button off while the file holds no transaction
+//// (#1489). Both marked in place.
 import _ from '@/lib/translate'
 import { GetStatementDetailsResponse } from '../import_utils'
 import { flt, formatCurrency } from '@/lib/numbers'
@@ -149,6 +148,7 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                                         <H4 className="text-base mb-0">{bank?.bank}</H4>
                                     </div>}
                                     <span className="tracking-tight text-sm font-medium">{bank?.account_name}</span>
+                                    {/* //// Neoffice — _() wrap: the tooltip is translated. */}
                                     <span title={_("GL Account")} className="text-sm">{bank?.account}</span>
                                 </div>
                             </TableCell>

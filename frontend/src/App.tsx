@@ -1,12 +1,9 @@
 import { useEffect } from 'react'
-//// Neoffice — NOT ours: this import and the BankStatementImporter one below are
-//// upstream v1.5.0, hand-ported with the CSV importer (89e7929). Take upstream's at
-//// the merge. The imports after Toaster (toast, NeoCockpit, FrappeLayout, NoraLearn)
-//// ARE ours: /mint runs inside the Neoffice cockpit and carries the Nora Learn overlay.
+//// Neoffice — the imports after Toaster (toast, NeoCockpit, FrappeLayout, NoraLearn) are ours: /mint
+//// runs inside the Neoffice cockpit and carries the Nora Learn overlay.
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { FrappeProvider } from 'frappe-react-sdk'
 import BankReconciliation from './pages/BankReconciliation'
-//// Neoffice — NOT ours: upstream v1.5.0 route, hand-ported (89e7929). See the note above.
 import BankStatementImporter from './pages/BankStatementImporter'
 import { Toaster } from './components/ui/sonner'
 //// Neoffice — added (2c514a4, 44c8b52). NeoCockpit is the shared Neoffice shell;

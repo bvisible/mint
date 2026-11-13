@@ -1,10 +1,4 @@
 import frappe
-# //// Neoffice — almost nothing in this file is our intent: it is upstream code carried by hand.
-# //// This import and the str | datetime.date hint at the bottom come from the v1.5.0
-# //// port (89e7929); the get_list rewrite below is a byte-identical backport of upstream
-# //// 5ba8c6b. At the next merge take upstream's bank_account.py and drop those markers,
-# //// EXCEPT the lines marked « (01.10) » in get_list (bic and bank_iid, for the bank logos):
-# //// ours, re-apply them on upstream's version.
 import datetime
 
 # //// Neoffice — getdate: the file's balance is compared with the typed one by day (get_closing_balance_as_per_statement).
@@ -14,18 +8,14 @@ from frappe.utils import getdate
 @frappe.read_only()
 def get_list(company: str, show_disabled: bool = False):
 
-    # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge: frappe.get_list
-    # //// applies User Permissions, the pypika join it replaces did not.
     filters = {
         "is_company_account": 1,
         "company": company
     }
 
-    # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge.
     if not show_disabled:
         filters["disabled"] = 0
 
-    # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge.
     bank_accounts = frappe.get_list("Bank Account", 
                                     filters=filters, 
                                     order_by="is_default desc",
@@ -33,8 +23,6 @@ def get_list(company: str, show_disabled: bool = False):
                                             # //// Neoffice — iban read (01.10) for its IID only, see below.
                                             "iban"])
 
-    # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge: account_currency
-    # //// was a column of the dropped join, it is now read per row from the Account cache.
     for bank_account in bank_accounts:
         bank_account.account_currency = frappe.get_cached_value("Account", bank_account.account, "account_currency")
         # //// Neoffice — added (01.10): what names the account's bank for its logo (logos.ts,
@@ -45,8 +33,6 @@ def get_list(company: str, show_disabled: bool = False):
         iban = (bank_account.pop("iban", None) or "").replace(" ", "").upper()
         bank_account.bank_iid = iban[4:9] if iban[:2] in ("CH", "LI") and iban[4:9].isdigit() else None
 
-    # //// Neoffice — backport of upstream 5ba8c6b (cherry-pick), drop at the merge: the stray
-    # //// blank line and the renamed return come from upstream's commit verbatim.
     
     return bank_accounts
 
@@ -96,7 +82,6 @@ def get_closing_balance_as_per_statement(bank_account: str, date: str):
 # //// Neoffice — POST only, as ERPNext v16 and v15-hotfix do for every method that writes; the SPA already
 # //// posts it (useFrappePostCall).
 @frappe.whitelist(methods=["POST"])
-# //// Neoffice — NOT ours: upstream v1.5.0 signature, hand-ported (89e7929). Take upstream's.
 def set_closing_balance_as_per_statement(bank_account: str, date: str | datetime.date, balance: float):
     """
     Set the closing balance as per statement for a bank account and date

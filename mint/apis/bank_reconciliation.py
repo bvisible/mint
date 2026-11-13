@@ -265,9 +265,6 @@ def create_bulk_bank_entry_and_reconcile(bank_transactions: list[str|int],
                 "debit_in_account_currency": transactions_details.unallocated_amount,
                 "debit": transactions_details.unallocated_amount,
                 "credit_in_account_currency": 0,
-                # //// Neoffice — backport of upstream v1.5.2 (cherry-pick, 2bdac9c), drop at the merge:
-                # //// upstream repeated the "debit" key in this dict literal, so the second one overwrote the
-                # //// first and the bank line of a bulk split was written with debit 0.
                 "credit": 0,
             })
 
@@ -292,9 +289,7 @@ def create_bulk_bank_entry_and_reconcile(bank_transactions: list[str|int],
 
 
 @frappe.whitelist(methods=['POST'])
-# //// Neoffice — whitespace only: upstream's line ends with a trailing space, an editor
-# //// stripped it. Take upstream's line at the merge.
-def create_bank_entry_and_reconcile(bank_transaction_name: str | int,
+def create_bank_entry_and_reconcile(bank_transaction_name: str | int, 
                                     cheque_date: str | datetime.date,
                                     posting_date: str | datetime.date,
                                     cheque_no: str,

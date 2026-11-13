@@ -1,6 +1,5 @@
-//// Neoffice — upstream v1.5.0 component, hand-carried (89e7929). Ours differs from
-//// upstream/develop by ONE line only: the "Header Row" tooltip is wrapped in _() so it can
-//// be translated. At the merge take upstream's file and re-apply that single wrap.
+//// Neoffice — upstream's component (merged with v1.5.4). Ours: ONE line, the "Header Row"
+//// tooltip wrapped in _() so it can be translated (marked below).
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { ArrowDownRightIcon, ArrowUpRightIcon, BanknoteIcon, CalendarIcon, DollarSignIcon, FileTextIcon, ListIcon, ReceiptIcon } from "lucide-react"
@@ -26,6 +25,7 @@ const CSVRawDataPreview = ({ data }: { data: GetStatementDetailsResponse }) => {
                     const isTransactionRow = index >= data.transaction_starting_index && index <= data.transaction_ending_index;
 
                     return <TableRow key={index}
+                        //// Neoffice — _() wrap: the tooltip is translated.
                         title={isHeaderRow ? _("Header Row") : ""}
                         className={cn({
                             // "bg-yellow-100": isHeaderRow,

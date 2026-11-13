@@ -25,13 +25,14 @@ class MintBankStatementImport(Document):
 		amended_from: DF.Link | None
 		bank_account: DF.Link
 		# //// Neoffice — auto-generated type stubs for the fields WE added to the doctype JSON
-		# //// (bank_statement_id, closing_balance, content_hash, currency, document_scan_name,
-		# //// document_status). Do not hand-merge this block: take upstream's, re-apply the JSON
+		# //// (bank_statement_id, closing_balance, content_hash, document_scan_name, document_status;
+		# //// currency is upstream's). Do not hand-merge this block: take upstream's, re-apply the JSON
 		# //// fields listed in NEOFFICE_FORK_MARKERS.md, then let bench regenerate it.
 		bank_statement_id: DF.Data | None
 		closing_balance: DF.Currency | None
 		content_hash: DF.Data | None
 		currency: DF.Link | None
+		# //// Neoffice — ours (see the marker above): the OCR and status fields.
 		document_scan_name: DF.Link | None
 		document_status: DF.Literal["Draft", "Submitted", "Cancelled"]
 		error: DF.Code | None
@@ -145,13 +146,11 @@ class MintBankStatementImport(Document):
 				"date": transaction.get("date"),
 				"status": "Unreconciled",
 				"bank_account": self.bank_account,
-				# //// Neoffice — added: without it the Bank Transaction inherits the company currency, which
-				# //// is wrong for a EUR or USD account. Upstream's own v1.5.x fix, hand-carried (89e7929).
-				"currency": self.currency,
 				"withdrawal": transaction.get("amount") if transaction.get("type") == "Withdrawal" else 0,
 				"deposit": transaction.get("amount") if transaction.get("type") == "Deposit" else 0,
 				"description": transaction.get("description"),
 				"reference_number": transaction.get("reference"),
+				"currency": self.currency,
 			})
 			bank_tx.insert()
 			bank_tx.submit()

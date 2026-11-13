@@ -127,7 +127,7 @@ export const useGetBankTransactions = () => {
         from_date: dates.fromDate,
         to_date: dates.toDate,
         all_transactions: true
-    }, `bank-reconciliation-bank-transactions-${bankAccount?.name}-${dates.fromDate}-${dates.toDate}`)
+    }, bankAccount ? `bank-reconciliation-bank-transactions-${bankAccount?.name}-${dates.fromDate}-${dates.toDate}` : null)
 }
 
 

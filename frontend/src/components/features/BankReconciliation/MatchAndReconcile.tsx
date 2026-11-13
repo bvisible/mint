@@ -4,7 +4,6 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai"
 //// feature. Each marker below says which.
 import { bankRecAmountFilter, bankRecDateAtom, bankRecDraftJEModalAtom, bankRecImportFilterAtom, bankRecTabAtom, bankRecRecordJournalEntryModalAtom, bankRecRecordPaymentModalAtom, bankRecSelectedTransactionAtom, bankRecTransactionTypeFilter, bankRecTransferModalAtom, selectedBankAccountAtom } from "./bankRecAtoms"
 import { H4 } from "@/components/ui/typography"
-//// Neoffice — NOT ours: upstream v1.5.0 (89e7929) added useRef for the search field.
 import { useEffect, useMemo, useRef, useState } from "react"
 import { getCompanyCurrency } from "@/lib/company"
 import ErrorBanner from "@/components/ui/error-banner"
@@ -39,7 +38,6 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { KeyboardMetaKeyIcon } from "@/components/ui/keyboard-keys"
 import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { useFrappeGetCall } from "frappe-react-sdk"
-//// Neoffice — NOT ours: upstream v1.5.0 empty-state primitives and router Link (89e7929).
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 //// Neoffice — the router Link is gone with upstream's importer button (see NoTransactionsFoundBanner); the deposit helper takes its place.
 import { depositStatement } from "@/components/features/StatementImports/depositStatement"
@@ -58,8 +56,6 @@ const MatchAndReconcile = ({ contentHeight }: { contentHeight: number }) => {
     const selectedBank = useAtomValue(selectedBankAccountAtom)
 
     if (!selectedBank) {
-        //// Neoffice — NOT ours: upstream v1.5.0 replaced a plain message with the Empty component
-        //// (89e7929). Take upstream's.
         return <Empty className="bg-muted/30 h-64">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -111,7 +107,6 @@ const UnreconciledTransactions = () => {
     const groupSeparator = formatInfo.group_sep || ","
     const decimalSeparator = formatInfo.decimal_str || "."
 
-    //// Neoffice — NOT ours: upstream v1.5.0 (89e7929), ref for the Clear Filters button.
     const inputRef = useRef<HTMLInputElement>(null)
 
     const { data: unreconciledTransactions, isLoading, error } = useGetUnreconciledTransactions()
@@ -190,7 +185,6 @@ const UnreconciledTransactions = () => {
         onFilterChange()
     }
 
-    //// Neoffice — NOT ours: upstream v1.5.0 Clear Filters handler (89e7929).
     const onClearFilters = () => {
         setSearch('')
         if (inputRef.current) {
@@ -210,7 +204,6 @@ const UnreconciledTransactions = () => {
     const fileDone = importFilter !== null && results.length === 0 && !(search !== '' || typeFilter !== 'All' || amountFilter.value !== 0 || toDecideOnly)
 
     if (isLoading) {
-        //// Neoffice — NOT ours: upstream v1.5.0 skeleton loading state (89e7929).
         return <UnreconciledTransactionsLoadingState />
     }
 
@@ -223,7 +216,6 @@ const UnreconciledTransactions = () => {
                 "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
             )}>
                 <Search className="w-5 h-5 text-muted-foreground" />
-                {/* //// Neoffice — NOT ours: upstream v1.5.0 rebuilt the search field around the ref (89e7929). */}
                 <Input
                     placeholder={_("Search")}
                     type='search'
@@ -242,8 +234,6 @@ const UnreconciledTransactions = () => {
                     decimalSeparator={decimalSeparator}
                     placeholder={`${currencySymbol}0${decimalSeparator}00`}
                     decimalsLimit={2}
-                    //// Neoffice — NOT ours: upstream v1.5.0 (89e7929) drives the amount filter from the atom's
-                    //// stringValue so the raw typing is preserved.
                     value={amountFilter.stringValue}
                     maxLength={12}
                     decimalScale={2}
@@ -313,7 +303,6 @@ const UnreconciledTransactions = () => {
         {/* //// Neoffice — not while the list is the lines of one file: the older lines are not the person's business there. */}
         {!importFilter && <OlderUnreconciledTransactionsBanner />}
 
-        {/* //// Neoffice — NOT ours: upstream v1.5.0 empty state with filter awareness (89e7929). */}
         {results.length === 0 && <NoTransactionsFoundBanner
             onClearFilters={hasFilters ? onClearFilters : undefined}
             text={fileDone ? _("Everything is dealt with") : hasFilters ? _("No transactions found for the given filters.") : _("No unreconciled transactions found")}
@@ -334,9 +323,8 @@ const UnreconciledTransactions = () => {
     </div>
 }
 
-//// Neoffice — NOT ours: this whole component is upstream v1.5.0 (89e7929). ONE line in it is
-//// ours: the _("Clear Filters") wrap, upstream ships the bare English label. Take upstream's
-//// component at the merge and re-apply that wrap.
+//// Neoffice — ONE line of this component is ours: the _("Clear Filters") wrap (upstream ships the
+//// bare English label).
 const NoTransactionsFoundBanner = ({ text, description, onClearFilters }: { text: string, description?: string, onClearFilters?: () => void }) => {
     //// Neoffice — the bank account of the page, for the statement deposit below (upstream's banner had no need of it).
     const bankAccount = useAtomValue(selectedBankAccountAtom)
@@ -447,7 +435,7 @@ const VouchersSection = ({ contentHeight }: { contentHeight: number }) => {
 
 
     if (selectedTransactions.length === 0) {
-        //// Neoffice — NOT ours: upstream v1.5.0 empty state (89e7929).
+        //// Neoffice — the column scrolls under its heading (see the column above), so this state scrolls itself.
         return <div className="min-h-0 flex-1 overflow-y-auto">
             <Empty className="h-64 my-4">
                 <EmptyHeader>
@@ -888,7 +876,6 @@ const VouchersForTransaction = ({ transaction, contentHeight }: { transaction: U
             <span>{_("or")}</span>
             <Separator className="flex-1" />
         </div>
-        {/* //// Neoffice — NOT ours: upstream v1.5.0 empty state for the voucher list (89e7929). */}
         {vouchers?.message.length === 0 && <Empty className="h-64 my-4">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -1097,8 +1084,6 @@ const OlderUnreconciledTransactionsBanner = () => {
     if (data && data.message.count > 0) {
 
         return <div className="flex flex-col gap-2">
-            {/* //// Neoffice — NOT ours: upstream v1.5.0 re-nested this banner so the action sits on the */}
-            {/* //// right (89e7929). Take upstream's. */}
             {/* //// Neoffice — ours: flex-wrap and gap-3. At the width of a desk tab the text stood in a */}
             {/* //// column of two words beside the button (01.10); the button now goes below it. */}
             <div className="border border-amber-500 rounded-md p-4 flex flex-wrap items-center justify-between gap-3">
@@ -1114,8 +1099,6 @@ const OlderUnreconciledTransactionsBanner = () => {
                         )}
                         <span className="text-sm text-amber-600">{_("The opening balance might not match your bank statement. Would you like to reconcile them?")}</span>
                     </div>
-{/* //// Neoffice — NOT ours: same upstream v1.5.0 re-nesting (89e7929), the button block moved */}
-{/* //// out of the text column. */}
 
                 </div>
                 {/* //// Neoffice — ml-auto: wrapped below the text, the action keeps to the right. */}

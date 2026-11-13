@@ -35,6 +35,7 @@ import FullPageButton, { FULL_PAGE_TAB_PARAM } from "@/components/features/BankR
 // The tabs of this page: the values of its TabsTrigger / ReportsMenu entries.
 const TABS = ["Match and Reconcile", "Bank Files", "Bank Transactions", "Bank Reconciliation Statement", "Bank Clearance Summary", "Incorrectly Cleared Entries"]
 
+//// Neoffice — initialTab is ours, see the marker above TABS.
 const BankReconciliation = ({ initialTab }: { initialTab?: string }) => {
 
     const [tab, setTab] = useAtom(bankRecTabAtom)
