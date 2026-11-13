@@ -96,12 +96,27 @@ def _reference_key(value) -> str:
 	return "".join(str(value or "").split()).upper()
 
 
+# The fields of a sales invoice that hold a reference of its own: what erpnextswiss writes (esr_reference, scor_reference) and
+# what neoffice_theme writes (qr_ref: the QR reference made of the invoice's name, the one on the slips it prints). A site
+# has the ones its apps added: a field it does not have reads as nothing.
+REFERENCE_FIELDS = ("esr_reference", "scor_reference", "qr_ref")
+
+
+def _own_references(invoice) -> set:
+	"""The structured references that are a sales invoice's own: its fields, and the reference it had in the billing program
+	it was taken over from (the `original_references` table of neoffice_archive: a customer pays with the slip they hold)."""
+	keys = {_reference_key(invoice.get(field)) for field in REFERENCE_FIELDS}
+	keys.update(_reference_key(row.get("payment_reference")) for row in invoice.get("original_references") or [])
+	return keys - {""}
+
+
 def _is_sure(invoice, reference) -> bool:
-	"""The invoice is recognised without doubt: a structured QR or creditor reference that is its own, or, for a
-	purchase invoice, a line of a payment run. A name or an amount is never enough to validate a partial payment."""
+	"""The invoice is recognised without doubt: a structured QR or creditor reference that is its own (one of its fields,
+	or the one it had before a takeover), or, for a purchase invoice, a line of a payment run. A name or an amount is
+	never enough to validate a partial payment."""
 	if invoice.doctype == "Sales Invoice":
 		key = _reference_key(reference)
-		return bool(key) and key in {_reference_key(invoice.get("esr_reference")), _reference_key(invoice.get("scor_reference"))} - {""}
+		return bool(key) and key in _own_references(invoice)
 	return bool(invoice.get("is_proposed"))
 
 

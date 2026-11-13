@@ -248,6 +248,18 @@ class TestPaymentGap(FrappeTestCase):
 		self._settings(payment_gap_automatic=1, payment_gap_partial_automatic=0)
 		self.assertFalse(self._judge("Sales Invoice", self.sales, half, reference=scor).automatic)
 
+	def test_the_qr_reference_of_neoffice_is_as_certain_as_the_creditor_reference(self):
+		# neoffice_theme writes qr_ref (the QR reference of the slips it prints) and leaves esr_reference empty
+		if not frappe.db.has_column("Sales Invoice", "qr_ref"):
+			self.skipTest("this site has no qr_ref on its sales invoices (neoffice_theme is not installed)")
+		qr_ref = frappe.db.get_value("Sales Invoice", self.sales, "qr_ref")
+		if not qr_ref:
+			self.skipTest("the invoice of the test has no qr_ref")
+		self._settings(payment_gap_automatic=1, payment_gap_partial_automatic=1)
+		half = flt(self._outstanding("Sales Invoice", self.sales) / 2, 2)
+		sure = self._judge("Sales Invoice", self.sales, half, reference=qr_ref)
+		self.assertEqual((sure.kind, sure.sure, sure.automatic), ("partial", True, True))
+
 	def test_the_early_discount_of_the_terms_is_recognised_inside_its_window(self):
 		invoice = self._with_a_discount(self.purchase, percent=3, days=10)
 		owed = self._outstanding("Purchase Invoice", invoice)
@@ -547,3 +559,55 @@ class TestPaymentGap(FrappeTestCase):
 		self.assertIn(dunning.name, payment_gap.account_problem(verdict))
 		with self.assertRaises(frappe.ValidationError):
 			payment_gap.book(verdict, "Sales Invoice", self.sales, LEDGER, nowdate(), scor, "gap test", by_person=True)
+
+
+QR_REF = "210000000003139471430009017"
+OLD_REF = "000000000000000099900000714"
+SCOR_REF = "RF18539007547034"
+
+
+def _sales(**fields):
+	return frappe._dict(doctype="Sales Invoice", name="SINV-ZZ-1", **fields)
+
+
+class TestSureReference(unittest.TestCase):
+	"""A payment is « sure » when the reference it carries is one of the sales invoice's own: one of its fields (esr_reference,
+	scor_reference, qr_ref) or the reference it had in the billing program it was taken over from. Played on invoices made
+	up in memory, so that it runs on a site that has neither erpnextswiss, neoffice_theme nor neoffice_archive."""
+
+	def test_the_qr_reference_neoffice_wrote_is_the_invoices_own_whatever_its_spaces(self):
+		invoice = _sales(qr_ref=QR_REF, esr_reference=None, scor_reference=None)
+		self.assertTrue(payment_gap._is_sure(invoice, QR_REF))
+		self.assertTrue(payment_gap._is_sure(invoice, "21 00000 00003 13947 14300 09017"))
+
+	def test_the_creditor_reference_and_the_qr_reference_of_erpnextswiss_still_are(self):
+		invoice = _sales(scor_reference=SCOR_REF, esr_reference="1 2345 6789 0123")
+		self.assertTrue(payment_gap._is_sure(invoice, "rf18 5390 0754 7034"))
+		self.assertTrue(payment_gap._is_sure(invoice, "1234567890123"))
+
+	def test_the_reference_the_invoice_had_before_a_takeover_is_its_own(self):
+		invoice = _sales(
+			qr_ref=QR_REF,
+			original_references=[frappe._dict(payment_reference=""), frappe._dict(payment_reference=OLD_REF)],
+		)
+		self.assertTrue(payment_gap._is_sure(invoice, OLD_REF))
+		self.assertTrue(payment_gap._is_sure(invoice, "00 00000 00000 00009 99000 00714"))
+		# and the reference Neoffice gave it afterwards, which is the one of its new slips
+		self.assertTrue(payment_gap._is_sure(invoice, QR_REF))
+
+	def test_a_reference_that_is_not_the_invoices_is_not_sure(self):
+		invoice = _sales(qr_ref=QR_REF, original_references=[frappe._dict(payment_reference=OLD_REF)])
+		for reference in ("210000000003139471430009018", "RF18539007547034", "Payment SINV-ZZ-1", "", None):
+			with self.subTest(reference=reference):
+				self.assertFalse(payment_gap._is_sure(invoice, reference))
+
+	def test_an_invoice_that_has_no_reference_is_never_sure_not_even_of_an_empty_one(self):
+		for invoice in (_sales(), _sales(qr_ref="", scor_reference=None, original_references=[frappe._dict(payment_reference=None)])):
+			with self.subTest(invoice=invoice):
+				self.assertFalse(payment_gap._is_sure(invoice, ""))
+				self.assertFalse(payment_gap._is_sure(invoice, None))
+				self.assertFalse(payment_gap._is_sure(invoice, QR_REF))
+
+	def test_a_purchase_invoice_is_sure_only_as_a_line_of_a_payment_run(self):
+		self.assertTrue(payment_gap._is_sure(frappe._dict(doctype="Purchase Invoice", is_proposed=1), "anything"))
+		self.assertFalse(payment_gap._is_sure(frappe._dict(doctype="Purchase Invoice", is_proposed=0, qr_ref=QR_REF), QR_REF))
