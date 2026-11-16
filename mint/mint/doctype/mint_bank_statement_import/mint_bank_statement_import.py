@@ -12,6 +12,31 @@ from frappe.model.document import Document
 from frappe.utils import fmt_money
 
 
+# //// Neoffice — added (#1490): what a file's name says it is. The form drops a file by saving the import first, with
+# //// file_type at its default « PDF », and only then reads the file's extension in the browser: an import whose upload
+# //// failed (an empty XML) stayed typed PDF, and a save that went out before the browser re-read the name could carry
+# //// « PDF » for a CAMT file. The server now sets the type from the file itself (the same suffixes as the form's
+# //// detect_file_type), whoever saves the import.
+XML_SUFFIXES = (".xml", ".camt", ".camt053")
+
+
+def file_type_of(file_url: str | None) -> str | None:
+	"""« XML » or « PDF » when the file's URL, or else the name of its File, says which; None when neither does."""
+	if not file_url:
+		return None
+	names = [file_url]
+	file_name = frappe.db.get_value("File", {"file_url": file_url}, "file_name")
+	if file_name:
+		names.append(file_name)
+	for name in names:
+		name = name.lower()
+		if name.endswith(XML_SUFFIXES):
+			return "XML"
+		if name.endswith(".pdf"):
+			return "PDF"
+	return None
+
+
 class MintBankStatementImport(Document):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
@@ -62,6 +87,9 @@ class MintBankStatementImport(Document):
 		# //// hand-carried (89e7929); the status line is ours (6d264d7).
 		# Update document_status based on docstatus
 		self.update_document_status()
+		# //// Neoffice — the type follows the file (#1490, file_type_of above), on a draft only.
+		if self.docstatus == 0:
+			self.file_type = file_type_of(self.file) or self.file_type
 		# Set currency from bank account (upstream fix)
 		if self.bank_account and not self.currency:
 			account = frappe.get_cached_value("Bank Account", self.bank_account, "account")

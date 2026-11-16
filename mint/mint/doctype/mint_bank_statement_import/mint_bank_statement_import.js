@@ -150,6 +150,12 @@ function show_import_wizard(frm) {
                 frappe.show_alert({ message: __("Please attach a file"), indicator: "orange" });
                 return;
             }
+            //// Neoffice — an empty file is refused here, before the import is saved (#1490): the upload of an
+            //// empty file fails on the server, and the import saved just before it stayed behind, typed « PDF ».
+            if (!wizard_file.size) {
+                frappe.show_alert({ message: __("The file is empty"), indicator: "orange" });
+                return;
+            }
             // All good — process
             frm.set_value('bank_account', bank_account);
             wizard.hide();
@@ -369,6 +375,10 @@ function upload_and_process(frm, file) {
                     }
                 }, 500);
             });
+        } else {
+            //// Neoffice — a refused upload said nothing (#1490): the server's answer carries no file, say so.
+            frappe.show_alert({ message: __("Failed to upload file"), indicator: "red" });
+            render_file_info(frm);
         }
     })
     .catch(() => {

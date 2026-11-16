@@ -71,3 +71,43 @@ class TestFindExistingPaymentEntry(FrappeTestCase):
 		self.assertEqual(self.asked[-1][1]["docstatus"], 1)
 		self._find(docstatus=0)
 		self.assertEqual(self.asked[-1][1]["docstatus"], 0)
+
+
+# //// Neoffice — added tests (#1490): the type of an import follows its file, whatever the browser saved first. Nothing is
+# //// written: the document is built in memory and only its before_validate runs; the File lookup is answered here.
+class TestFileTypeFollowsTheFile(FrappeTestCase):
+	def setUp(self):
+		self.file_names = {}  # file_url -> file_name of its File
+		original = frappe.db.get_value
+
+		def get_value(doctype, filters=None, *args, **kwargs):
+			# only the File lookup is answered here; everything else (the meta of a doctype...) reaches the database
+			if doctype == "File" and isinstance(filters, dict):
+				return self.file_names.get(filters.get("file_url"))
+			return original(doctype, filters, *args, **kwargs)
+
+		patcher = patch.object(frappe.db, "get_value", get_value)
+		patcher.start()
+		self.addCleanup(patcher.stop)
+
+	def _draft(self, file_url, saved_as="PDF"):
+		doc = frappe.new_doc("Mint Bank Statement Import")
+		doc.file = file_url
+		doc.file_type = saved_as  # what the form saved before it read the file's name: the field's default
+		doc.before_validate()
+		return doc
+
+	def test_a_camt_file_saved_as_pdf_becomes_xml(self):
+		self.assertEqual(self._draft("/private/files/statement-october.xml").file_type, "XML")
+		self.assertEqual(self._draft("/private/files/statement.CAMT053").file_type, "XML")
+
+	def test_a_pdf_saved_as_xml_becomes_pdf(self):
+		self.assertEqual(self._draft("/private/files/statement.pdf", saved_as="XML").file_type, "PDF")
+
+	def test_a_url_without_a_suffix_reads_the_name_of_its_file(self):
+		self.file_names["/private/files/abc123"] = "Statement November.xml"
+		self.assertEqual(self._draft("/private/files/abc123").file_type, "XML")
+
+	def test_a_name_that_says_nothing_keeps_the_type(self):
+		self.assertEqual(self._draft("/private/files/statement.txt", saved_as="XML").file_type, "XML")
+		self.assertEqual(importer.file_type_of(None), None)
