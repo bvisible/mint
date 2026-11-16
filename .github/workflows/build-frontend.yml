@@ -1,6 +1,9 @@
 name: build-frontend
 
 on:
+  # //// Neoffice — by hand too: a build that failed for a reason unrelated to its source
+  # //// (a lost push race, see below) could only be relaunched by pushing again.
+  workflow_dispatch:
   push:
     branches: [version-15]
     paths:
@@ -62,4 +65,13 @@ jobs:
             exit 0
           fi
           git commit --no-verify -m "[skip-build] frontend artifacts for ${GITHUB_SHA::8}"
-          git push
+          # //// Neoffice — rebase and retry. A plain push loses the build whenever another commit
+          # //// (the marker bot's, a cockpit pin bump) lands on the branch while this job compiles:
+          # //// the push is refused as non-fast-forward and nothing rebuilds that source, so the
+          # //// fleet keeps a frontend older than its code (suite, 04.09 to 13.09). A newer frontend
+          # //// push cancels this run (concurrency), so whatever landed meanwhile did not touch it.
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort; exit 1; }
+          done
+          exit 1
