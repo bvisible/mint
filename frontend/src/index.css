@@ -2,7 +2,10 @@
 
 @plugin "tailwindcss-animate";
 
-@custom-variant dark (&:is(.dark *));
+/* //// Neoffice — the dark variant and the dark tokens also follow [data-theme="dark"] on <html> (#2522): the */
+/* cockpit and App.tsx's bridge write that attribute, never the `.dark` class upstream keys on, so Mint kept its */
+/* light tokens inside a dark cockpit (white page, outline buttons white on white). */
+@custom-variant dark (&:is(.dark *, [data-theme="dark"] *));
 
 :root {
   --radius: 0.65rem;
@@ -39,7 +42,9 @@
   --sidebar-ring: oklch(0.623 0.214 259.815);
 }
 
-.dark {
+/* //// Neoffice — `[data-theme="dark"]` added beside upstream's `.dark` (#2522, see the variant above). */
+.dark,
+[data-theme="dark"] {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
@@ -156,7 +161,9 @@
   color: #18181b;
   box-shadow: 0 1px 2px -1px rgb(0 0 0 / 0.10), 0 1px 3px 0 rgb(0 0 0 / 0.10);
 }
-.dark [data-slot="tabs-trigger"][data-state="active"] {
+/* //// Neoffice — the dark pill follows [data-theme="dark"] too (#2522). */
+.dark [data-slot="tabs-trigger"][data-state="active"],
+[data-theme="dark"] [data-slot="tabs-trigger"][data-state="active"] {
   background-color: #3f3f46;
   color: #fafafa;
 }
@@ -166,3 +173,12 @@
 /* classes"): the cockpit's button reset (frappe-sidebar-react f724b332d, pinned by 9c2edc6) now holds its own */
 /* buttons only and gives the app's buttons their defaults in the `base` layer, which shadcn's utilities beat, so */
 /* the exception is no longer needed. */
+
+/* //// Neoffice — the dark theme's primary (#2522). mint.html loads the desk's stylesheet, which paints `.bg-primary` */
+/* and `.text-primary` ink with !important: a light-theme value. Once Mint's dark tokens apply, a primary button */
+/* became ink on the dark page with shadcn's dark-blue --primary-foreground on it (invisible), and a reference badge */
+/* ink on dark blue. The dark theme takes the desk's own dark primary instead: a cream surface with ink on it */
+/* (--nw-primary-solid / --nw-primary-on of neoffice_theme), and the page's light ink for primary text. */
+[data-theme="dark"] .bg-primary { background-color: var(--nw-primary-solid, #fffdf8) !important; }
+[data-theme="dark"] .text-primary-foreground { color: var(--nw-primary-on, #141414); }
+[data-theme="dark"] .text-primary { color: var(--nw-ink, #ededed) !important; }
