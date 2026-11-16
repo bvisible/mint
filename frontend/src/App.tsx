@@ -80,6 +80,14 @@ function App() {
 	useEffect(() => {
 		const readFrappeTheme = (): 'light' | 'dark' | null => {
 			try {
+				//// Neoffice — the cockpit's own mode comes first (#2522): `neocockpit-colormode` is what the cockpit, the
+				//// desk and the till set and read (« system » follows the OS). `theme_active` is only a resolved copy some
+				//// surface wrote last: read first, a stale « dark » kept Mint dark under a cockpit in « system » on a light OS.
+				const cockpit = window.localStorage.getItem('neocockpit-colormode')
+				if (cockpit === 'dark' || cockpit === 'light') return cockpit
+				if (cockpit === 'system') {
+					return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+				}
 				const ta = window.localStorage.getItem('theme_active')
 				if (ta === 'dark' || ta === 'light') return ta
 				const ap = (window.localStorage.getItem('appearance') || '').replace(/^"|"$/g, '')
