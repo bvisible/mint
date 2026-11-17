@@ -94,6 +94,9 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
     }
 
     const [progress, setProgress] = useState(0)
+    //// Neoffice — how many of how many, from the event's percentage (maintenance#1490, see the progress line).
+    const totalCount = data.final_transactions?.length || 0
+    const importedCount = Math.round(progress * totalCount / 100)
 
     useFrappeEventListener("mint-statement-import-progress", (event) => {
         setProgress(event.progress)
@@ -129,9 +132,9 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                 {progress > 0 && <div className='flex flex-col gap-2'><Progress value={progress} max={100} />
                     {/* //// Neoffice — the progress event carries a percentage (statement_import.py), upstream printed it */}
                     {/* //// as a number of transactions: « Importing 100 transactions » for a file of 13 (maintenance#1490). */}
-                    <span className='text-sm'>{_("Importing {0} of {1} transactions", [
-                        Math.round(progress * (data.final_transactions?.length || 0) / 100).toString(),
-                        (data.final_transactions?.length || 0).toString()])}
+                    {/* //// The call holds on one line: frappe's extractor of .tsx files is a regex that loses a call */}
+                    {/* //// whose arguments run over several lines. */}
+                    <span className='text-sm'>{_("Importing {0} of {1} transactions", [importedCount.toString(), totalCount.toString()])}
                     </span>
                 </div>}
 

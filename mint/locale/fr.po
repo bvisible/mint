@@ -714,7 +714,7 @@ msgstr "Virement groupé"
 
 #: frontend/src/lib/file.ts:27
 msgid "Bytes"
-msgstr "Octets"
+msgstr "octets"
 
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:217
 msgid "CAMT 053/054 file downloaded from your bank portal. Transactions are extracted automatically with bank references, amounts and party details."
