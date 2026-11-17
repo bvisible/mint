@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-17 20:39+0000\n"
+"POT-Creation-Date: 2026-11-17 20:44+0000\n"
 "PO-Revision-Date: 2025-10-28 16:42+0000\n"
 "Last-Translator: Claude Code <noreply@anthropic.com>\n"
 "Language: fr\n"
@@ -419,7 +419,7 @@ msgid "Automatically run rules on unreconciled transactions"
 msgstr "Exécuter automatiquement les règles sur les transactions non rapprochées"
 
 #: frontend/src/components/features/BankStatementImporter/CSV/CSVImport.tsx:19
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:108
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:111
 msgid "Back"
 msgstr "Retour"
 
@@ -485,7 +485,7 @@ msgstr "Banque"
 #. Label of a Link field in DocType 'Mint Bank Statement Import'
 #. Label of a Link field in DocType 'Mint Bank Statement Import Log'
 #. Label of a Link field in DocType 'Mint Bank Statement Import Template'
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:146
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:149
 #: frontend/src/pages/BankStatementImporter.tsx:103
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:17
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:176
@@ -912,7 +912,7 @@ msgstr ""
 msgid "Closing Balance"
 msgstr "Solde de clôture"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:187
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:190
 #, python-brace-format
 msgctxt "Do MMMM YYYY"
 msgid "Closing Balance as of {}"
@@ -1013,7 +1013,7 @@ msgstr "Confirmer le rabais et rapprocher"
 msgid "Confirmations"
 msgstr ""
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:226
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:229
 msgid "Conflicting Transactions"
 msgstr "Transactions en conflit"
 
@@ -1205,8 +1205,8 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:367
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:161
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:19
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:238
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:295
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:241
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:298
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:191
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:248
 #: frontend/src/components/features/StatementImports/StatementImportLines.tsx:46
@@ -1287,8 +1287,8 @@ msgstr "Suppression de la règle..."
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:165
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:338
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:160
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:242
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:299
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:245
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:302
 #: frontend/src/pages/BankStatementImporter.tsx:191
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:46
@@ -1303,8 +1303,8 @@ msgstr "Dépôt"
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:162
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1391
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:22
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:239
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:296
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:242
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:299
 #: frontend/src/components/features/StatementImports/StatementImportLines.tsx:47
 #: frontend/src/pages/BankStatementImporter.tsx:175
 #: frontend/src/pages/BankStatementImporter.tsx:196
@@ -1318,11 +1318,11 @@ msgstr "Description"
 msgid "Description Rules"
 msgstr "Règles de description"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:193
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:196
 msgid "Detected Amount Format"
 msgstr "Format de montant détecté"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:205
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:208
 msgid "Detected Date Format"
 msgstr "Format de date détecté"
 
@@ -1570,7 +1570,7 @@ msgstr "Existant"
 msgid "Existing Bank Transaction"
 msgstr "Transaction bancaire existante"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:235
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:238
 msgid "Existing transactions in the system belonging to the same bank account and date range"
 msgstr "Transactions existantes appartenant au même compte bancaire et à la même plage de dates"
 
@@ -1717,7 +1717,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/BankPicker.tsx:220
 #: frontend/src/components/features/BankReconciliation/BankPicker.tsx:224
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionDetails.tsx:72
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:165
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:168
 msgid "GL Account"
 msgstr "Compte du grand livre"
 
@@ -1845,7 +1845,7 @@ msgstr "Si la règle correspond, alors :"
 msgid "If your bank statement shows a different closing balance, it is because all transactions have not reconciled yet."
 msgstr "Si votre relevé bancaire affiche un solde de clôture différent, c'est parce que toutes les transactions n'ont pas encore été rapprochées."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:114
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:117
 msgid "Import 1 transaction"
 msgstr "Importer 1 transaction"
 
@@ -1873,7 +1873,7 @@ msgstr ""
 msgid "Import your bank statement to get started."
 msgstr "Importez votre relevé bancaire pour commencer."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:114
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:117
 #, python-brace-format
 msgid "Import {0} transactions"
 msgstr "Importer {0} transactions"
@@ -1894,7 +1894,12 @@ msgstr "Importé le"
 msgid "Importing a statement, step by step"
 msgstr "Importer un relevé, pas à pas"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:114
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:137
+#, python-brace-format
+msgid "Importing {0} of {1} transactions"
+msgstr "Importation de {0} sur {1} transactions"
+
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:117
 msgid "Importing..."
 msgstr "Importation..."
 
@@ -2528,7 +2533,7 @@ msgid "Nothing was imported yet."
 msgstr "Rien n'a encore été importé."
 
 #. Label of a Int field in DocType 'Mint Bank Statement Import Log'
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:183
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:186
 #: frontend/src/pages/BankStatementImporter.tsx:248
 #: mint/mint/doctype/mint_bank_statement_import_log/mint_bank_statement_import_log.json:29
 msgid "Number of Transactions"
@@ -2613,7 +2618,7 @@ msgstr "Factures ouvertes"
 msgid "Open the draft"
 msgstr "Ouvrir le brouillon"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:265
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:268
 #, python-brace-format
 msgid "Open {0} in a new tab"
 msgstr "Ouvrir {0} dans un nouvel onglet"
@@ -2912,7 +2917,7 @@ msgstr "Veuillez configurer les comptes de la règle d'écriture bancaire."
 msgid "Please provide a file_url parameter"
 msgstr "Veuillez fournir un paramètre file_url"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:123
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:126
 msgid "Please review the details below and click the 'Import' button to proceed."
 msgstr "Veuillez vérifier les détails ci-dessous et cliquer sur le bouton 'Importer' pour continuer."
 
@@ -2992,7 +2997,7 @@ msgstr "Préparé par {0} le {1} : {2} sur {3}."
 msgid "Preview"
 msgstr "Aperçu"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:282
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:285
 msgid "Preview Transactions"
 msgstr "Aperçu des transactions"
 
@@ -3211,8 +3216,8 @@ msgstr "Enregistrer le paiement partiel"
 msgid "Ref"
 msgstr "Réf"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:240
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:297
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:243
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:300
 msgid "Ref."
 msgstr "Réf."
 
@@ -3690,11 +3695,11 @@ msgstr ""
 msgid "Statement"
 msgstr "Relevé"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:118
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:121
 msgid "Statement Details"
 msgstr "Détails du relevé"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:170
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:173
 msgid "Statement File"
 msgstr "Fichier de relevé"
 
@@ -3847,7 +3852,7 @@ msgstr "Le compte sur lequel l'article est vendu. Pour une perte sur client, cho
 msgid "The account where the difference is booked: for a sale, a loss on customers or a discount account; for a purchase, an expense account. Your fiduciary knows which one to use. The company sets it once in its settings."
 msgstr "Le compte où la différence est comptabilisée : pour une vente, un compte de perte sur client ou d'escompte ; pour un achat, un compte de charges. Votre fiduciaire sait lequel utiliser. La société le règle une seule fois dans ses paramètres."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:196
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:199
 msgid "The amount format detected in the statement file. This is used to parse the deposit and withdrawal values from each row."
 msgstr "Le format de montant détecté dans le fichier de relevé. Utilisé pour analyser les valeurs de dépôt et retrait de chaque ligne."
 
@@ -3922,7 +3927,7 @@ msgstr "L'avoir qu'une personne a créé pour le solde d'un paiement partiel."
 msgid "The credit note cannot be brought to {0}."
 msgstr "Le montant de la note de crédit ne peut pas être ajusté à {0}."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:208
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:211
 msgid "The date format detected in the statement file. This is used to parse the date values."
 msgstr "Le format de date détecté dans le fichier de relevé. Utilisé pour analyser les valeurs de date."
 
@@ -4401,7 +4406,7 @@ msgstr "Total de la note de crédit"
 msgid "Transaction Date"
 msgstr "Date de transaction"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:179
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:182
 #: frontend/src/pages/BankStatementImporter.tsx:247
 msgid "Transaction Dates"
 msgstr "Dates de transaction"
@@ -4451,7 +4456,7 @@ msgstr "La colonne Type de transaction contient des valeurs « Deposit »/« Wit
 msgid "Transactions"
 msgstr "Transactions"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:291
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:294
 msgid "Transactions to be imported into the system"
 msgstr "Transactions à importer dans le système"
 
@@ -4747,19 +4752,19 @@ msgstr "Attention : l'écriture de journal n'est pas équilibrée. Les totaux d�
 msgid "We support uploading CSV, XLSX and XLS files. Please make sure the file contains the correct columns."
 msgstr "Formats pris en charge : CSV, XLSX et XLS. Assurez-vous que le fichier contient les bonnes colonnes."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:120
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:123
 msgid "We've auto-detected the details of the statement file."
 msgstr "Nous avons détecté automatiquement les détails du fichier de relevé."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:228
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:231
 msgid "We've found 1 existing transaction in the system that conflicts with the transactions in the statement file. Are you sure you want to proceed with the import?"
 msgstr "Nous avons trouvé 1 transaction existante dans le système qui entre en conflit avec les transactions du fichier de relevé. Êtes-vous sûr de vouloir continuer l'import ?"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:284
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:287
 msgid "We've found 1 transaction in the statement file that will be imported into the system. Please review the details below and click the 'Import' button to proceed."
 msgstr "Nous avons trouvé 1 transaction dans le fichier de relevé qui sera importée dans le système. Veuillez vérifier les détails ci-dessous et cliquer sur le bouton 'Importer' pour continuer."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:230
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:233
 #, python-brace-format
 msgid "We've found {0} existing transactions in the system that conflict with the transactions in the statement file. Are you sure you want to proceed with the import?"
 msgstr "Nous avons trouvé {0} transactions existantes dans le système qui sont en conflit avec celles du fichier de relevé. Voulez-vous vraiment poursuivre l’import ?"
@@ -4821,8 +4826,8 @@ msgstr "Avec TVA"
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:164
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:338
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:143
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:241
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:298
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:244
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:301
 #: frontend/src/pages/BankStatementImporter.tsx:191
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:46
@@ -5055,7 +5060,7 @@ msgstr "transactions sélectionnées"
 msgid "us"
 msgstr "us"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:214
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:217
 #, python-brace-format
 msgid "{0} (e.g. {1})"
 msgstr "{0} (p. ex. {1})"
@@ -5200,7 +5205,7 @@ msgstr "{0} à rapprocher"
 msgid "{0} to review in Mint"
 msgstr "{0} à traiter dans le rapprochement bancaire"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:180
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:183
 #, python-brace-format
 msgctxt "Do MMMM YYYY"
 msgid "{0} to {1}"
@@ -5222,7 +5227,7 @@ msgstr "{0} transactions trouvées"
 msgid "{0} transactions processed"
 msgstr "{0} transactions traitées"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:286
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:289
 #, python-brace-format
 msgid "{0} transactions will be imported into the system. Please review the details below and click the 'Import' button to proceed."
 msgstr "{0} transactions seront importées dans le système. Vérifiez les détails ci-dessous, puis cliquez sur le bouton « Importer » pour continuer."
