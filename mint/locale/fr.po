@@ -522,7 +522,7 @@ msgstr "Rapprochement bancaire"
 
 #: mint/mint/page/bank_reconciliation/bank_reconciliation.js:7
 msgid "Bank Reconciliation - Mint"
-msgstr "Rapprochement bancaire - Mint"
+msgstr "Rapprochement bancaire"
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:108
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:97
@@ -549,7 +549,7 @@ msgstr "Processeur de relevés bancaires"
 
 #: mint/apis/google_ai.py:134
 msgid "Bank Statement Processor is not set in Mint Settings"
-msgstr "Le processeur de relevés bancaires n'est pas configuré dans les paramètres Mint"
+msgstr "Le processeur de relevés bancaires n'est pas configuré dans les paramètres du rapprochement bancaire"
 
 #. Label of a Link field in DocType 'Mint Bank Statement Import Transactions'
 #. Label of a Link in the Mint Workspace
@@ -927,7 +927,7 @@ msgstr "Configurer les filtres de correspondance pour les pièces"
 
 #: frontend/src/components/features/Settings/Settings.tsx:78
 msgid "Configure settings for Mint."
-msgstr "Configurer les paramètres pour Mint."
+msgstr "Configurer les paramètres du rapprochement bancaire."
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1199
 msgid "Confirm and Submit"
@@ -1593,7 +1593,7 @@ msgstr "Filtrer par montant"
 
 #: frontend/src/components/features/Settings/Settings.tsx:92
 msgid "For example, if set to 4, Mint will try to find matching transactions in other banks 4 days before and after the transaction date. This is because transactions can clear on different days on different bank accounts."
-msgstr "Par exemple, si défini à 4, Mint essaiera de trouver des transactions correspondantes dans d'autres banques 4 jours avant et après la date de transaction. Ceci parce que les transactions peuvent être compensées à des dates différentes sur différents comptes bancaires."
+msgstr "Par exemple, si défini à 4, le rapprochement essaiera de trouver des transactions correspondantes dans d'autres banques 4 jours avant et après la date de transaction. Ceci parce que les transactions peuvent être compensées à des dates différentes sur différents comptes bancaires."
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:108
 #, python-brace-format
@@ -1651,7 +1651,7 @@ msgstr "Récupérer les factures impayées"
 
 #: mint/apis/google_ai.py:80
 msgid "Google APIs are not enabled. Please enable them in Mint Settings."
-msgstr "Les API Google ne sont pas activées. Veuillez les activer dans les paramètres Mint."
+msgstr "Les API Google ne sont pas activées. Veuillez les activer dans les paramètres du rapprochement bancaire."
 
 #. Label of a Section Break field in DocType 'Mint Settings'
 #: mint/mint/doctype/mint_settings/mint_settings.json:21
@@ -1680,11 +1680,11 @@ msgstr "ID de projet Google"
 
 #: mint/apis/google_ai.py:128
 msgid "Google Project ID is not set in Mint Settings"
-msgstr "L'ID de projet Google n'est pas défini dans les paramètres Mint"
+msgstr "L'ID de projet Google n'est pas défini dans les paramètres du rapprochement bancaire"
 
 #: mint/apis/google_ai.py:17
 msgid "Google Project ID is not set. Please set it in the Mint Settings."
-msgstr "L'ID de projet Google n'est pas défini. Veuillez le définir dans les paramètres Mint."
+msgstr "L'ID de projet Google n'est pas défini. Veuillez le définir dans les paramètres du rapprochement bancaire."
 
 #. Label of a Password field in DocType 'Mint Settings'
 #: frontend/src/components/features/Settings/Settings.tsx:129
@@ -1694,7 +1694,7 @@ msgstr "Clé JSON du compte de service Google"
 
 #: mint/apis/google_ai.py:131
 msgid "Google Service Account JSON Key is not set in Mint Settings"
-msgstr "La clé JSON du compte de service Google n'est pas définie dans les paramètres Mint"
+msgstr "La clé JSON du compte de service Google n'est pas définie dans les paramètres du rapprochement bancaire"
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:295
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:757
@@ -2175,21 +2175,21 @@ msgstr "Transactions d'import de relevé bancaire"
 #. Name of a DocType
 #: mint/mint/doctype/mint_bank_transaction_description_rules/mint_bank_transaction_description_rules.json:36
 msgid "Mint Bank Transaction Description Rules"
-msgstr "Règles de description de transaction bancaire Mint"
+msgstr "Règles de description du rapprochement bancaire"
 
 #. Name of a DocType
 #. Label of a Link in the Mint Workspace
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:148
 #: mint/mint/workspace/mint/mint.json:39
 msgid "Mint Bank Transaction Rule"
-msgstr "Règle de transaction bancaire Mint"
+msgstr "Règle de rapprochement bancaire"
 
 #. Name of a DocType
 #. Label of a Link in the Mint Workspace
 #: mint/mint/doctype/mint_settings/mint_settings.json:78
 #: mint/mint/workspace/mint/mint.json:59
 msgid "Mint Settings"
-msgstr "Paramètres Mint"
+msgstr "Paramètres du rapprochement bancaire"
 
 #. Name of a DocType
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:64
@@ -4958,7 +4958,7 @@ msgstr "{0} à rapprocher"
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:412
 #, python-brace-format
 msgid "{0} to review in Mint"
-msgstr "{0} à traiter dans Mint"
+msgstr "{0} à traiter dans le rapprochement bancaire"
 
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:167
 #, python-brace-format

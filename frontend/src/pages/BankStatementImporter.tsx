@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import ErrorBanner from "@/components/ui/error-banner"
-import { FileDropzone } from "@/components/ui/file-dropzone"
+import { FileDropzone, FileTypeIcon } from "@/components/ui/file-dropzone" //// Neoffice — FileTypeIcon: the file column (maintenance#1490)
+import { getFileExtension } from "@/lib/file" //// Neoffice — the file column (maintenance#1490)
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { H1, H3, Paragraph } from "@/components/ui/typography"
@@ -235,7 +236,11 @@ const StatementImportLog = () => {
 
             {data && data.length > 0 ? (
 
-                <Table>
+                <Table
+                    //// Neoffice — the headers wrap and a long file name is cut (maintenance#1490): in the half-width column the
+                    //// table ran past its edge and hid the closing balance and the file. Important (`!`): the desk's
+                    //// .whitespace-nowrap, loaded in mint.html outside any layer, beats a layered utility without it.
+                    className="[&_th]:whitespace-normal!">
                     <TableHeader>
                         <TableRow>
                             <TableHead>{_("Imported On")}</TableHead>
@@ -249,12 +254,21 @@ const StatementImportLog = () => {
                         {data?.map((item) => (
                             <TableRow key={item.name}>
                                 <TableCell>{formatDate(item.creation, 'Do MMM YYYY')}</TableCell>
-                                <TableCell>{formatDate(item.start_date, 'Do MMM YYYY')} to {formatDate(item.end_date, 'Do MMM YYYY')}</TableCell>
+                                {/* //// Neoffice — upstream joins the two dates with a bare English « to » that no catalogue reaches */}
+                                {/* //// (maintenance#1490): a dash, and one date when the statement covers a single day, so the column */}
+                                {/* //// stays narrow enough for the closing balance beside it; a period breaks between its two dates, */}
+                                {/* //// never inside one (`!`: the desk's unlayered .whitespace-nowrap of shadcn's cell, see the table). */}
+                                <TableCell className="whitespace-normal!">{item.start_date === item.end_date
+                                    ? <span className="whitespace-nowrap">{formatDate(item.start_date, 'Do MMM YYYY')}</span>
+                                    : <><span className="whitespace-nowrap">{formatDate(item.start_date, 'Do MMM YYYY')} –</span>{' '}
+                                        <span className="whitespace-nowrap">{formatDate(item.end_date, 'Do MMM YYYY')}</span></>}</TableCell>
                                 <TableCell className="text-right">{item.number_of_transactions}</TableCell>
                                 <TableCell className="text-right font-mono">{formatCurrency(flt(item.closing_balance, 2))}</TableCell>
+                                {/* //// Neoffice — the file is its type's icon, its name in the tooltip (maintenance#1490): in the */}
+                                {/* //// half-width column upstream's full name ran past the table's edge. */}
                                 <TableCell><a
-                                    href={item.file}
-                                    target="_blank" className="underline underline-offset-4">{item.file.split('/').pop()}</a></TableCell>
+                                    href={item.file} title={item.file.split('/').pop()} aria-label={item.file.split('/').pop()}
+                                    target="_blank" className="inline-flex"><FileTypeIcon fileType={getFileExtension(item.file)} size="sm" className="h-5 w-5" showBackground={false} /></a></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

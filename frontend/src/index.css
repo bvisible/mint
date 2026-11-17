@@ -182,3 +182,23 @@
 [data-theme="dark"] .bg-primary { background-color: var(--nw-primary-solid, #fffdf8) !important; }
 [data-theme="dark"] .text-primary-foreground { color: var(--nw-primary-on, #141414); }
 [data-theme="dark"] .text-primary { color: var(--nw-ink, #ededed) !important; }
+
+/* //// Neoffice — the tokens of a selection and of a focus take the desk's (maintenance#1490). Upstream's shadcn */
+/* --primary-foreground and --ring are blue: a chosen bank card was filled dark blue in the dark theme, every focus ring */
+/* was blue, against the design system (an action is ink, the signal marks an active state, blue is only the info */
+/* status). --primary itself is the desk's (neoffice_theme sets it with !important). The desk paints .border-primary */
+/* ink, which does not show on a dark card: the dark theme takes its light ink instead (--nw-primary-solid). */
+:root {
+  --primary-foreground: var(--nw-primary-on, #ffffff);
+  --ring: var(--nw-accent, #F55D1A);
+  --sidebar-primary-foreground: var(--nw-primary-on, #ffffff);
+  --sidebar-ring: var(--nw-accent, #F55D1A);
+}
+.dark,
+[data-theme="dark"] {
+  --primary-foreground: var(--nw-primary-on, #141414);
+  --ring: var(--nw-accent, #F55D1A);
+  --sidebar-primary-foreground: var(--nw-primary-on, #141414);
+  --sidebar-ring: var(--nw-accent, #F55D1A);
+}
+[data-theme="dark"] .border-primary { border-color: var(--nw-primary-solid, #fffdf8) !important; }

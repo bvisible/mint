@@ -155,8 +155,10 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
             role="button"
             title={_("Select {0}", [bank.account_name ?? ''])}
             onClick={onSelect}
+            //// Neoffice — the unselected card takes the theme's border and hover (maintenance#1490): upstream's
+            //// fixed gray-200 / gray-50 stay light in the dark theme, where the unselected card looked chosen.
             className={cn('flex min-w-56 max-w-72 cursor-pointer items-center gap-2 rounded-md border-2 bg-card px-2 py-1',
-                isSelected ? 'border-primary bg-primary-foreground' : 'border-gray-200 hover:bg-gray-50')}
+                isSelected ? 'border-primary bg-primary-foreground' : 'border-border hover:bg-accent')}
         >
             {bank.logo
                 ? <img src={`/assets/mint/mint/${bank.logo}`} alt={bank.bank || bank.name || ''} className="object-contain"
@@ -177,8 +179,10 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
         //// `Select ${bank.account_name}`, which the extractor cannot see: it stayed English.
         title={_("Select {0}", [bank.account_name ?? ''])}
         onClick={onSelect}
-        className={cn('rounded-md border-2 border-gray-200 min-w-80 relative p-2 bg-card overflow-hidden cursor-pointer',
-            isSelected ? 'border-primary bg-primary-foreground' : 'hover:bg-gray-50',
+        //// Neoffice — border-border and hover:bg-accent in place of upstream's gray-200 / gray-50 (maintenance#1490,
+        //// see the compact card above).
+        className={cn('rounded-md border-2 border-border min-w-80 relative p-2 bg-card overflow-hidden cursor-pointer',
+            isSelected ? 'border-primary bg-primary-foreground' : 'hover:bg-accent',
             {
                 "max-w-60 min-w-60": size === 'sm',
             }
@@ -225,7 +229,8 @@ const BankPickerItem = ({ bank, size = 'base' }: { bank: SelectedBank, size?: 'b
             "-top-1.5": size === 'sm',
         })}>
             {bank.account_type && <span className={cn("uppercase rounded-bl-sm text-xs tracking-tight font-semibold py-1 px-1.5",
-                isSelected ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-secondary-foreground/70',
+                //// Neoffice — bg-muted in place of upstream's gray-200, which stays light in the dark theme (maintenance#1490).
+                isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-secondary-foreground/70',
                 {
                     'text-[10px]': size === 'sm',
                 }

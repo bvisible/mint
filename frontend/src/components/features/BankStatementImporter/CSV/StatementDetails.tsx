@@ -127,22 +127,35 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                 </div>
 
                 {progress > 0 && <div className='flex flex-col gap-2'><Progress value={progress} max={100} />
-                    <span className='text-sm'>{_("Importing {0} transactions", [progress.toString()])}
+                    {/* //// Neoffice — the progress event carries a percentage (statement_import.py), upstream printed it */}
+                    {/* //// as a number of transactions: « Importing 100 transactions » for a file of 13 (maintenance#1490). */}
+                    <span className='text-sm'>{_("Importing {0} of {1} transactions", [
+                        Math.round(progress * (data.final_transactions?.length || 0) / 100).toString(),
+                        (data.final_transactions?.length || 0).toString()])}
                     </span>
                 </div>}
 
                 {error && <ErrorBanner error={error} />}
 
-                <Table>
+                {/* //// Neoffice — a value wraps (maintenance#1490): shadcn's cells never do, and « Colonnes séparées pour retrait et */}
+                {/* //// dépôt » was cut at the column's edge. Important (`!`): the desk's stylesheet, loaded in mint.html, paints */}
+                {/* //// .whitespace-nowrap outside any layer, so it beats every Tailwind utility (layered) without it. */}
+                <Table className="[&_td]:whitespace-normal!">
                     <TableBody>
                         <TableRow>
                             <TableHead className='bg-muted/70'>{_("Bank Account")}</TableHead>
                             <TableCell>
-                                <div className='flex items-center gap-2'>
+                                {/* //// Neoffice — flex-wrap (maintenance#1490): the logo, the account's name and its ledger account */}
+                                {/* //// go to the next line whole instead of each shrinking to a narrow column. */}
+                                <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
                                     {bank?.logo ? <img
                                         src={`/assets/mint/mint/${bank.logo}`}
                                         alt={bank.bank || bank.name || ''}
                                         className="max-w-24 object-left h-8 object-contain"
+                                        //// Neoffice — the logo is bounded by an inline style, as on the bank cards (e582a55): the
+                                        //// desk's stylesheet, loaded in mint.html, beats upstream's max-w-24 / h-8 and the Raiffeisen
+                                        //// logo filled the cell at full size, cut at « RAIFFEI » (maintenance#1490).
+                                        style={{ maxWidth: '112px', maxHeight: '32px', width: 'auto', height: 'auto' }}
                                     /> : <div className="rounded-md flex items-center h-8 gap-2">
                                         <Landmark size={'30px'} />
                                         <H4 className="text-base mb-0">{bank?.bank}</H4>
@@ -196,9 +209,10 @@ const StatementDetails = ({ data, bank, onBack }: Props) => {
                                     </InfoHint>
                                 </div>
                             </TableHead>
+                            {/* //// Neoffice — upstream writes « (e.g. » in bare text, never translated (maintenance#1490). */}
                             <TableCell>
-                                {dateFormatMeta?.label || data.date_format} (e.g.{" "}
-                                {formatDate(new Date(), dateFormatMeta?.dayjsFormat || "YYYY-MM-DD")})
+                                {_("{0} (e.g. {1})", [dateFormatMeta?.label || data.date_format,
+                                    formatDate(new Date(), dateFormatMeta?.dayjsFormat || "YYYY-MM-DD")])}
                             </TableCell>
                         </TableRow>
                     </TableBody>

@@ -1,3 +1,6 @@
+//// Neoffice — this import of the translator is ours (maintenance#1490, formatBytes).
+import _ from './translate'
+
 /**
  * Function to return extension of a file
  * @param filename name of the file with extension
@@ -19,14 +22,19 @@ export const getFileExtension = (filename: string) => {
  */
 export const formatBytes = (bytes: number, decimals = 2) => {
 
-    if (bytes === 0) return '0 Bytes'
+    //// Neoffice — the units go through the catalogue and the number takes the user's decimal sign
+    //// (maintenance#1490): upstream wrote « 12.5 Bytes » on the dropped file, in English, in a French screen.
+    const sizes = [_('Bytes'), _('KB'), _('MB'), _('GB'), _('TB'), 'PB', 'EB', 'ZB', 'YB']
+    if (bytes === 0) return '0 ' + sizes[0]
 
     const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    //// Neoffice — upstream's list of units stood here, untranslated: it moved above, through _() (maintenance#1490).
 
     const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i]
+    //// Neoffice — the number in the user's decimal sign (« 12,5 Ko »), upstream joined it raw (maintenance#1490).
+    const value = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))
+    return value.toLocaleString(window?.frappe?.boot?.lang || undefined) + ' ' + sizes[i]
 }
 
 
