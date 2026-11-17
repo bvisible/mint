@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-12 02:45+0000\n"
+"POT-Creation-Date: 2026-11-17 20:39+0000\n"
 "PO-Revision-Date: 2025-10-28 16:42+0000\n"
 "Last-Translator: Claude Code <noreply@anthropic.com>\n"
 "Language: fr\n"
@@ -37,7 +37,7 @@ msgstr ""
 msgid "<span class=\"h4\"><a href=\"/mint\">Bank Reconciliation</a></span>"
 msgstr "<span class=\"h4\"><a href=\"/mint\">Rapprochement bancaire</a></span>"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:430
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:442
 #, python-brace-format
 msgid "A Document Scan with the same file already exists: {0}. Process anyway?"
 msgstr "Un Document Scan avec le même fichier existe déjà : {0}. Traiter quand même ?"
@@ -46,35 +46,40 @@ msgstr "Un Document Scan avec le même fichier existe déjà : {0}. Traiter quan
 msgid "A Document Scan with this name already exists"
 msgstr "Un Document Scan portant ce nom existe déjà"
 
-#: mint/apis/gap_credit_note.py:87
+#: mint/apis/gap_credit_note.py:89
 #, python-brace-format
 msgid "A credit note goes to an income account, not {0}."
 msgstr "Une note de crédit se comptabilise sur un compte de produits, et non sur {0}."
 
-#: mint/apis/statement_follow_up.py:625
+#: mint/apis/statement_follow_up.py:678
 msgid "A credit note of the balance is for the short payment of a sales invoice."
 msgstr "Une note de crédit du solde sert quand le client a payé moins que le montant de sa facture de vente."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:221
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:358
+#, python-brace-format
+msgid "A credit note of {0} is made on the article below, with the VAT of the invoice. It settles the invoice."
+msgstr "Une note de crédit de {0} est établie sur l'article ci-dessous, avec la TVA de la facture. Elle solde la facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:278
 #, python-brace-format
 msgid "A credit note of {0} was prepared as a draft: {1}."
 msgstr "Une note de crédit de {0} a été préparée en brouillon : {1}."
 
-#: mint/apis/payment_gap.py:339
+#: mint/apis/payment_gap.py:443
 #, python-brace-format
 msgid "A difference goes to an income or expense account, not {0}."
 msgstr "Une différence se comptabilise sur un compte de produits ou de charges, et non sur {0}."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:146
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:175
 #, python-brace-format
 msgid "A difference of {0} on invoice {1}"
 msgstr "Une différence de {0} sur la facture {1}"
 
-#: mint/apis/statement_follow_up.py:728
+#: mint/apis/statement_follow_up.py:796
 msgid "A difference waits for your decision in the bank reconciliation."
 msgstr "Une différence attend votre décision dans le rapprochement bancaire."
 
-#: mint/apis/payment_gap.py:225
+#: mint/apis/payment_gap.py:243
 msgid "A partial payment is validated by a person."
 msgstr "Un paiement partiel est validé par une personne."
 
@@ -82,11 +87,11 @@ msgstr "Un paiement partiel est validé par une personne."
 msgid "A payment in a foreign currency is recorded in the payment window."
 msgstr "Un paiement en devise étrangère s'enregistre dans la fenêtre de paiement."
 
-#: mint/apis/statement_follow_up.py:686 mint/apis/statement_follow_up.py:691
+#: mint/apis/statement_follow_up.py:754 mint/apis/statement_follow_up.py:759
 msgid "A rule is for the short payments of a customer."
 msgstr "Une règle concerne les paiements inférieurs à la facture d'un client."
 
-#: mint/apis/gap_rule.py:234
+#: mint/apis/gap_rule.py:236
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:45
 msgid "A rule that prepares or makes the credit note by itself needs the usual share of the customer."
 msgstr "Une règle qui prépare l'avoir ou le fait seule a besoin de la part habituelle du client."
@@ -108,7 +113,7 @@ msgstr "Accepter la suggestion rapprochera les deux transactions."
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:808
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:851
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1117
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:823
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:811
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:257
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1389
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1434
@@ -116,6 +121,7 @@ msgstr "Accepter la suggestion rapprochera les deux transactions."
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:399
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:607
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:674
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:382
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:93
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:21
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:85
@@ -126,7 +132,7 @@ msgstr "Compte"
 msgid "Account company does not match with the rule company."
 msgstr "La société du compte ne correspond pas à la société de la règle."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:283
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:456
 msgid "Account for the difference"
 msgstr "Compte de la différence"
 
@@ -138,16 +144,12 @@ msgstr "Compte de la différence"
 msgid "Account is required"
 msgstr "Le compte est requis"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:283
-msgid "Account of the credit note"
-msgstr "Compte de la note de crédit"
-
-#: mint/apis/gap_credit_note.py:85 mint/apis/payment_gap.py:337
+#: mint/apis/gap_credit_note.py:87 mint/apis/payment_gap.py:441
 #, python-brace-format
 msgid "Account {0} cannot be posted to."
 msgstr "Le compte {0} ne peut pas recevoir d'écritures."
 
-#: mint/apis/gap_credit_note.py:83 mint/apis/payment_gap.py:335
+#: mint/apis/gap_credit_note.py:85 mint/apis/payment_gap.py:439
 #, python-brace-format
 msgid "Account {0} does not belong to company {1}"
 msgstr ""
@@ -188,11 +190,11 @@ msgid "Action"
 msgstr "Action"
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:437
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:815
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:803
 msgid "Action Type"
 msgstr "Type d'action"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:179
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:169
 #: frontend/src/components/features/BankReconciliation/IncorrectlyClearedEntries.tsx:123
 msgid "Actions"
 msgstr "Actions"
@@ -231,15 +233,15 @@ msgstr "Ajoutez tous les comptes dans lesquels vous souhaitez répartir la trans
 msgid "Advance"
 msgstr "Acompte"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:114
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:261
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:108
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:255
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:105
 msgid "Against Account"
 msgstr "Contre compte"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:330
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:352
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:277
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:320
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:342
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:267
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:126
 msgid "All"
 msgstr "Tout"
@@ -249,7 +251,7 @@ msgstr "Tout"
 msgid "All ({0})"
 msgstr "Tous ({0})"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:118
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:147
 #, python-brace-format
 msgid "All rows must have an amount and a type. Missing in row {0}"
 msgstr "Toutes les lignes doivent avoir un montant et un type. Manquant dans la ligne {0}"
@@ -274,31 +276,31 @@ msgstr "Amendé de"
 #. Import Template Columns'
 #. Label of a Currency field in DocType 'Mint Bank Statement Import
 #. Transactions'
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:115
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:257
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:109
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:251
 #: frontend/src/components/features/BankReconciliation/BankTransactionUnreconcileModal.tsx:83
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:131
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1007
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:994
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1392
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1493
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:25
 #: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:79
 #: frontend/src/components/features/StatementImports/StatementImportLines.tsx:48
-#: frontend/src/pages/BankStatementImporter.tsx:187
+#: frontend/src/pages/BankStatementImporter.tsx:186
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:37
 msgid "Amount"
 msgstr "Montant"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:31
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:30
 msgid "Amount column has \"CR\"/\"DR\" values"
 msgstr "La colonne Montant contient des valeurs « CR »/« DR »"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:32
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:31
 msgid "Amount column has positive/negative values"
 msgstr "La colonne montant contient des valeurs positives/négatives"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1011
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:998
 msgid "Amount does not match the selected transaction"
 msgstr "Le montant ne correspond pas à la transaction sélectionnée"
 
@@ -307,7 +309,7 @@ msgstr "Le montant ne correspond pas à la transaction sélectionnée"
 msgid "Amount is expressed as"
 msgstr "Le montant est exprimé en"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1009
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:996
 msgid "Amount matches the selected transaction"
 msgstr "Le montant correspond à la transaction sélectionnée"
 
@@ -328,17 +330,22 @@ msgstr "Un import existe déjà pour ce relevé"
 msgid "An invoice appears twice in the split."
 msgstr "Une facture figure deux fois dans la répartition."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:456
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:174
+#, python-brace-format
+msgid "An overpayment of {0} on invoice {1}"
+msgstr "Un trop-perçu de {0} sur la facture {1}"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:468
 msgid "Analysis Failed"
 msgstr "Échec de l'analyse"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:68
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:475
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:479
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:69
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:487
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:491
 msgid "Analysis in progress..."
 msgstr "Analyse en cours..."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:75
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:77
 msgid "Analyze with Nora AI"
 msgstr "Analyser avec Nora AI"
 
@@ -353,12 +360,12 @@ msgstr "Tout"
 msgid "Any debit transaction with the keyword 'Bank Fee'."
 msgstr "Toute transaction de débit avec le mot-clé 'Frais bancaires'."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:345
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:516
 #, python-brace-format, python-format
 msgid "Applies to a payment at about {0} % of the invoice. Confirmed {1} times by a person: by itself from {2}."
 msgstr "S'applique à un paiement d'environ {0} % de la facture. Confirmée {1} fois par une personne : « Le faire seule » dès {2}."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:233
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:290
 msgid "Apply the proposal"
 msgstr "Appliquer la proposition"
 
@@ -375,7 +382,22 @@ msgstr "Êtes-vous sûr de vouloir annuler l'appariement de la pièce de cette t
 msgid "Are you sure you want to unreconcile this transaction?"
 msgstr "Êtes-vous sûr de vouloir annuler le rapprochement de cette transaction ?"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:258
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:363
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:417
+msgid "Article"
+msgstr ""
+
+#: mint/apis/gap_credit_note.py:203
+#, python-brace-format
+msgid "Article {0} cannot be sold."
+msgstr "L'article {0} ne peut pas être vendu."
+
+#: mint/apis/gap_credit_note.py:201
+#, python-brace-format
+msgid "Article {0} does not exist."
+msgstr "L'article {0} n'existe pas."
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:256
 #, python-brace-format
 msgctxt "Do MMM YYYY"
 msgid "As of {0}"
@@ -396,8 +418,8 @@ msgstr "Pièces jointes"
 msgid "Automatically run rules on unreconciled transactions"
 msgstr "Exécuter automatiquement les règles sur les transactions non rapprochées"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/CSVImport.tsx:21
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:109
+#: frontend/src/components/features/BankStatementImporter/CSV/CSVImport.tsx:19
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:108
 msgid "Back"
 msgstr "Retour"
 
@@ -409,13 +431,13 @@ msgstr "Revenez à l'espace Finance"
 msgid "Back to Form"
 msgstr "Retour au formulaire"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:306
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:96
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:296
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:98
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js:15
 msgid "Back to bank files"
 msgstr "Retour aux fichiers bancaires"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:297
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:468
 msgid "Back to the company's account"
 msgstr "Revenir au compte de la société"
 
@@ -427,7 +449,7 @@ msgstr "Retour à l'aperçu en direct"
 #. Option for the 'Maps To' (Select) field in DocType 'Mint Bank Statement
 #. Import Template Columns'
 #. Label of a Select field in DocType 'Payment Gap Rule'
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:370
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:368
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:158
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:33
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
@@ -435,12 +457,21 @@ msgstr "Retour à l'aperçu en direct"
 msgid "Balance"
 msgstr "Solde"
 
-#: mint/apis/gap_rule.py:150 mint/apis/statement_follow_up.py:435
+#: mint/apis/payment_gap.py:392
+#, python-brace-format
+msgid "Balance of {0} taken off the sales"
+msgstr "Solde de {0} déduit du chiffre d'affaires"
+
+#: mint/apis/gap_rule.py:150 mint/apis/statement_follow_up.py:438
 #, python-brace-format
 msgid "Balance of {0}, paid {1} on {2}"
 msgstr "Solde de {0}, payé {1} le {2}"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:365
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:133
+msgid "Balance taken off the turnover, invoice settled and bank line reconciled"
+msgstr "Solde déduit du chiffre d'affaires, facture soldée et ligne bancaire rapprochée"
+
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:363
 #, python-brace-format
 msgctxt "Do MMM YYYY"
 msgid "Balances as per bank statement before {0}"
@@ -454,10 +485,10 @@ msgstr "Banque"
 #. Label of a Link field in DocType 'Mint Bank Statement Import'
 #. Label of a Link field in DocType 'Mint Bank Statement Import Log'
 #. Label of a Link field in DocType 'Mint Bank Statement Import Template'
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:140
-#: frontend/src/pages/BankStatementImporter.tsx:104
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:146
+#: frontend/src/pages/BankStatementImporter.tsx:103
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:17
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:168
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:176
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:38
 #: mint/mint/doctype/mint_bank_statement_import_log/mint_bank_statement_import_log.json:21
 #: mint/mint/doctype/mint_bank_statement_import_template/mint_bank_statement_import_template.json:24
@@ -468,7 +499,7 @@ msgstr "Compte bancaire"
 msgid "Bank Charges, Salary, etc."
 msgstr "Frais bancaires, Salaire, etc."
 
-#: frontend/src/pages/BankReconciliation.tsx:126
+#: frontend/src/pages/BankReconciliation.tsx:127
 msgid "Bank Clearance Summary"
 msgstr "Résumé de compensation bancaire"
 
@@ -481,8 +512,8 @@ msgstr "Écritures bancaires créées"
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:131
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:350
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:50
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:545
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:651
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:533
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:639
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:267
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:87
 msgid "Bank Entry"
@@ -505,7 +536,7 @@ msgstr "Écriture bancaire créée mais le téléchargement du fichier a échou�
 msgid "Bank Fee, Salary, etc."
 msgstr "Frais bancaires, Salaire, etc."
 
-#: frontend/src/pages/BankReconciliation.tsx:121
+#: frontend/src/pages/BankReconciliation.tsx:122
 msgid "Bank Files"
 msgstr "Fichiers bancaires"
 
@@ -515,7 +546,7 @@ msgstr "Compte général bancaire"
 
 #. Label of a Link in the Mint Workspace
 #. Label of a shortcut in the Mint Workspace
-#: frontend/src/pages/BankStatementImporter.tsx:76
+#: frontend/src/pages/BankStatementImporter.tsx:75
 #: mint/mint/workspace/mint/mint.json:19
 msgid "Bank Reconciliation"
 msgstr "Rapprochement bancaire"
@@ -526,11 +557,11 @@ msgstr "Rapprochement bancaire"
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:108
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:97
-#: frontend/src/pages/BankReconciliation.tsx:125
+#: frontend/src/pages/BankReconciliation.tsx:126
 msgid "Bank Reconciliation Statement"
 msgstr "État de rapprochement bancaire"
 
-#: frontend/src/pages/BankStatementImporter.tsx:113
+#: frontend/src/pages/BankStatementImporter.tsx:112
 msgid "Bank Statement"
 msgstr "Relevé bancaire"
 
@@ -568,7 +599,7 @@ msgstr "Date de la transaction bancaire"
 msgid "Bank Transaction {0} is already fully reconciled"
 msgstr "La transaction bancaire {0} est déjà complètement rapprochée"
 
-#: frontend/src/pages/BankReconciliation.tsx:122
+#: frontend/src/pages/BankReconciliation.tsx:123
 msgid "Bank Transactions"
 msgstr "Transactions bancaires"
 
@@ -597,11 +628,11 @@ msgstr "Analyse du relevé bancaire démarrée"
 msgid "Bank statement import created"
 msgstr "Import du relevé bancaire créé"
 
-#: mint/apis/statement_import.py:183
+#: mint/apis/statement_import.py:178
 msgid "Bank statement imported successfully."
 msgstr "Relevé bancaire importé avec succès."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:89
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:88
 msgid "Bank statement imported."
 msgstr "Relevé bancaire importé."
 
@@ -613,12 +644,12 @@ msgstr "Traitement du relevé bancaire démarré"
 msgid "Based on the above entries, the balance amount (debit or credit) will be set for the last row to balance the journal entry."
 msgstr "Sur la base des écritures ci-dessus, le montant restant (débit ou crédit) sera défini pour la dernière ligne afin d'équilibrer l'écriture de journal."
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:94
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:91
 #, python-brace-format
 msgid "Below is a list of all accounting entries posted against the bank account {0} between {1} and {2}."
 msgstr "Voici une liste de toutes les écritures comptables imputées au compte bancaire {0} entre {1} et {2}."
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:136
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:127
 #, python-brace-format
 msgid "Below is a list of all bank transactions imported in the system for the bank account {0} between {1} and {2}."
 msgstr "Voici une liste de toutes les transactions bancaires importées dans le système pour le compte bancaire {0} entre {1} et {2}."
@@ -628,23 +659,46 @@ msgstr "Voici une liste de toutes les transactions bancaires importées dans le 
 msgid "Below is a list of all entries posted against the bank account {0} which have not been cleared till {1}."
 msgstr "Voici une liste de toutes les écritures imputées au compte bancaire {0} qui n'ont pas été compensées jusqu'au {1}."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:153
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:338
+msgid "Book it as a difference"
+msgstr "Le comptabiliser comme différence"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:313
+msgid "Book it as a loss on the customer"
+msgstr "Le passer en perte sur client"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:313
+msgid "Book it as a rebate"
+msgstr "Le passer en rabais"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:186
 msgid "Book the dunning fee and reconcile"
 msgstr "Comptabiliser les frais de relance et rapprocher"
 
-#: mint/apis/statement_follow_up.py:719
+#: mint/apis/statement_follow_up.py:787
 #, python-brace-format
 msgid "Booked, {0} of them with a small difference ({1} in all)."
 msgstr "Comptabilisées, dont {0} avec une petite différence ({1} au total)."
 
-#: mint/apis/statement_follow_up.py:717
+#: mint/apis/statement_follow_up.py:785
 msgid "Booked."
 msgstr "Comptabilisées."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:164
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:199
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:207
 #, python-brace-format
 msgid "Books the payment received. The invoice stays due for {0}."
 msgstr "Enregistre le paiement reçu. La facture reste due pour {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:212
+#, python-brace-format
+msgid "Books the whole payment: the invoice is settled and {0} stays available for the customer, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : la facture est soldée et {0} reste à disposition du client, à rapprocher d'une prochaine facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:213
+#, python-brace-format
+msgid "Books the whole payment: the invoice is settled and {0} stays open with the supplier, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : la facture est soldée et {0} reste ouvert chez le fournisseur, à rapprocher d'une prochaine facture."
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:129
 msgid "Bulk Bank Entry"
@@ -658,7 +712,11 @@ msgstr "Paiement groupé"
 msgid "Bulk Transfer"
 msgstr "Virement groupé"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:209
+#: frontend/src/lib/file.ts:27
+msgid "Bytes"
+msgstr "Octets"
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:217
 msgid "CAMT 053/054 file downloaded from your bank portal. Transactions are extracted automatically with bank references, amounts and party details."
 msgstr "Fichier CAMT 053/054 téléchargé depuis le portail de votre banque. Les transactions sont extraites automatiquement avec les références bancaires, montants et coordonnées des tiers."
 
@@ -688,8 +746,8 @@ msgstr "Peut être « 1200 Dr » et sera converti en 1200 pour le montant et « 
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:416
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:423
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:325
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:276
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:323
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:270
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:157
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:638
 #: frontend/src/components/features/BankReconciliation/BankTransactionUnreconcileModal.tsx:120
@@ -703,10 +761,6 @@ msgstr "Peut être « 1200 Dr » et sera converti en 1200 pour le montant et « 
 msgid "Cancel"
 msgstr "Annuler"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:243
-msgid "Cancel the balance with a credit note"
-msgstr "Annuler le solde par une note de crédit"
-
 #. Option for the 'Document Status' (Select) field in DocType 'Mint Bank
 #. Statement Import'
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:373
@@ -717,11 +771,11 @@ msgstr "Annuler le solde par une note de crédit"
 msgid "Cancelled"
 msgstr "Annulé"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:546
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:573
 msgid "Cannot parse a submitted or cancelled document"
 msgstr "Impossible de traiter un document validé ou annulé"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:558
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:585
 msgid "Cannot read file"
 msgstr "Impossible de lire le fichier"
 
@@ -729,10 +783,14 @@ msgstr "Impossible de lire le fichier"
 msgid "Cash"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:265
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:402
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:273
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:414
 msgid "Change"
 msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:425
+msgid "Charges"
+msgstr "Frais"
 
 # //// Neoffice — the bare key `Check` read « Chèque » (upstream's machine
 # translation) and, loaded last, imposed it
@@ -759,8 +817,8 @@ msgstr "Critère"
 msgid "Checks and Deposits incorrectly cleared"
 msgstr "Chèques et dépôts compensés incorrectement"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:112
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:253
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:106
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:247
 msgid "Cheque/Reference Number"
 msgstr "Numéro de chèque/référence"
 
@@ -772,38 +830,50 @@ msgstr "Choisissez un client pour rapprocher ses paiements et ses avoirs de ses 
 msgid "Choose a supplier to reconcile its payments and debit notes with its invoices."
 msgstr "Choisissez un fournisseur pour rapprocher ses paiements et ses notes de débit de ses factures."
 
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:369
+msgid "Choose an article"
+msgstr "Choisissez un article"
+
 #: mint/apis/party_reconciliation.py:258
 msgid "Choose at least one invoice and one payment, credit note or entry."
 msgstr "Choisissez au moins une facture et un paiement, un avoir ou une écriture."
+
+#: mint/apis/gap_credit_note.py:284
+msgid "Choose the article of the credit note."
+msgstr "Choisissez l'article de la note de crédit."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:378
+msgid "Choose the article that tells why: a discount, a loss on a customer."
+msgstr "Choisissez l'article qui indique le motif : un rabais, une perte sur client."
 
 #. Label of a Select field in DocType 'Mint Bank Transaction Rule'
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:86
 msgid "Classify As"
 msgstr "Classer comme"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:301
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:338
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:353
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:291
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:326
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:341
 msgid "Clear Filters"
 msgstr "Effacer les filtres"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:113
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:269
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:107
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:263
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:108
 #: frontend/src/components/features/BankReconciliation/IncorrectlyClearedEntries.tsx:122
 msgid "Clearance Date"
 msgstr "Date de compensation"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:222
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:216
 msgid "Clearance date updated"
 msgstr "Date de compensation mise à jour"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:145
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:139
 #: frontend/src/components/features/BankReconciliation/IncorrectlyClearedEntries.tsx:80
 msgid "Cleared"
 msgstr "Compensé"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:409
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:421
 msgid "Click here to import a bank file"
 msgstr "Cliquez ici pour importer un fichier bancaire"
 
@@ -811,7 +881,7 @@ msgstr "Cliquez ici pour importer un fichier bancaire"
 msgid "Click to pay in full."
 msgstr "Cliquer pour payer intégralement."
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:242
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:240
 msgid "Click to set the closing balance as per statement"
 msgstr "Cliquer pour définir le solde de clôture selon le relevé"
 
@@ -825,31 +895,31 @@ msgstr "Cliquer pour définir le solde de clôture selon le relevé"
 #: frontend/src/components/features/Settings/Settings.tsx:143
 #: frontend/src/components/ui/dialog.tsx:132
 #: frontend/src/components/ui/sheet.tsx:81
-#: frontend/src/pages/BankStatementImporter.tsx:209
+#: frontend/src/pages/BankStatementImporter.tsx:208
 msgid "Close"
 msgstr "Fermer"
 
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:97
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:222
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:220
 msgid "Closing"
 msgstr ""
 
 #. Label of a Currency field in DocType 'Mint Bank Statement Import'
 #. Label of a Currency field in DocType 'Mint Bank Statement Import Log'
-#: frontend/src/pages/BankStatementImporter.tsx:246
+#: frontend/src/pages/BankStatementImporter.tsx:249
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:149
 #: mint/mint/doctype/mint_bank_statement_import_log/mint_bank_statement_import_log.json:37
 msgid "Closing Balance"
 msgstr "Solde de clôture"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:174
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:187
 #, python-brace-format
 msgctxt "Do MMMM YYYY"
 msgid "Closing Balance as of {}"
 msgstr "Solde de clôture au {}"
 
 # ── Mint UI translations (added by audit) ──
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:223
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:221
 msgid "Closing Balance as per statement"
 msgstr "Solde de clôture selon le relevé"
 
@@ -857,21 +927,21 @@ msgstr "Solde de clôture selon le relevé"
 msgid "Closing balance as per system"
 msgstr "Solde de clôture selon le système"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:354
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:352
 msgid "Closing balance deleted."
 msgstr "Solde de clôture supprimé."
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:298
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:296
 msgid "Closing balance is required."
 msgstr "Le solde de clôture est requis."
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:317
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:315
 #, python-brace-format
 msgctxt "Do MMM YYYY"
 msgid "Closing balance on bank statement as of {0}"
 msgstr "Solde de clôture du relevé bancaire au {0}"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:292
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:290
 msgid "Closing balance set."
 msgstr "Solde de clôture défini."
 
@@ -880,7 +950,7 @@ msgstr "Solde de clôture défini."
 msgid "Column Mapping"
 msgstr "Correspondance des colonnes"
 
-#: frontend/src/pages/BankStatementImporter.tsx:174
+#: frontend/src/pages/BankStatementImporter.tsx:173
 msgid "Column Name"
 msgstr "Nom de la colonne"
 
@@ -888,7 +958,7 @@ msgstr "Nom de la colonne"
 #. Label of a Link field in DocType 'Payment Gap Rule'
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1096
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:79
-#: frontend/src/pages/BankStatementImporter.tsx:98
+#: frontend/src/pages/BankStatementImporter.tsx:97
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:121
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.json:27
 msgid "Company"
@@ -898,7 +968,7 @@ msgstr "Société"
 msgid "Company is required"
 msgstr "La société est requise"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1039
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1026
 msgid "Complete Match"
 msgstr "Correspondance complète"
 
@@ -933,7 +1003,8 @@ msgstr "Configurer les paramètres du rapprochement bancaire."
 msgid "Confirm and Submit"
 msgstr "Confirmer et soumettre"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:154
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:187
 msgid "Confirm the rebate and reconcile"
 msgstr "Confirmer le rabais et rapprocher"
 
@@ -942,7 +1013,7 @@ msgstr "Confirmer le rabais et rapprocher"
 msgid "Confirmations"
 msgstr ""
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:212
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:226
 msgid "Conflicting Transactions"
 msgstr "Transactions en conflit"
 
@@ -969,7 +1040,7 @@ msgstr "Contient Cr/Dr"
 msgid "Content Hash"
 msgstr "Empreinte du contenu"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:473
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:485
 msgid "Continue in background"
 msgstr "Continuer en arrière-plan"
 
@@ -978,7 +1049,7 @@ msgstr "Continuer en arrière-plan"
 msgid "Copied"
 msgstr "Copié"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:85
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:82
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:76
 msgid "Copied to clipboard"
 msgstr "Copié dans le presse-papiers"
@@ -988,7 +1059,7 @@ msgstr "Copié dans le presse-papiers"
 msgid "Copy the reference"
 msgstr "Copier la référence"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:135
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:129
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:134
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
@@ -1016,11 +1087,11 @@ msgstr "Le centre de coûts est requis"
 msgid "Could not copy"
 msgstr "Impossible de copier"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:558
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:585
 msgid "Could not read file content"
 msgstr "Impossible de lire le contenu du fichier"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:844
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:832
 msgid "Create"
 msgstr "Créer"
 
@@ -1037,11 +1108,11 @@ msgstr "Créer un nouveau processeur de relevés bancaires"
 msgid "Create New {0}"
 msgstr "Créer un nouveau {0}"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:775
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:763
 msgid "Create a journal entry for expenses, income or split transactions"
 msgstr "Créer une écriture de journal pour les dépenses, revenus ou transactions fractionnées"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:781
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:769
 msgid "Create a new entry based on the rule"
 msgstr "Créer une nouvelle écriture basée sur la règle"
 
@@ -1054,7 +1125,8 @@ msgstr "Créer une nouvelle règle"
 msgid "Create a new rule to automatically classify transactions."
 msgstr "Créer une nouvelle règle pour classer automatiquement les transactions."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:151
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
 msgid "Create the credit note and reconcile"
 msgstr "Créer la note de crédit et rapprocher"
 
@@ -1072,6 +1144,7 @@ msgstr ""
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:401
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:611
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:728
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:411
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:49
 msgid "Credit"
 msgstr "Crédit"
@@ -1082,11 +1155,11 @@ msgstr "Crédit"
 msgid "Credit Note"
 msgstr ""
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:112
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:133
 msgid "Credit note made, invoice settled and bank line reconciled"
 msgstr "Note de crédit créée, facture soldée et ligne bancaire rapprochée"
 
-#: mint/apis/gap_credit_note.py:68
+#: mint/apis/gap_credit_note.py:70
 msgid "Credit note of the balance"
 msgstr "Note de crédit du solde"
 
@@ -1095,8 +1168,8 @@ msgstr "Note de crédit du solde"
 msgid "Credit/Debit"
 msgstr "Crédit/Débit"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:332
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:279
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:322
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:269
 msgid "Credits"
 msgstr "Crédits"
 
@@ -1129,15 +1202,15 @@ msgstr ""
 #. Option for the 'Maps To' (Select) field in DocType 'Mint Bank Statement
 #. Import Template Columns'
 #. Label of a Date field in DocType 'Mint Bank Statement Import Transactions'
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:369
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:171
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:367
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:161
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:19
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:224
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:281
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:238
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:295
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:191
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:248
 #: frontend/src/components/features/StatementImports/StatementImportLines.tsx:46
-#: frontend/src/pages/BankStatementImporter.tsx:182
+#: frontend/src/pages/BankStatementImporter.tsx:181
 #: mint/mint/doctype/mint_bank_statement_balance/mint_bank_statement_balance.json:26
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:29
@@ -1158,6 +1231,7 @@ msgstr "Plage de dates"
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:400
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:610
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:713
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:409
 #: mint/mint/doctype/mint_transaction_rule_accounts/mint_transaction_rule_accounts.json:43
 msgid "Debit"
 msgstr "Débit"
@@ -1166,8 +1240,8 @@ msgstr "Débit"
 msgid "Debit Note"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:331
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:278
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:321
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:268
 msgid "Debits"
 msgstr "Débits"
 
@@ -1187,7 +1261,7 @@ msgstr "Décidé le"
 msgid "Decision"
 msgstr "Décision"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:381
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:379
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:358
 msgid "Delete"
 msgstr "Supprimer"
@@ -1196,7 +1270,7 @@ msgstr "Supprimer"
 msgid "Delete the draft"
 msgstr "Supprimer le brouillon"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:353
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:351
 msgid "Deleting closing balance..."
 msgstr "Suppression du solde de clôture..."
 
@@ -1210,12 +1284,12 @@ msgstr "Suppression de la règle..."
 #. Transactions'
 #. Option for the 'Transaction Type' (Select) field in DocType 'Mint Bank
 #. Transaction Rule'
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:175
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:165
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:338
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:160
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:228
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:285
-#: frontend/src/pages/BankStatementImporter.tsx:192
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:242
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:299
+#: frontend/src/pages/BankStatementImporter.tsx:191
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:46
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:43
@@ -1226,14 +1300,14 @@ msgstr "Dépôt"
 #. Import Template Columns'
 #. Label of a Small Text field in DocType 'Mint Bank Statement Import
 #. Transactions'
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:172
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:162
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1391
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionsTable.tsx:22
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:225
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:282
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:239
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:296
 #: frontend/src/components/features/StatementImports/StatementImportLines.tsx:47
-#: frontend/src/pages/BankStatementImporter.tsx:176
-#: frontend/src/pages/BankStatementImporter.tsx:197
+#: frontend/src/pages/BankStatementImporter.tsx:175
+#: frontend/src/pages/BankStatementImporter.tsx:196
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:57
 msgid "Description"
@@ -1244,11 +1318,11 @@ msgstr "Description"
 msgid "Description Rules"
 msgstr "Règles de description"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:180
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:193
 msgid "Detected Amount Format"
 msgstr "Format de montant détecté"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:192
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:205
 msgid "Detected Date Format"
 msgstr "Format de date détecté"
 
@@ -1258,7 +1332,7 @@ msgstr "Format de date détecté"
 msgid "Difference"
 msgstr "Différence"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:112
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:133
 msgid "Difference booked and bank line reconciled"
 msgstr "Différence comptabilisée et ligne bancaire rapprochée"
 
@@ -1267,7 +1341,7 @@ msgstr "Différence comptabilisée et ligne bancaire rapprochée"
 msgid "Difference of {0}: to decide"
 msgstr "Différence de {0} : à décider"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:429
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:417
 #, python-brace-format
 msgid "Difference of {0}: {1}"
 msgstr "Différence de {0} : {1}"
@@ -1278,7 +1352,7 @@ msgstr "Différence de {0} : {1}"
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: mint/apis/statement_import.py:127
+#: mint/apis/statement_import.py:122
 msgid "Disabled Bank Account"
 msgstr "Compte bancaire désactivé"
 
@@ -1312,20 +1386,20 @@ msgstr "Document Scan introuvable"
 msgid "Document Status"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:109
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:103
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:101
 #: frontend/src/components/features/BankReconciliation/IncorrectlyClearedEntries.tsx:117
 msgid "Document Type"
 msgstr "Type de document"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:546
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:573
 msgid "Document cannot be parsed"
 msgstr "Le document ne peut pas être analysé"
 
 #. Option for the 'Document Status' (Select) field in DocType 'Mint Bank
 #. Statement Import'
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:127
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:989
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:976
 #: frontend/src/components/features/StatementImports/StatementImportCard.tsx:66
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:81
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js:33
@@ -1362,7 +1436,7 @@ msgstr "Brouillon {0} préparé : corrigez-le dans son onglet, validez-le, puis 
 msgid "Drag and drop file here"
 msgstr "Glisser-déposer le fichier ici"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:188
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:196
 msgid "Drag and drop your bank file here"
 msgstr "Glissez-déposez votre fichier bancaire ici"
 
@@ -1370,7 +1444,7 @@ msgstr "Glissez-déposez votre fichier bancaire ici"
 msgid "Drag to reorder"
 msgstr "Glisser pour réordonner"
 
-#: frontend/src/components/ui/file-dropzone.tsx:48
+#: frontend/src/components/ui/file-dropzone.tsx:36
 msgid "Drop a file here, or click to select a file"
 msgstr "Déposez un fichier ici, ou cliquez pour en sélectionner un"
 
@@ -1378,7 +1452,7 @@ msgstr "Déposez un fichier ici, ou cliquez pour en sélectionner un"
 msgid "Drop file here"
 msgstr "Déposer le fichier ici"
 
-#: frontend/src/components/ui/file-dropzone.tsx:48
+#: frontend/src/components/ui/file-dropzone.tsx:36
 msgid "Drop some files here, or click to select files"
 msgstr "Déposez des fichiers ici, ou cliquez pour sélectionner"
 
@@ -1405,7 +1479,7 @@ msgstr "Modifier"
 msgid "Edit this rule"
 msgstr "Modifier cette règle"
 
-#: mint/apis/statement_import.py:240
+#: mint/apis/statement_import.py:235
 msgid "Empty File"
 msgstr "Fichier vide"
 
@@ -1432,7 +1506,7 @@ msgstr "Se termine par"
 msgid "Enter an amount greater than zero"
 msgstr "Saisissez un montant supérieur à zéro"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:310
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:308
 #, python-brace-format
 msgctxt "Do MMM YYYY"
 msgid "Enter the closing balance you see in your bank statement for {0} as of the {1}"
@@ -1449,7 +1523,7 @@ msgstr "Les écritures ci-dessous ont une date de comptabilisation après {0} ma
 #. Import Transactions'
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:108
 #: frontend/src/components/features/BankReconciliation/utils.ts:294
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:434
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:446
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:48
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:113
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import_list.js:69
@@ -1461,7 +1535,7 @@ msgstr "Erreur"
 msgid "Every bank file that came in, by the bank connection or deposited by hand, and what became of each of its lines: passed by the import, reconciled afterwards, or still waiting for someone."
 msgstr "Chaque fichier bancaire reçu, par la connexion bancaire ou déposé à la main, et le sort de chacune de ses lignes : passée par l'import, rapprochée ensuite, ou encore en attente de quelqu'un."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:319
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:308
 #: frontend/src/components/features/StatementImports/StatementImportCard.tsx:67
 msgid "Everything is dealt with"
 msgstr "Tout est traité"
@@ -1496,7 +1570,7 @@ msgstr "Existant"
 msgid "Existing Bank Transaction"
 msgstr "Transaction bancaire existante"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:221
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:235
 msgid "Existing transactions in the system belonging to the same bank account and date range"
 msgstr "Transactions existantes appartenant au même compte bancaire et à la même plage de dates"
 
@@ -1523,7 +1597,7 @@ msgstr "Échec de la création du processeur de documents"
 msgid "Failed to create processor"
 msgstr "Échec de la création du processeur"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:355
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:353
 msgid "Failed to delete closing balance."
 msgstr "Échec de la suppression du solde de clôture."
 
@@ -1536,7 +1610,7 @@ msgstr "Échec de la suppression de la règle."
 msgid "Failed to extract transactions from bank statement. Please check the file format or try again. Error: {0}"
 msgstr "Échec de l'extraction des transactions du relevé bancaire. Veuillez vérifier le format du fichier ou réessayer. Erreur : {0}"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:505
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:517
 msgid "Failed to process file"
 msgstr "Échec du traitement du fichier"
 
@@ -1544,7 +1618,7 @@ msgstr "Échec du traitement du fichier"
 msgid "Failed to run rules evaluation"
 msgstr "Échec de l'exécution de l'évaluation des règles"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:436
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:448
 msgid "Failed to start analysis"
 msgstr "Échec du démarrage de l'analyse"
 
@@ -1556,14 +1630,15 @@ msgstr "Échec de la mise à jour des paramètres de classification automatique 
 msgid "Failed to update rule priorities"
 msgstr "Échec de la mise à jour des priorités des règles"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:373
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:380
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:385
 msgid "Failed to upload file"
 msgstr "Échec du téléversement du fichier"
 
 #. Label of a HTML field in DocType 'Mint Bank Statement Import'
 #. Label of a Attach field in DocType 'Mint Bank Statement Import'
 #. Label of a Attach field in DocType 'Mint Bank Statement Import Log'
-#: frontend/src/pages/BankStatementImporter.tsx:247
+#: frontend/src/pages/BankStatementImporter.tsx:250
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:59
 #: mint/mint/doctype/mint_bank_statement_import_log/mint_bank_statement_import_log.json:62
 msgid "File"
@@ -1578,16 +1653,24 @@ msgstr "Type de fichier"
 msgid "File deposited by hand"
 msgstr "Fichier déposé à la main"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:552
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:579
 msgid "File type must be XML"
 msgstr "Le type de fichier doit être XML"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:273
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:446
 msgid "Fill in the settings"
 msgstr "Remplir les réglages"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:293
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:239
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:377
+msgid "Filled in: the article most used for the credit notes of the company."
+msgstr "Rempli automatiquement : l'article le plus utilisé pour les notes de crédit de la société."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:375
+msgid "Filled in: the article of the credit notes of this customer."
+msgstr "Rempli automatiquement : l'article des notes de crédit de ce client."
+
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:283
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:231
 msgid "Filter by amount"
 msgstr "Filtrer par montant"
 
@@ -1600,11 +1683,11 @@ msgstr "Par exemple, si défini à 4, le rapprochement essaiera de trouver des t
 msgid "For more information, open the {0} menu below, then {1}."
 msgstr "Pour plus d'informations, ouvrez le menu {0} ci-dessous, puis {1}."
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:188
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:182
 msgid "Force Clear"
 msgstr "Forcer la compensation"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:234
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:228
 msgid "Force Clear Voucher"
 msgstr "Forcer la compensation de la pièce"
 
@@ -1620,17 +1703,21 @@ msgstr "Forcer la réévaluation de toutes les transactions non rapprochées, m�
 msgid "Found by the IBAN of the payer."
 msgstr "Trouvé par l'IBAN du payeur."
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:225
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:223
 #, python-brace-format
 msgid "From the statement file imported, as of {0}."
 msgstr "D'après le fichier de relevé importé, au {0}."
 
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:83
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:174
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:221
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:226
+#: frontend/src/lib/file.ts:27
+msgid "GB"
+msgstr ""
+
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:79
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:171
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:220
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:224
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionDetails.tsx:72
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:152
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:165
 msgid "GL Account"
 msgstr "Compte du grand livre"
 
@@ -1648,6 +1735,10 @@ msgstr "Général"
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:976
 msgid "Get Unpaid Invoices"
 msgstr "Récupérer les factures impayées"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:399
+msgid "Goods are coming back and must go into stock?"
+msgstr "De la marchandise revient et doit rentrer en stock ?"
 
 #: mint/apis/google_ai.py:80
 msgid "Google APIs are not enabled. Please enable them in Mint Settings."
@@ -1735,7 +1826,7 @@ msgstr "Masquer les lignes"
 msgid "How many times a person confirmed this handling for this customer. The level automatic is only available from three."
 msgstr "Nombre de fois qu'une personne a confirmé ce traitement pour ce client. Le niveau « automatic » n'est disponible qu'à partir de trois."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:580
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:607
 #, python-brace-format
 msgid "IBAN in XML ({0}) points to {1}, but {2} is selected. Using selected account."
 msgstr "L'IBAN dans le XML ({0}) correspond à {1}, mais {2} est sélectionné. Le compte sélectionné sera utilisé."
@@ -1754,14 +1845,14 @@ msgstr "Si la règle correspond, alors :"
 msgid "If your bank statement shows a different closing balance, it is because all transactions have not reconciled yet."
 msgstr "Si votre relevé bancaire affiche un solde de clôture différent, c'est parce que toutes les transactions n'ont pas encore été rapprochées."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:115
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:114
 msgid "Import 1 transaction"
 msgstr "Importer 1 transaction"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:143
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:356
-#: frontend/src/pages/BankStatementImporter.tsx:82
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:136
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:134
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:344
+#: frontend/src/pages/BankStatementImporter.tsx:81
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:138
 msgid "Import Bank Statement"
 msgstr "Importer un relevé bancaire"
 
@@ -1774,15 +1865,15 @@ msgstr "Résumé de l'import"
 msgid "Import a bank statement (XML or PDF)"
 msgstr "Importer un relevé bancaire (XML ou PDF)"
 
-#: mint/apis/statement_import.py:222
+#: mint/apis/statement_import.py:217
 msgid "Import template should be of type .csv, .xlsx or .xls"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:320
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:309
 msgid "Import your bank statement to get started."
 msgstr "Importez votre relevé bancaire pour commencer."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:115
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:114
 #, python-brace-format
 msgid "Import {0} transactions"
 msgstr "Importer {0} transactions"
@@ -1795,7 +1886,7 @@ msgstr "Importer {0} transactions"
 msgid "Imported"
 msgstr "Importé"
 
-#: frontend/src/pages/BankStatementImporter.tsx:243
+#: frontend/src/pages/BankStatementImporter.tsx:246
 msgid "Imported On"
 msgstr "Importé le"
 
@@ -1803,12 +1894,7 @@ msgstr "Importé le"
 msgid "Importing a statement, step by step"
 msgstr "Importer un relevé, pas à pas"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:131
-#, python-brace-format
-msgid "Importing {0} transactions"
-msgstr "Import de {0} transactions en cours"
-
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:115
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:114
 msgid "Importing..."
 msgstr "Importation..."
 
@@ -1821,7 +1907,7 @@ msgstr "Dans ce cas, le montant sera calculé à 25% du montant de la transactio
 msgid "Include Drafts"
 msgstr "Inclure les brouillons"
 
-#: frontend/src/pages/BankReconciliation.tsx:127
+#: frontend/src/pages/BankReconciliation.tsx:128
 msgid "Incorrectly Cleared Entries"
 msgstr "Écritures compensées incorrectement"
 
@@ -1835,15 +1921,15 @@ msgstr "Écritures compensées incorrectement selon le rapport."
 msgid "Index count starts from 0"
 msgstr "Le comptage des index commence à 0"
 
-#: mint/apis/payment_gap.py:449
+#: mint/apis/payment_gap.py:558
 msgid "Interest and/or dunning fee"
 msgstr ""
 
-#: mint/apis/statement_import.py:122
+#: mint/apis/statement_import.py:117
 msgid "Invalid Bank Account"
 msgstr "Compte bancaire invalide"
 
-#: mint/apis/statement_import.py:222
+#: mint/apis/statement_import.py:217
 msgid "Invalid File Type"
 msgstr "Type de fichier non valide"
 
@@ -1892,40 +1978,49 @@ msgstr "Correspondances de factures"
 msgid "Invoice No"
 msgstr "N° de facture"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:47
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:133
+msgid "Invoice settled and bank line reconciled, the surplus stays available"
+msgstr "Facture soldée et ligne bancaire rapprochée, le surplus reste à disposition"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:55
 #, python-brace-format
 msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: a rebate within what the company accepts."
 msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : un rabais accepté par la société."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:41
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:49
 #, python-brace-format
 msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: a rounding."
 msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : un arrondi."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:44
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:52
 #, python-brace-format
 msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: the early payment discount of {5} % that its terms grant until {6}."
 msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : l'escompte de {5} % que ses conditions accordent jusqu'au {6}."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:45
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:53
 #, python-brace-format
 msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} less: the early payment discount that its terms grant."
 msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de moins : l'escompte que ses conditions accordent."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:53
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:61
 #, python-brace-format
-msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed: that is never passed by itself."
-msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de plus que le dû : un trop-perçu ne se passe jamais tout seul."
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed."
+msgstr "La facture {0} de {1} se solde à {2}. Vous avez payé {3}, soit {4} de plus que le montant dû."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:51
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:59
 #, python-brace-format
 msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more: the fee of the dunning {5}, booked on its account and settling it."
 msgstr "La facture {0} de {1} se solde à {2}. Vous avez payé {3}, soit {4} de plus : les frais de la relance {5}, comptabilisés sur son compte et soldant la facture."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:49
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:57
 #, python-brace-format
 msgid "Invoice {0} of {1} still owes {2}. You paid {3}: a partial payment, what came in is booked and {4} stays open."
 msgstr "La facture {0} de {1} présente encore un reste dû de {2}. Vous avez payé {3} : un paiement partiel, le montant reçu est comptabilisé et {4} reste ouvert."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:431
+#, python-brace-format
+msgid "Invoice {0}: amount due"
+msgstr "Facture {0} : montant dû"
 
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:742
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1187
@@ -1957,7 +2052,7 @@ msgstr "Détails de l'écriture de journal"
 msgid "Journal Entry submitted and reconciled"
 msgstr "Écriture de journal soumise et rapprochée"
 
-#: mint/apis/bank_reconciliation.py:1065
+#: mint/apis/bank_reconciliation.py:1060
 #, python-brace-format
 msgid "Journal Entry {0} is not a draft"
 msgstr "L'écriture de journal {0} n'est pas un brouillon"
@@ -1965,6 +2060,14 @@ msgstr "L'écriture de journal {0} n'est pas un brouillon"
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:391
 msgid "Journal Template Accounts"
 msgstr "Comptes du modèle de journal"
+
+#: frontend/src/lib/file.ts:27
+msgid "KB"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:329
+msgid "Keep it for a next invoice"
+msgstr "Le garder pour une prochaine facture"
 
 #: frontend/src/components/features/BankReconciliation/BankRecDateFilter.tsx:80
 msgid "Last Fiscal Year"
@@ -1978,7 +2081,7 @@ msgstr "Mois dernier"
 msgid "Last Quarter"
 msgstr "Dernier trimestre"
 
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:227
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:225
 msgid "Last Synced Transaction"
 msgstr "Dernière transaction synchronisée"
 
@@ -1995,7 +2098,7 @@ msgstr "Année dernière"
 msgid "Last confirmed on"
 msgstr "Dernière confirmation le"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:240
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:298
 msgid "Leave the balance to pay"
 msgstr "Laisser le solde à payer"
 
@@ -2008,7 +2111,7 @@ msgstr "Reste ouvert"
 msgid "Left open by {0} on {1}"
 msgstr "Laissé ouvert par {0} le {1}"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:357
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:528
 #, python-brace-format
 msgid "Left open by {0} on {1}."
 msgstr "Laissé ouvert par {0} le {1}."
@@ -2026,7 +2129,7 @@ msgstr ""
 msgid "Lines"
 msgstr "Lignes"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:300
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:290
 #, python-brace-format
 msgid "Lines of the file of {0} that wait"
 msgstr "Lignes du fichier bancaire du {0} en attente"
@@ -2045,33 +2148,41 @@ msgstr "Chargement..."
 msgid "Location where the document processor is run."
 msgstr "Emplacement où le processeur de documents est exécuté."
 
+#: frontend/src/lib/file.ts:27
+msgid "MB"
+msgstr ""
+
 #: frontend/src/components/features/StatementImports/utils.ts:67
 #, python-brace-format
 msgid "Made by itself by the rule of the customer, credit note {0}"
 msgstr "Créée automatiquement selon la règle du client, note de crédit {0}"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:248
-#, python-brace-format
-msgid "Made like the credit notes this customer already has ({0}), without link to the invoice."
-msgstr "Créée comme les notes de crédit que ce client a déjà ({0}), sans lien avec la facture."
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:307
+msgid "Make a credit note"
+msgstr "Faire une note de crédit"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:510
 msgid "Make it by itself"
 msgstr "Le faire seule"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:161
-#, python-brace-format
-msgid "Makes a credit note of {0} and settles the invoice. The payment received is booked as it is."
-msgstr "Crée une note de crédit de {0} et solde la facture. Le paiement reçu est comptabilisé tel quel."
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:400
+msgid "Make the credit note yourself from the invoice, then choose Leave the balance to pay: you match it afterwards."
+msgstr "Établissez vous-même la note de crédit à partir de la facture, puis choisissez « Laisser le solde à payer » : vous la rapprocherez ensuite."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:245
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:194
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:202
 #, python-brace-format
-msgid "Makes a credit note of {0} for the customer: the invoice is settled and nothing more is owed. The VAT is corrected like on any credit note. Choose this when you grant a rebate afterwards or when the rest is not due."
-msgstr "Crée une note de crédit de {0} pour le client : la facture est soldée et il ne doit plus rien. La TVA est corrigée comme pour toute note de crédit. Choisissez cette option si vous accordez un rabais après coup ou si le reste n'est pas dû."
+msgid "Makes a credit note of {0} on the article chosen above and settles the invoice. The payment received is booked as it is."
+msgstr "Établit une note de crédit de {0} sur l'article choisi ci-dessus et solde la facture. Le paiement reçu est enregistré tel quel."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:308
+#, python-brace-format
+msgid "Makes a credit note of {0} on the article you choose, with the VAT of the invoice, and settles the invoice. It is one line and moves no stock. When goods come back, make the credit note yourself from the invoice, then choose Leave the balance to pay."
+msgstr "Établit une note de crédit de {0} sur l'article que vous choisissez, avec la TVA de la facture, et solde la facture. C'est une seule ligne, sans toucher au stock. Si des marchandises vous sont retournées, établissez vous-même la note de crédit à partir de la facture, puis choisissez « Laisser le solde à payer »."
 
 #. Label of a Select field in DocType 'Mint Bank Statement Import Template
 #. Columns'
-#: frontend/src/pages/BankStatementImporter.tsx:175
+#: frontend/src/pages/BankStatementImporter.tsx:174
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:32
 msgid "Maps To"
 msgstr "Correspond à"
@@ -2085,11 +2196,11 @@ msgstr "Correspondance"
 msgid "Match Transfers across (days)"
 msgstr "Faire correspondre les virements sur (jours)"
 
-#: frontend/src/pages/BankReconciliation.tsx:119
+#: frontend/src/pages/BankReconciliation.tsx:120
 msgid "Match and Reconcile"
 msgstr "Faire correspondre et rapprocher"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:91
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:87
 msgid "Match or Create"
 msgstr "Faire correspondre ou créer"
 
@@ -2103,7 +2214,7 @@ msgstr "Apparié"
 msgid "Matched Amount"
 msgstr "Montant rapproché"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:421
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:409
 msgid "Matched by rule"
 msgstr "Correspondance par règle"
 
@@ -2196,7 +2307,7 @@ msgstr "Paramètres du rapprochement bancaire"
 msgid "Mint Transaction Rule Accounts"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:589
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:616
 msgid "Missing IBAN"
 msgstr "IBAN manquant"
 
@@ -2204,7 +2315,7 @@ msgstr "IBAN manquant"
 msgid "Missing document_scan_name"
 msgstr "document_scan_name manquant"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:549
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:576
 msgid "Missing file"
 msgstr "Fichier manquant"
 
@@ -2217,7 +2328,7 @@ msgstr "Mode de paiement"
 msgid "More"
 msgstr ""
 
-#: mint/apis/payment_gap.py:202 mint/apis/statement_follow_up.py:498
+#: mint/apis/payment_gap.py:220
 msgid "More came in than is owed: that is never passed by itself."
 msgstr "Il est reçu plus que ce qui est dû : cela n'est jamais comptabilisé automatiquement."
 
@@ -2243,7 +2354,7 @@ msgstr ""
 msgid "Named by the import."
 msgstr "Désigné par l'import."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:259
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:421
 msgid "Net"
 msgstr ""
 
@@ -2251,7 +2362,7 @@ msgstr ""
 msgid "New Rule"
 msgstr "Nouvelle règle"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1039
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1026
 msgid "No Match"
 msgstr "Aucune correspondance"
 
@@ -2264,15 +2375,15 @@ msgid "No accounts found."
 msgstr "Aucun compte trouvé."
 
 #: frontend/src/components/features/StatementImports/StatementImportList.tsx:28
-#: frontend/src/pages/BankStatementImporter.tsx:269
+#: frontend/src/pages/BankStatementImporter.tsx:281
 msgid "No bank statements imported yet"
 msgstr "Aucun relevé bancaire importé pour le moment"
 
-#: frontend/src/components/features/BankReconciliation/CompanySelector.tsx:63
+#: frontend/src/components/features/BankReconciliation/CompanySelector.tsx:66
 msgid "No company found."
 msgstr "Aucune société trouvée."
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:163
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:157
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:149
 msgid "No entries found"
 msgstr "Aucune écriture trouvée"
@@ -2285,7 +2396,7 @@ msgstr "Aucune facture liée"
 msgid "No invoice recognised"
 msgstr "Aucune facture reconnue"
 
-#: mint/apis/statement_follow_up.py:736
+#: mint/apis/statement_follow_up.py:804
 msgid "No invoice recognised: they wait like any bank line not reconciled."
 msgstr "Aucune facture reconnue : elles attendent comme toute ligne bancaire non rapprochée."
 
@@ -2293,11 +2404,11 @@ msgstr "Aucune facture reconnue : elles attendent comme toute ligne bancaire non
 msgid "No invoice recognised: to match in the bank reconciliation"
 msgstr "Aucune facture reconnue : à rapprocher dans le rapprochement bancaire"
 
-#: mint/apis/statement_follow_up.py:607
+#: mint/apis/statement_follow_up.py:656
 msgid "No invoice was recognised for this line."
 msgstr "Aucune facture n'a été reconnue pour cette ligne."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:673
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:700
 msgid "No new transactions to import"
 msgstr "Aucune nouvelle transaction à importer"
 
@@ -2321,7 +2432,7 @@ msgstr "Aucun résultat trouvé"
 msgid "No results found."
 msgstr "Aucun résultat trouvé."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:346
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:517
 #, python-brace-format
 msgid "No rule yet: choosing a level makes one from this payment. By itself is available after {0} confirmations by a person."
 msgstr "Aucune règle pour l'instant : choisir un niveau en crée une à partir de ce paiement. « Le faire seule » est disponible après {0} confirmations par une personne."
@@ -2336,35 +2447,35 @@ msgstr "Aucune règle trouvée"
 msgid "No transaction selected"
 msgstr "Aucune transaction sélectionnée"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:235
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:225
 msgid "No transactions found"
 msgstr "Aucune transaction trouvée"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:319
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:308
 msgid "No transactions found for the given filters."
 msgstr "Aucune transaction trouvée pour les filtres donnés."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:132
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:161
 msgid "No transactions to import"
 msgstr "Aucune transaction à importer"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:319
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:308
 msgid "No unreconciled transactions found"
 msgstr "Aucune transaction non rapprochée trouvée"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:897
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:884
 msgid "No vouchers found for this transaction"
 msgstr "Aucune pièce trouvée pour cette transaction"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:472
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:484
 msgid "Nora AI analysis in progress..."
 msgstr "Analyse Nora AI en cours..."
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:147
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:141
 msgid "Not Cleared"
 msgstr "Non compensé"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:195
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:185
 msgid "Not Reconciled"
 msgstr "Non rapproché"
 
@@ -2388,7 +2499,7 @@ msgstr "Non traitée"
 msgid "Not imported yet"
 msgstr "Pas encore importée"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:228
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:226
 msgid "Not known yet: click the figure to enter it."
 msgstr "Pas encore connu : cliquez sur le montant pour le saisir."
 
@@ -2408,7 +2519,7 @@ msgstr "Rien à rapprocher."
 msgid "Nothing waits in this import."
 msgstr "Rien n'est en attente dans cet import."
 
-#: mint/apis/statement_follow_up.py:744
+#: mint/apis/statement_follow_up.py:812
 msgid "Nothing was created for them."
 msgstr "Rien n'a été créé pour elles."
 
@@ -2417,8 +2528,8 @@ msgid "Nothing was imported yet."
 msgstr "Rien n'a encore été importé."
 
 #. Label of a Int field in DocType 'Mint Bank Statement Import Log'
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:170
-#: frontend/src/pages/BankStatementImporter.tsx:245
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:183
+#: frontend/src/pages/BankStatementImporter.tsx:248
 #: mint/mint/doctype/mint_bank_statement_import_log/mint_bank_statement_import_log.json:29
 msgid "Number of Transactions"
 msgstr "Nombre de transactions"
@@ -2451,9 +2562,9 @@ msgstr "Échec du traitement OCR"
 msgid "OCR processing started"
 msgstr "Traitement OCR démarré"
 
-#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:25
-msgid "One existing voucher could match this line."
-msgstr "Une pièce existante pourrait correspondre à cette ligne."
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:43
+msgid "One existing voucher has the amount or the reference of this line."
+msgstr "Une pièce existante a le montant ou la référence de cette ligne."
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:138
 msgid "One payment, several invoices"
@@ -2467,10 +2578,14 @@ msgstr "Seuls les clients et les fournisseurs peuvent être rapprochés ici."
 msgid "Only submitted vouchers can be cleared."
 msgstr "Seules les pièces validées peuvent être compensées."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:240
+#: mint/apis/payment_gap.py:374
+msgid "Only the balance of a sale is taken off the turnover."
+msgstr "Seul le solde d'une vente est déduit du chiffre d'affaires."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:298
 #, python-brace-format
-msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, for example a deposit or a payment in several parts."
-msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour {0} : choisissez cette option si le client doit encore payer le reste, par exemple un acompte ou un paiement en plusieurs fois."
+msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, or when a credit note will be made afterwards (goods brought back into stock, for example) and matched later."
+msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour {0} : choisissez cette option lorsque le client doit encore régler le reste, ou lorsqu'une note de crédit sera établie plus tard (marchandise reprise en stock, par exemple) et rapprochée ensuite."
 
 #: frontend/src/components/features/PartyReconciliation/PartyList.tsx:59
 msgid "Only those with something to reconcile"
@@ -2493,12 +2608,12 @@ msgstr ""
 msgid "Open invoices"
 msgstr "Factures ouvertes"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:223
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:197
 msgid "Open the draft"
 msgstr "Ouvrir le brouillon"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:251
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:265
 #, python-brace-format
 msgid "Open {0} in a new tab"
 msgstr "Ouvrir {0} dans un nouvel onglet"
@@ -2513,11 +2628,11 @@ msgstr ""
 msgid "Opening Balance"
 msgstr "Solde d'ouverture"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:375
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:546
 msgid "Opens the full payment form, pointed at the customer (or supplier) of this invoice. Use it when none of the choices fits."
 msgstr "Ouvre le formulaire de paiement complet, pointé sur le client (ou le fournisseur) de cette facture. Utilisez-le si aucun des choix ne convient."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:275
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:448
 msgid "Opens the settings of the company in a new tab: this screen stays open. The accounts are in the section Payment Gaps."
 msgstr "Ouvre les réglages de la société dans un nouvel onglet : cet écran reste ouvert. Les comptes se trouvent dans la section Différences de paiement."
 
@@ -2544,12 +2659,12 @@ msgstr "Chèques et dépôts en attente de compensation"
 msgid "PDF"
 msgstr "PDF"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:215
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:223
 msgid "PDF bank statement"
 msgstr "Relevé bancaire PDF"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:252
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:390
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:260
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:402
 msgid "PDF — analyzed by Nora AI"
 msgstr "PDF — analysé par Nora AI"
 
@@ -2579,18 +2694,18 @@ msgstr "Payé à (compte GL)"
 msgid "Paid to (Party Type)"
 msgstr "Payé à (Type de tiers)"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:145
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:172
 #, python-brace-format
 msgid "Paid {0} out of {1}"
 msgstr "Payé {0} sur {1}"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1039
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1070
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1026
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1057
 msgid "Partial Match"
 msgstr "Correspondance partielle"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:199
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:355
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:189
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:345
 msgid "Partially Reconciled"
 msgstr "Partiellement rapproché"
 
@@ -2600,7 +2715,7 @@ msgstr "Partiellement rapproché"
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:957
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:970
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1118
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:830
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:818
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:228
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:240
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:624
@@ -2690,8 +2805,8 @@ msgstr "Paiement"
 msgid "Payment Details"
 msgstr "Détails du paiement"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:110
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:244
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:104
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:238
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:102
 #: frontend/src/components/features/BankReconciliation/IncorrectlyClearedEntries.tsx:118
 msgid "Payment Document"
@@ -2727,7 +2842,7 @@ msgstr "Règle de différence de paiement"
 msgid "Payment Recorded"
 msgstr "Paiement enregistré"
 
-#: mint/apis/payment_gap.py:353 mint/apis/payment_gap.py:369
+#: mint/apis/payment_gap.py:461 mint/apis/payment_gap.py:477
 #, python-brace-format
 msgid "Payment gap of {0}"
 msgstr "Différence de paiement de {0}"
@@ -2754,8 +2869,8 @@ msgstr "Paiements, avoirs et écritures"
 msgid "Pending"
 msgstr "En attente"
 
-#: mint/apis/statement_import.py:105 mint/apis/statement_import.py:110
-#: mint/apis/statement_import.py:115
+#: mint/apis/statement_import.py:100 mint/apis/statement_import.py:105
+#: mint/apis/statement_import.py:110
 msgid "Permission Denied"
 msgstr "Autorisation refusée"
 
@@ -2776,15 +2891,15 @@ msgstr "Choisissez le {0} concerné : ses factures ouvertes viennent ensuite."
 msgid "Please add an account for the Bank Entry rule."
 msgstr "Veuillez ajouter un compte pour la règle d'écriture bancaire."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:148
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:150
 msgid "Please attach a file"
 msgstr "Veuillez joindre un fichier"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:549
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:576
 msgid "Please attach an XML file first"
 msgstr "Veuillez d'abord joindre un fichier XML"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:589
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:616
 #, python-brace-format
 msgid "Please check your IBAN. It is missing: {0}"
 msgstr "Veuillez vérifier votre IBAN. Il manque : {0}"
@@ -2797,15 +2912,15 @@ msgstr "Veuillez configurer les comptes de la règle d'écriture bancaire."
 msgid "Please provide a file_url parameter"
 msgstr "Veuillez fournir un paramètre file_url"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:124
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:123
 msgid "Please review the details below and click the 'Import' button to proceed."
 msgstr "Veuillez vérifier les détails ci-dessous et cliquer sur le bouton 'Importer' pour continuer."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:144
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:146
 msgid "Please select a bank account"
 msgstr "Veuillez sélectionner un compte bancaire"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:37
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:34
 msgid "Please select a bank account to view the bank clearance summary."
 msgstr "Veuillez sélectionner un compte bancaire pour afficher le résumé de compensation bancaire."
 
@@ -2813,11 +2928,11 @@ msgstr "Veuillez sélectionner un compte bancaire pour afficher le résumé de c
 msgid "Please select a bank account to view the bank reconciliation statement."
 msgstr "Veuillez sélectionner un compte bancaire pour afficher l'état de rapprochement bancaire."
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:41
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:35
 msgid "Please select a bank and set the date range"
 msgstr "Veuillez sélectionner une banque et définir la plage de dates"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:41
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:38
 msgid "Please select dates to view the bank clearance summary."
 msgstr "Veuillez sélectionner des dates pour afficher le résumé de compensation bancaire."
 
@@ -2835,13 +2950,13 @@ msgstr "Veuillez télécharger un fichier"
 msgid "Positive/Negative Value"
 msgstr "Valeur positive/négative"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1017
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1004
 msgid "Posted On"
 msgstr "Comptabilisé le"
 
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:449
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:111
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:249
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:105
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:243
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:539
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1097
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:100
@@ -2852,15 +2967,15 @@ msgstr "Comptabilisé le"
 msgid "Posting Date"
 msgstr "Date de comptabilisation"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1020
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1007
 msgid "Posting date does not match the transaction date"
 msgstr "La date de comptabilisation ne correspond pas à la date de transaction"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1020
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1007
 msgid "Posting date matches the transaction date"
 msgstr "La date de comptabilisation correspond à la date de transaction"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:510
 msgid "Prepare it as a draft"
 msgstr "Le préparer en brouillon"
 
@@ -2877,7 +2992,7 @@ msgstr "Préparé par {0} le {1} : {2} sur {3}."
 msgid "Preview"
 msgstr "Aperçu"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:268
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:282
 msgid "Preview Transactions"
 msgstr "Aperçu des transactions"
 
@@ -2885,7 +3000,7 @@ msgstr "Aperçu des transactions"
 msgid "Preview data is invalid. Please try again."
 msgstr "Les données d'aperçu sont invalides. Veuillez réessayer."
 
-#: frontend/src/pages/BankStatementImporter.tsx:234
+#: frontend/src/pages/BankStatementImporter.tsx:233
 msgid "Previous Imports"
 msgstr "Imports précédents"
 
@@ -2898,12 +3013,12 @@ msgid "Print the PDF"
 msgstr "Imprimer le PDF"
 
 #. Label of a Int field in DocType 'Mint Bank Transaction Rule'
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:809
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:797
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:115
 msgid "Priority"
 msgstr "Priorité"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:139
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:141
 msgid "Process"
 msgstr "Traiter"
 
@@ -2918,23 +3033,23 @@ msgstr "Traiter les {0} en attente"
 msgid "Processing"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:492
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:504
 msgid "Processing bank file..."
 msgstr "Traitement du fichier bancaire..."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:476
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:488
 msgid "Processing continues in background. Page will reload when done."
 msgstr "Le traitement continue en arrière-plan. La page se rechargera à la fin."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:487
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:499
 msgid "Processing file..."
 msgstr "Traitement du fichier..."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:510
 msgid "Propose it to me"
 msgstr "Me le proposer"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:186
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:243
 msgid "Proposed"
 msgstr "Proposé"
 
@@ -2973,18 +3088,18 @@ msgstr "Reçu"
 msgid "Received from (Party Type)"
 msgstr "Reçu de (Type de tiers)"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:806
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:794
 msgid "Recommended Action"
 msgstr "Action recommandée"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1052
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1039
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:310
 #: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:64
 #: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:105
 msgid "Reconcile"
 msgstr "Rapprocher"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:374
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:545
 msgid "Reconcile manually"
 msgstr "Rapprocher manuellement"
 
@@ -2993,8 +3108,8 @@ msgstr "Rapprocher manuellement"
 msgid "Reconcile with {0}"
 msgstr "Rapprocher avec {0}"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:202
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:353
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:192
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:343
 #: frontend/src/components/features/BankReconciliation/utils.ts:281
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:300
 #: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:53
@@ -3033,7 +3148,7 @@ msgstr "Historique de rapprochement"
 msgid "Reconciliation Type"
 msgstr "Type de rapprochement"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1052
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1039
 msgid "Reconciling"
 msgstr "Rapprochement en cours"
 
@@ -3041,19 +3156,19 @@ msgstr "Rapprochement en cours"
 msgid "Reconciling…"
 msgstr "Rapprochement en cours…"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:563
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:631
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:551
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:619
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:72
 msgid "Record Payment"
 msgstr "Paiement"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:543
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:648
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:531
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:636
 msgid "Record a bank journal entry for expenses, income or split transactions"
 msgstr "Enregistrer une écriture de journal bancaire pour les dépenses, revenus ou transactions fractionnées"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:549
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:655
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:537
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:643
 msgid "Record a journal entry for expenses, income or split transactions"
 msgstr "Enregistrer une écriture de journal pour les dépenses, revenus ou transactions fractionnées"
 
@@ -3061,20 +3176,20 @@ msgstr "Enregistrer une écriture de journal pour les dépenses, revenus ou tran
 msgid "Record a journal entry for expenses, income or split transactions."
 msgstr "Enregistrer une écriture de journal pour les dépenses, revenus ou transactions fractionnées."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:561
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:567
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:628
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:635
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:777
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:549
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:555
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:616
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:623
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:765
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:74
 msgid "Record a payment entry against a customer or supplier"
 msgstr "Enregistrer une écriture de paiement contre un client ou un fournisseur"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:580
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:586
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:668
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:675
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:779
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:568
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:574
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:656
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:663
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:767
 msgid "Record an internal transfer to another bank/credit card/cash account"
 msgstr "Enregistrer un virement interne vers un autre compte bancaire/carte de crédit/espèces"
 
@@ -3086,17 +3201,18 @@ msgstr "Enregistrer un virement interne vers un autre compte bancaire/carte de c
 msgid "Record another way"
 msgstr "Enregistrer autrement"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:151
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
 msgid "Record the partial payment"
 msgstr "Enregistrer le paiement partiel"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:417
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:405
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionDetails.tsx:71
 msgid "Ref"
 msgstr "Réf"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:226
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:283
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:240
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:297
 msgid "Ref."
 msgstr "Réf."
 
@@ -3107,14 +3223,14 @@ msgstr "Réf."
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:489
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:316
 #: frontend/src/components/features/PartyReconciliation/VoucherSheet.tsx:69
-#: frontend/src/pages/BankStatementImporter.tsx:202
+#: frontend/src/pages/BankStatementImporter.tsx:201
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:64
 msgid "Reference"
 msgstr "Référence"
 
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:106
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:173
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:163
 msgid "Reference #"
 msgstr "Référence #"
 
@@ -3122,7 +3238,7 @@ msgstr "Référence #"
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1098
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:107
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:164
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1025
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1012
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:500
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:311
 msgid "Reference Date"
@@ -3140,15 +3256,15 @@ msgstr "Document de référence"
 msgid "Reference No"
 msgstr "N° de référence"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1028
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1015
 msgid "Reference date does not match the transaction date"
 msgstr "La date de référence ne correspond pas à la date de transaction"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1028
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1015
 msgid "Reference date matches the transaction date"
 msgstr "La date de référence correspond à la date de transaction"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1042
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1029
 msgid "Reference does not match the selected transaction"
 msgstr "La référence ne correspond pas à la transaction sélectionnée"
 
@@ -3156,11 +3272,11 @@ msgstr "La référence ne correspond pas à la transaction sélectionnée"
 msgid "Reference is required"
 msgstr "La référence est requise"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1042
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1029
 msgid "Reference matches the selected transaction"
 msgstr "La référence correspond à la transaction sélectionnée"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1042
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1029
 msgid "Reference matches the selected transaction partially"
 msgstr "La référence correspond partiellement à la transaction sélectionnée"
 
@@ -3182,7 +3298,7 @@ msgstr "Regex"
 msgid "Remarks"
 msgstr "Remarques"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:326
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:497
 msgid "Remember this choice for this customer"
 msgstr "Retenir ce choix pour ce client"
 
@@ -3210,7 +3326,7 @@ msgstr "Supprimer l'extraction TVA"
 msgid "Reports"
 msgstr "Rapports"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:61
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:62
 msgid "Reprocess File"
 msgstr "Retraiter le fichier"
 
@@ -3218,7 +3334,7 @@ msgstr "Retraiter le fichier"
 msgid "Reset Clearing Date"
 msgstr "Réinitialiser la date de compensation"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:78
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:80
 msgid "Retry Analysis"
 msgstr "Relancer l'analyse"
 
@@ -3242,7 +3358,7 @@ msgstr "Règle créée avec succès"
 msgid "Rule deleted."
 msgstr "Règle supprimée."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:797
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:785
 msgid "Rule matched based on transaction description and other criteria."
 msgstr "Règle correspondante basée sur la description de transaction et autres critères."
 
@@ -3302,14 +3418,14 @@ msgstr "Facture de vente"
 msgid "Same amount: pick this one"
 msgstr "Même montant : choisir celle-ci"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:327
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:325
 #: frontend/src/components/features/BankReconciliation/Rules/CreateNewRule.tsx:55
 #: frontend/src/components/features/BankReconciliation/Rules/EditRule.tsx:95
 #: frontend/src/components/features/Settings/Settings.tsx:145
 msgid "Save"
 msgstr "Enregistrer"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:218
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:226
 msgid "Scanned or downloaded bank statement. Nora AI analyzes the document and extracts transactions using artificial intelligence (OCR)."
 msgstr "Relevé bancaire scanné ou téléchargé. Nora AI analyse le document et extrait les transactions grâce à l'intelligence artificielle (OCR)."
 
@@ -3321,8 +3437,8 @@ msgstr "Tâche planifiée désactivée. Les transactions ne seront pas classées
 msgid "Scheduled job enabled. Transactions will be auto classified."
 msgstr "Tâche planifiée activée. Les transactions seront classées automatiquement."
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:286
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:228
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:276
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:220
 msgid "Search"
 msgstr "Rechercher"
 
@@ -3342,24 +3458,24 @@ msgstr "Rechercher un fournisseur"
 msgid "Search account..."
 msgstr "Rechercher un compte..."
 
-#: frontend/src/components/features/BankReconciliation/CompanySelector.tsx:61
+#: frontend/src/components/features/BankReconciliation/CompanySelector.tsx:64
 msgid "Search company..."
 msgstr "Rechercher une société..."
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:280
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:220
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:270
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:213
 msgid "Search transactions"
 msgstr "Rechercher des transactions"
 
-#: mint/apis/statement_follow_up.py:749
+#: mint/apis/statement_follow_up.py:817
 msgid "See all the imports"
 msgstr "Voir tous les imports"
 
-#: mint/apis/statement_follow_up.py:748
+#: mint/apis/statement_follow_up.py:816
 msgid "See the error log."
 msgstr "Voir le journal des erreurs."
 
-#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:29
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:47
 msgid "See them"
 msgstr "Les voir"
 
@@ -3384,16 +3500,16 @@ msgstr "Sélectionner un emplacement"
 msgid "Select Processor"
 msgstr "Sélectionner un processeur"
 
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:104
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:231
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:100
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:239
 msgid "Select a bank account"
 msgstr "Sélectionnez un compte bancaire"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:68
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:64
 msgid "Select a bank account to reconcile"
 msgstr "Sélectionner un compte bancaire à rapprocher"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:457
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:445
 msgid "Select a transaction to match and reconcile with vouchers"
 msgstr "Sélectionner une transaction à faire correspondre et rapprocher avec des pièces"
 
@@ -3417,23 +3533,23 @@ msgid "Select row {0}"
 msgstr "Sélectionner la ligne {0}"
 
 #: frontend/src/components/common/LinkFieldCombobox.tsx:127
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:129
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:161
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:183
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:125
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:156
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:180
 #, python-brace-format
 msgid "Select {0}"
 msgstr "Sélectionner {0}"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:30
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:29
 msgid "Separate columns for withdrawal and deposit"
 msgstr "Colonnes séparées pour retrait et dépôt"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:308
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:306
 msgid "Set closing balance as per bank statement"
 msgstr "Définir le solde de clôture selon le relevé bancaire"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:191
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:236
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:185
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:230
 msgid "Set the clearance date for this voucher without reconciling with a bank transaction."
 msgstr "Définir la date de compensation pour cette pièce sans la rapprocher d'une transaction bancaire."
 
@@ -3453,15 +3569,24 @@ msgstr "Paramètres"
 msgid "Settings updated"
 msgstr "Paramètres mis à jour"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:151
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:184
 msgid "Settle the invoice and book the difference"
 msgstr "Solder la facture et comptabiliser la différence"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:154
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+msgid "Settle the invoice and book the loss"
+msgstr "Solder la facture et comptabiliser la perte"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:184
+msgid "Settle the invoice and keep the surplus"
+msgstr "Solder la facture et garder le surplus"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:187
 msgid "Settle the invoice and reconcile"
 msgstr "Solder la facture et rapprocher"
 
-#: mint/apis/statement_follow_up.py:754
+#: mint/apis/statement_follow_up.py:822
 #, python-brace-format
 msgid "Settle the {0} that wait"
 msgstr "Régler les {0} en attente"
@@ -3470,15 +3595,23 @@ msgstr "Régler les {0} en attente"
 msgid "Settled by this payment"
 msgstr "Réglée par ce paiement"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:167
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:206
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:216
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and the difference of {0} goes to the account chosen above."
 msgstr "Solde la facture : le paiement est comptabilisé pour le montant reçu, et la différence de {0} va sur le compte choisi ci-dessus."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:163
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:198
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:210
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and {0} goes to the account chosen above."
 msgstr "Solde la facture : le paiement est enregistré pour le montant reçu, et {0} est porté sur le compte choisi ci-dessus."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:196
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:204
+#, python-brace-format
+msgid "Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT."
+msgstr "Solde la facture : le paiement est comptabilisé pour le montant reçu, et {0} est déduit du chiffre d'affaires, sur le compte de vente de la facture, avec sa TVA."
 
 #: frontend/src/components/features/BankReconciliation/MatchFilters.tsx:37
 msgid "Show Only Exact Amount"
@@ -3496,7 +3629,7 @@ msgstr "Afficher le PDF de la version enregistrée"
 msgid "Show the lines"
 msgstr "Afficher les lignes"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:305
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:476
 msgid "Show what will be booked"
 msgstr "Voir ce qui sera enregistré"
 
@@ -3535,7 +3668,7 @@ msgstr "Répartition sur {0} factures"
 msgid "Start Date"
 msgstr ""
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:422
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:434
 msgid "Starting analysis..."
 msgstr "Démarrage de l'analyse..."
 
@@ -3553,19 +3686,19 @@ msgstr "Commence par"
 msgid "State"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:222
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:220
 msgid "Statement"
 msgstr "Relevé"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:119
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:118
 msgid "Statement Details"
 msgstr "Détails du relevé"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:157
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:170
 msgid "Statement File"
 msgstr "Fichier de relevé"
 
-#: frontend/src/pages/BankStatementImporter.tsx:167
+#: frontend/src/pages/BankStatementImporter.tsx:166
 msgid "Statement Import Instructions"
 msgstr "Instructions d'import du relevé"
 
@@ -3580,8 +3713,8 @@ msgstr "Relevé moins système."
 
 #. Label of a Select field in DocType 'Mint Bank Statement Import'
 #. Label of a Select field in DocType 'Mint Bank Statement Import Transactions'
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:116
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:178
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:110
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:168
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:47
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:113
 msgid "Status"
@@ -3599,7 +3732,7 @@ msgstr "Reste dû sur ces factures"
 msgid "Still owed"
 msgstr "Solde restant dû"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:182
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:180
 msgid "Still to deal with"
 msgstr "Reste à traiter"
 
@@ -3608,7 +3741,7 @@ msgstr "Reste à traiter"
 msgid "String Amount"
 msgstr "Montant en chaîne"
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:278
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:272
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:159
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:289
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:563
@@ -3641,7 +3774,7 @@ msgstr "Soumission en cours..."
 msgid "Suggest creating a"
 msgstr "Suggérer de créer un"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1058
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1045
 msgid "Suggested"
 msgstr "Suggéré"
 
@@ -3669,6 +3802,19 @@ msgstr ""
 msgid "System Manager"
 msgstr "Gestionnaire système"
 
+#: frontend/src/lib/file.ts:27
+msgid "TB"
+msgstr ""
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:301
+msgid "Take it off the turnover"
+msgstr "Le déduire du chiffre d'affaires"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
+msgid "Take it off the turnover and reconcile"
+msgstr "Déduire du chiffre d'affaires et rapprocher"
+
 #. Description of the 'Bank Transaction' (Link) field in DocType 'Mint Bank
 #. Statement Import Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:156
@@ -3679,7 +3825,7 @@ msgstr "La transaction bancaire créée par cette ligne : le sort de la ligne se
 msgid "The Google Project ID is used to authenticate with the Google Cloud Platform."
 msgstr "L'ID de projet Google est utilisé pour s'authentifier avec Google Cloud Platform."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:316
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:487
 msgid "The VAT is cut from the account, as in the payment entry."
 msgstr "La TVA est déduite du compte, comme dans l'écriture de paiement."
 
@@ -3688,19 +3834,36 @@ msgstr "La TVA est déduite du compte, comme dans l'écriture de paiement."
 msgid "The account of the credit note or of the gap. Empty: the one of the customer's previous credit notes, else the company's gap account."
 msgstr "Le compte de la note de crédit ou de la différence. Vide : celui des notes de crédit précédentes de ce client, sinon le compte de différence de la société."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:287
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:392
+msgid "The account the article is sold on."
+msgstr "Le compte sur lequel l'article est vendu."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:391
+#, python-brace-format
+msgid "The account the article is sold on. For a loss on a customer, choose {0}."
+msgstr "Le compte sur lequel l'article est vendu. Pour une perte sur client, choisissez {0}."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:458
 msgid "The account where the difference is booked: for a sale, a loss on customers or a discount account; for a purchase, an expense account. Your fiduciary knows which one to use. The company sets it once in its settings."
 msgstr "Le compte où la différence est comptabilisée : pour une vente, un compte de perte sur client ou d'escompte ; pour un achat, un compte de charges. Votre fiduciaire sait lequel utiliser. La société le règle une seule fois dans ses paramètres."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:183
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:196
 msgid "The amount format detected in the statement file. This is used to parse the deposit and withdrawal values from each row."
 msgstr "Le format de montant détecté dans le fichier de relevé. Utilisé pour analyser les valeurs de dépôt et retrait de chaque ligne."
 
-#: mint/apis/statement_import.py:127
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:373
+msgid "The article you chose."
+msgstr "L'article que vous avez choisi."
+
+#: mint/apis/payment_gap.py:291
+msgid "The balance of a sale is taken off the turnover only for a short payment."
+msgstr "Le solde d'une vente n'est déduit du chiffre d'affaires que pour un paiement incomplet."
+
+#: mint/apis/statement_import.py:122
 msgid "The bank account is disabled. Please enable it"
 msgstr "Le compte bancaire est désactivé. Veuillez l'activer"
 
-#: mint/apis/statement_import.py:122
+#: mint/apis/statement_import.py:117
 msgid "The bank account is not a company account. Please select a company account"
 msgstr "Le compte bancaire n'est pas un compte de l'entreprise. Veuillez sélectionner un compte d'entreprise"
 
@@ -3712,37 +3875,41 @@ msgstr "La banque avait déjà cette ligne : rien n'a été créé."
 msgid "The bank line was cancelled"
 msgstr "La ligne bancaire a été annulée."
 
-#: mint/apis/payment_gap.py:212 mint/apis/payment_gap.py:319
+#: mint/apis/payment_gap.py:230 mint/apis/payment_gap.py:366
 msgid "The company has no early payment discount account."
 msgstr "La société n'a pas de compte d'escompte."
 
-#: mint/apis/payment_gap.py:86
+#: mint/apis/payment_gap.py:89
 msgid "The company has no payment gap account on purchases."
 msgstr "La société n'a pas de compte de différence de paiement sur les achats."
 
-#: mint/apis/gap_credit_note.py:80 mint/apis/payment_gap.py:88
+#: mint/apis/gap_credit_note.py:82 mint/apis/payment_gap.py:91
 msgid "The company has no payment gap account."
 msgstr "La société n'a pas de compte de différence de paiement."
 
-#: mint/apis/payment_gap.py:222
+#: mint/apis/payment_gap.py:240
 msgid "The company has not named an amount up to which a rebate is passed by itself: a person confirms it."
 msgstr "La société n'a pas fixé de montant jusqu'auquel un rabais passe automatiquement : une personne le confirme."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:215
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:272
 msgid "The company has not named an amount up to which a rebate is passed by itself: you confirm it."
 msgstr "La société n'a pas fixé de montant jusqu'auquel un rabais passe automatiquement : vous le confirmez."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:267
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:440
 msgid "The company has not said yet where to book the differences on purchases."
 msgstr "La société n'a pas encore indiqué où comptabiliser les différences sur les achats."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:267
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:440
 msgid "The company has not said yet where to book the differences on sales."
 msgstr "La société n'a pas encore indiqué où comptabiliser les différences sur les ventes."
 
-#: mint/apis/payment_gap.py:204
+#: mint/apis/payment_gap.py:222
 msgid "The company has not switched on passing payment gaps by itself."
 msgstr "La société n'a pas activé le passage automatique des différences de paiement."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:405
+msgid "The credit note"
+msgstr "La note de crédit"
 
 #. Description of the 'Credit Note' (Link) field in DocType 'Mint Bank
 #. Statement Import Transactions'
@@ -3750,16 +3917,16 @@ msgstr "La société n'a pas activé le passage automatique des différences de 
 msgid "The credit note a person made for the balance of a partial payment."
 msgstr "L'avoir qu'une personne a créé pour le solde d'un paiement partiel."
 
-#: mint/apis/gap_credit_note.py:147
+#: mint/apis/gap_credit_note.py:194
 #, python-brace-format
 msgid "The credit note cannot be brought to {0}."
 msgstr "Le montant de la note de crédit ne peut pas être ajusté à {0}."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:195
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:208
 msgid "The date format detected in the statement file. This is used to parse the date values."
 msgstr "Le format de date détecté dans le fichier de relevé. Utilisé pour analyser les valeurs de date."
 
-#: frontend/src/pages/BankStatementImporter.tsx:183
+#: frontend/src/pages/BankStatementImporter.tsx:182
 msgid "The date of the transaction"
 msgstr "La date de la transaction"
 
@@ -3767,7 +3934,7 @@ msgstr "La date de la transaction"
 msgid "The dates will be updated to match the bank transaction."
 msgstr "Les dates seront mises à jour pour correspondre à la transaction bancaire."
 
-#: frontend/src/pages/BankStatementImporter.tsx:198
+#: frontend/src/pages/BankStatementImporter.tsx:197
 msgid "The description of the transaction"
 msgstr "La description de la transaction"
 
@@ -3775,24 +3942,25 @@ msgstr "La description de la transaction"
 msgid "The document has been created and reconciled. Uploading attachments..."
 msgstr "Le document a été créé et rapproché. Téléchargement des pièces jointes..."
 
-#: mint/apis/payment_gap.py:433
+#: mint/apis/payment_gap.py:542
 #, python-brace-format
 msgid "The dunning {0} has no Income Account to book its fee on: set it on the Dunning Type {1}."
 msgstr "La relance {0} n'a pas de Compte de Produits pour comptabiliser ses frais : renseignez-le sur le Type de relance {1}."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:166
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:215
 msgid "The fee of the dunning is booked on its own account and settles it."
 msgstr "Les frais de rappel sont enregistrés sur leur propre compte et le soldent."
 
-#: mint/apis/statement_import.py:194
+#: mint/apis/statement_import.py:189
 msgid "The file could not be read"
 msgstr "Le fichier n'a pas pu être lu"
 
-#: mint/apis/statement_import.py:240
+#: mint/apis/statement_import.py:235
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:156
 msgid "The file is empty"
 msgstr "Le fichier est vide"
 
-#: frontend/src/pages/BankStatementImporter.tsx:170
+#: frontend/src/pages/BankStatementImporter.tsx:169
 msgid "The file should contain the following columns with a distinct header row. You can upload most bank statements as is without changing the columns."
 msgstr "Le fichier doit contenir les colonnes suivantes avec une ligne d'en-tête distincte. Vous pouvez importer la plupart des relevés bancaires tels quels sans modifier les colonnes."
 
@@ -3814,41 +3982,65 @@ msgstr "L'import n'a reconnu aucune facture."
 msgid "The import recognised {0} invoices."
 msgstr "L'import a reconnu {0} factures."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:286
-msgid "The income account that the credit note is booked on: the one the earlier credit notes of this customer use, or the one you choose."
-msgstr "Le compte de produits sur lequel la note de crédit est comptabilisée : celui qu'utilisent les notes de crédit précédentes de ce client, ou celui que vous choisissez."
-
 #. Description of the 'Gap Amount' (Currency) field in DocType 'Mint Bank
 #. Statement Import Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:208
 msgid "The invoice balance minus the payment: positive when less came in than is owed."
 msgstr "Le solde de la facture moins le paiement : positif lorsque le paiement reçu est inférieur au montant dû."
 
+#: mint/apis/payment_gap.py:378
+msgid "The invoice has no sales account to take the balance off."
+msgstr "La facture n'a pas de compte de vente où déduire le solde."
+
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:860
 #, python-brace-format
 msgid "The invoice is not fully allocated as there is a difference of {0}."
 msgstr "La facture n'est pas entièrement allouée car il y a une différence de {0}."
 
-#: mint/apis/payment_gap.py:206
+#: mint/apis/payment_gap.py:224
 msgid "The invoice is not in the currency of the company."
 msgstr "La facture n'est pas dans la devise de la société."
 
-#: mint/apis/payment_gap.py:146
+#: mint/apis/payment_gap.py:376 mint/apis/payment_gap.py:423
+msgid "The invoice is not in the currency of the company: use Reconcile manually."
+msgstr "La facture n'est pas dans la devise de la société : utilisez « Rapprocher manuellement »."
+
+#: mint/apis/payment_gap.py:164
 msgid "The invoice is not open."
 msgstr "La facture n'est pas ouverte."
 
-#: mint/apis/payment_gap.py:217
+#: mint/apis/payment_gap.py:235
 msgid "The invoice is not recognised without doubt: a person validates a payment that includes a dunning fee."
 msgstr "La facture n'est pas identifiée avec certitude : une personne valide un paiement qui inclut des frais de relance."
 
-#: mint/apis/payment_gap.py:227
+#: mint/apis/payment_gap.py:245
 msgid "The invoice is not recognised without doubt: a person validates the partial payment."
 msgstr "La facture n'est pas reconnue sans équivoque : une personne valide le paiement partiel."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:254
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:317
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked as a loss on the account you choose below (the one the company set, by default). Choose this when the customer will not pay the rest."
+msgstr "La facture est soldée et {0} est comptabilisé en perte sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option lorsque le client ne réglera pas le reste."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:315
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked as a rebate on the account you choose below (the one the company set, by default). Choose this to accept the rebate as it is."
+msgstr "La facture est soldée et {0} est comptabilisé comme rabais sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option pour accepter le rabais tel quel."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
+#, python-brace-format
+msgid "The invoice is settled and {0} is booked on the account you choose below, like the fee of a dunning. Nothing stays available for later."
+msgstr "La facture est soldée et {0} est comptabilisé sur le compte que vous choisissez ci-dessous, comme les frais d'un rappel. Rien ne reste à disposition pour plus tard."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:318
 #, python-brace-format
 msgid "The invoice is settled and {0} is booked on the account you choose below: a loss on customers when the customer will not pay the rest, or a discount when you grant one. Unlike a credit note, no document is made for the customer."
 msgstr "La facture est soldée et {0} est comptabilisé sur le compte que vous choisissez ci-dessous : une perte sur client si le client ne paiera pas le reste, ou un escompte si vous en accordez un. Contrairement à une note de crédit, aucun document n'est établi pour le client."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:302
+#, python-brace-format
+msgid "The invoice is settled and {0} is taken off the turnover, on the sales account of the invoice and with its VAT: one entry, no document for the customer. Choose this for an arrangement with the customer, a commercial gesture or a rebate."
+msgstr "La facture est soldée et {0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, pas de document pour le client. Choisissez cette option pour un arrangement avec le client, un geste commercial ou un rabais."
 
 #: mint/apis/line_invoices.py:300
 #, python-brace-format
@@ -3864,7 +4056,7 @@ msgstr "La dernière ligne de compte ne doit comporter aucun montant au débit o
 msgid "The ledger says {0}, the open documents say {1}: a difference of {2}."
 msgstr "Le grand livre indique {0}, les documents ouverts indiquent {1} : un écart de {2}."
 
-#: mint/apis/gap_rule.py:237
+#: mint/apis/gap_rule.py:239
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:48
 #, python-brace-format
 msgid "The level automatic is available after {0} confirmations by a person: {1} so far."
@@ -3874,13 +4066,33 @@ msgstr "Le niveau « automatic » est disponible après {0} confirmations par un
 msgid "The open invoices of the party, the oldest first. Tick the ones this payment settles: the amount is split between them and stays editable. A draft is opened in its own tab so that you can correct it by hand before validating."
 msgstr "Les factures ouvertes du tiers, de la plus ancienne à la plus récente. Cochez celles que ce paiement règle : le montant se répartit entre elles et reste modifiable. Un brouillon s'ouvre dans son propre onglet, pour que vous puissiez le corriger à la main avant de le valider."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1115
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1100
 msgid "The opening balance might not match your bank statement. Would you like to reconcile them?"
 msgstr "Le solde d'ouverture pourrait ne pas correspondre à votre relevé bancaire. Souhaitez-vous les rapprocher ?"
 
 #: mint/apis/party_reconciliation.py:236 mint/apis/party_reconciliation.py:243
 msgid "The party has changed"
 msgstr "Le tiers a changé entre-temps."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:331
+#, python-brace-format
+msgid "The payment is booked in full. The invoice is settled and {0} stays available for the customer on this payment: you match it to another invoice later, in a reconciliation."
+msgstr "Le paiement est enregistré en entier. La facture est soldée et {0} reste à disposition du client sur ce paiement : vous le rapprocherez plus tard d'une autre facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:332
+#, python-brace-format
+msgid "The payment is booked in full. The invoice is settled and {0} stays open with the supplier on this payment: you match it to another invoice later, in a reconciliation."
+msgstr "Le paiement est enregistré en entier. La facture est soldée et {0} reste ouvert chez le fournisseur sur ce paiement : vous le rapprocherez plus tard d'une autre facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:346
+#, python-brace-format
+msgid "The payment is booked in full: {0} settle the invoice and {1} stay available for {2}, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : {0} solde la facture et {1} reste à disposition de {2}, à rapprocher d'une prochaine facture."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:347
+#, python-brace-format
+msgid "The payment is booked in full: {0} settle the invoice and {1} stay open with {2}, to match with a next invoice."
+msgstr "Le paiement est enregistré en entier : {0} solde la facture et {1} reste ouvert chez {2}, à rapprocher d'une prochaine facture."
 
 #: mint/apis/line_invoices.py:363
 #, python-brace-format
@@ -3891,7 +4103,7 @@ msgstr "Le paiement est {0}, la ligne bancaire {1}."
 msgid "The preview could not be drawn."
 msgstr "L'aperçu n'a pas pu être généré."
 
-#: frontend/src/pages/BankStatementImporter.tsx:203
+#: frontend/src/pages/BankStatementImporter.tsx:202
 msgid "The reference number of the transaction"
 msgstr "Le numéro de référence de la transaction"
 
@@ -3932,16 +4144,16 @@ msgstr "La référence structurée du paiement (QR ou référence créancier), t
 msgid "The system found a mirror transaction ({0}) in another account with the same amount and date."
 msgstr "Le système a trouvé une transaction miroir ({0}) dans un autre compte avec le même montant et la même date."
 
-#: mint/apis/gap_rule.py:230
+#: mint/apis/gap_rule.py:232
 #: mint/mint/doctype/payment_gap_rule/payment_gap_rule.py:42
 msgid "The usual share is a percentage between 0 and 100."
 msgstr "La part habituelle est un pourcentage compris entre 0 et 100."
 
-#: frontend/src/pages/BankStatementImporter.tsx:193
+#: frontend/src/pages/BankStatementImporter.tsx:192
 msgid "The withdrawal or deposit amounts - only required if there's no amount column."
 msgstr "Les montants de retrait ou dépôt — uniquement requis s'il n'y a pas de colonne de montant."
 
-#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:166
+#: frontend/src/components/features/BankReconciliation/BankClearanceSummary.tsx:160
 #: frontend/src/components/features/BankReconciliation/BankReconciliationStatement.tsx:151
 msgid "There are no accounting entries in the system for the selected account and dates."
 msgstr "Il n'y a aucune écriture comptable dans le système pour le compte et les dates sélectionnés."
@@ -3950,11 +4162,11 @@ msgstr "Il n'y a aucune écriture comptable dans le système pour le compte et l
 msgid "There are no entries in the system where the clearance date is before the posting date."
 msgstr "Il n'y a aucune écriture dans le système où la date de compensation est avant la date de comptabilisation."
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:237
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:227
 msgid "There are no transactions in the system for the selected bank account and dates that match the filters."
 msgstr "Il n'y a aucune transaction dans le système pour le compte bancaire et les dates sélectionnés correspondant aux filtres."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1111
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1096
 #, python-brace-format
 msgid "There are {0} unreconciled transactions before {1}."
 msgstr "Il y a {0} transactions non rapprochées avant le {1}."
@@ -3964,12 +4176,12 @@ msgstr "Il y a {0} transactions non rapprochées avant le {1}."
 msgid "There is already a rule for {0} in {1}: {2}."
 msgstr "Il existe déjà une règle pour {0} dans {1} : {2}."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1113
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1098
 #, python-brace-format
 msgid "There is one unreconciled transaction before {0}."
 msgstr "Il y a une transaction non rapprochée avant le {0}."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:92
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:91
 msgid "There was an error while importing the bank statement."
 msgstr "Une erreur s'est produite lors de l'importation du relevé bancaire."
 
@@ -4006,29 +4218,25 @@ msgstr "Cette semaine"
 msgid "This Year"
 msgstr "Cette année"
 
-#: mint/apis/statement_follow_up.py:600 mint/apis/statement_follow_up.py:683
+#: mint/apis/statement_follow_up.py:649 mint/apis/statement_follow_up.py:751
 msgid "This bank line did not come from an import."
 msgstr "Cette ligne bancaire ne provient pas d'un import."
 
 #: mint/apis/line_invoices.py:323 mint/apis/line_invoices.py:342
-#: mint/apis/statement_follow_up.py:597
+#: mint/apis/statement_follow_up.py:646
 msgid "This bank line is already dealt with."
 msgstr "Cette ligne bancaire est déjà traitée."
 
-#: frontend/src/pages/BankStatementImporter.tsx:188
+#: frontend/src/pages/BankStatementImporter.tsx:187
 msgid "This can contain \"CR\"/\"DR\" values or positive/negative values. You could also have a separate column for CR/DR."
 msgstr "Cela peut contenir des valeurs « CR »/« DR » ou des valeurs positives/négatives. Vous pouvez aussi avoir une colonne distincte pour CR/DR."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:249
-msgid "This customer has no credit note yet: the account of the company is used, without link to the invoice."
-msgstr "Ce client n'a pas encore de note de crédit : le compte de la société est utilisé, sans lien avec la facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:231
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:288
 #, python-brace-format, python-format
 msgid "This customer pays {0} % of its invoices: {1} of its last {2} paid invoices were paid at that share, and {3} of them ended with the rest as a credit note."
 msgstr "Ce client paie {0} % de ses factures : {1} de ses {2} dernières factures payées l'ont été à cette hauteur, et {3} d'entre elles se sont terminées par une note de crédit pour le reste."
 
-#: mint/apis/payment_gap.py:220
+#: mint/apis/payment_gap.py:238
 #, python-brace-format
 msgid "This difference is above {0}: a person confirms it."
 msgstr "Cette différence dépasse {0} : une personne doit la confirmer."
@@ -4080,12 +4288,12 @@ msgstr "Cette méthode n'est destinée qu'au mode développeur"
 msgid "This party also has balances on other accounts, which are reconciled separately:"
 msgstr "Ce tiers a aussi des soldes sur d'autres comptes, rapprochés séparément :"
 
-#: mint/apis/payment_gap.py:256
+#: mint/apis/payment_gap.py:287
 #, python-brace-format
 msgid "This payment is not to be passed by itself: {0}"
 msgstr "Ce paiement ne doit pas être comptabilisé automatiquement : {0}"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:214
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:271
 #, python-brace-format
 msgid "This rebate is above {0}: the import does not pass it by itself, you confirm it."
 msgstr "Ce rabais dépasse {0} : l'import ne le passe pas automatiquement, vous le confirmez."
@@ -4121,7 +4329,7 @@ msgstr "Cochez au moins une facture et un paiement, un avoir ou une écriture."
 msgid "Ticked to use"
 msgstr "À utiliser (cochés)"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:445
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:457
 msgid "Timeout — check Document Scan"
 msgstr "Délai dépassé — vérifiez le Document Scan"
 
@@ -4139,12 +4347,12 @@ msgstr "À appliquer"
 msgid "To bring a new statement in, use the button on the right: a CAMT file (XML) from your bank, or a PDF."
 msgstr "Pour importer un nouveau relevé, utilisez le bouton à droite : un fichier CAMT (XML) fourni par votre banque, ou un PDF."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:198
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:255
 msgid "To confirm"
 msgstr "À confirmer"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:290
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:198
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:280
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:255
 #: frontend/src/components/features/StatementImports/utils.ts:19
 #: frontend/src/components/features/StatementImports/utils.ts:77
 msgid "To decide"
@@ -4185,7 +4393,7 @@ msgstr "Total crédit"
 msgid "Total Debit"
 msgstr "Total débit"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:261
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:426
 msgid "Total of the credit note"
 msgstr "Total de la note de crédit"
 
@@ -4193,8 +4401,8 @@ msgstr "Total de la note de crédit"
 msgid "Transaction Date"
 msgstr "Date de transaction"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:166
-#: frontend/src/pages/BankStatementImporter.tsx:244
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:179
+#: frontend/src/pages/BankStatementImporter.tsx:247
 msgid "Transaction Dates"
 msgstr "Dates de transaction"
 
@@ -4229,11 +4437,11 @@ msgstr "Type de transaction contenant Dépôt/Retrait"
 msgid "Transaction Unreconciled"
 msgstr "Transaction non rapprochée"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:33
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:32
 msgid "Transaction type column has \"CR\"/\"DR\" values"
 msgstr "La colonne Type de transaction contient des valeurs « CR »/« DR »"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:34
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:33
 msgid "Transaction type column has \"Deposit\"/\"Withdrawal\" values"
 msgstr "La colonne Type de transaction contient des valeurs « Deposit »/« Withdrawal »"
 
@@ -4243,7 +4451,7 @@ msgstr "La colonne Type de transaction contient des valeurs « Deposit »/« Wit
 msgid "Transactions"
 msgstr "Transactions"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:277
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:291
 msgid "Transactions to be imported into the system"
 msgstr "Transactions à importer dans le système"
 
@@ -4256,8 +4464,8 @@ msgstr "Transactions à importer dans le système"
 #. Transaction Rule'
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:125
 #: frontend/src/components/features/ActionLog/ActionLog.tsx:352
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:582
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:671
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:570
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:659
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:269
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:41
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:145
@@ -4303,14 +4511,14 @@ msgstr "Transféré depuis"
 msgid "Transferred to"
 msgstr "Transféré vers"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:320
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:309
 msgid "Try adjusting your search or filter criteria."
 msgstr "Essayez d'ajuster vos critères de recherche ou de filtre."
 
 #. Label of a Select field in DocType 'Mint Bank Statement Import Transactions'
 #: frontend/src/components/common/PartyTypeDropdown.tsx:67
 #: frontend/src/components/common/PartyTypeDropdown.tsx:70
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:177
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:167
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1110
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:45
 msgid "Type"
@@ -4320,7 +4528,7 @@ msgstr "Type"
 msgid "Type of check"
 msgstr "Type de chèque"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:227
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:225
 msgid "Typed by hand."
 msgstr "Saisi à la main."
 
@@ -4328,20 +4536,20 @@ msgstr "Saisi à la main."
 msgid "US"
 msgstr "US"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:176
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:435
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:166
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:423
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:927
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionDetails.tsx:66
 msgid "Unallocated"
 msgstr "Non alloué"
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:481
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:222
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:212
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:97
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:432
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:232
 #: frontend/src/components/features/BankReconciliation/utils.ts:285
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:115
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:136
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:91
 msgid "Undo"
 msgstr "Annuler"
@@ -4360,13 +4568,13 @@ msgstr "Annuler {} ?"
 msgid "Unique Reference"
 msgstr "Référence unique"
 
-#: mint/apis/statement_follow_up.py:302 mint/apis/statement_follow_up.py:592
+#: mint/apis/statement_follow_up.py:302 mint/apis/statement_follow_up.py:641
 #, python-brace-format
 msgid "Unknown decision {0}."
 msgstr "Décision inconnue : {0}."
 
-#: mint/apis/gap_rule.py:84 mint/apis/gap_rule.py:225
-#: mint/apis/statement_follow_up.py:677
+#: mint/apis/gap_rule.py:84 mint/apis/gap_rule.py:227
+#: mint/apis/statement_follow_up.py:745
 msgid "Unknown level or handling of the rule."
 msgstr "Niveau ou traitement de la règle inconnu."
 
@@ -4383,7 +4591,7 @@ msgstr "Non apparié"
 msgid "Unpaid invoices from {0} for {1}."
 msgstr "Factures impayées de {0} pour {1}."
 
-#: mint/apis/statement_import.py:194
+#: mint/apis/statement_import.py:189
 msgid "Unreadable File"
 msgstr "Fichier illisible"
 
@@ -4391,11 +4599,11 @@ msgstr "Fichier illisible"
 msgid "Unreconcile"
 msgstr "Annuler le rapprochement"
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:354
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:344
 msgid "Unreconciled"
 msgstr "Non rapproché"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:79
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:75
 msgid "Unreconciled Transactions"
 msgstr "Transactions non rapprochées"
 
@@ -4403,7 +4611,7 @@ msgstr "Transactions non rapprochées"
 msgid "Untick"
 msgstr "Décocher"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:268
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:441
 msgid "Until it does, each difference is decided one by one: choose an account for this line below."
 msgstr "Tant que ce n'est pas le cas, chaque différence se décide une à une : choisissez un compte pour cette ligne ci-dessous."
 
@@ -4431,19 +4639,19 @@ msgstr "Mise à jour..."
 msgid "Updating…"
 msgstr "Mise à jour…"
 
-#: frontend/src/pages/BankStatementImporter.tsx:145
+#: frontend/src/pages/BankStatementImporter.tsx:144
 msgid "Upload"
 msgstr "Importer"
 
-#: frontend/src/pages/BankStatementImporter.tsx:118
+#: frontend/src/pages/BankStatementImporter.tsx:117
 msgid "Upload your bank statement file to start the import process. We support CSV, and XLSX files."
 msgstr "Importez votre fichier de relevé bancaire pour commencer le processus d'import. Formats pris en charge : CSV et XLSX."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:329
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:337
 msgid "Uploading"
 msgstr ""
 
-#: frontend/src/pages/BankStatementImporter.tsx:145
+#: frontend/src/pages/BankStatementImporter.tsx:144
 msgid "Uploading..."
 msgstr "Importation en cours..."
 
@@ -4463,7 +4671,7 @@ msgstr "Part habituelle de la facture"
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:1139
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:1428
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:260
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:423
 msgid "VAT"
 msgstr "TVA"
 
@@ -4472,7 +4680,7 @@ msgstr "TVA"
 msgid "Validate and reconcile"
 msgstr "Valider et rapprocher"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:149
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:178
 msgid "Validate the draft and reconcile"
 msgstr "Valider le brouillon et rapprocher"
 
@@ -4493,15 +4701,15 @@ msgstr "Valeur"
 msgid "Variable"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:212
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:202
 msgid "View"
 msgstr "Voir"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:72
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:73
 msgid "View Document Scan"
 msgstr "Voir le Document Scan"
 
-#: frontend/src/pages/BankStatementImporter.tsx:163
+#: frontend/src/pages/BankStatementImporter.tsx:162
 msgid "View Instructions"
 msgstr "Voir les instructions"
 
@@ -4509,11 +4717,11 @@ msgstr "Voir les instructions"
 msgid "View all reconciliation actions taken in this session."
 msgstr "Voir toutes les actions de rapprochement effectuées dans cette session."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1129
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1112
 msgid "View older transaction"
 msgstr "Voir la transaction plus ancienne"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1129
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:1112
 msgid "View older transactions"
 msgstr "Voir les transactions plus anciennes"
 
@@ -4535,23 +4743,23 @@ msgstr "En attente ({0})"
 msgid "Warning: The journal entry is not balanced. Debit and credit totals must be equal."
 msgstr "Attention : l'écriture de journal n'est pas équilibrée. Les totaux débit et crédit doivent être égaux."
 
-#: frontend/src/pages/BankStatementImporter.tsx:168
+#: frontend/src/pages/BankStatementImporter.tsx:167
 msgid "We support uploading CSV, XLSX and XLS files. Please make sure the file contains the correct columns."
 msgstr "Formats pris en charge : CSV, XLSX et XLS. Assurez-vous que le fichier contient les bonnes colonnes."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:121
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:120
 msgid "We've auto-detected the details of the statement file."
 msgstr "Nous avons détecté automatiquement les détails du fichier de relevé."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:214
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:228
 msgid "We've found 1 existing transaction in the system that conflicts with the transactions in the statement file. Are you sure you want to proceed with the import?"
 msgstr "Nous avons trouvé 1 transaction existante dans le système qui entre en conflit avec les transactions du fichier de relevé. Êtes-vous sûr de vouloir continuer l'import ?"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:270
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:284
 msgid "We've found 1 transaction in the statement file that will be imported into the system. Please review the details below and click the 'Import' button to proceed."
 msgstr "Nous avons trouvé 1 transaction dans le fichier de relevé qui sera importée dans le système. Veuillez vérifier les détails ci-dessous et cliquer sur le bouton 'Importer' pour continuer."
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:216
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:230
 #, python-brace-format
 msgid "We've found {0} existing transactions in the system that conflict with the transactions in the statement file. Are you sure you want to proceed with the import?"
 msgstr "Nous avons trouvé {0} transactions existantes dans le système qui sont en conflit avec celles du fichier de relevé. Voulez-vous vraiment poursuivre l’import ?"
@@ -4571,10 +4779,15 @@ msgstr "Sort de la ligne"
 msgid "What becomes of the balance when this customer pays less than the invoice, beyond a small gap."
 msgstr "Ce qu'il advient du solde lorsque ce client paie moins que la facture, au-delà d'une petite différence."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:239
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:296
 #, python-brace-format
 msgid "What becomes of the remaining {0}?"
 msgstr "Que devient le solde restant de {0} ?"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:326
+#, python-brace-format
+msgid "What becomes of the surplus of {0}?"
+msgstr "Que devient le surplus de {0} ?"
 
 #: frontend/src/components/features/StatementImports/InfoHint.tsx:46
 msgid "What does this do?"
@@ -4585,6 +4798,10 @@ msgstr "Que fait cela ?"
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:201
 msgid "What the payment is to the invoice it was recognised on, when it does not settle it to the cent."
 msgstr "Ce que représente le paiement pour la facture sur laquelle il a été rapproché, lorsqu'il ne la solde pas au centime près."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:405
+msgid "What will be booked"
+msgstr "Ce qui sera comptabilisé"
 
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:633
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:638
@@ -4601,12 +4818,12 @@ msgstr "Avec TVA"
 #. Transactions'
 #. Option for the 'Transaction Type' (Select) field in DocType 'Mint Bank
 #. Transaction Rule'
-#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:174
+#: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:164
 #: frontend/src/components/features/BankReconciliation/Rules/RuleConfigureButton.tsx:338
 #: frontend/src/components/features/BankReconciliation/Rules/RuleForm.tsx:143
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:227
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:284
-#: frontend/src/pages/BankStatementImporter.tsx:192
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:241
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:298
+#: frontend/src/pages/BankStatementImporter.tsx:191
 #: mint/mint/doctype/mint_bank_statement_import_template_columns/mint_bank_statement_import_template_columns.json:33
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:46
 #: mint/mint/doctype/mint_bank_transaction_rule/mint_bank_transaction_rule.json:43
@@ -4617,11 +4834,11 @@ msgstr "Retrait"
 msgid "Work on the whole page"
 msgstr "Travaillez en pleine page"
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:254
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:313
 msgid "Write off the balance as a loss or a discount"
 msgstr "Passer le solde en perte ou en escompte"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:552
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:579
 msgid "Wrong file type"
 msgstr "Type de fichier incorrect"
 
@@ -4636,16 +4853,16 @@ msgstr ""
 msgid "XML Details"
 msgstr "Détails XML"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:427
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:454
 msgid "XML Import Complete"
 msgstr "Import XML terminé"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:206
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:214
 msgid "XML file"
 msgstr "Fichier XML"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:252
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:390
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:260
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:402
 msgid "XML file — automatic processing"
 msgstr "Fichier XML — traitement automatique"
 
@@ -4661,11 +4878,11 @@ msgstr "Vous pouvez réinitialiser les dates de compensation de ces écritures i
 msgid "You can set up the rule to split the transaction across multiple accounts."
 msgstr "Vous pouvez configurer la règle pour répartir la transaction sur plusieurs comptes."
 
-#: mint/apis/statement_import.py:115
+#: mint/apis/statement_import.py:110
 msgid "You do not have permission to import and submit bank transactions"
 msgstr "Vous n'êtes pas autorisé à importer et à valider les transactions bancaires"
 
-#: mint/apis/statement_import.py:105 mint/apis/statement_import.py:110
+#: mint/apis/statement_import.py:100 mint/apis/statement_import.py:105
 msgid "You do not have permission to import bank transactions"
 msgstr "Vous n'êtes pas autorisé à importer les transactions bancaires"
 
@@ -4673,7 +4890,7 @@ msgstr "Vous n'êtes pas autorisé à importer les transactions bancaires"
 msgid "You have not performed any reconciliations in this session yet."
 msgstr "Vous n'avez pas encore effectué de rapprochement dans cette session."
 
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:366
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:537
 msgid "Your name and the date are noted on the line of the import."
 msgstr "Votre nom et la date sont notés sur la ligne de l'import."
 
@@ -4759,13 +4976,13 @@ msgstr "écart"
 msgid "left_open"
 msgstr "laissé ouvert"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:871
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:888
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:859
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:876
 msgid "or"
 msgstr "ou"
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:606
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:191
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:199
 msgid "or click to browse"
 msgstr "ou cliquez pour parcourir"
 
@@ -4795,7 +5012,7 @@ msgstr "paiement partiel"
 msgid "passed_gap"
 msgstr "différence passée"
 
-#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:183
+#: frontend/src/components/features/BankReconciliation/BankBalance.tsx:181
 msgid "reconciled"
 msgstr "Rapproché"
 
@@ -4816,11 +5033,19 @@ msgstr "Proposer"
 msgid "suggest: the card proposes it. draft: the credit note is prepared as a draft. automatic: it is made by itself, only after repeated confirmations."
 msgstr "« suggest » : la carte le propose. « draft » : l'avoir est préparé en brouillon. « automatic » : il est fait seul, uniquement après des confirmations répétées."
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:524
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:157
+msgid "the customer"
+msgstr "le client"
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:157
+msgid "the supplier"
+msgstr "le fournisseur"
+
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:512
 msgid "transaction selected"
 msgstr "transaction sélectionnée"
 
-#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:524
+#: frontend/src/components/features/BankReconciliation/MatchAndReconcile.tsx:512
 msgid "transactions selected"
 msgstr "transactions sélectionnées"
 
@@ -4830,11 +5055,16 @@ msgstr "transactions sélectionnées"
 msgid "us"
 msgstr "us"
 
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:214
+#, python-brace-format
+msgid "{0} (e.g. {1})"
+msgstr "{0} (p. ex. {1})"
+
 #: mint/apis/gap_rule.py:145 mint/apis/line_invoices.py:267
-#: mint/apis/statement_follow_up.py:643
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:315
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:359
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:473
+#: mint/apis/statement_follow_up.py:707
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:342
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:386
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:500
 #, python-brace-format
 msgid "{0} - Payment for {1}"
 msgstr "{0} - Paiement pour {1}"
@@ -4844,35 +5074,40 @@ msgstr "{0} - Paiement pour {1}"
 msgid "{0} / {1} dealt with"
 msgstr "{0} / {1} traitées"
 
-#: mint/apis/statement_follow_up.py:743
+#: mint/apis/statement_follow_up.py:811
 #, python-brace-format
 msgid "{0} already in the bank"
 msgstr "{0} déjà dans la banque"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:401
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:357
+#, python-brace-format
+msgid "{0} are taken off the turnover, on the sales account of the invoice and with its VAT: one entry, and the invoice is settled. For an arrangement with the customer, a commercial gesture or a rebate."
+msgstr "{0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, et la facture est soldée. Pour un arrangement avec le client, un geste commercial ou un rabais."
+
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:428
 #, python-brace-format
 msgid "{0} auto-matched"
 msgstr "{0} rapprochées automatiquement"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:396
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:423
 #, python-brace-format
 msgid "{0} created"
 msgstr "{0} créées"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:399
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:426
 #, python-brace-format
 msgid "{0} duplicates skipped"
 msgstr "{0} doublons ignorés"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:414
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:441
 #, python-brace-format
 msgid "{0} errors"
 msgstr "{0} erreurs"
 
-#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:26
+#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:44
 #, python-brace-format
-msgid "{0} existing vouchers could match this line."
-msgstr "{0} pièces existantes pourraient correspondre à cette ligne."
+msgid "{0} existing vouchers have the amount or the reference of this line."
+msgstr "{0} pièces existantes ont le montant ou la référence de cette ligne."
 
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:212
 #, python-brace-format
@@ -4894,7 +5129,7 @@ msgstr "{0} n'est pas une pièce affichée sur cet écran."
 msgid "{0} is not a voucher this tool can clear"
 msgstr "{0} n'est pas une pièce que cet outil peut compenser"
 
-#: mint/apis/payment_gap.py:119
+#: mint/apis/payment_gap.py:137
 #, python-brace-format
 msgid "{0} is not an invoice a payment can settle."
 msgstr "{0} n'est pas une facture qu'un paiement peut solder."
@@ -4909,17 +5144,17 @@ msgstr "{0} n'est pas une facture ouverte de {1}."
 msgid "{0} is not in the currency of the payment."
 msgstr "{0} n'est pas dans la devise du paiement."
 
-#: mint/apis/statement_follow_up.py:715
+#: mint/apis/statement_follow_up.py:783
 #, python-brace-format
 msgid "{0} lines read in the file."
 msgstr "{0} lignes lues dans le fichier."
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:498
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:510
 #, python-brace-format
 msgid "{0} new, {1} already imported"
 msgstr "{0} nouvelles, {1} déjà importées"
 
-#: mint/apis/statement_follow_up.py:748
+#: mint/apis/statement_follow_up.py:816
 #, python-brace-format
 msgid "{0} not handled"
 msgstr "{0} non traitée(s)"
@@ -4929,12 +5164,17 @@ msgstr "{0} non traitée(s)"
 msgid "{0} open invoice(s)"
 msgstr "{0} facture(s) ouverte(s)"
 
-#: mint/apis/statement_follow_up.py:722
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:174
+#, python-brace-format
+msgid "{0} paid too much on invoice {1}"
+msgstr "{0} payés en trop sur la facture {1}"
+
+#: mint/apis/statement_follow_up.py:790
 #, python-brace-format
 msgid "{0} passed by themselves"
 msgstr "{0} passées seules"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:405
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:432
 #, python-brace-format
 msgid "{0} passed with a gap (total {1})"
 msgstr "{0} comptabilisées avec une différence (total {1})"
@@ -4944,23 +5184,23 @@ msgstr "{0} comptabilisées avec une différence (total {1})"
 msgid "{0} to apply"
 msgstr "{0} à appliquer"
 
-#: mint/apis/statement_follow_up.py:727
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:410
+#: mint/apis/statement_follow_up.py:795
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:437
 #, python-brace-format
 msgid "{0} to decide"
 msgstr "{0} à décider"
 
-#: mint/apis/statement_follow_up.py:735
+#: mint/apis/statement_follow_up.py:803
 #, python-brace-format
 msgid "{0} to match"
 msgstr "{0} à rapprocher"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:412
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:439
 #, python-brace-format
 msgid "{0} to review in Mint"
 msgstr "{0} à traiter dans le rapprochement bancaire"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:167
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:180
 #, python-brace-format
 msgctxt "Do MMMM YYYY"
 msgid "{0} to {1}"
@@ -4971,18 +5211,18 @@ msgstr "Du {0} au {1}"
 msgid "{0} transactions extracted"
 msgstr "{0} transactions extraites"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:452
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:495
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:464
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:507
 #, python-brace-format
 msgid "{0} transactions found"
 msgstr "{0} transactions trouvées"
 
-#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:395
+#: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.py:422
 #, python-brace-format
 msgid "{0} transactions processed"
 msgstr "{0} transactions traitées"
 
-#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:272
+#: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:286
 #, python-brace-format
 msgid "{0} transactions will be imported into the system. Please review the details below and click the 'Import' button to proceed."
 msgstr "{0} transactions seront importées dans le système. Vérifiez les détails ci-dessous, puis cliquez sur le bouton « Importer » pour continuer."
@@ -4992,7 +5232,7 @@ msgstr "{0} transactions seront importées dans le système. Vérifiez les déta
 msgid "{0} was not prepared for this bank line."
 msgstr "{0} n'a pas été préparé pour cette ligne bancaire."
 
-#: mint/apis/bank_reconciliation.py:792
+#: mint/apis/bank_reconciliation.py:787
 #, python-brace-format
 msgid "{0} {1} does not exist"
 msgstr "{0} {1} n'existe pas"
@@ -5033,6 +5273,16 @@ msgstr "{} Ouvert(s)"
 msgid "{} invoices"
 msgstr "{} factures"
 
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:53
+#, python-brace-format
+msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed: that is never passed by itself."
+msgstr "La facture {0} de {1} se règle à {2}. Vous avez payé {3}, soit {4} de plus que le dû : un trop-perçu ne se passe jamais tout seul."
+
+#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:240
+#, python-brace-format
+msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, for example a deposit or a payment in several parts."
+msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour {0} : choisissez cette option si le client doit encore payer le reste, par exemple un acompte ou un paiement en plusieurs fois."
 
 #: frontend/src/components/features/BankReconciliation/BankEntryModal.tsx:535
 msgid "Add a row to with the difference amount"
@@ -5197,269 +5447,3 @@ msgstr "Ouvre les réglages de la société dans un nouvel onglet : cet écran r
 #, python-brace-format
 msgid "Settles the invoice: the payment is booked for what came in and the gap of {0} goes to the account chosen above."
 msgstr "Solde la facture : le paiement est enregistré pour le montant reçu, et l'écart de {0} est porté sur le compte choisi ci-dessus."
-
-#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:43
-msgid "One existing voucher has the amount or the reference of this line."
-msgstr "Une pièce existante a le montant ou la référence de cette ligne."
-
-#: frontend/src/components/features/StatementImports/MatchingVouchersHint.tsx:44
-#, python-brace-format
-msgid "{0} existing vouchers have the amount or the reference of this line."
-msgstr "{0} pièces existantes ont le montant ou la référence de cette ligne."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:154
-#, python-brace-format
-msgid "An overpayment of {0} on invoice {1}"
-msgstr "Un trop-perçu de {0} sur la facture {1}"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:288
-msgid "Book it as a difference"
-msgstr "Le comptabiliser comme différence"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
-#, python-brace-format
-msgid "Books the whole payment: the invoice is settled and {0} stays available for the customer, to match with a next invoice."
-msgstr "Le paiement est enregistré en entier : la facture est soldée et {0} reste à disposition du client, à rapprocher d'une prochaine facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:181
-#, python-brace-format
-msgid "Books the whole payment: the invoice is settled and {0} stays open with the supplier, to match with a next invoice."
-msgstr "Le paiement est enregistré en entier : la facture est soldée et {0} reste ouvert chez le fournisseur, à rapprocher d'une prochaine facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:115
-msgid "Invoice settled and bank line reconciled, the surplus stays available"
-msgstr "Facture soldée et ligne bancaire rapprochée, le surplus reste à disposition"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:56
-#, python-brace-format
-msgid "Invoice {0} of {1} settles at {2}. You paid {3}, that is {4} more than is owed."
-msgstr "La facture {0} de {1} se solde à {2}. Vous avez payé {3}, soit {4} de plus que le montant dû."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:279
-msgid "Keep it for a next invoice"
-msgstr "Le garder pour une prochaine facture"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:162
-msgid "Settle the invoice and keep the surplus"
-msgstr "Solder la facture et garder le surplus"
-
-#: mint/apis/payment_gap.py:340
-msgid "The invoice is not in the currency of the company: use Reconcile manually."
-msgstr "La facture n'est pas dans la devise de la société : utilisez « Rapprocher manuellement »."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:289
-#, python-brace-format
-msgid "The invoice is settled and {0} is booked on the account you choose below, like the fee of a dunning. Nothing stays available for later."
-msgstr "La facture est soldée et {0} est comptabilisé sur le compte que vous choisissez ci-dessous, comme les frais d'un rappel. Rien ne reste à disposition pour plus tard."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:281
-#, python-brace-format
-msgid "The payment is booked in full. The invoice is settled and {0} stays available for the customer on this payment: you match it to another invoice later, in a reconciliation."
-msgstr "Le paiement est enregistré en entier. La facture est soldée et {0} reste à disposition du client sur ce paiement : vous le rapprocherez plus tard d'une autre facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:282
-#, python-brace-format
-msgid "The payment is booked in full. The invoice is settled and {0} stays open with the supplier on this payment: you match it to another invoice later, in a reconciliation."
-msgstr "Le paiement est enregistré en entier. La facture est soldée et {0} reste ouvert chez le fournisseur sur ce paiement : vous le rapprocherez plus tard d'une autre facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:296
-#, python-brace-format
-msgid "The payment is booked in full: {0} settle the invoice and {1} stay available for {2}, to match with a next invoice."
-msgstr "Le paiement est enregistré en entier : {0} solde la facture et {1} reste à disposition de {2}, à rapprocher d'une prochaine facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:297
-#, python-brace-format
-msgid "The payment is booked in full: {0} settle the invoice and {1} stay open with {2}, to match with a next invoice."
-msgstr "Le paiement est enregistré en entier : {0} solde la facture et {1} reste ouvert chez {2}, à rapprocher d'une prochaine facture."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:137
-msgid "the supplier"
-msgstr "le fournisseur"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:276
-#, python-brace-format
-msgid "What becomes of the surplus of {0}?"
-msgstr "Que devient le surplus de {0} ?"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:154
-#, python-brace-format
-msgid "{0} paid too much on invoice {1}"
-msgstr "{0} payés en trop sur la facture {1}"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:334
-#, python-brace-format
-msgid "A credit note of {0} is made, linked to invoice {1}, on its sales accounts and with its VAT. It settles the invoice."
-msgstr "Une note de crédit de {0} est établie, liée à la facture {1}, sur ses comptes de vente et avec sa TVA. Elle solde la facture."
-
-#: mint/apis/payment_gap.py:372
-#, python-brace-format
-msgid "Balance of {0} taken off the sales"
-msgstr "Solde de {0} déduit du chiffre d'affaires"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:123
-msgid "Balance taken off the turnover, invoice settled and bank line reconciled"
-msgstr "Solde déduit du chiffre d'affaires, facture soldée et ligne bancaire rapprochée"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:291
-msgid "Book it as a loss on the customer"
-msgstr "Le passer en perte sur client"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:338
-msgid "Goods are coming back and must go into stock?"
-msgstr "De la marchandise revient et doit rentrer en stock ?"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:369
-#, python-brace-format
-msgid "Invoice {0}: amount due"
-msgstr "Facture {0} : montant dû"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:285
-msgid "Make a credit note"
-msgstr "Faire une note de crédit"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:339
-msgid "Make the credit note yourself first, then choose Leave the balance to pay: you match it afterwards."
-msgstr "Faites d'abord vous-même la note de crédit, puis choisissez « Laisser le solde à payer » : vous la rapprocherez ensuite."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:180
-#, python-brace-format
-msgid "Makes a credit note of {0}, linked to the invoice, and settles the invoice. The payment received is booked as it is."
-msgstr "Établit une note de crédit de {0}, liée à la facture, et solde la facture. Le paiement reçu est comptabilisé tel quel."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:286
-#, python-brace-format
-msgid "Makes a credit note of {0}, linked to the invoice, on its sales accounts and with its VAT, and settles the invoice. No stock moves: when goods come back, make the credit note yourself first and choose Leave the balance to pay."
-msgstr "Établit une note de crédit de {0}, liée à la facture, sur ses comptes de vente et avec sa TVA, et solde la facture. Aucun mouvement de stock : si la marchandise revient, faites d'abord vous-même la note de crédit, puis choisissez « Laisser le solde à payer »."
-
-#: mint/apis/payment_gap.py:354
-msgid "Only the balance of a sale is taken off the turnover."
-msgstr "Seul le solde d'une vente est déduit du chiffre d'affaires."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:276
-#, python-brace-format
-msgid "Only the payment received is booked. The invoice stays open for {0}: choose this when the customer still has to pay the rest, or when a credit note will be made afterwards (goods brought back into stock, for example) and matched later."
-msgstr "Seul le paiement reçu est comptabilisé. La facture reste ouverte pour {0} : choisissez cette option lorsque le client doit encore régler le reste, ou lorsqu'une note de crédit sera établie plus tard (marchandise reprise en stock, par exemple) et rapprochée ensuite."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
-msgid "Settle the invoice and book the loss"
-msgstr "Solder la facture et comptabiliser la perte"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:182
-#, python-brace-format
-msgid "Settles the invoice: the payment is booked for what came in and {0} is taken off the turnover, on the sales account of the invoice with its VAT."
-msgstr "Solde la facture : le paiement est comptabilisé pour le montant reçu, et {0} est déduit du chiffre d'affaires, sur le compte de vente de la facture, avec sa TVA."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:279
-msgid "Take it off the turnover"
-msgstr "Le déduire du chiffre d'affaires"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:168
-msgid "Take it off the turnover and reconcile"
-msgstr "Déduire du chiffre d'affaires et rapprocher"
-
-#: mint/apis/payment_gap.py:271
-msgid "The balance of a sale is taken off the turnover only for a short payment."
-msgstr "Le solde d'une vente n'est déduit du chiffre d'affaires que pour un paiement incomplet."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:344
-msgid "The credit note"
-msgstr "La note de crédit"
-
-#: mint/apis/gap_credit_note.py:204
-msgid "The credit note of the balance is drawn from an invoice that is submitted and not a return."
-msgstr "La note de crédit du solde est établie à partir d'une facture validée, et non d'un retour."
-
-#: mint/apis/payment_gap.py:358
-msgid "The invoice has no sales account to take the balance off."
-msgstr "La facture n'a pas de compte de vente où déduire le solde."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:293
-#, python-brace-format
-msgid "The invoice is settled and {0} is booked as a loss on the account you choose below (the one the company set, by default). Choose this when the customer will not pay the rest."
-msgstr "La facture est soldée et {0} est comptabilisé en perte sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option lorsque le client ne réglera pas le reste."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:280
-#, python-brace-format
-msgid "The invoice is settled and {0} is taken off the turnover, on the sales account of the invoice and with its VAT: one entry, no document for the customer. Choose this for an arrangement with the customer, a commercial gesture or a rebate."
-msgstr "La facture est soldée et {0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, pas de document pour le client. Choisissez cette option pour un arrangement avec le client, un geste commercial ou un rabais."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:333
-#, python-brace-format
-msgid "{0} are taken off the turnover, on the sales account of the invoice and with its VAT: one entry, and the invoice is settled. For an arrangement with the customer, a commercial gesture or a rebate."
-msgstr "{0} est déduit du chiffre d'affaires, sur le compte de vente de la facture et avec sa TVA : une seule écriture, et la facture est soldée. Pour un arrangement avec le client, un geste commercial ou un rabais."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:303
-msgid "Book it as a rebate"
-msgstr "Le passer en rabais"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:305
-#, python-brace-format
-msgid "The invoice is settled and {0} is booked as a rebate on the account you choose below (the one the company set, by default). Choose this to accept the rebate as it is."
-msgstr "La facture est soldée et {0} est comptabilisé comme rabais sur le compte que vous choisissez ci-dessous (celui défini par la société, par défaut). Choisissez cette option pour accepter le rabais tel quel."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:358
-#, python-brace-format
-msgid "A credit note of {0} is made on the article below, with the VAT of the invoice. It settles the invoice."
-msgstr "Une note de crédit de {0} est établie sur l'article ci-dessous, avec la TVA de la facture. Elle solde la facture."
-
-#: mint/apis/gap_credit_note.py:178
-#, python-brace-format
-msgid "Article {0} cannot be sold."
-msgstr "L'article {0} ne peut pas être vendu."
-
-#: mint/apis/gap_credit_note.py:176
-#, python-brace-format
-msgid "Article {0} does not exist."
-msgstr "L'article {0} n'existe pas."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:423
-msgid "Charges"
-msgstr "Frais"
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:369
-msgid "Choose an article"
-msgstr "Choisissez un article"
-
-#: mint/apis/gap_credit_note.py:259
-msgid "Choose the article of the credit note."
-msgstr "Choisissez l'article de la note de crédit."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:378
-msgid "Choose the article that tells why: a discount, a loss on a customer."
-msgstr "Choisissez l'article qui indique le motif : un rabais, une perte sur client."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:377
-msgid "Filled in: the article most used for the credit notes of the company."
-msgstr "Rempli automatiquement : l'article le plus utilisé pour les notes de crédit de la société."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:375
-msgid "Filled in: the article of the credit notes of this customer."
-msgstr "Rempli automatiquement : l'article des notes de crédit de ce client."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:400
-msgid "Make the credit note yourself from the invoice, then choose Leave the balance to pay: you match it afterwards."
-msgstr "Établissez vous-même la note de crédit à partir de la facture, puis choisissez « Laisser le solde à payer » : vous la rapprocherez ensuite."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:194
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:202
-#, python-brace-format
-msgid "Makes a credit note of {0} on the article chosen above and settles the invoice. The payment received is booked as it is."
-msgstr "Établit une note de crédit de {0} sur l'article choisi ci-dessus et solde la facture. Le paiement reçu est enregistré tel quel."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:308
-#, python-brace-format
-msgid "Makes a credit note of {0} on the article you choose, with the VAT of the invoice, and settles the invoice. It is one line and moves no stock. When goods come back, make the credit note yourself from the invoice, then choose Leave the balance to pay."
-msgstr "Établit une note de crédit de {0} sur l'article que vous choisissez, avec la TVA de la facture, et solde la facture. C'est une seule ligne, sans toucher au stock. Si des marchandises vous sont retournées, établissez vous-même la note de crédit à partir de la facture, puis choisissez « Laisser le solde à payer »."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:392
-msgid "The account the article is sold on."
-msgstr "Le compte sur lequel l'article est vendu."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:391
-#, python-brace-format
-msgid "The account the article is sold on. For a loss on a customer, choose {0}."
-msgstr "Le compte sur lequel l'article est vendu. Pour une perte sur client, choisissez {0}."
-
-#: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:373
-msgid "The article you chose."
-msgstr "L'article que vous avez choisi."
