@@ -234,7 +234,37 @@ def get_framed_boot() -> dict:
     }
 
 
+# //// Neoffice — added function (no upstream equivalent).
+def enforce_desk_user(*, redirect_on_guest: bool = True) -> None:
+    """Mint is a screen of the desk: only an account of the desk opens it or reads its boot.
+
+    /mint and its boot answered anyone: a visitor not signed in got the system defaults, the metadata
+    and the whole dictionary (8.8 MB, about a second of server per request), and a customer of the
+    portal the same boot for their account (neoffice-maintenance#3148). A visitor not signed in goes to
+    the login page and comes back (the page), or is refused (a method); a signed-in account without the
+    desk is refused. Same rule as the other apps of the desk (CRM, Construction's enforce_access).
+    """
+    from urllib.parse import quote
+
+    from frappe import _
+
+    user = frappe.session.user
+    if user == "Guest":
+        if redirect_on_guest:
+            request = getattr(frappe.local, "request", None)
+            target = request.full_path.rstrip("?") if request else "/mint"
+            frappe.local.flags.redirect_location = "/login?redirect-to=" + quote(target)
+            redirect = frappe.Redirect()
+            redirect.http_status_code = 302
+            raise redirect
+        frappe.throw(_("Not permitted"), frappe.PermissionError)
+    if frappe.get_cached_value("User", user, "user_type") != "System User":
+        frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+
 @frappe.whitelist()
 def get_navbar_boot_api() -> dict:
     """HTTP endpoint to refresh navbar boot from the SPA (post settings change)."""
+    # //// Neoffice — the desk's accounts only (enforce_desk_user).
+    enforce_desk_user(redirect_on_guest=False)
     return get_navbar_boot()

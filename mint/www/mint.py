@@ -23,6 +23,8 @@ from frappe import _
 from mint.api.boot import get_navbar_boot
 # //// Neoffice — added import: the boot of a page framed in the desk (see get_context).
 from mint.api.boot import get_framed_boot
+# //// Neoffice — added import: the page and its boot are the desk's accounts' only (#3148).
+from mint.api.boot import enforce_desk_user
 
 no_cache = 1
 
@@ -53,6 +55,8 @@ def _get_asset_url(asset_path: str) -> str:
 
 
 def get_context(context):
+    # //// Neoffice — a visitor not signed in goes to the login page, an account without the desk is refused.
+    enforce_desk_user()
     csrf_token = frappe.sessions.get_csrf_token()
     frappe.db.commit()
 
@@ -87,6 +91,8 @@ def get_context_for_dev():
     # //// was rewritten for the embedded shell (711dfb1). Take upstream's tabbed version.
     if not frappe.conf.developer_mode:
         frappe.throw(_('This method is only meant for developer mode'))
+    # //// Neoffice — on a site in developer mode (osiris) it answered anyone the page's boot (enforce_desk_user).
+    enforce_desk_user(redirect_on_guest=False)
     return json.loads(get_boot())
 
 
