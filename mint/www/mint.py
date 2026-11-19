@@ -21,6 +21,8 @@ from frappe import _
 # //// Neoffice — added (711dfb1). mint/api/boot.py is a file we added: a curated mini-boot for
 # //// the embedded sidebar/navbar. Upstream imports nothing of the sort.
 from mint.api.boot import get_navbar_boot
+# //// Neoffice — added import: the boot of a page framed in the desk (see get_context).
+from mint.api.boot import get_framed_boot
 
 no_cache = 1
 
@@ -55,7 +57,8 @@ def get_context(context):
     frappe.db.commit()
 
     context = frappe._dict()
-    context.boot = get_boot()
+    # //// Neoffice — framed in a tab of the desk (« embed=1 »), the page takes the desk's boot (get_framed_boot).
+    context.boot = get_boot(framed=bool(frappe.utils.cint(frappe.form_dict.get("embed"))))
     context.csrf_token = csrf_token
     context.build_version = frappe.utils.get_build_version()
 
@@ -87,7 +90,8 @@ def get_context_for_dev():
     return json.loads(get_boot())
 
 
-def get_boot():
+# //// Neoffice — `framed` added (see get_context).
+def get_boot(framed: bool = False):
     try:
         # //// Neoffice — replaced frappe.sessions.get() (711dfb1). The full session boot is ~1 MB and
         # //// pulls in desk-only keys the SPA never reads; worse, it varies with the installed apps,
@@ -96,7 +100,8 @@ def get_boot():
         # Curated mini-boot designed for FrappeNavbar/FrappeSidebar rather than
         # the full frappe.sessions.get() payload. Keeps surface small + stable,
         # guarantees defensive keys (is_fc_site, developer_mode) are always set.
-        boot = frappe._dict(get_navbar_boot())
+        # //// Neoffice — framed, the boot is the desk's, taken by the page (get_framed_boot).
+        boot = frappe._dict(get_framed_boot() if framed else get_navbar_boot())
     except Exception as e:
         raise frappe.SessionBootFailed from e
 

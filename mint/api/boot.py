@@ -214,6 +214,26 @@ def get_navbar_boot() -> dict:
     return boot
 
 
+# //// Neoffice — added function (no upstream equivalent).
+def get_framed_boot() -> dict:
+    """The boot of a page framed in a tab of the desk (« /mint?embed=1 »): who it is for, and Mint's own senses.
+
+    The page of a Mint tab built the desk's whole boot again (frappe's get_bootinfo, some 200 queries) and
+    carried the dictionary of every installed app (87,000 entries, 8 MB): built, sent and read at each opening of
+    a tab, about a second before Mint could start (19.11.2026). The desk around the frame already holds both, for
+    the same person: the page takes them from it (mint.html), and asks get_navbar_boot_api only when no desk of
+    that person and language is around it. Framed, Mint draws no menu, so the curated chrome keys are not needed.
+    """
+    messages = {}
+    _keep_bank_senses(messages)
+    return {
+        "take_desk_boot": 1,
+        "user": {"name": frappe.session.user},
+        "lang": frappe.local.lang,
+        "__messages": messages,
+    }
+
+
 @frappe.whitelist()
 def get_navbar_boot_api() -> dict:
     """HTTP endpoint to refresh navbar boot from the SPA (post settings change)."""

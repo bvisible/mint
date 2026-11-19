@@ -219,6 +219,41 @@
     window.csrf_token = '{{ frappe.session.csrf_token }}';
     if (!window.frappe) window.frappe = {};
     frappe.boot = JSON.parse({{ boot }});
+    //// Neoffice — framed in a tab of the desk, the page comes without a boot of its own: rebuilding the desk's and
+    //// carrying the dictionary of every app (8 MB) took about a second at each opening of a Mint tab. The desk
+    //// around the frame holds both for the same person: the page takes a copy of them, Mint's own senses on top.
+    //// No desk of that person and language around it: the page asks the server for its whole boot, once.
+    if (frappe.boot['take_desk_boot']) {
+      var own = frappe.boot;
+      var taken = null;
+      try {
+        var desk = window.parent !== window ? window.parent.frappe : null;
+        var deskBoot = desk && desk.boot;
+        if (deskBoot && deskBoot.user && deskBoot.user.name === own.user.name && deskBoot.lang === own.lang && desk['_messages']) {
+          var copy = {};
+          Object.keys(deskBoot).forEach(function (key) {
+            if (key !== '__messages') copy[key] = deskBoot[key];
+          });
+          taken = JSON.parse(JSON.stringify(copy));
+          taken['__messages'] = Object.assign({}, desk['_messages']);
+        }
+      } catch (e) {
+        taken = null;
+      }
+      if (!taken) {
+        try {
+          var asked = new XMLHttpRequest();
+          asked.open('GET', '/api/method/mint.api.boot.get_navbar_boot_api', false);
+          asked.setRequestHeader('Accept', 'application/json');
+          asked.send();
+          taken = asked.status === 200 ? JSON.parse(asked.responseText).message : null;
+        } catch (e) {
+          taken = null;
+        }
+      }
+      frappe.boot = taken || own;
+      frappe.boot['__messages'] = Object.assign({}, frappe.boot['__messages'] || {}, own['__messages']);
+    }
     frappe._messages = frappe.boot["__messages"];
 
         //// Neoffice — added. See the note below: bracket notation is mandatory here.
