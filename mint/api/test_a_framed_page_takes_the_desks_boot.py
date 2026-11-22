@@ -31,6 +31,12 @@ class TestAFramedPageTakesTheDesksBoot(FrappeTestCase):
         lang = frappe.local.lang
         frappe.local.lang = "fr"
         self.addCleanup(setattr, frappe.local, "lang", lang)
+        # The account speaks French too: a page not framed builds the desk's boot, and frappe's get_bootinfo
+        # sets the language from the account (User.language, then the site's default). The CI's site speaks
+        # English, so the page answered in English there and the test was red from its first night (19.11).
+        spoken = frappe.db.get_value("User", self.user, "language")
+        frappe.db.set_value("User", self.user, "language", "fr")
+        self.addCleanup(frappe.db.set_value, "User", self.user, "language", spoken)
 
     def page(self, **query):
         # The page's controller as the frame calls it, without the session's token or its commit.
