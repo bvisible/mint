@@ -34,3 +34,21 @@ class TestNoBankAccountNoCall(unittest.TestCase):
         for call in calls:
             name = re.match(r"export const (\w+)", call).group(1)
             self.assertRegex(call, r"\}, bankAccount \? `[^`]+` : null", name)
+
+
+PICKER = UTILS.replace("utils.ts", "BankPicker.tsx")
+
+
+class TestTheAccountFollowsTheCompany(unittest.TestCase):
+    """The company changed on the page: the account of the one left stayed on screen, its transactions under the other's
+    name, when the new one had none. The list of the company decides, whether it was asked again or came from the cache."""
+
+    def test_the_account_is_chosen_from_the_list_on_screen_and_dropped_when_it_has_none(self):
+        with open(PICKER, encoding="utf-8") as handle:
+            source = handle.read()
+        picker = source[source.index("const BankPicker = ") : source.index("export default BankPicker")]
+        self.assertIn("useGetBankAccounts()", picker, "an onSuccess is not called for a list in the cache")
+        effect = re.search(r"useEffect\(\(\) => \{(.*?)\}, \[banks, isLoading, setSelectedBank\]\)", picker, re.S)
+        self.assertTrue(effect, "the effect on the list of the company")
+        self.assertIn("banks.some((bank) => bank.name === current.name)", effect.group(1))
+        self.assertIn("?? null", effect.group(1), "no account of this company: none is chosen")

@@ -1,7 +1,8 @@
 import { useAtom, useSetAtom } from "jotai"
 import { SelectedBank, selectedBankAccountAtom } from "./bankRecAtoms"
-//// Neoffice — added: useState drives the open/closed popover of the new size "select" (1e4b754).
-import { useCallback, useState } from "react"
+//// Neoffice — added: useState drives the open/closed popover of the new size "select" (1e4b754); useEffect in place of
+//// upstream's useCallback, for the account that follows the company's list (below).
+import { useEffect, useState } from "react"
 import { useGetBankAccounts, useGetUnreconciledTransactions } from "./utils"
 import { cn } from "@/lib/utils"
 import { Check, ChevronDown, Landmark } from "lucide-react"
@@ -20,19 +21,20 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
 
     const setSelectedBank = useSetAtom(selectedBankAccountAtom)
 
-    const onLoadingSuccess = useCallback((data?: SelectedBank[]) => {
-        if (!data) return
-        if (data.length === 1) {
-            setSelectedBank(data[0])
-        } else if (data.length > 1) {
-            const defaultBank = data.find((bank: SelectedBank) => bank.is_default)
-            if (defaultBank) {
-                setSelectedBank(defaultBank)
-            }
-        }
-    }, [setSelectedBank])
+    const { banks, isLoading, error } = useGetBankAccounts()
 
-    const { banks, isLoading, error } = useGetBankAccounts(onLoadingSuccess)
+    //// Neoffice — the account follows the list of the company on screen. Upstream chooses it in the onSuccess of the list: a
+    //// company without an account chose nothing, so the account of the company left stayed, with its transactions under the
+    //// other company's name, and a list already in SWR's cache has no onSuccess at all. Here the list decides, however it
+    //// came: an account of this company is kept, else the only one, else the default one, else none (maintenance#2973).
+    useEffect(() => {
+        if (isLoading) return
+        setSelectedBank((current) => {
+            if (current && banks.some((bank) => bank.name === current.name)) return current
+            if (banks.length === 1) return banks[0]
+            return banks.find((bank) => bank.is_default) ?? null
+        })
+    }, [banks, isLoading, setSelectedBank])
 
     if (isLoading) {
         return null
