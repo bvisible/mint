@@ -21,6 +21,9 @@ const BankPicker = ({ className, size = 'base' }: { className?: string, size?: '
 
     const setSelectedBank = useSetAtom(selectedBankAccountAtom)
 
+    //// Neoffice — removed upstream's onLoadingSuccess callback, no longer passed to useGetBankAccounts (3fa6cb6 "the
+    //// account follows the company on screen, and is dropped where it has none"): the account is now chosen by the
+    //// list itself in the useEffect below instead of the list's onSuccess (see that effect's marker for why).
     const { banks, isLoading, error } = useGetBankAccounts()
 
     //// Neoffice — the account follows the list of the company on screen. Upstream chooses it in the onSuccess of the list: a
