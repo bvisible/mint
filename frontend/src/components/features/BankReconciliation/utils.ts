@@ -95,7 +95,10 @@ export const useGetUnreconciledTransactions = () => {
         bank_account: bankAccount?.name,
         from_date: dates.fromDate,
         to_date: dates.toDate
-    }, `bank-reconciliation-unreconciled-transactions-${bankAccount?.name}-${dates.fromDate}-${dates.toDate}`, {
+        //// Neoffice — no account, no call. Upstream asks whatever is chosen: `bank_account` undefined is not sent, the server
+        //// requires it and answered a 500, each time the page opened before the account was known and all along on a company
+        //// that has none. The key is null until then, as useGetBankTransactions does below (neoffice-maintenance#2973).
+    }, bankAccount ? `bank-reconciliation-unreconciled-transactions-${bankAccount.name}-${dates.fromDate}-${dates.toDate}` : null, {
         revalidateOnFocus: false,
         revalidateIfStale: false
     })
