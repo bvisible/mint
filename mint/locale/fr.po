@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mint VERSION\n"
 "Report-Msgid-Bugs-To: support@thecommit.company\n"
-"POT-Creation-Date: 2026-11-17 20:44+0000\n"
+"POT-Creation-Date: 2026-11-25 02:46+0000\n"
 "PO-Revision-Date: 2025-10-28 16:42+0000\n"
 "Last-Translator: Claude Code <noreply@anthropic.com>\n"
 "Language: fr\n"
@@ -1196,7 +1196,7 @@ msgstr ""
 #. Import Transactions'
 #: mint/mint/doctype/mint_bank_statement_import_transactions/mint_bank_statement_import_transactions.json:104
 msgid "DBIT"
-msgstr ""
+msgstr "DÉBIT"
 
 #. Label of a Date field in DocType 'Mint Bank Statement Balance'
 #. Option for the 'Maps To' (Select) field in DocType 'Mint Bank Statement
@@ -1522,7 +1522,7 @@ msgstr "Les écritures ci-dessous ont une date de comptabilisation après {0} ma
 #. Label of a Code field in DocType 'Mint Bank Statement Import'
 #. Import Transactions'
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:108
-#: frontend/src/components/features/BankReconciliation/utils.ts:294
+#: frontend/src/components/features/BankReconciliation/utils.ts:297
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:446
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:48
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.json:113
@@ -1712,10 +1712,10 @@ msgstr "D'après le fichier de relevé importé, au {0}."
 msgid "GB"
 msgstr ""
 
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:79
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:171
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:220
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:224
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:84
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:176
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:225
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:229
 #: frontend/src/components/features/BankReconciliation/SelectedTransactionDetails.tsx:72
 #: frontend/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:168
 msgid "GL Account"
@@ -2086,7 +2086,7 @@ msgstr "Mois dernier"
 msgid "Last Quarter"
 msgstr "Dernier trimestre"
 
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:225
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:230
 msgid "Last Synced Transaction"
 msgstr "Dernière transaction synchronisée"
 
@@ -2507,6 +2507,10 @@ msgstr "Pas encore importée"
 #: frontend/src/components/features/BankReconciliation/BankBalance.tsx:226
 msgid "Not known yet: click the figure to enter it."
 msgstr "Pas encore connu : cliquez sur le montant pour le saisir."
+
+#: mint/api/boot.py:260 mint/api/boot.py:262
+msgid "Not permitted"
+msgstr ""
 
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:288
 msgid "Nothing to apply."
@@ -3115,7 +3119,7 @@ msgstr "Rapprocher avec {0}"
 
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:192
 #: frontend/src/components/features/BankReconciliation/BankTransactionList.tsx:343
-#: frontend/src/components/features/BankReconciliation/utils.ts:281
+#: frontend/src/components/features/BankReconciliation/utils.ts:284
 #: frontend/src/components/features/PartyReconciliation/PartyDetail.tsx:300
 #: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:53
 #: frontend/src/components/features/PartyReconciliation/ReconcileDialog.tsx:93
@@ -3505,7 +3509,7 @@ msgstr "Sélectionner un emplacement"
 msgid "Select Processor"
 msgstr "Sélectionner un processeur"
 
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:100
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:105
 #: mint/mint/doctype/mint_bank_statement_import/mint_bank_statement_import.js:239
 msgid "Select a bank account"
 msgstr "Sélectionnez un compte bancaire"
@@ -3538,9 +3542,9 @@ msgid "Select row {0}"
 msgstr "Sélectionner la ligne {0}"
 
 #: frontend/src/components/common/LinkFieldCombobox.tsx:127
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:125
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:156
-#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:180
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:130
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:161
+#: frontend/src/components/features/BankReconciliation/BankPicker.tsx:185
 #, python-brace-format
 msgid "Select {0}"
 msgstr "Sélectionner {0}"
@@ -4285,7 +4289,7 @@ msgstr "C'est ce que le système s'attend à ce que le solde de clôture soit da
 msgid "This is what will be written. Nothing is changed until you confirm."
 msgstr "Voici ce qui sera enregistré. Rien n'est modifié tant que vous ne confirmez pas."
 
-#: mint/www/mint.py:86
+#: mint/www/mint.py:93
 msgid "This method is only meant for developer mode"
 msgstr "Cette méthode n'est destinée qu'au mode développeur"
 
@@ -4482,7 +4486,9 @@ msgstr "Transférer"
 # //// Neoffice — the SPA's own sense: mint/api/boot.py puts this word under
 # the bare key of the SPA's dictionary,
 # //// whatever app loads last.
-#: mint/api/boot.py:107
+#: mint/api/boot.py:107 mint/api/test_a_framed_page_takes_the_desks_boot.py:54
+#: mint/api/test_a_framed_page_takes_the_desks_boot.py:65
+#: mint/api/test_a_framed_page_takes_the_desks_boot.py:72
 msgctxt "Bank transfer"
 msgid "Transfer"
 msgstr "Virement"
@@ -4553,7 +4559,7 @@ msgstr "Non alloué"
 #: frontend/src/components/features/BankReconciliation/DraftJEModal.tsx:97
 #: frontend/src/components/features/BankReconciliation/RecordPaymentModal.tsx:432
 #: frontend/src/components/features/BankReconciliation/TransferModal.tsx:232
-#: frontend/src/components/features/BankReconciliation/utils.ts:285
+#: frontend/src/components/features/BankReconciliation/utils.ts:288
 #: frontend/src/components/features/StatementImports/GapDecisionCard.tsx:136
 #: frontend/src/components/features/StatementImports/LineInvoicesCard.tsx:91
 msgid "Undo"
