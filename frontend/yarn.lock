@@ -522,9 +522,9 @@
     lucide-react "^0.400.0"
     tailwind-merge "^2.0.0"
 
-"@neoffice/nora-learn-react@git+https://github.com/bvisible/nora-learn-react.git#6d17211":
+"@neoffice/nora-learn-react@git+https://github.com/bvisible/nora-learn-react.git#5dfe9d6":
   version "1.2.0"
-  resolved "https://github.com/bvisible/nora-learn-react.git#6d17211b92da3c92dac4af4201cfc1c2797e1b12"
+  resolved "https://github.com/bvisible/nora-learn-react.git#5dfe9d6ca6bb5c5a41b1a65b8546e6962b6c945e"
 
 "@radix-ui/number@1.1.1":
   version "1.1.1"
